@@ -1,0 +1,110 @@
+.no-border{
+    border: 0 !important;
+}
+/* small-box com cores do text em branco */
+.small-box.bg-warning .inner,
+.small-box.bg-warning .small-box-footer{
+    color: #fff !important;
+}
+/* espaçamento a esquerda no sub-item do menu */
+@media (min-width: 992px) {
+    .nav-item .nav-treeview .nav-item .nav-link {
+        padding-left: 30px;
+    }
+}
+.no-margin{
+    margin: 0px !important;
+}
+.no-padding{
+    padding: 0px !important;
+}
+.dataTable thead tr th,
+.dataTable tfoot tr th {
+    padding: 8px;
+    background: #eee;
+}
+.dataTable tbody tr td {
+    padding: 8px;
+}
+.dataTable thead tr th {
+    border-top: 0;
+    border-bottom: 0;
+    height: 15px;
+}
+.dataTable tfoot tr th {
+    border-bottom: 0;
+    height: 15px;
+}
+.dataTables_length select[name*="_length"]{
+    cursor: pointer;
+    width: 70px !important;
+    height: 35px;
+}
+.tooltip{
+    left: 15px !important;
+}
+.sidebar > .nav .nav-item:not(.hover-open) .collapse .sub-menu .nav-item .nav-link.active:before{
+    background-color: #fff;
+}
+.sidebar > .nav .nav-item.active .nav-link:not(.active){
+    background: #0f25d5;
+}
+.sidebar > .nav .nav-item .nav-link{
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    margin-left: 10px;
+}
+.card .card-header{
+    padding: 0.9rem 0.9rem;
+}
+.btn{
+    font-size: 0.95rem;
+}
+table.dataTable thead th:before,
+table.dataTable thead th:after{
+    bottom: 0.6em !important;
+}
+table.table-bordered.dataTable tbody td{
+    padding: 4px 5px;
+}
+table.table-bordered.dataTable tbody th, table.table-bordered.dataTable tbody td{
+    font-size: .8rem;
+}
+table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>td:first-child:before,
+table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>th:first-child:before{
+    line-height: 15px;
+}
+table.dataTable tr td:last-child{
+    padding: 4px 0;
+}
+.card-body::after, .card-footer::after, .card-header::after{
+    display: none;
+}
+.margin-btn{
+    padding: 5px 0;
+}
+.btn-action{
+    width: 50px;
+}
+.btn-action i{
+    margin: 0;
+}
+.table.table-bordered td{
+    border-color: transparent;
+}
+.card .card-body .header-card-body{
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+.card .card-body .header-card-body h4{
+    font-size: 25px;
+    padding-right: 20px;
+    border-right: 1px solid #ddd;
+    font-weight: inherit;
+}
+.card .card-body .header-card-body p{
+    padding-left: 20px;
+}
