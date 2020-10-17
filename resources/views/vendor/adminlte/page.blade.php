@@ -26,6 +26,7 @@
 
             <div class="main-panel">
                 <div class="content-wrapper">
+                    <div class="row block-screen-load"><img src="{{ asset('dist/img/system/load.gif') }}"/></div>
                     @yield('content')
                 </div>
                 <!-- content-wrapper ends -->

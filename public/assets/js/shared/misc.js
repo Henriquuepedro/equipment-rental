@@ -7,6 +7,17 @@ var dangerColor = getComputedStyle(document.body).getPropertyValue('--danger');
 var infoColor = getComputedStyle(document.body).getPropertyValue('--info');
 var darkColor = getComputedStyle(document.body).getPropertyValue('--dark');
 var lightColor = getComputedStyle(document.body).getPropertyValue('--light');
+var Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+});
 (function ($) {
   'use strict';
   $(function () {
@@ -56,6 +67,30 @@ var lightColor = getComputedStyle(document.body).getPropertyValue('--light');
     //checkbox and radios
     $(".form-check label,.form-radio label").append('<i class="input-helper"></i>');
 
+    setTimeout(() => { $('.block-screen-load').hide() }, 500 );
+
+    $(".form-control").click(function() {
+      $(this).parent().addClass("label-animate");
+    });
+
+    $(window).click(function() {
+      if (!$(event.target).is('.form-control')) {
+          $(".form-control").each(function() {
+              if ($(this).val() == '') {
+                  $(this).parent().removeClass("label-animate");
+              }
+          });
+      }
+    });
+    $(document).on('click, focus', ".form-control", function() {
+      $(".form-control").each(function() {
+          if ($(this).val() == '') {
+              $(this).parent().removeClass("label-animate");
+          }
+      });
+      $(this).parent().addClass("label-animate");
+    });
+
   });
-  $('.dropdown-toggle').dropdown()
+  $('.dropdown-toggle').dropdown();
 })(jQuery);

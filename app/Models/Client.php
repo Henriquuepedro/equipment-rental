@@ -15,7 +15,7 @@ class Client extends Model
      * @var array
      */
     protected $fillable = [
-        'type', 'name', 'fantasy', 'email', 'phone_1', 'phone_2', 'cpf', 'cnpj', 'rg', 'ie'
+        'company_id', 'type', 'name', 'fantasy', 'email', 'phone_1', 'phone_2', 'cpf_cnpj', 'rg_ie', 'user_insert', 'user_update'
     ];
 
     /**
@@ -40,5 +40,10 @@ class Client extends Model
     public function getCountClients()
     {
         return $this->count();
+    }
+
+    public function insert($data)
+    {
+        return $this->create($data);
     }
 }

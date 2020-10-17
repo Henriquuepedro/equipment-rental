@@ -84,8 +84,8 @@
 {{--        <meta name="msapplication-TileColor" content="#ffffff">--}}
 {{--        <meta name="msapplication-TileImage" content="{{ asset('favicon/ms-icon-144x144.png') }}">--}}
 {{--    @endif--}}
-    <link rel="stylesheet" href="{{ asset('dist/css/styles.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+    <link rel="stylesheet" href="{{ asset('dist/css/styles.css') }}">
 
 </head>
 
@@ -123,12 +123,18 @@
     <!-- plugins:js -->
     <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
     <script src="{{ asset('assets/vendors/js/vendor.bundle.addons.js') }}"></script>
+    {{-- Libs --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/additional-methods.min.js"></script>
     <!-- inject:js -->
     <script src="{{ asset('assets/js/shared/off-canvas.js') }}"></script>
     <script src="{{ asset('assets/js/shared/hoverable-collapse.js') }}"></script>
     <script src="{{ asset('assets/js/shared/misc.js') }}"></script>
     <script src="{{ asset('assets/js/shared/settings.js') }}"></script>
     <script src="{{ asset('assets/js/shared/todolist.js') }}"></script>
+    <script src="{{ asset('dist/js/demo_.js') }}"></script>
     {{-- Custom Scripts --}}
     @yield('adminlte_js')
 

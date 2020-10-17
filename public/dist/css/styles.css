@@ -12,6 +12,36 @@
         padding-left: 30px;
     }
 }
+
+.display-none{
+    display: none;
+}
+
+/* inputs */
+.form-group>label {
+    top: 35px;
+    left: 15px;
+    position: relative;
+    background-color: white;
+    padding: 0px 5px 0px 5px;
+    font-size: 0.95em;
+    transition: 0.2s;
+    pointer-events:none;
+    color: #777;
+}
+
+.form-group.label-animate>label {
+    top: 18px !important;
+    left: 10px !important;
+    font-size: 0.75em;
+    color: #000;
+}
+.form-group input {
+    font-size: 1em;
+    border-radius: 5px
+}
+
+
 .no-margin{
     margin: 0px !important;
 }
@@ -107,4 +137,47 @@ table.dataTable tr td:last-child{
 }
 .card .card-body .header-card-body p{
     padding-left: 20px;
+}
+.block-screen-load{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #fff;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.block-screen-load img{
+    width: 100px;
+    height: 100px
+}
+label sup{
+    color: #f00
+}
+.form-radio.form-radio-flat label input:checked + .input-helper:after{
+    top: 40%
+}
+.form-radio.form-radio-flat label input:checked + .input-helper:before{
+    background: #3257f8;
+    border-color: #2349f0;
+}
+.error-form label.error{
+    width: 100%;
+    font-weight: unset;
+}
+.error-form label.error:before{
+    font-family: "Font Awesome 5 Free";
+    content: "\f06a";
+    display: inline-block;
+    margin-right: 10px;
+    font-weight: 900;
+}
+.error-form ol li{
+    list-style-type: none;
+}
+.form-control.error{
+    border: 1px solid #7c060b;
 }
