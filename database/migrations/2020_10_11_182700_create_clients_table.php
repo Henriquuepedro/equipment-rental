@@ -15,8 +15,7 @@ class CreateClientsTable extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->integer('company_id')->foreign('company_id')->references('id')->on('companies')->nullable();;
-            $table->string('type', 2);
+            $table->bigInteger('company_id')->unsigned();
             $table->string('name', 256);
             $table->string('fantasy', 256)->nullable();
             $table->string('email', 256)->nullable();
@@ -24,9 +23,14 @@ class CreateClientsTable extends Migration
             $table->string('phone_2', 11)->nullable();
             $table->string('cpf_cnpj', 14)->nullable();
             $table->string('rg_ie', 16)->nullable();
-            $table->integer('user_insert');
-            $table->integer('user_update')->nullable();
+            $table->string('type', 2);
+            $table->bigInteger('user_insert')->unsigned();
+            $table->bigInteger('user_update')->unsigned()->nullable();
             $table->timestamps();
+
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->foreign('user_insert')->references('id')->on('users');
+            $table->foreign('user_update')->references('id')->on('users');
         });
     }
 

@@ -247,7 +247,7 @@ return [
                 [
                     'text' => 'Clientes',
                     'route'  => 'client.index',
-                    'active'  => ['client.index', 'client.create']
+                    'active'  => ['client.index', 'client.create', 'client.edit']
                 ]
             ],
         ]

@@ -36,6 +36,12 @@ Route::group(['middleware' => 'auth'], function (){
         Route::get('/{id}', [App\Http\Controllers\ClientController::class, 'edit'])->name('edit');
         Route::post('/atualizar', [App\Http\Controllers\ClientController::class, 'update'])->name('update');
 
-        Route::post('/delete', [App\Http\Controllers\ClientController::class, 'delete'])->name('delete');
+    });
+    // Clientes
+    Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
+        Route::group(['prefix' => '/clientes', 'as' => 'client.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\ClientController::class, 'fetchClients'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\ClientController::class, 'delete'])->name('delete');
+        });
     });
 });

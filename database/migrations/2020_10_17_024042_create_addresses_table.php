@@ -15,8 +15,8 @@ class CreateAddressesTable extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->integer('company_id')->foreign('company_id')->references('id')->on('companies');
-            $table->integer('client_id')->foreign('client_id')->references('id')->on('clients');
+            $table->bigInteger('company_id')->unsigned();
+            $table->bigInteger('client_id')->unsigned();
             $table->string('name_address', 256)->nullable();
             $table->string('address', 256)->nullable();
             $table->string('number', 256)->nullable();
@@ -26,9 +26,15 @@ class CreateAddressesTable extends Migration
             $table->string('neigh', 256)->nullable();
             $table->string('city', 256)->nullable();
             $table->string('state', 256)->nullable();
-            $table->integer('user_insert')->foreign('user_insert')->references('id')->on('users');
-            $table->integer('user_update')->foreign('user_update')->references('id')->on('users')->nullable();
+            $table->bigInteger('user_insert')->unsigned();
+            $table->bigInteger('user_update')->unsigned()->nullable();
             $table->timestamps();
+
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
+            $table->foreign('user_insert')->references('id')->on('users');
+            $table->foreign('user_update')->references('id')->on('users');
+
         });
     }
 

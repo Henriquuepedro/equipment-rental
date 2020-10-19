@@ -65,7 +65,7 @@
 
     $(() => {
         $('[name="cep"]').mask('00.000-000');
-        $('[name="phone_1"]').mask('(00) 000000000');
+        $('[name="phone_1"],[name="phone_2"]').mask('(00) 000000000');
         $('[name="rg_ie"]').mask('0#');
         if ($('[name="type_person"]:checked').length) {
             $('[name="type_person"]:checked').trigger('change');
@@ -101,6 +101,7 @@
 
         },
         submitHandler: function(form) {
+            $('#formCreateClient [type="submit"]').attr('disabled', true);
             form.submit();
         }
     });
@@ -146,7 +147,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card" style="display:none">
+                        <div class="card display-none">
                             <div class="card-body">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Cliente</h4>
@@ -193,7 +194,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card" style="display:none">
+                        <div class="card display-none">
                             <div class="card-body">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Endereço</h4>
@@ -230,25 +231,25 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-4">
                                         <label>Bairro</label>
                                         <input type="text" class="form-control" name="neigh" autocomplete="nope" value="{{ old('neigh') }}">
                                     </div>
-                                    <div class="form-group col-md-6">
+                                    <div class="form-group col-md-4">
                                         <label>Cidade</label>
                                         <input type="text" class="form-control" name="city" autocomplete="nope" value="{{ old('city') }}">
                                     </div>
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-4">
                                         <label>Estado</label>
                                         <input type="text" class="form-control" name="state" autocomplete="nope" value="{{ old('state') }}">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card" style="display:none">
+                        <div class="card display-none">
                             <div class="card-body d-flex justify-content-between">
-                                <button class="btn btn-secondary col-md-3">Cancelar</button>
-                                <button type="submit" class="btn btn-success col-md-3">Cadastrar</button>
+                                <a href="{{ route('client.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
+                                <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Cadastrar</button>
                             </div>
                         </div>
                         {{ csrf_field() }}

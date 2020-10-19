@@ -7,29 +7,79 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('vendor/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('vendor/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
 @stop
 
 @section('js')
-    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
     <script>
+        var tableClient;
         $(function () {
-            $("#tableClients").DataTable({
+            tableClient = getTable();
+        });
+
+        const getTable = () => {
+            return $("#tableClients").DataTable({
                 "responsive": true,
+                "processing": true,
                 "autoWidth": false,
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json"
-                },
+                "serverSide": true,
+                "sortable": true,
+                "searching": true,
+                "serverMethod": "post",
                 "order": [[ 0, 'desc' ]],
+                "ajax": $.fn.dataTable.pipeline({
+                    url: '{{ route('ajax.client.fetch') }}',
+                    pages: 2,
+                    type: 'POST',
+                    data: { "_token": $('meta[name="csrf-token"]').attr('content') },
+                }),
                 "initComplete": function( settings, json ) {
                     $('[data-toggle="tooltip"]').tooltip();
+                },
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json"
                 }
             });
-        });
+        }
+
+        $(document).on('click', '.btnRemoveClient', function (){
+            const client_id = $(this).attr('client-id');
+            const client_name = $(this).closest('tr').find('td:eq(1)').text();
+
+            Swal.fire({
+                title: 'Exclusão de Cliente',
+                html: "Você está prestes a excluir definitivamente o cliente <br><strong>"+client_name+"</strong><br>Deseja continuar?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#bbb',
+                confirmButtonText: 'Sim, excluir',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: 'POST',
+                        url: "{{ route('ajax.client.delete') }}",
+                        data: { client_id },
+                        dataType: 'json',
+                        success: response => {
+                            tableClient.destroy();
+                            $("#tableClients tbody").empty();
+                            tableClient = getTable();
+                            Toast.fire({
+                                icon: response.success ? 'success' : 'error',
+                                title: response.message
+                            })
+                        }, error: e => {
+                            console.log(e);
+                        }
+                    });
+                }
+            })
+        })
     </script>
 @stop
 
@@ -64,18 +114,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                            @foreach($dataClients as $client)
-                            <tr client-id="{{ $client['id'] }}">
-                                <td data-order="{{ $client['id'] }}" class="text-center">{{ $client['id'] }}</td>
-                                <td>{{ $client['name'] }}</td>
-                                <td>{{ $client['email'] }}</td>
-                                <td>{{ $client['phone_1'] }}</td>
-                                <td class="text-center d-md-flex justify-content-center margin-btn">
-                                    <a href="{{ route('client.edit', ['id' => $client['id']]) }}" class="btn btn-primary btn-sm btn-rounded btn-action" data-toggle="tooltip" title="Editar" ><i class="fas fa-edit"></i></a>
-                                    <button class="btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1" data-toggle="tooltip"  title="Excluir"><i class="fas fa-times"></i></button>
-                                </td>
-                            </tr>
-                            @endforeach
                         </tbody>
                         <tfoot>
                             <tr>

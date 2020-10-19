@@ -21,12 +21,11 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('phone', 11)->nullable();
             $table->string('password', 256);
-            $table->integer('company_id')->foreign('company_id')->references('id')->on('companies')->nullable();
+            $table->bigInteger('company_id')->unsigned()->nullable();
             $table->rememberToken();
             $table->timestamps();
 
-//            $table->foreign('company_id')->references('id')->on('companies');
-            $table->index('company_id', 'company_id_index');
+            $table->foreign('company_id')->references('id')->on('companies');
         });
     }
 
