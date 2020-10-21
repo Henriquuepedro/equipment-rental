@@ -24,6 +24,8 @@ class CreateClientsTable extends Migration
             $table->string('cpf_cnpj', 14)->nullable();
             $table->string('rg_ie', 16)->nullable();
             $table->string('type', 2);
+            $table->longText('observation')->nullable();
+            $table->string('contact', 256)->nullable();
             $table->bigInteger('user_insert')->unsigned();
             $table->bigInteger('user_update')->unsigned()->nullable();
             $table->timestamps();

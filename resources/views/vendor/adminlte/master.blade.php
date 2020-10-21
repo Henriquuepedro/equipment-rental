@@ -84,6 +84,9 @@
 {{--        <meta name="msapplication-TileColor" content="#ffffff">--}}
 {{--        <meta name="msapplication-TileImage" content="{{ asset('favicon/ms-icon-144x144.png') }}">--}}
 {{--    @endif--}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
     <link rel="stylesheet" href="{{ asset('vendor/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
@@ -135,6 +138,9 @@
     <script src="{{ asset('vendor/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap/js/pipeline.js') }}" type="text/javascript"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
     <!-- inject:js -->
     <script src="{{ asset('assets/js/shared/off-canvas.js') }}"></script>
     <script src="{{ asset('assets/js/shared/hoverable-collapse.js') }}"></script>

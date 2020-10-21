@@ -11,7 +11,7 @@ var Toast = Swal.mixin({
     toast: true,
     position: 'top-end',
     showConfirmButton: false,
-    timer: 3000,
+    timer: 5000,
     timerProgressBar: true,
     didOpen: (toast) => {
         toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -73,7 +73,7 @@ var Toast = Swal.mixin({
             $(this).parent().addClass("label-animate");
         });
 
-        $(window).click(function() {
+        $(window).click(function(event) {
             if (!$(event.target).is('.form-control')) {
                 $(".form-control").each(function() {
                     if ($(this).val() === '') {

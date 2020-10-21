@@ -26,6 +26,8 @@ class CreateAddressesTable extends Migration
             $table->string('neigh', 256)->nullable();
             $table->string('city', 256)->nullable();
             $table->string('state', 256)->nullable();
+            $table->string('lat', 256)->nullable();
+            $table->string('lng', 256)->nullable();
             $table->bigInteger('user_insert')->unsigned();
             $table->bigInteger('user_update')->unsigned()->nullable();
             $table->timestamps();
