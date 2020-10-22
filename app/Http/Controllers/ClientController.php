@@ -24,12 +24,7 @@ class ClientController extends Controller
 
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-        $getClients = $this->client->getClients($company_id);
-
-        $dataClients = $getClients;
-
-        return view('client.index', compact('dataClients'));
+        return view('client.index');
     }
 
     public function create()

@@ -46,7 +46,7 @@ var Toast = Swal.mixin({
                     if ($this.attr('href').indexOf(current) !== -1) {
                         $(this).parents('.nav-item').last().addClass('active');
                         if ($(this).parents('.sub-menu').length) {
-                            $(this).addClass('active');
+                            // $(this).addClass('active');
                         }
                         if (current !== "index.html") {
                             $(this).parents('.nav-item').last().find(".nav-link").attr("aria-expanded", "true");

@@ -27,7 +27,7 @@ Route::group(['middleware' => 'auth'], function (){
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'dashboard'])->name('dashboard');
 
     // Clientes
-    Route::group(['prefix' => '/clientes', 'as' => 'client.'], function () {
+    Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
 
         Route::get('/', [App\Http\Controllers\ClientController::class, 'index'])->name('index');
         Route::get('/novo', [App\Http\Controllers\ClientController::class, 'create'])->name('create');
@@ -38,10 +38,25 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
     // Clientes
+    Route::group(['prefix' => '/equipamento', 'as' => 'equipament.'], function () {
+
+        Route::get('/', [App\Http\Controllers\EquipamentController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\EquipamentController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\EquipamentController::class, 'insert'])->name('insert');
+
+        Route::get('/{id}', [App\Http\Controllers\EquipamentController::class, 'edit'])->name('edit');
+        Route::post('/atualizar', [App\Http\Controllers\EquipamentController::class, 'update'])->name('update');
+
+    });
+    // Clientes
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
-        Route::group(['prefix' => '/clientes', 'as' => 'client.'], function () {
+        Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
             Route::post('/buscar', [App\Http\Controllers\ClientController::class, 'fetchClients'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\ClientController::class, 'delete'])->name('delete');
+        });
+        Route::group(['prefix' => '/equipamento', 'as' => 'equipament.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\EquipamentController::class, 'fetchEquipaments'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\EquipamentController::class, 'delete'])->name('delete');
         });
     });
 });

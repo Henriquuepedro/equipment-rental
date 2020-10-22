@@ -17,7 +17,7 @@ class CreateCompaniesTable extends Migration
             $table->id();
             $table->string('name', 256);
             $table->string('fantasy', 256);
-            $table->string('cnpj_cnpj', 14);
+            $table->string('cpf_cnpj', 14);
             $table->string('email', 256);
             $table->string('phone_1', 11);
             $table->string('phone_2', 11);

@@ -148,7 +148,7 @@
         if (!verifyAddress[0]) {
             Toast.fire({
                 icon: 'warning',
-                title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para finalizar o cadastro.`
+                title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para adicionar um novo.`
             });
             return false;
         }
@@ -596,7 +596,7 @@
                                             </div>
                                         @endfor
                                     @endif
-                                    <div class="alert alert-warning {{old('name_address')?'display-none':''}}" id="no-have-address"><h4 class="text-center">Não existem endereços ainda.</h4></div>
+                                    <div class="alert alert-warning {{old('name_address')?'display-none':''}}" id="no-have-address"><h4 class="text-center no-margin">Não existem endereços ainda.</h4></div>
                                     <div id="new-addressses"></div>
                                 </div>
                                 <div class="col-md-12 text-center">

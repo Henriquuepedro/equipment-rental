@@ -27,7 +27,7 @@
     font-size: 0.95em;
     transition: 0.2s;
     pointer-events:none;
-    color: #777;
+    color: #aaa;
 }
 
 .form-group.label-animate>label {
@@ -179,7 +179,7 @@
 .sidebar > .nav .nav-item:not(.hover-open) .collapse .sub-menu .nav-item .nav-link.active:before{
     background-color: #fff;
 }
-.sidebar > .nav .nav-item.active .nav-link:not(.active){
+.sidebar > .nav .nav-item.active .nav-link:not(.sub-menu .active){
     background: #0f25d5;
 }
 .sidebar > .nav .nav-item .nav-link{
@@ -656,11 +656,26 @@ div.dataTables_wrapper div.dataTables_processing{
         transform:rotate(360deg);
     }
 }
-.dataTable tbody tr td:last-child{
+.dataTable tbody tr td:last-child {
     display: flex;
     justify-content: center;
 }
 #map {
     width: 100%;
     height: 200px;
+}
+.dataTable .dataTables_empty {
+    display: table-cell !important;
+}
+.card .header-card-body .card-description {
+    color: #aaa;
+}
+.form-control {
+    color: #000
+}
+select.form-control {
+    border-radius: 5px;
+    height: 37px;
+    margin-top: 1px;
+    font-size: 1em;
 }

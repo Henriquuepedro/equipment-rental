@@ -86,7 +86,7 @@
     // Validar dados
     const container = $("div.error-form");
     // validate the form when it is submitted
-    $("#formCreateClient").validate({
+    $("#formUpdateClient").validate({
         errorContainer: container,
         errorLabelContainer: $("ol", container),
         wrapper: 'li',
@@ -123,12 +123,12 @@
             if (!verifyAddress[0]) {
                 Toast.fire({
                     icon: 'warning',
-                    title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para finalizar o cadastro.`
+                    title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para alterar o cadastro.`
                 });
                 return false;
             }
 
-            $('#formCreateClient [type="submit"]').attr('disabled', true);
+            $('#formUpdateClient [type="submit"]').attr('disabled', true);
             form.submit();
         }
     });
@@ -148,7 +148,7 @@
         if (!verifyAddress[0]) {
             Toast.fire({
                 icon: 'warning',
-                title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para finalizar o cadastro.`
+                title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para adicionar um novo.`
             });
             return false;
         }
@@ -431,7 +431,7 @@
             findDiv.find('[name="lng[]"]').val(lng);
         });
     }
-    
+
     $(document).on('keydown', function(e){
         if(e.keyCode == 13){
             return false;
@@ -455,7 +455,7 @@
                             @endforeach
                         </ol>
                     </div>
-                    <form action="{{ route(('client.update')) }}" method="POST" enctype="multipart/form-data" id="formCreateClient">
+                    <form action="{{ route(('client.update')) }}" method="POST" enctype="multipart/form-data" id="formUpdateClient">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">
@@ -666,7 +666,7 @@
                                             </div>
                                         @endfor
                                     @endif
-                                    <div class="alert alert-warning {{count($addresses)?'display-none':''}}" id="no-have-address"><h4 class="text-center">Não existem endereços ainda.</h4></div>
+                                    <div class="alert alert-warning {{count($addresses)?'display-none':''}}" id="no-have-address"><h4 class="text-center no-margin">Não existem endereços ainda.</h4></div>
                                     <div id="new-addressses"></div>
                                 </div>
                                 <div class="col-md-12 text-center">

@@ -36,7 +36,6 @@
                     <div class="collapse {{ $menuActive ? 'show' : '' }}" id="item_{{ $key }}">
                         <ul class="nav flex-column sub-menu">
                             @foreach($menu['submenu'] as $subMenu)
-
                                 <li class="nav-item {{ in_array($route->getName(), $subMenu['active']) ? 'active' : '' }}">
                                     <a class="nav-link {{ in_array($route->getName(), $subMenu['active']) ? 'active' : '' }}" href="{{ route($subMenu['route']) }}">{{ $subMenu['text'] }}</a>
                                 </li>
