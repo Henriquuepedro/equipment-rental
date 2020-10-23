@@ -165,12 +165,12 @@ class EquipamentController extends Controller
         if($updateEquipament && $updatePeriods) {
             DB::commit();
             return redirect()->route('equipament.index')
-                ->with('success', "Equipamento com o código {$equipament_id}, cadastrado com sucesso!");
+                ->with('success', "Equipamento com o código {$equipament_id}, alterado com sucesso!");
         }
 
         DB::rollBack();
         return redirect()->back()
-            ->withErrors(['Não foi possível cadastrar o equipamento, tente novamente!'])
+            ->withErrors(['Não foi possível alterar o equipamento, tente novamente!'])
             ->withInput();
     }
 
