@@ -679,3 +679,6 @@ select.form-control {
     margin-top: 1px;
     font-size: 1em;
 }
+.alert.alert-success {
+    display: none;
+}

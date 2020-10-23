@@ -337,7 +337,7 @@
                                     <button type="button" class="btn btn-primary" id="add-new-period">Adicionar Novo Período</button>
                                 </div>
                                 <div class="col-md-12 text-center mt-2">
-                                    <p class="text-danger">Caso opte por não adicionar períodos, no cadastro de uma nova locação será segerido o valor por dia cadastrado no equipamento.</p>
+                                    <p class="text-danger">Caso opte por não adicionar períodos, no cadastro de uma nova locação será sugerido o valor por dia cadastrado no equipamento.</p>
                                 </div>
                             </div>
                         </div>

@@ -90,7 +90,7 @@
     <link rel="stylesheet" href="{{ asset('vendor/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
-    <link rel="stylesheet" href="{{ asset('dist/css/styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('dist/css/styles.css') }}?v=1.00">
 
 </head>
 
@@ -147,7 +147,7 @@
     <script src="{{ asset('assets/js/shared/misc.js') }}"></script>
     <script src="{{ asset('assets/js/shared/settings.js') }}"></script>
     <script src="{{ asset('assets/js/shared/todolist.js') }}"></script>
-    <script src="{{ asset('dist/js/demo_.js') }}"></script>
+    <script src="{{ asset('dist/js/demo_.js') }}?v=1.00"></script>
     {{-- Custom Scripts --}}
     @yield('adminlte_js')
 

@@ -37,9 +37,9 @@ class EquipamentController extends Controller
         $name           = filter_var($request->type_equipament, FILTER_SANITIZE_STRING) === "cacamba" ? null : filter_var($request->name, FILTER_SANITIZE_STRING);
         $volume         = filter_var($request->type_equipament, FILTER_SANITIZE_STRING) === "cacamba" ? filter_var($request->volume, FILTER_VALIDATE_INT) : null;
         $reference      = filter_var($request->reference, FILTER_SANITIZE_STRING);
-        $manufacturer   = $request->manufacturer  ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
-        $value          = $request->value  ? $this->transformMoneyBr_En($request->value) : null;
-        $stock          = $request->stock  ? filter_var($request->stock, FILTER_VALIDATE_INT) : null;
+        $manufacturer   = $request->manufacturer ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
+        $value          = $request->value ? $this->transformMoneyBr_En($request->value) : 0.00;
+        $stock          = $request->stock ? filter_var($request->stock, FILTER_VALIDATE_INT) : 0;
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
@@ -120,9 +120,9 @@ class EquipamentController extends Controller
         $name           = filter_var($request->type_equipament, FILTER_SANITIZE_STRING) === "cacamba" ? null : filter_var($request->name, FILTER_SANITIZE_STRING);
         $volume         = filter_var($request->type_equipament, FILTER_SANITIZE_STRING) === "cacamba" ? filter_var($request->volume, FILTER_VALIDATE_INT) : null;
         $reference      = filter_var($request->reference, FILTER_SANITIZE_STRING);
-        $manufacturer   = $request->manufacturer  ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
-        $value          = $request->value  ? $this->transformMoneyBr_En($request->value) : null;
-        $stock          = $request->stock  ? filter_var($request->stock, FILTER_VALIDATE_INT) : null;
+        $manufacturer   = $request->manufacturer ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
+        $value          = $request->value ? $this->transformMoneyBr_En($request->value) : 0.00;
+        $stock          = $request->stock ? filter_var($request->stock, FILTER_VALIDATE_INT) : 0;
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 

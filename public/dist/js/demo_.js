@@ -93,14 +93,18 @@ var Toast = Swal.mixin({
 
     });
     $('.dropdown-toggle').dropdown();
-})(jQuery);
 
+    if ($('.alert.alert-success').length) {
+        Toast.fire({
+            icon: 'success',
+            title: $('.alert.alert-success').text()
+        });
+    }
+})(jQuery);
 
 $(document).on('click', '[data-widget="collapse"]', function (){
     $(this).closest('.box').find('.box-body').toggle('slow');
 })
-
-
 
 const validCNPJ = cnpj => {
 
@@ -189,7 +193,6 @@ const validCPF = cpf => {
         rev = 0;
     return rev === parseInt(cpf.charAt(10));
 }
-
 const validCPFCNPJ = cpf_cnpj => {
     cpf_cnpj = cpf_cnpj.replace(/[^\d]+/g,'');
 
