@@ -10,48 +10,10 @@
 @stop
 
 @section('js')
+<script src="{{ asset('assets/js/views/equipament/form.js') }}" type="application/javascript"></script>
 <script>
-    $(() => {
-        $('[name="cep"]').mask('00.000-000');
-        $('[name="phone_1"],[name="phone_2"]').mask('(00) 000000000');
-        $('[name="stock"]').mask('0#');
-        $('[name="value"]').mask('#.##0,00', { reverse: true });
-        $('[name="day_start[]"], [name="day_end[]"]').mask('0#');
-        $('[name="value_period[]"]').mask('#.##0,00', { reverse: true });
-        if ($('[name="type_equipament"]:checked').length) {
-            $('[name="type_equipament"]:checked').trigger('change');
-            $(".form-control").each(function() {
-                if ($(this).val() != '')
-                    $(this).parent().addClass("label-animate");
-            });
-        }
-    });
-
-    $('[name="type_equipament"]').on('change', function(){
-        const type = $(this).val();
-
-        if (type === 'cacamba') {
-            $('#name').val('').closest('.form-group').addClass('d-none');
-            $('#volume').closest('.form-group').removeClass('d-none');
-        }
-        else if (type === 'others') {
-            $('#volume').val($('#volume option:eq(0)').val()).closest('.form-group').addClass('d-none');
-            $('#name').closest('.form-group').removeClass('d-none');
-        }
-
-        $('.error-form').slideUp('slow');
-        $(".card").each(function() {
-            $(this).slideDown('slow');
-        });
-    });
-
-    // Validar dados
-    const container = $("div.error-form");
     // validate the form when it is submitted
     $("#formUpdateEquipament").validate({
-        errorContainer: container,
-        errorLabelContainer: $("ol", container),
-        wrapper: 'li',
         rules: {
             name: {
                 name_valid: true
@@ -69,15 +31,35 @@
             }
         },
         invalidHandler: function(event, validator) {
-            $('html, body').animate({scrollTop:0}, 'slow');
+            $('html, body').animate({scrollTop:0}, 400);
+            let arrErrors = [];
+            $.each(validator.errorMap, function (key, val) {
+                arrErrors.push(val);
+            });
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                });
+            }, 500);
         },
         submitHandler: function(form) {
             let verifyPeriod = verifyPeriodComplet();
             if (!verifyPeriod[0]) {
-                Toast.fire({
-                    icon: 'warning',
-                    title: `Finalize o cadastro do ${verifyPeriod[1]}º período, para finalizar o cadastro.`
-                });
+
+                if (verifyPeriod[2] !== undefined) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>'+verifyPeriod[2].join('</li><li>')+'</li></ol>'
+                    })
+                } else {
+                    Toast.fire({
+                        icon: 'warning',
+                        title: `Finalize o cadastro do ${verifyPeriod[1]}º período, para adicionar um novo.`
+                    });
+                }
                 return false;
             }
 
@@ -85,125 +67,23 @@
             form.submit();
         }
     });
-
-
-    jQuery.validator.addMethod("name_valid", function(value, element) {
-        console.log(element);
-        value = jQuery.trim(value);
-        return value !== "";
-
-    }, 'Informe um nome para o equipamento');
-
-    jQuery.validator.addMethod("volume", function(value, element) {
-        value = jQuery.trim(value);
-        return value !== "Selecione ...";
-
-    }, 'Selecione um volume para a caçamba');
-
-    $('#add-new-period').on('click', function () {
-
-        const verifyPeriod = verifyPeriodComplet();
-        if (!verifyPeriod[0]) {
-            Toast.fire({
-                icon: 'warning',
-                title: `Finalize o cadastro do ${verifyPeriod[1]}º período, para adicionar um novo.`
-            });
-            return false;
-        }
-
-        let countPeriod = 0;
-        countPeriod = $('.period').length + 1;
-
-        $('#new-periods').append(`
-            <div class="period display-none">
-                <div class="row">
-                    <div class="form-group col-md-2">
-                        <label>${countPeriod}º Período</label>
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Dia Inicial</label>
-                        <input type="text" class="form-control" name="day_start[]" autocomplete="nope">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Dia Final</label>
-                        <input type="text" class="form-control" name="day_end[]" autocomplete="nope">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Valor</label>
-                        <input type="text" class="form-control" name="value_period[]" autocomplete="nope">
-                    </div>
-                    <div class="form-group col-md-1">
-                        <label>&nbsp;</label>
-                        <button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>
-                    </div>
-                </div>
-            </div>
-        `).find('.period').slideDown('slow');
-
-        $('[name="day_start[]"], [name="day_end[]"]').mask('0#');
-        $('[name="value_period[]"]').mask('#.##0,00', { reverse: true });
-        $('#no-have-period').slideUp(500);
-    });
-
-    $(document).on('click', '.remove-period', function (){
-        $(this).closest('.period').slideUp(500);
-        setTimeout(() => { if ($('.period').length === 0) $('#no-have-period').slideDown(500) }, 600);
-        setTimeout(() => { $(this).closest('.period').remove() }, 500);
-    });
-
-    const verifyPeriodComplet = () => {
-        cleanBorderPeriod();
-
-        const periodCount = $('.period').length;
-        let existError = false;
-        for (let countPeriod = 0; countPeriod < periodCount; countPeriod++) {
-            if (!$(`[name="day_start[]"]:eq(${countPeriod})`).val().length) {
-                $(`[name="day_start[]"]:eq(${countPeriod})`).css('border', '1px solid red');
-                existError = true;
-            }
-            if (!$(`[name="day_end[]"]:eq(${countPeriod})`).val().length) {
-                $(`[name="day_end[]"]:eq(${countPeriod})`).css('border', '1px solid red');
-                existError = true;
-            }
-            if (!$(`[name="value_period[]"]:eq(${countPeriod})`).val().length) {
-                $(`[name="value_period[]"]:eq(${countPeriod})`).css('border', '1px solid red');
-                existError = true;
-            }
-            if (existError) return [false, (countPeriod + 1)];
-        }
-        return [true];
-    }
-
-    const cleanBorderPeriod = () => {
-        $('[name="day_start[]"]').removeAttr('style');
-        $('[name="day_end[]"]').removeAttr('style');
-        $('[name="value_period[]"]').removeAttr('style');
-    }
-
-
-    $(document).on('keydown', function(e){
-        if(e.keyCode == 13){
-            return false;
-        }
-    });
-
 </script>
 @stop
 
 @section('content')
-
     <div class="row">
         <div class="col-md-12 d-flex align-items-stretch grid-margin">
             <div class="row flex-grow">
                 <div class="col-12">
-                    <div class="error-form alert alert-warning {{ count($errors) == 0 ? 'display-none' : '' }}">
-                        <h5>Existem erros no envio do formulário, veja abaixo para corrigi-los.</h5>
+                    @if ($errors->any())
+                    <div class="alert alert-warning">
                         <ol>
                             @foreach($errors->all() as $error)
-                                <li><label id="name-error" class="error">{{ $error }}</label></li>
+                                <li>{{ $error }}</li>
                             @endforeach
                         </ol>
                     </div>
+                    @endif
                     <form action="{{ route(('equipament.update')) }}" method="POST" enctype="multipart/form-data" id="formUpdateEquipament">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
@@ -228,7 +108,7 @@
                                 <div class="row">
                                     <div class="form-group col-md-4 label-animate">
                                         <label for="volume">Volume <sup>*</sup></label>
-                                        <select class="form-control " id="volume" name="volume">
+                                        <select class="form-control" id="volume" name="volume">
                                             <option {{ old() ? old('volume') == '' ? 'selected' : '' : ($equipament->volume == null ? 'selected' : '') }}>Selecione ...</option>
                                             <option value="3" {{ old() ? old('volume') == 3 ? 'selected' : '' : ($equipament->volume == 3 ? 'selected' : '') }}>3m³</option>
                                             <option value="4" {{ old() ? old('volume') == 4 ? 'selected' : '' : ($equipament->volume == 4 ? 'selected' : '')  }}>4m³</option>
@@ -354,5 +234,4 @@
             </div>
         </div>
     </div>
-
 @stop

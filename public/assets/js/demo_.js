@@ -100,6 +100,14 @@ var Toast = Swal.mixin({
             title: $('.alert.alert-success').text()
         });
     }
+
+    if ($('.alert.alert-warning ol li').length) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atenção',
+            html: $('.alert.alert-warning').html()
+        })
+    }
 })(jQuery);
 
 $(document).on('click', '[data-widget="collapse"]', function (){
@@ -203,4 +211,16 @@ const validCPFCNPJ = cpf_cnpj => {
     if (cpf_cnpj.length === 11) return validCPF(cpf_cnpj);
     else if (cpf_cnpj.length === 14) return validCNPJ(cpf_cnpj);
     else return false;
+}
+
+const inArray = (needle, haystack) => {
+    const length = haystack.length;
+    for(var i = 0; i < length; i++) {
+        if(typeof haystack[i] == 'object') {
+            if(arrayCompare(haystack[i], needle)) return true;
+        } else {
+            if(haystack[i] == needle) return true;
+        }
+    }
+    return false;
 }

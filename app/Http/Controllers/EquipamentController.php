@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EquipamentCreatePost;
+use App\Http\Requests\EquipamentUpdatePost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,29 +31,23 @@ class EquipamentController extends Controller
         return view('equipament.create');
     }
 
-    public function insert(Request $request)
+    public function insert(EquipamentCreatePost $request)
     {
+        dd($request->all());
         // data equipament
-        $company_id     = $request->user()->company_id;
-        $user_id        = $request->user()->id;
-        $name           = filter_var($request->type_equipament, FILTER_SANITIZE_STRING) === "cacamba" ? null : filter_var($request->name, FILTER_SANITIZE_STRING);
-        $volume         = filter_var($request->type_equipament, FILTER_SANITIZE_STRING) === "cacamba" ? filter_var($request->volume, FILTER_VALIDATE_INT) : null;
-        $reference      = filter_var($request->reference, FILTER_SANITIZE_STRING);
-        $manufacturer   = $request->manufacturer ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
-        $value          = $request->value ? $this->transformMoneyBr_En($request->value) : 0.00;
-        $stock          = $request->stock ? filter_var($request->stock, FILTER_VALIDATE_INT) : 0;
+        $dataEquipament = $this->formatDataEquipament($request);
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
         $createEquipament = $this->equipament->insert(array(
-            'company_id'    => $company_id,
-            'name'          => $name,
-            'reference'     => $reference,
-            'stock'         => $stock,
-            'value'         => $value,
-            'manufacturer'  => $manufacturer,
-            'volume'        => $volume,
-            'user_insert'   => $user_id
+            'company_id'    => $dataEquipament->company_id,
+            'name'          => $dataEquipament->name,
+            'reference'     => $dataEquipament->reference,
+            'stock'         => $dataEquipament->stock,
+            'value'         => $dataEquipament->value,
+            'manufacturer'  => $dataEquipament->manufacturer,
+            'volume'        => $dataEquipament->volume,
+            'user_insert'   => $dataEquipament->user_id
         ));
 
         $createPeriods = true;
@@ -59,24 +55,42 @@ class EquipamentController extends Controller
 
         // data period
         $qtyPeriods = isset($request->day_start) ? count($request->day_start) : 0;
+        $arrDaysVerify = array();
         for ($per = 0; $per < $qtyPeriods; $per++) {
-            $day_start      = filter_var((int)$request->day_start[$per], FILTER_VALIDATE_INT);
-            $day_end        = filter_var((int)$request->day_end[$per], FILTER_VALIDATE_INT);
-            $value_period   = $this->transformMoneyBr_En($request->value_period[$per]);
+            $periodUser = $per+1;
+            $dataPeriod = $this->formatDataPeriod($request, $per);
 
-            if ($day_start < 0 || $day_end <= 0 || $value_period <= 0)
+            // dia inicial maior que o final
+            if ($dataPeriod->day_start > $dataPeriod->day_end)
+                return redirect()->back()
+                    ->withErrors(["Existem erros no período. O dia final do {$periodUser}º período não pode ser menor que o inicial, deve ser informado em ordem crescente."])
+                    ->withInput();
+
+            // adiciona valor em array para validação
+            for ($countPer = $dataPeriod->day_start; $countPer <= $dataPeriod->day_end; $countPer++) {
+                // dia informado já está dentro de um prazo
+                if (in_array($countPer, $arrDaysVerify))
+                    return redirect()->back()
+                        ->withErrors(["Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros perído."])
+                        ->withInput();
+
+                array_push($arrDaysVerify, $countPer);
+            }
+
+            if ($dataPeriod->day_start < 0 || $dataPeriod->day_end <= 0 || $dataPeriod->value_period <= 0)
                 return redirect()->back()
                     ->withErrors(['Existem erros no período. Dia inicial não pode ser negativo. Dia final deve ser maior que zero e valor deve ser maior que zero'])
                     ->withInput();
 
-            $createPeriods = $this->equipament_wallet->insert(array(
-                'company_id'    => $company_id,
+            $queryPeriods = $this->equipament_wallet->insert(array(
+                'company_id'    => $dataEquipament->company_id,
                 'equipament_id' => $equipamentId,
-                'day_start'     => $day_start,
-                'day_end'       => $day_end,
-                'value'         => $value_period,
-                'user_insert'   => $user_id
+                'day_start'     => $dataPeriod->day_start,
+                'day_end'       => $dataPeriod->day_end,
+                'value'         => $dataPeriod->value_period,
+                'user_insert'   => $dataEquipament->user_id
             ));
+            if (!$queryPeriods) $createPeriods = false;
         }
 
         if($createEquipament && $createPeriods) {
@@ -104,68 +118,81 @@ class EquipamentController extends Controller
         return view('equipament.update', compact('equipament', 'equipament_wallet'));
     }
 
-    public function update(Request $request)
+    public function update(EquipamentUpdatePost $request)
     {
         // data equipament
-        $company_id     = $request->user()->company_id;
-        $equipament_id  = (int)$request->equipament_id;
+        $dataEquipament = $this->formatDataEquipament($request);
 
-
-        if (!$this->equipament->getEquipament($equipament_id, $company_id))
+        if (!$this->equipament->getEquipament($dataEquipament->equipament_id, $dataEquipament->company_id))
             return redirect()->back()
                 ->withErrors(['Não foi possível localizar o equipamento para atualizar!'])
                 ->withInput();
 
-        $user_id        = $request->user()->id;
-        $name           = filter_var($request->type_equipament, FILTER_SANITIZE_STRING) === "cacamba" ? null : filter_var($request->name, FILTER_SANITIZE_STRING);
-        $volume         = filter_var($request->type_equipament, FILTER_SANITIZE_STRING) === "cacamba" ? filter_var($request->volume, FILTER_VALIDATE_INT) : null;
-        $reference      = filter_var($request->reference, FILTER_SANITIZE_STRING);
-        $manufacturer   = $request->manufacturer ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
-        $value          = $request->value ? $this->transformMoneyBr_En($request->value) : 0.00;
-        $stock          = $request->stock ? filter_var($request->stock, FILTER_VALIDATE_INT) : 0;
-
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
-        $updateEquipament = $this->equipament->edit(array(
-            'name'          => $name,
-            'reference'     => $reference,
-            'stock'         => $stock,
-            'value'         => $value,
-            'manufacturer'  => $manufacturer,
-            'volume'        => $volume,
-            'user_update'   => $user_id
-        ), $equipament_id);
+        $updateEquipament = $this->equipament->edit(
+            array(
+                'name'          => $dataEquipament->name,
+                'reference'     => $dataEquipament->reference,
+                'stock'         => $dataEquipament->stock,
+                'value'         => $dataEquipament->value,
+                'manufacturer'  => $dataEquipament->manufacturer,
+                'volume'        => $dataEquipament->volume,
+                'user_update'   => $dataEquipament->user_id
+            ),
+            $dataEquipament->equipament_id
+        );
 
         $updatePeriods = true;
 
         // data period
         $qtyPeriods = isset($request->day_start) ? count($request->day_start) : 0;
         // remover todos os períodos do equipamento
-        $this->equipament_wallet->removeAllEquipament($equipament_id, $company_id);
+        $this->equipament_wallet->removeAllEquipament($dataEquipament->equipament_id, $dataEquipament->company_id);
+        $arrDaysVerify = array();
         for ($per = 0; $per < $qtyPeriods; $per++) {
-            $day_start      = filter_var((int)$request->day_start[$per], FILTER_VALIDATE_INT);
-            $day_end        = filter_var((int)$request->day_end[$per], FILTER_VALIDATE_INT);
-            $value_period   = $this->transformMoneyBr_En($request->value_period[$per]);
+            $periodUser = $per+1;
+            $dataPeriod = $this->formatDataPeriod($request, $per);
 
-            if ($day_start < 0 || $day_end <= 0 || $value_period <= 0)
+            // dia inicial maior que o final
+            if ($dataPeriod->day_start > $dataPeriod->day_end)
                 return redirect()->back()
-                    ->withErrors(['Existem erros no período. Dia inicial não pode ser negativo. Dia final deve ser maior que zero e valor deve ser maior que zero'])
+                    ->withErrors(["Existem erros no período. O dia final do {$periodUser}º período não pode ser menor que o inicial, deve ser informado em ordem crescente."])
                     ->withInput();
 
-            $updatePeriods = $this->equipament_wallet->insert(array(
-                'company_id'    => $company_id,
-                'equipament_id' => $equipament_id,
-                'day_start'     => $day_start,
-                'day_end'       => $day_end,
-                'value'         => $value_period,
-                'user_insert'   => $user_id
+            // adiciona valor em array para validação
+            for ($countPer = $dataPeriod->day_start; $countPer <= $dataPeriod->day_end; $countPer++) {
+                // dia informado já está dentro de um prazo
+                if (in_array($countPer, $arrDaysVerify))
+                    return redirect()->back()
+                        ->withErrors(["Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros perído."])
+                        ->withInput();
+
+                array_push($arrDaysVerify, $countPer);
+            }
+
+            // valor zerados ou negativo
+            if ($dataPeriod->day_start < 0 || $dataPeriod->day_end <= 0 || $dataPeriod->value_period <= 0)
+                return redirect()->back()
+                    ->withErrors(['Existem erros no período. Dia inicial não pode ser negativo. Dia final e valor deve ser maior que zero.'])
+                    ->withInput();
+
+            $queryPeriods = $this->equipament_wallet->insert(array(
+                'company_id'    => $dataEquipament->company_id,
+                'equipament_id' => $dataEquipament->equipament_id,
+                'day_start'     => $dataPeriod->day_start,
+                'day_end'       => $dataPeriod->day_end,
+                'value'         => $dataPeriod->value_period,
+                'user_insert'   => $dataEquipament->user_id
             ));
+
+            if (!$queryPeriods) $updatePeriods = false;
         }
 
         if($updateEquipament && $updatePeriods) {
             DB::commit();
             return redirect()->route('equipament.index')
-                ->with('success', "Equipamento com o código {$equipament_id}, alterado com sucesso!");
+                ->with('success', "Equipamento com o código {$dataEquipament->equipament_id}, alterado com sucesso!");
         }
 
         DB::rollBack();
@@ -254,5 +281,33 @@ class EquipamentController extends Controller
         );
 
         echo json_encode($output);
+    }
+
+    private function formatDataEquipament($request)
+    {
+        $obj = new \stdClass;
+
+        $obj->company_id    = $request->user()->company_id;
+        $obj->user_id       = $request->user()->id;
+        $obj->name          = $request->type_equipament === "cacamba" ? null : filter_var($request->name, FILTER_SANITIZE_STRING);
+        $obj->volume        = $request->type_equipament === "others" ? null : filter_var($request->volume, FILTER_VALIDATE_INT);
+        $obj->reference     = filter_var($request->reference, FILTER_SANITIZE_STRING);
+        $obj->manufacturer  = $request->manufacturer ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
+        $obj->value         = $request->value ? $this->transformMoneyBr_En($request->value) : 0.00;
+        $obj->stock         = $request->stock ? filter_var($request->stock, FILTER_VALIDATE_INT) : 0;
+        $obj->equipament_id = isset($request->equipament_id) ? (int)$request->equipament_id : null;
+
+        return $obj;
+    }
+
+    private function formatDataPeriod($request, $per)
+    {
+        $obj = new \stdClass;
+
+        $obj->day_start      = filter_var((int)$request->day_start[$per], FILTER_VALIDATE_INT);
+        $obj->day_end        = filter_var((int)$request->day_end[$per], FILTER_VALIDATE_INT);
+        $obj->value_period   = $this->transformMoneyBr_En($request->value_period[$per]);
+
+        return $obj;
     }
 }

@@ -2,13 +2,87 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/EquipamentCreatePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/EquipamentUpdatePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/js/views/client/form.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/js/views/equipament/form.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/dist/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/dist/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/dist/js/demo_.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/dist/js/demo_.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/adminlte.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/adminlte.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/adminlte.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/adminlte.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.components.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.components.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.components.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.components.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.core.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.core.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.core.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.core.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.extra-components.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.extra-components.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.extra-components.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.extra-components.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.pages.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.pages.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.pages.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.pages.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.plugins.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.plugins.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.plugins.min.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/alt/adminlte.plugins.min.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/AdminLTELogo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/avatar.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/avatar04.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/avatar2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/avatar3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/avatar5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/boxed-bg.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/boxed-bg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/credit/american-express.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/credit/cirrus.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/credit/mastercard.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/credit/mestro.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/credit/paypal.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/credit/paypal2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/credit/visa.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/default-150x150.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/icons.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/photo1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/photo2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/photo3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/photo4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/prod-1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/prod-2.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/prod-3.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/prod-4.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/prod-5.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/system/load.gif" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/images/system/load.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/user1-128x128.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/user2-160x160.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/user3-128x128.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/user4-128x128.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/user5-128x128.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/user6-128x128.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/user7-128x128.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/img/user8-128x128.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/adminlte.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/adminlte.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/adminlte.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/adminlte.min.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/demo.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/demo_.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/demo_.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/pages/dashboard.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/pages/dashboard2.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/dist/js/pages/dashboard3.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/client/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/client/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/update.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/equipament/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipament/create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/equipament/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipament/update.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/master.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/page.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/page.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -163,7 +237,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/public/assets/js/views" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -174,17 +248,19 @@
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Projetos\locacao\public" />
-      <recent name="C:\Projetos\locacao\resources\views\dashboard" />
-      <recent name="C:\Projetos\locacao\resources\views" />
-      <recent name="C:\Projetos\locacao\resources\views\vendor\adminlte" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Projetos\locacao\public\assets\js\views" />
       <recent name="C:\Projetos\locacao\resources\views" />
       <recent name="C:\Projetos\locacao\resources\views\client" />
       <recent name="C:\Projetos\locacao\public\assets\js\shared" />
       <recent name="C:\Projetos\locacao\resources\views\vendor\adminlte\partials\navbar" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Projetos\locacao\public\assets\js" />
+      <recent name="C:\Projetos\locacao\public\assets\css" />
+      <recent name="C:\Projetos\locacao\public\assets\images" />
+      <recent name="C:\Projetos\locacao\public" />
+      <recent name="C:\Projetos\locacao\resources\views\dashboard" />
     </key>
   </component>
   <component name="RunManager">
@@ -220,7 +296,10 @@
       <workItem from="1602971920376" duration="23548000" />
       <workItem from="1603238857298" duration="14668000" />
       <workItem from="1603315129267" duration="12675000" />
-      <workItem from="1603411687923" duration="610000" />
+      <workItem from="1603411687923" duration="1382000" />
+      <workItem from="1603491963255" duration="3917000" />
+      <workItem from="1603545769022" duration="5477000" />
+      <workItem from="1603752764045" duration="10022000" />
     </task>
     <servers />
   </component>
@@ -236,18 +315,18 @@
     </state>
     <state x="1508" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1603320396037" />
     <state x="76" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.728@0.0.1366.728" timestamp="1603049996534" />
-    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1603327876999">
+    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1603757833607">
       <screen x="1366" y="0" width="2560" height="1040" />
     </state>
-    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1603327876999" />
+    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1603757833607" />
     <state x="2463" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1603251919454">
       <screen x="1366" y="0" width="2560" height="1040" />
     </state>
     <state x="2463" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1603251919454" />
-    <state x="1820" y="256" width="585" height="592" key="find.popup" timestamp="1603330417093">
+    <state x="1820" y="256" width="585" height="592" key="find.popup" timestamp="1603761466900">
       <screen x="1366" y="0" width="2560" height="1040" />
     </state>
-    <state x="1820" y="256" width="585" height="592" key="find.popup/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1603330417093" />
+    <state x="1820" y="256" width="585" height="592" key="find.popup/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1603761466900" />
     <state x="242" y="179" width="555" height="534" key="find.popup/0.0.1366.728@0.0.1366.728" timestamp="1603051736338" />
     <state x="2302" y="240" key="run.anything.popup" timestamp="1602991997267">
       <screen x="1366" y="0" width="2560" height="1040" />
