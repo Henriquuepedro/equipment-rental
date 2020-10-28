@@ -157,28 +157,35 @@
                                     <h4 class="card-title">Dados do Endereço</h4>
                                     <p class="card-description"> Preencha o formulário abaixo com as informações de endereço </p>
                                 </div>
-                                <div class="accordion form-group" id="accordionAddress">
+                                <table class="table col-md-12 display-none">
+                                    <thead>
+                                    <tr>
+                                        <th>Identificação</th>
+                                        <th>CEP</th>
+                                        <th>Endereço</th>
+                                        <th>Cidade/Estado</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
                                     @if (old('name_address') && count(old('name_address')))
                                         @for($addr = 0; $addr < count(old('name_address')); $addr++)
-                                            @php
-                                                $numberNewAddress = $addr + 1;
-                                            @endphp
-                                            <div class="box collapsed-box box-primary">
-                                                <div class="box-header">
-                                                    <h5 class="mb-0 d-flex justify-content-between">
-                                                        <button class="btn btn-link no-sublime" type="button">
-                                                            <i class="fa fa-caret-right"></i>  <strong>{{ old('name_address')[$addr] }} |</strong> {{ old('cep')[$addr] }} - {{ old('address')[$addr] }}, {{ old('number')[$addr] }} - {{ old('neigh')[$addr] }} - {{ old('city')[$addr] }} - {{old('state')[$addr] }}
-                                                        </button>
-                                                        <div class="col-md-2 text-right no-padding">
-                                                            <button type="button" class="btn btn-primary edit-address"><i class="fa fa-edit"></i></button>
-                                                            <button type="button" class="btn btn-danger remove-address"><i class="fa fa-trash"></i></button>
-                                                        </div>
-                                                    </h5>
-                                                </div>
-                                                <div class="box-body display-none">
-                                                    <div class="row">
+                                        <tr>
+                                            <td>{{ old('name_address')[$addr] }}</td>
+                                            <td>{{ old('cep')[$addr] }}</td>
+                                            <td>{{ old('address')[$addr] }}, {{ old('number')[$addr] }} - {{ old('neigh')[$addr] }}</td>
+                                            <td>{{ old('city')[$addr] }} - {{old('state')[$addr] }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary edit-address btn-sm btn-rounded btn-action"><i class="fa fa-edit"></i></button>
+                                                <button type="button" class="btn btn-danger remove-address btn-sm btn-rounded btn-action"><i class="fa fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr class="display-none">
+                                            <td colspan="5">
+                                                <div class="address display-none">
+                                                    <div class="row mt-3">
                                                         <div class="form-group col-md-12">
-                                                            <label>Nome de Controle</label>
+                                                            <label>Identificação do Endereço</label>
                                                             <input type="text" class="form-control" name="name_address[]" autocomplete="nope" value="{{ old('name_address')[$addr] }}">
                                                         </div>
                                                     </div>
@@ -221,20 +228,22 @@
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="form-group d-flex justify-content-between flex-wrap col-md-12">
-                                                            <button type="button" class="btn btn-link confirm-map text-center"><i class="fas fa-map-marked-alt"></i> Confirmar Endereço no Mapa</button>
-                                                            <button type="button" class="btn btn-success text-center save-address"><i class="fa fa-save"></i> Salvar</button>
+                                                        <div class="form-group d-flex justify-content-between flex-wrap col-md-12 mt-2">
+                                                            <button type="button" class="btn btn-primary confirm-map text-center"><i class="fas fa-map-marked-alt"></i> Confirmar Endereço no Mapa</button>
+                                                            <button type="button" class="btn btn-secondary text-center save-address"><i class="fa fa-arrow-up"></i> Retornar</button>
                                                         </div>
                                                     </div>
                                                     <input type="hidden" name="lat[]" value="{{ old('lat')[$addr] }}"/>
                                                     <input type="hidden" name="lng[]" value="{{ old('lng')[$addr] }}"/>
                                                 </div>
-                                            </div>
+                                            </td>
+                                        </tr>
                                         @endfor
                                     @endif
-                                    <div id="new-addressses"></div>
-                                </div>
-                                <div class="col-md-12 text-center">
+                                    </tbody>
+                                </table>
+                                <div id="new-addressses"></div>
+                                <div class="col-md-12 text-center mt-4">
                                     <button type="button" class="btn btn-primary" id="add-new-address">Adicionar Novo Endereço</button>
                                 </div>
                             </div>
@@ -261,7 +270,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-md-12 form-group text-center">
+                            <div class="col-md-12 form-group text-center mb-2">
                                 <button type="button" class="btn btn-primary" id="updateLocationMap"><i class="fas fa-sync-alt"></i> Atualizar Localização</button>
                             </div>
                         </div>

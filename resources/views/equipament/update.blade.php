@@ -211,9 +211,8 @@
                                         </div>
                                     @endfor
                                 @endif
-                                <div class="alert alert-warning mt-2 {{old() ? count(old('day_start'))?'display-none':'':(count($equipament_wallet)?'display-none':'')}}" id="no-have-period"><h4 class="text-center no-margin">Não existem períodos ainda.</h4></div>
                                 <div id="new-periods" class="mt-2"></div>
-                                <div class="col-md-12 text-center">
+                                <div class="col-md-12 text-center mt-2">
                                     <button type="button" class="btn btn-primary" id="add-new-period">Adicionar Novo Período</button>
                                 </div>
                                 <div class="col-md-12 text-center mt-2">

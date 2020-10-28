@@ -93,12 +93,10 @@ $('#add-new-period').on('click', function () {
 
     $('[name="day_start[]"], [name="day_end[]"]').mask('0#');
     $('[name="value_period[]"]').mask('#.##0,00', { reverse: true });
-    $('#no-have-period').slideUp(500);
 });
 
 $(document).on('click', '.remove-period', function (){
     $(this).closest('.period').slideUp(500);
-    setTimeout(() => { if ($('.period').length === 0) $('#no-have-period').slideDown(500) }, 600);
     setTimeout(() => { $(this).closest('.period').remove() }, 500);
 });
 

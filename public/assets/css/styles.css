@@ -31,16 +31,33 @@
 }
 
 .form-group.label-animate label {
-    top: 18px !important;
-    left: 10px !important;
+    top: 18px;
+    left: 10px;
     font-size: 0.75em;
-    color: #1a73e8;
+    color: #555;
+}
+
+table td .form-group>label {
+    top: 10px;
+    left: 20px;
+    position: absolute;
+    font-size: 1.15em;
+}
+table td .form-group.label-animate label {
+    top: -5px;
+    left: 20px;
+    font-size: 0.9em;
 }
 .form-group.label-animate .form-control {
+    border-color: #dee2e6;
+}
+.form-group.label-animate .form-control:focus {
     border-color: #1a73e8;
 }
-.form-group input {
-    font-size: 1em;
+.form-group input,
+.form-group textarea,
+.form-group select {
+    font-size: 15px;
     border-radius: 5px
 }
 .mb-0{
@@ -674,10 +691,10 @@ div.dataTables_wrapper div.dataTables_processing{
     color: #aaa;
 }
 .form-control {
-    color: #000
+    color: #000;
+    font-weight: 400;
 }
 select.form-control {
-    border-radius: 5px;
     height: 37px;
     margin-top: 1px;
     font-size: 1em;
@@ -701,4 +718,13 @@ select.form-control {
 }
 .no-sublime {
     text-decoration: none !important;
+}
+.form-group {
+    margin-bottom: 0;
+}
+table .form-group {
+    margin-bottom: 1rem;
+}
+.card-title {
+    text-transform: unset;
 }

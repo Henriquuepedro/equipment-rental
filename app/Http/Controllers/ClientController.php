@@ -90,7 +90,7 @@ class ClientController extends Controller
             // verifica se foi digitado algo no endereço para validar
             if ($verifyAddressStep_1 && !$verifyAddressStep_2)
                 return redirect()->back()
-                    ->withErrors(['É necessário informar os campos de endereço obrigatório. Nome de Controle, Endereço, Número, Bairro, Cidade e Estado.'])
+                    ->withErrors(['É necessário informar os campos de endereço obrigatório. Identificação do Endereço, Endereço, Número, Bairro, Cidade e Estado.'])
                     ->withInput();
 
             $createAddress = $this->address->insert(array(
@@ -198,12 +198,12 @@ class ClientController extends Controller
             $lng            = $request->lng[$adr] ? filter_var($request->lng[$adr], FILTER_SANITIZE_STRING) : null;
 
             $verifyAddressStep_1 = $name_address || $cep || $address || $number || $complement || $reference || $neigh || $city || $state;
-            $verifyAddressStep_2 = $name_address && $address && $number && $neigh && $city && $state;
+            $verifyAddressStep_2 = $address && $number && $neigh && $city && $state;
 
             // verifica se foi digitado algo no endereço para validar
             if ($verifyAddressStep_1 && !$verifyAddressStep_2)
                 return redirect()->back()
-                    ->withErrors(['É necessário informar os campos de endereço obrigatório. Nome de Controle, Endereço, Número, Bairro, Cidade e Estado.'])
+                    ->withErrors(['É necessário informar os campos de endereço obrigatório. Endereço, Número, Bairro, Cidade e Estado.'])
                     ->withInput();
 
             $createAddress = $this->address->insert(array(
