@@ -23,6 +23,20 @@
         [aria-labelledby="dropdownConfigUser"] .btn{
             border-radius: 0;
         }
+        @media (max-width: 576px) {
+            #users-registred .card .card-body {
+                padding: 0.8rem 0.8rem;
+            }
+            #users-registred .card .card-body .user-avatar{
+                width: 100%;
+                text-align: center;
+            }
+            [aria-labelledby="dropdownConfigUser"]{
+                top: -163px !important;
+                left: 0px !important;;
+                right: 40px !important;;
+            }
+        }
     </style>
 @stop
 
@@ -616,25 +630,25 @@
                             <div class="card rounded shadow-none">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-md-10 d-flex">
+                                        <div class="col-md-10 d-lg-flex">
                                             <div class="user-avatar mb-auto">
                                                 <img src="${ value.image }" alt="profile image" class="profile-img img-lg rounded-circle">
                                             </div>
-                                            <div class="wrapper pl-4">
-                                                <div class="wrapper d-flex align-items-center">
+                                            <div class="wrapper pl-0 pl-lg-4">
+                                                <div class="wrapper d-lg-flex align-items-center">
                                                     <h4 class="mb-0 font-weight-medium">${ value.name }</h4>
-                                                    <div class="badge badge-secondary text-dark mt-2 ml-2">${identificationUser}</div>
+                                                    <div class="badge badge-secondary text-dark mt-2 ml-lg-2">${identificationUser}</div>
                                                     ${statusUser}
                                                 </div>
                                                 <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
                                                     <i class="fa fa-envelope mr-2"></i>
                                                     <p class="mb-0 text-muted">${ value.email }</p>
                                                 </div>
-                                                <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
+                                                <div class="wrapper d-lg-flexx align-items-center font-weight-medium text-muted">
                                                     <strong>Último Acesso:</strong>
                                                     <p class="mb-0 text-muted">&nbsp;${ value.last_access }</p>
                                                 </div>
-                                                <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
+                                                <div class="wrapper d-lg-flex align-items-center font-weight-medium text-muted">
                                                     <strong>Último Login:</strong>
                                                     <p class="mb-0 text-muted">&nbsp;${ value.last_login }</p>
                                                 </div>
