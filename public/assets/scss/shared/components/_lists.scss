@@ -62,6 +62,10 @@ ul {
   position: relative;
   list-style-type: none;
 
+  .rtl & {
+    padding-right: 0px;
+  }
+
   li {
     position: relative;
     line-height: 1;

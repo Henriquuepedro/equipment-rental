@@ -11,6 +11,11 @@
     display: block;
     padding-left: 30px;
 
+    .rtl & {
+      padding-left: 0;
+      padding-right: 30px;
+    }
+
     line-height: 1.5;
 
     input {
@@ -19,6 +24,11 @@
       margin-top: 4px\9;
       top: 0;
       left: 0;
+
+      .rtl & {
+        left: auto;
+        right: 0;
+      }
 
       z-index: 1;
       cursor: pointer;
@@ -78,6 +88,12 @@
         height: 18px;
         border-radius: 2px;
         left: 0;
+
+        .rtl & {
+          left: auto;
+          right: 0;
+        }
+
         border: 2px solid $border-color;
         transition: all;
         transition-duration: 0s;
@@ -91,14 +107,21 @@
         font-family: Material Design Icons;
         opacity: 0;
         filter: alpha(opacity=0);
+        ;
         transform: scale(0);
         content: '\F12C';
         position: absolute;
         font-size: 0.9375rem;
         font-weight: bold;
         left: 0;
+
+        .rtl & {
+          left: auto;
+          right: 0;
+        }
+
         top: 14%;
-        transform: translateY(-14%);
+        transform:translateY(-14%);
         color: theme-color(info);
       }
     }
@@ -160,6 +183,12 @@
           top: 50%;
           transform: translateY(-50%);
           left: 0;
+
+          .rtl & {
+            left: auto;
+            right: 0;
+          }
+
           border: 2px solid $border-color;
           width: 20px;
           height: 20px;
@@ -179,6 +208,12 @@
           top: 30%;
           transform: translateY(-30%);
           left: 6px;
+
+          .rtl & {
+            left: auto;
+            right: 6px;
+          }
+
           transition: none;
           transition-duration: 250s;
           opacity: 0;
@@ -247,6 +282,12 @@
               top: 50%;
               transform: translateY(-50%);
               left: -2px;
+
+              .rtl & {
+                left: auto;
+                right: -2px;
+              }
+
               color: $form-check-label-input-helper-bg;
               background: none;
               content: '\F12C';

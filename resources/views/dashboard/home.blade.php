@@ -10,8 +10,11 @@
 @stop
 
 @section('js')
-    <!--end::Page Vendors -->
-    <!--begin::Page Snippets -->
+    <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap.min.js') }}"></script>
+    <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
+    <script src="{{ asset('assets/vendors/justgage/raphael-2.1.4.min.js') }}"></script>
+    <script src="{{ asset('assets/vendors/justgage/justgage.js') }}"></script>
+    <script src="{{ asset('assets/vendors/chart.js/Chart.min.js') }}"></script>
     <script src="{{ asset('assets/js/demo_1/dashboard.js') }}"></script>
 @stop
 

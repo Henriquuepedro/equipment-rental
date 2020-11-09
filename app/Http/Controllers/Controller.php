@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -18,5 +19,26 @@ class Controller extends BaseController
         $value = filter_var($value, FILTER_VALIDATE_FLOAT);
 
         return (float)$value;
+    }
+
+    public function hasPermission($permission)
+    {
+        $permissions = empty(auth()->user()->permission) ? [] : json_decode(auth()->user()->permission);
+        $permission = Permission::query()->where('name', $permission)->first()->id;
+        return in_array($permission, $permissions) || $this->hasAdmin();
+    }
+
+    public function hasAdmin()
+    {
+        return auth()->user()->type_user === 1 || auth()->user()->type_user === 2;
+    }
+
+    public function hasAdminMaster()
+    {
+        return auth()->user()->type_user === 2;
+    }
+
+    public function isAjax(){
+        return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
     }
 }

@@ -243,7 +243,7 @@
                                     </tbody>
                                 </table>
                                 <div id="new-addressses"></div>
-                                <div class="col-md-12 text-center mt-4">
+                                <div class="col-md-12 text-center pt-4" style="border-top: 1px solid #dee2e6">
                                     <button type="button" class="btn btn-primary" id="add-new-address">Adicionar Novo Endereço</button>
                                 </div>
                             </div>

@@ -7,10 +7,6 @@ $(() => {
     $('[name="value_period[]"]').mask('#.##0,00', { reverse: true });
     if ($('[name="type_equipament"]:checked').length) {
         $('[name="type_equipament"]:checked').trigger('change');
-        $(".form-control").each(function() {
-            if ($(this).val() != '')
-                $(this).parent().addClass("label-animate");
-        });
     }
 });
 

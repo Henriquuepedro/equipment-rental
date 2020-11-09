@@ -8,20 +8,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <link rel="stylesheet" href="{{ asset('assets/vendors/iconfonts/mdi/css/materialdesignicons.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendors/iconfonts/ionicons/dist/css/ionicons.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendors/iconfonts/flag-icon-css/css/flag-icon.min.css') }}">
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{{ asset('assets/vendors/mdi/css/materialdesignicons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendors/flag-icon-css/css/flag-icon.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendors/ti-icons/css/themify-icons.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/vendors/typicons/typicons.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendors/css/vendor.bundle.base.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendors/css/vendor.bundle.addons.css') }}">
-
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="{{ asset('assets/vendors/jvectormap/jquery-jvectormap.css') }}">
+    <!-- End Plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="{{ asset('assets/css/shared/style.css') }}">
     <!-- endinject -->
     <!-- Layout styles -->
     <link rel="stylesheet" href="{{ asset('assets/css/demo_1/style.css') }}">
-
-    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}" />
+    <!-- End Layout styles -->
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}"/>
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="{{ asset('assets/css/demo_1/style.css') }}">
 
     {{-- Custom Meta Tags --}}
     @yield('meta_tags')
@@ -52,7 +58,6 @@
 
     <!-- plugins:js -->
     <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
-    <script src="{{ asset('assets/vendors/js/vendor.bundle.addons.js') }}"></script>
     {{-- Libs --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -67,14 +72,14 @@
             integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
             crossorigin=""></script>
     <!-- inject:js -->
+    <script src="{{ asset('assets/js/demo_.js') }}?v=1.02"></script>
+    {{-- Custom Scripts --}}
+    @yield('adminlte_js')
     <script src="{{ asset('assets/js/shared/off-canvas.js') }}"></script>
     <script src="{{ asset('assets/js/shared/hoverable-collapse.js') }}"></script>
     <script src="{{ asset('assets/js/shared/misc.js') }}"></script>
     <script src="{{ asset('assets/js/shared/settings.js') }}"></script>
     <script src="{{ asset('assets/js/shared/todolist.js') }}"></script>
-    <script src="{{ asset('assets/js/demo_.js') }}?v=1.02"></script>
-    {{-- Custom Scripts --}}
-    @yield('adminlte_js')
 
 </body>
 

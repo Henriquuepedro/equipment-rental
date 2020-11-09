@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientCreatePost;
+use App\Http\Requests\ClientDeletePost;
 use App\Http\Requests\ClientUpdatePost;
 use Illuminate\Http\Request;
 use App\Models\Client;
@@ -24,11 +25,21 @@ class ClientController extends Controller
 
     public function index()
     {
+        if (!$this->hasPermission('ClientView')) {
+            return redirect()->route('dashboard')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         return view('client.index');
     }
 
     public function create()
     {
+        if (!$this->hasPermission('ClientCreatePost')) {
+            return redirect()->route('client.index')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         return view('client.create');
     }
 
@@ -85,7 +96,7 @@ class ClientController extends Controller
             $lng            = $request->lng[$adr] ? filter_var($request->lng[$adr], FILTER_SANITIZE_STRING) : null;
 
             $verifyAddressStep_1 = $name_address || $cep || $address || $number || $complement || $reference || $neigh || $city || $state;
-            $verifyAddressStep_2 = $name_address && $address && $number && $neigh && $city && $state;
+            $verifyAddressStep_2 = $address && $number && $neigh && $city && $state;
 
             // verifica se foi digitado algo no endereço para validar
             if ($verifyAddressStep_1 && !$verifyAddressStep_2)
@@ -238,22 +249,18 @@ class ClientController extends Controller
             ->withInput();
     }
 
-    public function delete(Request $request)
+    public function delete(ClientDeletePost $request)
     {
         $company_id = $request->user()->company_id;
         $client_id = $request->client_id;
 
-        if (!$this->client->getClient($client_id, $company_id)) {
-            echo json_encode(['success' => false, 'message' => 'Não foi possível localizar o cliente!']);
-            die;
-        }
+        if (!$this->client->getClient($client_id, $company_id))
+            return response()->json(['success' => false, 'message' => 'Não foi possível localizar o cliente!']);
 
-        if (!$this->client->remove($client_id, $company_id)) {
-            echo json_encode(['success' => false, 'message' => 'Não foi possível excluir o cliente!']);
-            die;
-        }
+        if (!$this->client->remove($client_id, $company_id))
+            return response()->json(['success' => false, 'message' => 'Não foi possível excluir o cliente!']);
 
-        echo json_encode(['success' => true, 'message' => 'Cliente excluído com sucesso!']);
+        return response()->json(['success' => true, 'message' => 'Cliente excluído com sucesso!']);
     }
 
     public function fetchClients(Request $request)
@@ -296,11 +303,15 @@ class ClientController extends Controller
         // get string query
         // DB::getQueryLog();
 
+        $permissionUpdate = $this->hasPermission('ClientUpdatePost');
+        $permissionDelete = $this->hasPermission('ClientDeletePost');
+
         $i = 0;
         foreach ($data as $key => $value) {
             $i++;
-            $buttons = "<a href='".route('client.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Editar' ><i class='fas fa-edit'></i></a>
-                        <button class='btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' client-id='{$value['id']}'><i class='fas fa-times'></i></button>";
+            $buttons = "<a href='".route('client.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
+            $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' client-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
 
             $result[$key] = array(
                 $value['id'],
@@ -320,6 +331,6 @@ class ClientController extends Controller
             "data" => $result
         );
 
-        echo json_encode($output);
+        return response()->json($output);
     }
 }

@@ -66,8 +66,17 @@
       padding-left: 1.5rem;
       color: $body-color;
 
+      .rtl & {
+        padding-left: 0;
+        padding-right: 1.5rem;
+      }
+
       &:first-child {
         padding-left: 0;
+
+        .rtl & {
+          padding-right: 0;
+        }
       }
 
       p {

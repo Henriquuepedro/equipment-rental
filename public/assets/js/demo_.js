@@ -28,36 +28,8 @@ var Toast = Swal.mixin({
         var sidebar = $('#sidebar');
 
         //Add active class to nav-link based on url dynamically
-        //Active class can be hard coded directly in html file also as required
-        if (!$('#sidebar').hasClass("dynamic-active-class-disabled")) {
-            var current = location.pathname.split("/").slice(-1)[0].replace(/^\/|\/$/g, '');
-            $('#sidebar >.nav > li:not(.not-navigation-link) a').each(function () {
-                var $this = $(this);
-                if (current === "") {
-                    //for root url
-                    if ($this.attr('href').indexOf("index.html") !== -1) {
-                        $(this).parents('.nav-item').last().addClass('active');
-                        if ($(this).parents('.sub-menu').length) {
-                            $(this).addClass('active');
-                        }
-                    }
-                } else {
-                    //for other url
-                    if ($this.attr('href').indexOf(current) !== -1) {
-                        $(this).parents('.nav-item').last().addClass('active');
-                        if ($(this).parents('.sub-menu').length) {
-                            // $(this).addClass('active');
-                        }
-                        if (current !== "index.html") {
-                            $(this).parents('.nav-item').last().find(".nav-link").attr("aria-expanded", "true");
-                            if ($(this).parents('.sub-menu').length) {
-                                $(this).closest('.collapse').addClass('show');
-                            }
-                        }
-                    }
-                }
-            })
-        }
+        $('.nav-item.active').find('a:first').attr('aria-expanded',true);
+        $('.nav-item.active').find('.collapse').addClass('show');
 
         //Close other submenu in sidebar on opening any
         $("#sidebar > .nav > .nav-item > a[data-toggle='collapse']").on("click", function () {
@@ -91,28 +63,38 @@ var Toast = Swal.mixin({
             $(this).parent().addClass("label-animate");
         });
 
+        if ($('.alert.alert-success').length) {
+            Toast.fire({
+                icon: 'success',
+                title: $('.alert.alert-success').text()
+            });
+        }
+
+        if ($('.alert.alert-warning ol li').length) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção',
+                html: $('.alert.alert-warning').html()
+            })
+        }
+
+        $('.dropdown-toggle').dropdown();
+
+        checkLabelAnimate();
+
     });
-    $('.dropdown-toggle').dropdown();
-
-    if ($('.alert.alert-success').length) {
-        Toast.fire({
-            icon: 'success',
-            title: $('.alert.alert-success').text()
-        });
-    }
-
-    if ($('.alert.alert-warning ol li').length) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Atenção',
-            html: $('.alert.alert-warning').html()
-        })
-    }
 })(jQuery);
 
 $(document).on('click', '[data-widget="collapse"]', function (){
     $(this).closest('.box').find('.box-body').toggle('slow');
-})
+});
+
+const checkLabelAnimate = () => {
+    $(".form-control").each(function() {
+        if ($(this).val() !== '')
+            $(this).parent().addClass("label-animate");
+    });
+}
 
 const validCNPJ = cnpj => {
 

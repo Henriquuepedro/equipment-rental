@@ -75,15 +75,10 @@
         @extend .dropdownAnimation;
         box-shadow: $navbar-dropdown-box-shadow;
         overflow-x: hidden;
-        max-height: 350px;
-        overflow-y: auto;
-
         .rtl & {
           right: auto;
           left: 0;
         }
-
-        overflow: hidden;
 
         @media (max-width: 991px) {
           right: -85px;

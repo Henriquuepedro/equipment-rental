@@ -300,6 +300,42 @@
   }
 }
 
+.image-grouped {
+  display: flex;
+
+  .text-avatar,
+  img {
+    @extend .img-ss;
+    border-radius: 100%;
+    margin-left: -10px;
+    z-index: 0;
+    border: 4px solid $card-bg;
+    transform: scale(1);
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+    transition-property: "box-shadow", "z-index", "transform", "border-width";
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:hover {
+      z-index: 1;
+      box-shadow: 0 0 5px -2px rgba(0, 0, 0, 0.5);
+      transform: scale(1.05);
+      border-width: 0;
+
+    }
+  }
+
+  .text-avatar {
+    @extend .bg-inverse-primary;
+    color: theme-color(primary);
+    font-size: 11px;
+    font-weight: 600;
+  }
+}
+
 .v-strock-1 {
   width: 2px;
 }
@@ -330,6 +366,13 @@
 
 .h-strock-4 {
   height: 5px;
+}
+
+@each $color,
+$value in $theme-colors {
+  .bg-inverse-#{$color} {
+    @include bg-inverse-variant($value);
+  }
 }
 
 .list {
@@ -365,4 +408,28 @@
   justify-content: center;
   align-items: center;
   font-weight: 500;
+}
+
+.user-avatar {
+  position: relative;
+  display: inline-block;
+
+  .edit-avatar-icon {
+    position: absolute;
+    bottom: 8%;
+    right: -10px;
+    height: 35px;
+    width: 35px;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: theme-color(secondary);
+    color: $text-gray;
+    border: 3px solid #fff;
+
+    i {
+      font-size: 15px;
+    }
+  }
 }

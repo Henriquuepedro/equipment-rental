@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\EquipamentCreatePost;
+use App\Http\Requests\EquipamentDeletePost;
 use App\Http\Requests\EquipamentUpdatePost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,17 +24,26 @@ class EquipamentController extends Controller
 
     public function index()
     {
+        if (!$this->hasPermission('EquipamentView')) {
+            return redirect()->route('dashboard')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         return view('equipament.index');
     }
 
     public function create()
     {
+        if (!$this->hasPermission('EquipamentCreatePost')) {
+            return redirect()->route('equipament.index')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         return view('equipament.create');
     }
 
     public function insert(EquipamentCreatePost $request)
     {
-        dd($request->all());
         // data equipament
         $dataEquipament = $this->formatDataEquipament($request);
 
@@ -201,22 +211,18 @@ class EquipamentController extends Controller
             ->withInput();
     }
 
-    public function delete(Request $request)
+    public function delete(EquipamentDeletePost $request)
     {
         $company_id = $request->user()->company_id;
         $equipament_id = $request->equipament_id;
 
-        if (!$this->equipament->getEquipament($equipament_id, $company_id)) {
-            echo json_encode(['success' => false, 'message' => 'Não foi possível localizar o equipamento!']);
-            die;
-        }
+        if (!$this->equipament->getEquipament($equipament_id, $company_id))
+            return response()->json(['success' => false, 'message' => 'Não foi possível localizar o equipamento!']);
 
-        if (!$this->equipament->remove($equipament_id, $company_id)) {
-            echo json_encode(['success' => false, 'message' => 'Não foi possível excluir o equipamento!']);
-            die;
-        }
+        if (!$this->equipament->remove($equipament_id, $company_id))
+            return response()->json(['success' => false, 'message' => 'Não foi possível excluir o equipamento!']);
 
-        echo json_encode(['success' => true, 'message' => 'Equipamento excluído com sucesso!']);
+        return response()->json(['success' => true, 'message' => 'Equipamento excluído com sucesso!']);
     }
 
     public function fetchEquipaments(Request $request)
@@ -256,11 +262,15 @@ class EquipamentController extends Controller
         // get string query
         // DB::getQueryLog();
 
+        $permissionUpdate = $this->hasPermission('EquipamentUpdatePost');
+        $permissionDelete = $this->hasPermission('EquipamentDeletePost');
+
         $i = 0;
         foreach ($data as $key => $value) {
             $i++;
-            $buttons = "<a href='".route('equipament.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Editar' ><i class='fas fa-edit'></i></a>
-                        <button class='btn btn-danger btnRemoveEquipament btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' equipament-id='{$value['id']}'><i class='fas fa-times'></i></button>";
+            $buttons = "<a href='".route('equipament.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
+            $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveEquipament btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' equipament-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
 
             $result[$key] = array(
                 $value['id'],

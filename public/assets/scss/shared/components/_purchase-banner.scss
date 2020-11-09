@@ -17,6 +17,11 @@
         margin-right: 15px;
         font-weight: 400;
         color: $purchase-banner-color;
+
+        .rtl & {
+            margin-right: auto;
+            margin-left: 15px;
+        }
     }
 
     .banner-button {
@@ -28,5 +33,10 @@
     .toggler-close {
         margin-left: auto;
         color: $purchase-banner-color;
+
+        .rtl & {
+            margin-right: auto;
+            margin-left: 0;
+        }
     }
 }

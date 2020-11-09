@@ -11,10 +11,6 @@ $(() => {
     $('[name="rg_ie"]').mask('0#');
     if ($('[name="type_person"]:checked').length) {
         $('[name="type_person"]:checked').trigger('change');
-        $(".form-control").each(function() {
-            if ($(this).val() != '')
-                $(this).parent().addClass("label-animate");
-        });
     }
     showHideTableAddress();
     getLocation();
@@ -212,10 +208,10 @@ jQuery.validator.addMethod("cpf_cnpj", function(value, element) {
 $('#add-new-address').on('click', function () {
 
     const verifyAddress = verifyAddressComplet();
-    if (!verifyAddress[0] || $('.new-address-show').length) {
+    if (!verifyAddress[0] || $('.new-address-show').length || $('table tr td[colspan="5"]:visible').length) {
         Toast.fire({
             icon: 'warning',
-            title: `Finalize o cadastro do endereço, para adicionar um novo.`
+            title: `Finalize o cadastro/alteração do endereço, para adicionar um novo.`
         });
         return false;
     }
@@ -302,7 +298,7 @@ $(document).on('click', '.edit-address', function(){
         if ($('table tr td[colspan="5"]:visible').length) {
             Toast.fire({
                 icon: 'warning',
-                title: `Salve o cadastro de endereço em aberto para editar um próximo.`
+                title: `Retorne o cadastro de endereço aberto para editar um próximo.`
             });
             return false;
         }
@@ -378,10 +374,7 @@ $(document).on('click', '.save-new-address', function(event){
     createNewAddress(name_control, cep, address, number, complement, reference, neigh, city, state, lat, lng);
     el.find('.remove-new-address').trigger('click');
 
-    $("table tbody tr:last .form-control").each(function() {
-        if ($(this).val() != '')
-            $(this).parent().addClass("label-animate");
-    });
+    checkLabelAnimate();
     showHideTableAddress();
 });
 
@@ -503,7 +496,7 @@ const createNewAddress = (name_address, cep, address, number, complement, refere
         <td>${address}, ${number} - ${neigh}</td>
         <td>${city} - ${state}</td>
         <td>
-            <button type="button" class="btn btn-primary edit-address btn-sm btn-rounded btn-action"><i class="fa fa-edit"></i></button>
+            <button type="button" class="btn btn-primary edit-address btn-sm btn-rounded btn-action pull-left"><i class="fa fa-edit"></i></button>
             <button type="button" class="btn btn-danger remove-address btn-sm btn-rounded btn-action"><i class="fa fa-trash"></i></button>
         </td>
     </tr>

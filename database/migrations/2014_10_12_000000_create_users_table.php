@@ -22,6 +22,13 @@ class CreateUsersTable extends Migration
             $table->string('phone', 11)->nullable();
             $table->string('password', 256);
             $table->bigInteger('company_id')->unsigned()->nullable();
+            $table->string('profile', 64)->nullable();
+            $table->tinyInteger('active')->default(1);
+            $table->dateTime('last_login_at')->nullable();
+            $table->ipAddress('last_login_ip')->nullable();
+            $table->dateTime('last_access_at')->nullable();
+            $table->boolean('logout')->default(false);
+            $table->tinyInteger('type_user')->default(0);
             $table->rememberToken();
             $table->timestamps();
 

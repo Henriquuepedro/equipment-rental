@@ -75,6 +75,15 @@
                             })
                         }, error: e => {
                             console.log(e);
+                        },
+                        complete: function(xhr) {
+                            if (xhr.status === 403) {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: 'Você não tem permissão para fazer essa operação!'
+                                });
+                                $(`button[equipament-id="${equipament_id}"]`).trigger('blur');
+                            }
                         }
                     });
                 }
@@ -96,7 +105,9 @@
                 <div class="card-body">
                     <div class="header-card-body justify-content-between flex-wrap">
                         <h4 class="card-title no-border">Equipamentos Cadastrados</h4>
+                        @if(in_array('EquipamentCreatePost', $permissions))
                         <a href="{{ route('equipament.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
+                        @endif
                     </div>
                     <table id="tableEquipaments" class="table table-bordered">
                         <thead>

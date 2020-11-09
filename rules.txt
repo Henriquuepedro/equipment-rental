@@ -1,0 +1,14 @@
+- Somente admin e admin-master pode operar na tela de configuração.
+- Somente admin-master pode excluir usuário.
+- Admin e admin-master terá acesso total ao sistema, sendo assim não haverá uma tela de permissões para admin e admin-master.
+- Não é possível inativar, excluir ou alterar(na tela de configurações, ainda não implementado) o prórpio usuário.
+- Ao promover um usuário como administrador, não será mais possível reverter a ação. Tornar como usuário novamente.
+- É permitido cadastrar usuário sem permissões.
+- Cada "grupo" de permissão ser composto por visualização, cadastro, atualização e exclusão.
+- Sempre que selecionar alguma permisão diferente de visualização, automaticamente a opção de visualização será marcada, sendo assim não ser possível desmarcar a opção de visualização até que todas as de mais estejam desmarcadas.
+
+
+* Dúvidas em aberto *
+
+- Admin pode tornar um usuario admin também? Ou apenas o admin-master poderá realizar essa ação?
+- Admin pode cadastrar novos usuarios? Ou apenas o admin-master poderá cadastrar?

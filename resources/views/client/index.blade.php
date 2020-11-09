@@ -75,6 +75,15 @@
                             })
                         }, error: e => {
                             console.log(e);
+                        },
+                        complete: function(xhr) {
+                            if (xhr.status === 403) {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: 'Você não tem permissão para fazer essa operação!'
+                                });
+                                $(`button[client-id="${client_id}"]`).trigger('blur');
+                            }
                         }
                     });
                 }
@@ -93,15 +102,12 @@
                 <div class="alert alert-danger mt-2">{{session('warning')}}</div>
             @endif
             <div class="card">
-{{--                <div class="card-header d-flex justify-content-between align-items-center">--}}
-{{--                    <h3 class="card-title">Clientes Cadastrados</h3>--}}
-{{--                    <a href="{{ route('client.create') }}" class="btn btn-primary col-md-3"><i class="fas fa-plus"></i> Novo Cadastro</a>--}}
-{{--                </div>--}}
-                <!-- /.card-header -->
                 <div class="card-body">
                     <div class="header-card-body justify-content-between flex-wrap">
                         <h4 class="card-title no-border">Clientes Cadastrados</h4>
+                        @if(in_array('ClientCreatePost', $permissions))
                         <a href="{{ route('client.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
+                        @endif
                     </div>
                     <table id="tableClients" class="table table-bordered">
                         <thead>

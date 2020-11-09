@@ -15,7 +15,7 @@ class EquipamentUpdatePost extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return $this->hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
 
     /**
@@ -43,6 +43,7 @@ class EquipamentUpdatePost extends FormRequest
             ]
         ];
     }
+
     /**
      * Get the error messages for the defined validation rules.
      *

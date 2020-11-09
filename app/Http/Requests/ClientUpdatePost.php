@@ -14,7 +14,7 @@ class ClientUpdatePost extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return $this->hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
 
     /**
@@ -42,7 +42,7 @@ class ClientUpdatePost extends FormRequest
             ],
             'phone_1'       => 'min:13|max:14|nullable',
             'phone_2'       => 'min:13|max:14|nullable',
-            'email'         => 'email|nullable',
+            'email'         => 'email:rfc,dns|nullable',
             'cpf_cnpj'      => [
                 function ($attribute, $value, $fail) {
                     $cpf_cnpj = filter_var(preg_replace('~[\\\\/.-]~', '', $this->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT);

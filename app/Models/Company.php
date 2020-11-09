@@ -15,7 +15,7 @@ class Company extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'fantasy', 'cpf_cnpj', 'email', 'phone_1', 'phone_2', 'contact'
+        'name', 'fantasy', 'email', 'phone_1', 'phone_2', 'contact', 'logo', 'user_update'
     ];
 
     /**
@@ -31,4 +31,14 @@ class Company extends Model
      * @var array
      */
     protected $casts = [];
+
+    public function getCompany($id)
+    {
+        return $this->find($id);
+    }
+
+    public function edit($data, $id)
+    {
+        return $this->where('id', $id)->update($data);
+    }
 }

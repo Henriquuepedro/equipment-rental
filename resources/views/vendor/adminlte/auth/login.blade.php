@@ -7,14 +7,30 @@
     <script src="{{ asset('assets/snippets/pages/user/login.js') }}" type="text/javascript"></script>
 @stop
 
-
-
 @section('auth_body')
-
     <div class="container-scroller">
         <div class="container-fluid page-body-wrapper full-page-wrapper">
             <div class="content-wrapper d-flex align-items-center auth auth-bg-1 theme-one">
                 <div class="row w-100">
+                    @if($errors->has('email'))
+                        <div class="invalid-feedback">
+                            <strong>{{ $errors->first('email') }}</strong>
+                        </div>
+                    @endif
+                    @if($errors->has('password'))
+                        <div class="invalid-feedback">
+                            <strong>{{ $errors->first('password') }}</strong>
+                        </div>
+                    @endif
+                        @if ($errors->any())
+                            <div class="alert alert-warning">
+                                <ol>
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ol>
+                            </div>
+                        @endif
                     <div class="col-lg-4 mx-auto">
                         <div class="auto-form-wrapper">
                             <form action="{{ route('login') }}" method="post">

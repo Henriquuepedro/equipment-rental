@@ -15,7 +15,7 @@ class EquipamentCreatePost extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return $this->hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
 
     /**

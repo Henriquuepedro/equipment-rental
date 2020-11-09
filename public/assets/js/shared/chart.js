@@ -1,5 +1,6 @@
 $(function () {
   /* ChartJS */
+
   'use strict';
   if ($("#mixed-chart").length) {
     var chartData = {
@@ -35,13 +36,14 @@ $(function () {
         responsive: true,
         title: {
           display: true,
-          text: 'Revenue and number of lincences sold'
+          text: 'Revenue and number of lincences sold',
+          fontColor: chartFontcolor
         },
         scales: {
           xAxes: [{
             display: true,
             ticks: {
-              fontColor: '#212229',
+              fontColor: chartFontcolor,
               stepSize: 50,
               min: 0,
               max: 150,
@@ -53,8 +55,8 @@ $(function () {
             gridLines: {
               display: false,
               drawBorder: false,
-              color: 'transparent',
-              zeroLineColor: '#eeeeee'
+              color: chartGridLineColor,
+              zeroLineColor: chartGridLineColor
             }
           }],
           yAxes: [{
@@ -63,10 +65,11 @@ $(function () {
               display: true,
               labelString: 'Number of Sales',
               fontSize: 12,
-              lineHeight: 2
+              lineHeight: 2,
+              fontColor: chartFontcolor
             },
             ticks: {
-              fontColor: '#212229',
+              fontColor: chartFontcolor,
               display: true,
               autoSkip: false,
               maxRotation: 0,
@@ -75,7 +78,9 @@ $(function () {
               max: 100
             },
             gridLines: {
-              drawBorder: false
+              drawBorder: false,
+              color: chartGridLineColor,
+              zeroLineColor: chartGridLineColor
             }
           }]
         },
@@ -126,10 +131,11 @@ $(function () {
             display: true,
             labelString: 'Month',
             fontSize: 12,
-            lineHeight: 2
+            lineHeight: 2,
+            fontColor: chartFontcolor
           },
           ticks: {
-            fontColor: '#212229',
+            fontColor: chartFontcolor,
             stepSize: 50,
             min: 0,
             max: 150,
@@ -151,10 +157,11 @@ $(function () {
             display: true,
             labelString: 'Number of sales',
             fontSize: 12,
-            lineHeight: 2
+            lineHeight: 2,
+            fontColor: chartFontcolor
           },
           ticks: {
-            fontColor: '#212229',
+            fontColor: chartFontcolor,
             display: true,
             autoSkip: false,
             maxRotation: 0,
@@ -163,7 +170,9 @@ $(function () {
             max: 300
           },
           gridLines: {
-            drawBorder: false
+            drawBorder: false,
+            color: chartGridLineColor,
+            zeroLineColor: chartGridLineColor
           }
         }]
       },
@@ -229,6 +238,7 @@ $(function () {
           scaleLabel: {
             display: true,
             labelString: 'Month',
+            fontColor: chartFontcolor,
             fontSize: 12,
             lineHeight: 2
           },
@@ -237,13 +247,13 @@ $(function () {
             autoSkipPadding: 35,
             maxRotation: 0,
             maxTicksLimit: 10,
-            fontColor: '#212229'
+            fontColor: chartFontcolor
           },
           gridLines: {
             display: false,
             drawBorder: false,
-            color: 'transparent',
-            zeroLineColor: '#eeeeee'
+            color: chartGridLineColor,
+            zeroLineColor: chartGridLineColor
           }
         }],
         yAxes: [{
@@ -252,6 +262,7 @@ $(function () {
             display: true,
             labelString: 'Number of user',
             fontSize: 12,
+            fontColor: chartFontcolor,
             lineHeight: 2
           },
           ticks: {
@@ -260,10 +271,13 @@ $(function () {
             maxRotation: 0,
             stepSize: 100,
             min: 0,
-            max: 300
+            max: 300,
+            fontColor: chartFontcolor
           },
           gridLines: {
-            drawBorder: false
+            drawBorder: false,
+            color: chartGridLineColor,
+            zeroLineColor: chartGridLineColor
           }
         }]
       },
@@ -331,11 +345,12 @@ $(function () {
             scaleLabel: {
               display: true,
               labelString: 'Sales by year',
+              fontColor: chartFontcolor,
               fontSize: 12,
               lineHeight: 2
             },
             ticks: {
-              fontColor: '#bfccda',
+              fontColor: chartFontcolor,
               stepSize: 50,
               min: 0,
               max: 150,
@@ -347,8 +362,8 @@ $(function () {
             gridLines: {
               display: false,
               drawBorder: false,
-              color: 'transparent',
-              zeroLineColor: '#eeeeee'
+              color: chartGridLineColor,
+              zeroLineColor: chartGridLineColor
             }
           }],
           yAxes: [{
@@ -356,6 +371,7 @@ $(function () {
             scaleLabel: {
               display: true,
               labelString: 'revenue by sales',
+              fontColor: chartFontcolor,
               fontSize: 12,
               lineHeight: 2
             },
@@ -363,13 +379,15 @@ $(function () {
               display: true,
               autoSkip: false,
               maxRotation: 0,
-              fontColor: '#bfccda',
+              fontColor: chartFontcolor,
               stepSize: 50,
               min: 0,
               max: 150
             },
             gridLines: {
-              drawBorder: false
+              drawBorder: false,
+              color: chartGridLineColor,
+              zeroLineColor: chartGridLineColor
             }
           }]
         },
@@ -440,11 +458,12 @@ $(function () {
             scaleLabel: {
               display: true,
               labelString: 'User by time',
+              fontColor: chartFontcolor,
               fontSize: 12,
               lineHeight: 2
             },
             ticks: {
-              fontColor: '#bfccda',
+              fontColor: chartFontcolor,
               stepSize: 50,
               min: 0,
               max: 150,
@@ -456,8 +475,8 @@ $(function () {
             gridLines: {
               display: false,
               drawBorder: false,
-              color: 'transparent',
-              zeroLineColor: '#eeeeee'
+              color: chartGridLineColor,
+              zeroLineColor: chartGridLineColor
             }
           }],
           yAxes: [{
@@ -465,11 +484,12 @@ $(function () {
             scaleLabel: {
               display: true,
               labelString: 'Number of users',
+              fontColor: chartFontcolor,
               fontSize: 12,
               lineHeight: 2
             },
             ticks: {
-              fontColor: '#bfccda',
+              fontColor: chartFontcolor,
               stepSize: 50,
               min: 0,
               max: 150,
@@ -479,7 +499,9 @@ $(function () {
               maxTicksLimit: 10
             },
             gridLines: {
-              drawBorder: false
+              drawBorder: false,
+              color: chartGridLineColor,
+              zeroLineColor: chartGridLineColor
             }
           }]
         },
@@ -547,9 +569,12 @@ $(function () {
           max: 100,
           stepSize: 20,
           display: false,
+          fontColor: chartFontcolor
         },
         pointLabels: {
-          fontSize: 14
+          fontSize: 14,
+          fontColor: chartFontcolor,
+          color: chartGridLineColor
         }
       },
       legend: false,
@@ -923,26 +948,28 @@ $(function () {
           xAxes: [{
             gridLines: {
               display: false,
-              color: '#fff',
+              color: chartGridLineColor,
+              zeroLineColor: chartGridLineColor
             },
             ticks: {
               autoSkip: true,
               autoSkipPadding: 45,
               maxRotation: 0,
               maxTicksLimit: 10,
-              fontColor: '#212229'
+              fontColor: chartFontcolor
             }
           }],
           yAxes: [{
             gridLines: {
-              color: '#eff2ff',
+              color: chartGridLineColor,
+              zeroLineColor: chartGridLineColor,
               display: true
             },
             ticks: {
               beginAtZero: true,
               stepSize: 25,
               max: 100,
-              fontColor: '#212229'
+              fontColor: chartFontcolor
             }
           }]
         },

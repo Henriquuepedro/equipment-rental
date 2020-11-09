@@ -70,6 +70,12 @@
 </script>
 @stop
 
+@php
+    $disabled = in_array('EquipamentUpdatePost', $permissions) ? '' : 'disabled';
+    $btns = in_array('EquipamentUpdatePost', $permissions);
+@endphp
+
+
 @section('content')
     <div class="row">
         <div class="col-md-12 d-flex align-items-stretch grid-margin">
@@ -89,12 +95,12 @@
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">
                                     <label class="form-check-label">
-                                        <input type="radio" class="form-check-input" name="type_equipament" value="cacamba" {{ old() ? (old('type_equipament') === 'cacamba' ? 'checked' : '') : ($equipament->name === null ? 'checked' : '') }}> Caçamba <i class="input-helper"></i>
+                                        <input {{ $disabled }} type="radio" class="form-check-input" name="type_equipament" value="cacamba" {{ old() ? (old('type_equipament') === 'cacamba' ? 'checked' : '') : ($equipament->name === null ? 'checked' : '') }}> Caçamba <i class="input-helper"></i>
                                     </label>
                                 </div>
                                 <div class="form-radio form-radio-flat">
                                     <label class="form-check-label">
-                                        <input type="radio" class="form-check-input" name="type_equipament" value="others" {{ old() ? (old('type_equipament') === 'others' ? 'checked' : '') : ($equipament->name !== null ? 'checked' : '') }}> Outros <i class="input-helper"></i>
+                                        <input {{ $disabled }} type="radio" class="form-check-input" name="type_equipament" value="others" {{ old() ? (old('type_equipament') === 'others' ? 'checked' : '') : ($equipament->name !== null ? 'checked' : '') }}> Outros <i class="input-helper"></i>
                                     </label>
                                 </div>
                             </div>
@@ -108,7 +114,7 @@
                                 <div class="row">
                                     <div class="form-group col-md-4 label-animate">
                                         <label for="volume">Volume <sup>*</sup></label>
-                                        <select class="form-control" id="volume" name="volume">
+                                        <select {{ $disabled }} class="form-control" id="volume" name="volume">
                                             <option {{ old() ? old('volume') == '' ? 'selected' : '' : ($equipament->volume == null ? 'selected' : '') }}>Selecione ...</option>
                                             <option value="3" {{ old() ? old('volume') == 3 ? 'selected' : '' : ($equipament->volume == 3 ? 'selected' : '') }}>3m³</option>
                                             <option value="4" {{ old() ? old('volume') == 4 ? 'selected' : '' : ($equipament->volume == 4 ? 'selected' : '')  }}>4m³</option>
@@ -122,25 +128,25 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="name">Nome do Equipamento <sup>*</sup></label>
-                                        <input type="text" class="form-control" id="name" name="name" autocomplete="nope" value="{{ old('name') ?? $equipament->name }}">
+                                        <input {{ $disabled }} type="text" class="form-control" id="name" name="name" autocomplete="nope" value="{{ old('name') ?? $equipament->name }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="reference">Referência <sup>*</sup></label>
-                                        <input type="text" class="form-control" id="reference" name="reference" autocomplete="nope" value="{{ old('reference') ?? $equipament->reference }}" required>
+                                        <input {{ $disabled }} type="text" class="form-control" id="reference" name="reference" autocomplete="nope" value="{{ old('reference') ?? $equipament->reference }}" required>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="manufacturer">Fabricante </label>
-                                        <input type="text" class="form-control" id="manufacturer" name="manufacturer" autocomplete="nope" value="{{ old('manufacturer') ?? $equipament->manufacturer }}">
+                                        <input {{ $disabled }} type="text" class="form-control" id="manufacturer" name="manufacturer" autocomplete="nope" value="{{ old('manufacturer') ?? $equipament->manufacturer }}">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-4">
                                         <label for="value">Valor Por Dia</label>
-                                        <input type="text" class="form-control" id="value" name="value" autocomplete="nope" value="{{ old('value') ?? $equipament->value }}">
+                                        <input {{ $disabled }} type="text" class="form-control" id="value" name="value" autocomplete="nope" value="{{ old('value') ?? $equipament->value }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="stock">Estoque</label>
-                                        <label for="stock"></label><input type="text" class="form-control" id="stock" name="stock" autocomplete="nope" value="{{ old('stock') ?? $equipament->stock }}">
+                                        <input {{ $disabled }} type="text" class="form-control" id="stock" name="stock" autocomplete="nope" value="{{ old('stock') ?? $equipament->stock }}">
                                     </div>
                                 </div>
                             </div>
@@ -163,19 +169,19 @@
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Dia Inicial</label>
-                                                    <input type="text" class="form-control" name="day_start[]" autocomplete="nope" value="{{ $period->day_start }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="day_start[]" autocomplete="nope" value="{{ $period->day_start }}">
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Dia Final</label>
-                                                    <input type="text" class="form-control" name="day_end[]" autocomplete="nope" value="{{ $period->day_end }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="day_end[]" autocomplete="nope" value="{{ $period->day_end }}">
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Valor</label>
-                                                    <input type="text" class="form-control" name="value_period[]" autocomplete="nope" value="{{ $period->value }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="value_period[]" autocomplete="nope" value="{{ $period->value }}">
                                                 </div>
                                                 <div class="form-group col-md-1">
                                                     <label>&nbsp;</label>
-                                                    <button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>
+                                                    @if ($btns)<button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>@endif
                                                 </div>
                                             </div>
                                         </div>
@@ -193,28 +199,30 @@
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Dia Inicial</label>
-                                                    <input type="text" class="form-control" name="day_start[]" autocomplete="nope" value="{{ old('day_start')[$period] }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="day_start[]" autocomplete="nope" value="{{ old('day_start')[$period] }}">
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Dia Final</label>
-                                                    <input type="text" class="form-control" name="day_end[]" autocomplete="nope" value="{{ old('day_end')[$period] }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="day_end[]" autocomplete="nope" value="{{ old('day_end')[$period] }}">
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Valor</label>
-                                                    <input type="text" class="form-control" name="value_period[]" autocomplete="nope" value="{{ old('value_period')[$period] }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="value_period[]" autocomplete="nope" value="{{ old('value_period')[$period] }}">
                                                 </div>
                                                 <div class="form-group col-md-1">
                                                     <label>&nbsp;</label>
-                                                    <button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>
+                                                    @if ($btns)<button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>@endif
                                                 </div>
                                             </div>
                                         </div>
                                     @endfor
                                 @endif
+                                @if ($btns)
                                 <div id="new-periods" class="mt-2"></div>
                                 <div class="col-md-12 text-center mt-2">
                                     <button type="button" class="btn btn-primary" id="add-new-period">Adicionar Novo Período</button>
                                 </div>
+                                @endif
                                 <div class="col-md-12 text-center mt-2">
                                     <p class="text-danger">Caso opte por não adicionar períodos, no cadastro de uma nova locação será sugerido o valor por dia cadastrado no equipamento.</p>
                                 </div>
@@ -223,7 +231,7 @@
                         <div class="card display-none">
                             <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('equipament.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
-                                <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-sync"></i> Atualizar</button>
+                                @if ($btns)<button type="submit" class="btn btn-success col-md-3"><i class="fa fa-sync"></i> Atualizar</button>@endif
                             </div>
                         </div>
                         <input type="hidden" name="equipament_id" value="{{ $equipament->id }}">

@@ -29,6 +29,10 @@
           .sub-menu {
             margin: 5px 0;
 
+            .rtl & {
+              padding: $rtl-sidebar-submenu-padding;
+            }
+
             .nav-item {
               .nav-link {
                 padding: 10px 0px 10px 70px;
@@ -49,6 +53,11 @@
                   height: 100%;
                   width: 2px;
                   background: $sidebar-light-submenu-line-color;
+
+                  .rtl & {
+                    right: -5px;
+                    left: unset;
+                  }
                 }
 
                 &:hover {
@@ -57,6 +66,10 @@
                   &:before {
                     background: #fff;
                   }
+                }
+
+                .rtl & {
+                  padding: 10px 15px 10px 0px;
                 }
               }
 
@@ -82,6 +95,10 @@
         padding: $sidebar-menu-padding;
         white-space: nowrap;
         color: $sidebar-light-menu-color;
+
+        .rtl & {
+          padding: $sidebar-menu-padding-rtl;
+        }
 
         i {
           &.menu-arrow {
@@ -119,6 +136,11 @@
           line-height: 1;
           font-size: 18px;
           color: $sidebar-light-menu-icon-color;
+
+          .rtl & {
+            margin-right: 0;
+            margin-left: 1.25rem;
+          }
         }
 
         .menu-title {
@@ -168,6 +190,11 @@
           .profile-image {
             margin-right: 15px;
             position: relative;
+
+            .rtl & {
+              margin-right: 0;
+              margin-left: 15px;
+            }
           }
 
           .dot-indicator {
@@ -221,6 +248,11 @@
           border-radius: 100%;
           border: 2px solid $sidebar-nav-item-dot-color;
           display: block;
+
+          .rtl & {
+            left: auto;
+            right: 45px;
+          }
         }
       }
     }
@@ -239,6 +271,11 @@
             >.nav-link:not([aria-expanded="true"]) {
               background: $sidebar-light-menu-hover-bg;
               padding-left: 65px;
+
+              .rtl & {
+                padding-left: 30px;
+                padding-right: 80px;
+              }
 
               &:before {
                 border-color: $sidebar-light-menu-hover-color;
