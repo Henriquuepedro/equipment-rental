@@ -22,7 +22,7 @@
     <div class="container-scroller">
         @include('vendor.adminlte.partials.navbar.navbar')
         <div class="container-fluid page-body-wrapper">
-            @include('vendor.adminlte.partials.navbar.sidebar')
+            @include('vendor.adminlte.partials.sidebar.sidebar')
 
             <div class="main-panel">
                 <div class="content-wrapper">

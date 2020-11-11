@@ -48,6 +48,9 @@ table td .form-group.label-animate label {
 .form-group.label-animate .form-control:focus {
     border-color: #1a73e8;
 }
+.form-group.label-animate .label-focus {
+    color: #1a73e8;
+}
 .form-group input,
 .form-group textarea,
 .form-group select {
@@ -293,7 +296,7 @@ label sup{
     list-style-type: none;
 }
 .form-control.error{
-    border: 1px solid red;
+    border: 1px solid red !important;
 }
 /*
  * Component: Box
@@ -723,6 +726,64 @@ table .form-group {
 .modal .modal-dialog .modal-content .modal-header {
     padding: 15px 25px;
     align-items: center;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    margin-right: 5px;
+}
+.switch-input {
+    display: none;
+}
+.switch-label {
+    display: block;
+    width: 45px;
+    height: 24px;
+    text-indent: -150%;
+    clip: rect(0 0 0 0);
+    color: transparent;
+    user-select: none;
+}
+.switch-label::before,
+.switch-label::after {
+    content: "";
+    display: block;
+    position: absolute;
+    cursor: pointer;
+}
+.switch-label::before {
+    width: 100%;
+    height: 24px;
+    background-color: #ff6258;
+    border-radius: 9999em;
+    -webkit-transition: background-color 0.25s ease;
+    transition: background-color 0.25s ease;
+    margin-left: 1px;
+}
+.switch-label::after {
+    top: 0;
+    left: 1px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.45);
+    -webkit-transition: left 0.25s ease;
+    transition: left 0.25s ease;
+}
+.switch-input:checked + .switch-label::before {
+    background-color: #19d895;
+}
+.switch-input:checked + .switch-label::after {
+    left: 22px;
+}
+.dataTables_wrapper .dataTables_length select {
+    margin-left: 0;
+    margin-right: 0;
+}
+.form-control:disabled {
+    background-color: #fff;
+    cursor: not-allowed;
 }
 
 

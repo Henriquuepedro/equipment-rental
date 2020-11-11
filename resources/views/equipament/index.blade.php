@@ -26,12 +26,15 @@
                 "searching": true,
                 "serverMethod": "post",
                 "order": [[ 0, 'desc' ]],
-                "ajax": $.fn.dataTable.pipeline({
+                "ajax": {
                     url: '{{ route('ajax.equipament.fetch') }}',
                     pages: 2,
                     type: 'POST',
                     data: { "_token": $('meta[name="csrf-token"]').attr('content') },
-                }),
+                    error: function(jqXHR, ajaxOptions, thrownError) {
+                        console.log(jqXHR, ajaxOptions, thrownError);
+                    }
+                },
                 "initComplete": function( settings, json ) {
                     $('[data-toggle="tooltip"]').tooltip();
                 },

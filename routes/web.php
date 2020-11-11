@@ -49,6 +49,7 @@ Route::group(['middleware' => 'auth'], function (){
         Route::post('/atualizar', [App\Http\Controllers\ClientController::class, 'update'])->name('update');
 
     });
+
     // Equipamento
     Route::group(['prefix' => '/equipamento', 'as' => 'equipament.'], function () {
 
@@ -60,6 +61,19 @@ Route::group(['middleware' => 'auth'], function (){
         Route::post('/atualizar', [App\Http\Controllers\EquipamentController::class, 'update'])->name('update');
 
     });
+
+    // Motoristas
+    Route::group(['prefix' => '/motorista', 'as' => 'driver.'], function () {
+
+        Route::get('/', [App\Http\Controllers\DriverController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\DriverController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\DriverController::class, 'insert'])->name('insert');
+
+        Route::get('/{id}', [App\Http\Controllers\DriverController::class, 'edit'])->name('edit');
+        Route::post('/atualizar', [App\Http\Controllers\DriverController::class, 'update'])->name('update');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -83,6 +97,10 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/excluir', [App\Http\Controllers\UserController::class, 'deleteUser'])->name('delete');
             Route::post('/atualizar', [App\Http\Controllers\UserController::class, 'update'])->name('update');
             Route::post('/usuario', [App\Http\Controllers\UserController::class, 'getUser'])->name('get-user');
+        });
+        Route::group(['prefix' => '/motorista', 'as' => 'driver.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\DriverController::class, 'fetchDrivers'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\DriverController::class, 'delete'])->name('delete');
         });
     });
 });

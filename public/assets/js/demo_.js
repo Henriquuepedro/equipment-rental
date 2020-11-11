@@ -60,7 +60,11 @@ var Toast = Swal.mixin({
                     $(this).parent().removeClass("label-animate");
                 }
             });
-            $(this).parent().addClass("label-animate");
+            $(this).parent().addClass("label-animate").find("label").addClass('label-focus');
+        });
+
+        $(document).on('blur', ".form-control", function(event) {
+            $('.label-focus').removeClass('label-focus');
         });
 
         if ($('.alert.alert-success').length) {

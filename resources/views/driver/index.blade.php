@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Listagem de Clientes')
+@section('title', 'Listagem de Motoristas')
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Listagem de Clientes</h1>
+    <h1 class="m-0 text-dark">Listagem de Motoristas</h1>
 @stop
 
 @section('css')
@@ -11,13 +11,13 @@
 
 @section('js')
     <script>
-        var tableClient;
+        var tableDriver;
         $(function () {
-            tableClient = getTable();
+            tableDriver = getTable();
         });
 
         const getTable = () => {
-            return $("#tableClients").DataTable({
+            return $("#tableDrivers").DataTable({
                 "responsive": true,
                 "processing": true,
                 "autoWidth": false,
@@ -27,7 +27,7 @@
                 "serverMethod": "post",
                 "order": [[ 0, 'desc' ]],
                 "ajax": {
-                    url: '{{ route('ajax.client.fetch') }}',
+                    url: '{{ route('ajax.driver.fetch') }}',
                     pages: 2,
                     type: 'POST',
                     data: { "_token": $('meta[name="csrf-token"]').attr('content') },
@@ -44,13 +44,13 @@
             });
         }
 
-        $(document).on('click', '.btnRemoveClient', function (){
-            const client_id = $(this).attr('client-id');
-            const client_name = $(this).closest('tr').find('td:eq(1)').text();
+        $(document).on('click', '.btnRemoveDriver', function (){
+            const driver_id = $(this).attr('driver-id');
+            const driver_name = $(this).closest('tr').find('td:eq(1)').text();
 
             Swal.fire({
-                title: 'Exclusão de Cliente',
-                html: "Você está prestes a excluir definitivamente o cliente <br><strong>"+client_name+"</strong><br>Deseja continuar?",
+                title: 'Exclusão de Motorista',
+                html: "Você está prestes a excluir definitivamente o motorista <br><strong>"+driver_name+"</strong><br>Deseja continuar?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -65,13 +65,13 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         type: 'POST',
-                        url: "{{ route('ajax.client.delete') }}",
-                        data: { client_id },
+                        url: "{{ route('ajax.driver.delete') }}",
+                        data: { driver_id },
                         dataType: 'json',
                         success: response => {
-                            tableClient.destroy();
-                            $("#tableClients tbody").empty();
-                            tableClient = getTable();
+                            tableDriver.destroy();
+                            $("#tableDrivers tbody").empty();
+                            tableDriver = getTable();
                             Toast.fire({
                                 icon: response.success ? 'success' : 'error',
                                 title: response.message
@@ -85,7 +85,7 @@
                                     icon: 'error',
                                     title: 'Você não tem permissão para fazer essa operação!'
                                 });
-                                $(`button[client-id="${client_id}"]`).trigger('blur');
+                                $(`button[driver-id="${driver_id}"]`).trigger('blur');
                             }
                         }
                     });
@@ -107,17 +107,17 @@
             <div class="card">
                 <div class="card-body">
                     <div class="header-card-body justify-content-between flex-wrap">
-                        <h4 class="card-title no-border">Clientes Cadastrados</h4>
-                        @if(in_array('ClientCreatePost', $permissions))
-                        <a href="{{ route('client.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
+                        <h4 class="card-title no-border">Motoristas Cadastrados</h4>
+                        @if(in_array('DriverCreatePost', $permissions))
+                        <a href="{{ route('driver.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
                         @endif
                     </div>
-                    <table id="tableClients" class="table table-bordered">
+                    <table id="tableDrivers" class="table table-bordered">
                         <thead>
                         <tr>
                             <th>#</th>
                             <th>Nome</th>
-                            <th>Email</th>
+                            <th>CPF</th>
                             <th>Telefone</th>
                             <th>Ação</th>
                         </tr>
@@ -128,7 +128,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nome</th>
-                                <th>Email</th>
+                                <th>CPF</th>
                                 <th>Telefone</th>
                                 <th>Ação</th>
                             </tr>

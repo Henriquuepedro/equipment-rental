@@ -50,8 +50,12 @@ class CompanyController extends Controller
             foreach ($permissions as $permission) {
                 $htmlPermissions .= '
                           <tr>
-                            <td class="pr-0 pl-0">
-                              <input type="checkbox" name="newuser_'.$permission->name.'" id="newuser_'.$permission->name.'" permission-id="'.$permission->id.'" auto-check="'.$permission->auto_check.'"> <label for="newuser_'.$permission->name.'">'.$permission->text.'</label>
+                            <td class="pr-0 pl-0 pt-3 d-flex align-items-center">
+                              <div class="switch">
+                                <input type="checkbox" class="switch-input" name="newuser_'.$permission->name.'" id="newuser_'.$permission->name.'" permission-id="'.$permission->id.'" auto-check="'.$permission->auto_check.'">
+                                <label for="newuser_'.$permission->name.'" class="switch-label"></label>
+                              </div>
+                              '.$permission->text.'
                             </td>
                           </tr>';
             }

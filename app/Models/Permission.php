@@ -44,7 +44,7 @@ class Permission extends Model
 
     public function getGroupPermissions()
     {
-        return $this->select(['group_name', 'group_text'])->groupBy('group_name')->get();
+        return $this->select(['group_name', 'group_text'])->groupBy('group_text')->get();
     }
 
     public function getPermissionByGroup($group)

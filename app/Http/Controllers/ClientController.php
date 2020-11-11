@@ -165,7 +165,7 @@ class ClientController extends Controller
         $name       = $request->name_client     ? filter_var($request->name_client, FILTER_SANITIZE_STRING) : null;
         $type       = $request->type_person     ? filter_var($request->type_person, FILTER_SANITIZE_STRING) : 'pf';
         $fantasy    = $request->fantasy_client  ? filter_var($request->fantasy_client, FILTER_SANITIZE_STRING) : null;
-        $email      = $request->email           ? filter_var($request->email, FILTER_VALIDATE_EMAIL) : null;
+        $email      = $request->email           ? (filter_var($request->email, FILTER_VALIDATE_EMAIL) ? $request->email : null) : null;
         $phone_1    = $request->phone_1         ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_1), FILTER_SANITIZE_NUMBER_INT) : null;
         $phone_2    = $request->phone_2         ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_2), FILTER_SANITIZE_NUMBER_INT) : null;
         $cpf_cnpj   = $request->cpf_cnpj        ? filter_var(preg_replace('/[^0-9]/', '', $request->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT) : null;

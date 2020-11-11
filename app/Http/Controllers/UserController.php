@@ -285,8 +285,12 @@ class UserController extends Controller
 
                 $htmlPermissions .= '
                           <tr>
-                            <td class="pr-0 pl-0">
-                              <input type="checkbox" class="update-permission" name="'.$permission->name.'" id="user_'.$permission->name.'" permission-id="'.$permission->id.'" auto-check="'.$permission->auto_check.'" '.$checked.'> <label for="user_'.$permission->name.'">'.$permission->text.'</label>
+                            <td class="pr-0 pl-0 pt-3 d-flex align-items-center">
+                              <div class="switch">
+                                <input type="checkbox" class="update-permission switch-input" name="'.$permission->name.'" id="user_'.$permission->name.'" permission-id="'.$permission->id.'" auto-check="'.$permission->auto_check.'" '.$checked.'>
+                                <label for="user_'.$permission->name.'" class="switch-label"></label>
+                              </div>
+                              '.$permission->text.'
                             </td>
                           </tr>';
             }

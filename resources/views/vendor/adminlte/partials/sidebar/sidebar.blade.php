@@ -35,9 +35,14 @@
                     </li>
                     @endif
                     @if(in_array('EquipamentView', $permissions))
-                    <li class="nav-item">
-                        <a class="nav-link" href=" {{ route('equipament.index') }}">Equipamento</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href=" {{ route('equipament.index') }}">Equipamento</a>
+                        </li>
+                    @endif
+                    @if(in_array('DriverView', $permissions))
+                        <li class="nav-item">
+                            <a class="nav-link" href=" {{ route('driver.index') }}">Motorista</a>
+                        </li>
                     @endif
                 </ul>
             </div>

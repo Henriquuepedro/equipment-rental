@@ -23,8 +23,12 @@
         [aria-labelledby="dropdownConfigUser"] .btn{
             border-radius: 0;
         }
+        #viewPermission .permissions .card .card-body ,
+        #newUserModal .permissions .card .card-body {
+            padding: 0.8rem 0.8rem;
+        }
         @media (max-width: 576px) {
-            #users-registred .card .card-body {
+            #users-registred .permissions .card .card-body {
                 padding: 0.8rem 0.8rem;
             }
             #users-registred .card .card-body .user-avatar{
@@ -48,6 +52,12 @@
             else $('#cpf_cnpj').mask('00.000.000/0000-00');
 
             $('[name="phone_1"],[name="phone_2"],[name="phone_modal"]').mask('(00) 000000000');
+
+            setTimeout(() => {
+                $('#newUserModal #formCreateUser .form-group').each(function (){
+                    $(this).removeClass('label-animate').find('input.form-control').val('');
+                });
+            }, 1000);
 
             var src = document.getElementById("profile-logo");
             var target = document.getElementById("src-profile-logo");
@@ -515,6 +525,7 @@
         $(document).on('click', '.removeUser', function (){
             const user_id   = $(this).attr('user-id');
             const user_name = $(this).attr('user-name');
+            const elDelete  = $(this).closest('.card').closest('.col-md-12');
 
             Swal.fire({
                 title: 'Excluir usuário definitivamente',
@@ -542,7 +553,10 @@
                                 title: response.message
                             })
 
-                            if (response.success) loadUsers();
+                            if (response.success) {
+                                elDelete.slideUp(700);
+                                setTimeout(() => { elDelete.remove() }, 900);
+                            }
                         }, error: e => {
                             console.log(e);
                         },

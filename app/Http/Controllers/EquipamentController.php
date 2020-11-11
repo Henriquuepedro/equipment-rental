@@ -227,6 +227,9 @@ class EquipamentController extends Controller
 
     public function fetchEquipaments(Request $request)
     {
+        if (!$this->hasPermission('EquipamentView'))
+            return response()->json([]);
+
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
@@ -290,7 +293,7 @@ class EquipamentController extends Controller
             "data" => $result
         );
 
-        echo json_encode($output);
+        return response()->json($output);
     }
 
     private function formatDataEquipament($request)

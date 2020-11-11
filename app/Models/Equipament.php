@@ -47,35 +47,35 @@ class Equipament extends Model
         return $this->where('id', $equipament_id)->update($data);
     }
 
-    public function getEquipaments($company_id, $init = null, $length = null, $searchUser = null, $orderBy = array())
+    public function getEquipaments($company_id, $init = null, $length = null, $searchEquipament = null, $orderBy = array())
     {
-        $client = $this->where('company_id', $company_id);
-        if ($searchUser)
-            $client->where(function($query) use ($searchUser) {
-                $query->where('name', 'like', "%{$searchUser}%")
-                    ->orWhere('reference', 'like', "%{$searchUser}%")
-                    ->orWhere('stock', 'like', "%{$searchUser}%");
+        $equipament = $this->where('company_id', $company_id);
+        if ($searchEquipament)
+            $equipament->where(function($query) use ($searchEquipament) {
+                $query->where('name', 'like', "%{$searchEquipament}%")
+                    ->orWhere('reference', 'like', "%{$searchEquipament}%")
+                    ->orWhere('stock', 'like', "%{$searchEquipament}%");
             });
 
-        if (count($orderBy) !== 0) $client->orderBy($orderBy['field'], $orderBy['order']);
-        else $client->orderBy('id', 'desc');
+        if (count($orderBy) !== 0) $equipament->orderBy($orderBy['field'], $orderBy['order']);
+        else $equipament->orderBy('id', 'desc');
 
-        if ($init !== null && $length !== null) $client->offset($init)->limit($length);
+        if ($init !== null && $length !== null) $equipament->offset($init)->limit($length);
 
-        return $client->get();
+        return $equipament->get();
     }
 
-    public function getCountEquipaments($company_id, $searchUser = null)
+    public function getCountEquipaments($company_id, $searchEquipament = null)
     {
-        $client = $this->where('company_id', $company_id);
-        if ($searchUser)
-            $client->where(function($query) use ($searchUser) {
-                $query->where('name', 'like', "%{$searchUser}%")
-                    ->orWhere('reference', 'like', "%{$searchUser}%")
-                    ->orWhere('stock', 'like', "%{$searchUser}%");
+        $equipament = $this->where('company_id', $company_id);
+        if ($searchEquipament)
+            $equipament->where(function($query) use ($searchEquipament) {
+                $query->where('name', 'like', "%{$searchEquipament}%")
+                    ->orWhere('reference', 'like', "%{$searchEquipament}%")
+                    ->orWhere('stock', 'like', "%{$searchEquipament}%");
             });
 
-        return $client->count();
+        return $equipament->count();
     }
 
     public function getEquipament($equipament_id, $company_id)
