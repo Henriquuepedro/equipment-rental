@@ -2,40 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/DriverController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Requests/DriverCreatePost.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Requests/DriverDeletePost.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Requests/DriverUpdatePost.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Models/Driver.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2020_11_10_001443_create_drivers_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/js/views/driver/form.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/driver/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/driver/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/driver/update.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CompanyController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/ClientCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/ClientCreatePost.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Equipament.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Equipament.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Permission.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Permission.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/js/demo_.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/demo_.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/client/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2014_10_11_160802_create_companies_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2014_10_11_160802_create_companies_table.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/config/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/config/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/equipament/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipament/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/page.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/page.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/navbar/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/left-sidebar.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/menu-item-header.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/menu-item-link.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/menu-item-search-form.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/menu-item-treeview-menu.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/menu-item.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/right-sidebar.blade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -203,19 +174,19 @@
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Projetos\locacao\public\assets\js\views" />
-      <recent name="C:\Projetos\locacao\resources\views" />
-      <recent name="C:\Projetos\locacao\resources\lang" />
-      <recent name="C:\Projetos\locacao\resources\views\config" />
-      <recent name="C:\Projetos\locacao\resources\views\profile" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Projetos\locacao\resources\views\vendor\adminlte\partials\sidebar" />
       <recent name="C:\Projetos\locacao\resources\views\config" />
       <recent name="C:\Projetos\locacao\public\assets\js" />
       <recent name="C:\Projetos\locacao\public\assets\css" />
       <recent name="C:\Projetos\locacao\public\assets\images" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Projetos\locacao\public\assets\js\views" />
+      <recent name="C:\Projetos\locacao\resources\views" />
+      <recent name="C:\Projetos\locacao\resources\lang" />
+      <recent name="C:\Projetos\locacao\resources\views\config" />
+      <recent name="C:\Projetos\locacao\resources\views\profile" />
     </key>
   </component>
   <component name="RunManager">
@@ -270,7 +241,9 @@
       <workItem from="1604924207646" duration="2282000" />
       <workItem from="1604961699983" duration="7041000" />
       <workItem from="1605053625980" duration="5612000" />
-      <workItem from="1605130310964" duration="2846000" />
+      <workItem from="1605130310964" duration="3713000" />
+      <workItem from="1605185138865" duration="298000" />
+      <workItem from="1605223829510" duration="3353000" />
     </task>
     <servers />
   </component>

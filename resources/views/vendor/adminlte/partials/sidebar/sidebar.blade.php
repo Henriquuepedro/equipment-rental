@@ -7,7 +7,8 @@
     if ($route->getName() == 'dashboard') $dashboardActive = 'active';
     elseif (
         strstr($route->getName(),'client') !== false ||
-        strstr($route->getName(),'equipament') !== false
+        strstr($route->getName(),'equipament') !== false ||
+        strstr($route->getName(),'driver') !== false
     ) $registerActive = 'active';
 @endphp
 

@@ -84,6 +84,15 @@ class CompanyController extends Controller
         $phone_2    = $request->phone_2 ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_2), FILTER_SANITIZE_NUMBER_INT) : null;
         $contact    = $request->contact ? filter_var($request->contact, FILTER_SANITIZE_STRING) : null;
 
+        $cep            = $request->cep ? filter_var(preg_replace('/[^0-9]/', '', $request->cep), FILTER_SANITIZE_NUMBER_INT) : null;
+        $address        = $request->address ? filter_var($request->address, FILTER_SANITIZE_STRING) : null;
+        $number         = $request->number ? filter_var($request->number, FILTER_SANITIZE_STRING) : null;
+        $complement     = $request->complement ? filter_var($request->complement, FILTER_SANITIZE_STRING) : null;
+        $reference      = $request->reference ? filter_var($request->reference, FILTER_SANITIZE_STRING) : null;
+        $neigh          = $request->neigh ? filter_var($request->neigh, FILTER_SANITIZE_STRING) : null;
+        $city           = $request->city ? filter_var($request->city, FILTER_SANITIZE_STRING) : null;
+        $state          = $request->state ? filter_var($request->state, FILTER_SANITIZE_STRING) : null;
+
         if ($request->profile_logo) {
             $uploadLogo = $this->uploadLogoCompany($company_id, $request->file('profile_logo'));
             if ($uploadLogo === false) {
@@ -100,6 +109,14 @@ class CompanyController extends Controller
             'phone_1'       => $phone_1,
             'phone_2'       => $phone_2,
             'contact'       => $contact,
+            'address'       => $address,
+            'number'        => $number,
+            'cep'           => $cep,
+            'complement'    => $complement,
+            'reference'     => $reference,
+            'neigh'         => $neigh,
+            'city'          => $city,
+            'state'         => $state,
             'user_update'   => $user_id
         );
 

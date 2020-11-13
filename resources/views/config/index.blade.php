@@ -48,6 +48,8 @@
     <script src="{{ asset('assets/js/shared/file-upload.js') }}" type="application/javascript"></script>
     <script>
         $(() => {
+            $('[name="cep"]').mask('00.000-000');
+
             if ($('#cpf_cnpj').val().length == 11) $('#cpf_cnpj').mask('000.000.000-00');
             else $('#cpf_cnpj').mask('00.000.000/0000-00');
 
@@ -64,6 +66,35 @@
             showImage(src,target);
         });
 
+        $(document).on('blur', '[name="cep"]', function (){
+            const cep = $(this).val().replace(/\D/g, '');
+            let el = $(this).closest('form');
+
+            if (cep.length === 0) return false;
+            if (cep.length !== 8) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'CEP não encontrado'
+                });
+                return false;
+            }
+            $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/", function(dados) {
+
+                if (!("erro" in dados)) {
+                    if(dados.logradouro !== '') el.find('[name="address"]').val(dados.logradouro).parent().addClass("label-animate");
+                    if(dados.bairro !== '')     el.find('[name="neigh"]').val(dados.bairro).parent().addClass("label-animate");
+                    if(dados.localidade !== '') el.find('[name="city"]').val(dados.localidade).parent().addClass("label-animate");
+                    if(dados.uf !== '')         el.find('[name="state"]').val(dados.uf).parent().addClass("label-animate");
+                } //end if.
+                else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'CEP não encontrado'
+                    })
+                }
+            });
+        })
+
         $("#formUpdateCompany").validate({
             rules: {
                 name: {
@@ -79,6 +110,18 @@
                 email: {
                     required: true,
                     email: true
+                },
+                address: {
+                    required: true
+                },
+                neigh: {
+                    required: true
+                },
+                city: {
+                    required: true
+                },
+                state: {
+                    required: true
                 }
             },
             messages: {
@@ -95,6 +138,18 @@
                 email: {
                     required: "Informe um e-mail comercial válido.",
                     email: "Informe um e-mail comercial válido."
+                },
+                address: {
+                    required: "Informe o endereço para a empresa."
+                },
+                neigh: {
+                    required: "Informe o bairro para a empresa."
+                },
+                city: {
+                    required: "Informe a cidade para a empresa."
+                },
+                state: {
+                    required: "Informe o estado para a empresa."
                 }
             },
             invalidHandler: function(event, validator) {
@@ -115,7 +170,7 @@
 
         $('#new-user').on('click', function (){
             $('#newUserModal').modal();
-        })
+        });
 
         $('#formCreateUser').validate({
             rules: {
@@ -825,6 +880,64 @@
                                             </div>
                                             <div class="col-md-12 no-padding">
                                                 <div class="row">
+                                                    <div class="col-md-12">
+                                                        <hr class="mb-0">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 no-padding mt-3">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <h4>Endereço da Empresa</h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 no-padding">
+                                                <div class="row">
+                                                    <div class="form-group col-md-3">
+                                                        <label for="cep">CEP</label>
+                                                        <input type="tel" class="form-control" name="cep" id="cep" value="{{ old('cep') ?? $company->cep }}">
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="address">Endereço</label>
+                                                        <input type="text" class="form-control" name="address" id="address" value="{{ old('address') ?? $company->address }}">
+                                                    </div>
+                                                    <div class="form-group col-md-3">
+                                                        <label for="number">Número</label>
+                                                        <input type="text" class="form-control" name="number" id="number" value="{{ old('number') ?? $company->number }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 no-padding">
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="complement">Complemento</label>
+                                                        <input type="text" class="form-control" name="complement" id="complement" value="{{ old('complement') ?? $company->complement }}">
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="reference">Referência</label>
+                                                        <input type="text" class="form-control" name="reference" id="reference" value="{{ old('reference') ?? $company->reference }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 no-padding">
+                                                <div class="row">
+                                                    <div class="form-group col-md-4">
+                                                        <label for="neigh">Bairro</label>
+                                                        <input type="text" class="form-control" name="neigh" id="neigh" value="{{ old('neigh') ?? $company->neigh }}">
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="city">Cidade</label>
+                                                        <input type="text" class="form-control" name="city" id="city" value="{{ old('city') ?? $company->city }}">
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="state">Estado</label>
+                                                        <input type="text" class="form-control" name="state" id="state" value="{{ old('state') ?? $company->state }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 no-padding">
+                                                <div class="row">
                                                     <div class="form-group col-md-12 text-right pt-3 mt-3 border-top">
                                                         <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Salvar</button>
                                                     </div>
@@ -894,7 +1007,7 @@
                         <div class="row">
                             <div class="col-md-12 mb-5 text-center">
                                 <h4 class="no-margin">Permissões de acesso</h4>
-                                <small>Defina quais as funcionalidades o usuário terá permissão de realizar</small>
+                                <small>Defina as permissão do usuário</small>
                             </div>
                         </div>
 

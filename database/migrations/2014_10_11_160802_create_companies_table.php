@@ -24,6 +24,14 @@ class CreateCompaniesTable extends Migration
             $table->string('phone_2', 11)->nullable();
             $table->string('contact', 256);
             $table->string('logo', 64)->nullable();
+            $table->string('cep', 8)->nullable();
+            $table->string('address', 256)->nullable();
+            $table->string('number', 256)->nullable();
+            $table->string('complement', 256)->nullable();
+            $table->string('reference', 256)->nullable();
+            $table->string('neigh', 256)->nullable();
+            $table->string('city', 256)->nullable();
+            $table->string('state', 256)->nullable();
             $table->integer('user_update')->nullable();
             $table->timestamps();
         });
