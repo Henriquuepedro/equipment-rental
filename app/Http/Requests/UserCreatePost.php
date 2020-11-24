@@ -29,10 +29,8 @@ class UserCreatePost extends FormRequest
                 'required',
                 function ($attribute, $value, $fail) {
                     $exists = DB::table('users')->where(['name' => $value, 'company_id' => $this->user()->company_id])->count();
-                    if ($exists) {
-                        echo json_encode(['success' => false, 'message' => 'Nome informado do novo usuário já está em uso.']);
-                        die;
-                    }
+                    if ($exists)
+                        return response()->json(['success' => false, 'message' => 'Nome informado do novo usuário já está em uso.']);
                 }
             ],
             'email_modal'       => [
@@ -40,10 +38,8 @@ class UserCreatePost extends FormRequest
                 'email:rfc,dns',
                 function ($attribute, $value, $fail) {
                     $exists = DB::table('users')->where('email', $value)->count();
-                    if ($exists) {
-                        echo json_encode(['success' => false, 'message' => 'E-mail informado do novo usuário já está em uso.']);
-                        die;
-                    }
+                    if ($exists)
+                        return response()->json(['success' => false, 'message' => 'E-mail informado do novo usuário já está em uso.']);
                 }
             ],
             'phone_modal'       => 'min:13|max:14|required',

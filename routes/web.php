@@ -74,6 +74,18 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
 
+    // Motoristas
+    Route::group(['prefix' => '/veiculo', 'as' => 'vehicle.'], function () {
+
+        Route::get('/', [App\Http\Controllers\VehicleController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\VehicleController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\VehicleController::class, 'insert'])->name('insert');
+
+        Route::get('/{id}', [App\Http\Controllers\VehicleController::class, 'edit'])->name('edit');
+        Route::post('/atualizar', [App\Http\Controllers\VehicleController::class, 'update'])->name('update');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -101,6 +113,12 @@ Route::group(['middleware' => 'auth'], function (){
         Route::group(['prefix' => '/motorista', 'as' => 'driver.'], function () {
             Route::post('/buscar', [App\Http\Controllers\DriverController::class, 'fetchDrivers'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\DriverController::class, 'delete'])->name('delete');
+            Route::post('/novo-motorista', [App\Http\Controllers\DriverController::class, 'insert'])->name('new-driver');
+            Route::get('/visualizar-motoristas', [App\Http\Controllers\DriverController::class, 'getDrivers'])->name('get-drivers');
+        });
+        Route::group(['prefix' => '/veiculo', 'as' => 'vehicle.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\VehicleController::class, 'fetchVehicles'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\VehicleController::class, 'delete'])->name('delete');
         });
     });
 });

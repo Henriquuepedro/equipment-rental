@@ -227,7 +227,7 @@
                     },
                     type: 'POST',
                     url: getForm.attr('action'),
-                    data: $('#formCreateUser').serialize(),
+                    data: getForm.serialize(),
                     dataType: 'json',
                     success: response => {
 
@@ -245,7 +245,7 @@
                         Toast.fire({
                             icon: 'success',
                             title: response.message
-                        })
+                        });
 
                         $('#newUserModal').modal('hide');
                         $('#newUserModal #formCreateUser .form-group').each(function (){

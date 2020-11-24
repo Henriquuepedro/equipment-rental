@@ -14,7 +14,7 @@
 /* inputs */
 .form-group>label {
     top: 35px;
-    left: 15px;
+    left: 10px;
     position: relative;
     background-color: white;
     padding: 0 5px 0 5px;
@@ -26,9 +26,10 @@
 
 .form-group.label-animate label {
     top: 18px;
-    left: 10px;
+    left: 5px;
     font-size: 0.75em;
     color: #555;
+    z-index: 1;
 }
 
 table td .form-group>label {
@@ -688,8 +689,12 @@ select.form-control {
     margin-top: 1px;
     font-size: 1em;
 }
+.input-group select.form-control{
+    margin-top: 0;
+}
 .alert.alert-success,
-.alert.alert-warning {
+.alert.alert-warning,
+.alert.alert-danger {
     display: none !important;
 }
 .swal2-content ol li {

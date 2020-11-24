@@ -58,7 +58,7 @@ class Driver extends Model
             });
 
         if (count($orderBy) !== 0) $driver->orderBy($orderBy['field'], $orderBy['order']);
-        else $driver->orderBy('id', 'desc');
+        else $driver->orderBy('name', 'asc');
 
         if ($init !== null && $length !== null) $driver->offset($init)->limit($length);
 

@@ -81,6 +81,12 @@ var Toast = Swal.mixin({
                 html: $('.alert.alert-warning').html()
             })
         }
+        if ($('.alert.alert-danger').length) {
+            Toast.fire({
+                icon: 'error',
+                title: $('.alert.alert-danger').text()
+            });
+        }
 
         $('.dropdown-toggle').dropdown();
 
@@ -97,6 +103,8 @@ const checkLabelAnimate = () => {
     $(".form-control").each(function() {
         if ($(this).val() !== '')
             $(this).parent().addClass("label-animate");
+        else
+            $(this).parent().removeClass("label-animate");
     });
 }
 

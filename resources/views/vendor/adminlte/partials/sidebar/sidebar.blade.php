@@ -8,7 +8,8 @@
     elseif (
         strstr($route->getName(),'client') !== false ||
         strstr($route->getName(),'equipament') !== false ||
-        strstr($route->getName(),'driver') !== false
+        strstr($route->getName(),'driver') !== false ||
+        strstr($route->getName(),'vehicle') !== false
     ) $registerActive = 'active';
 @endphp
 
@@ -43,6 +44,11 @@
                     @if(in_array('DriverView', $permissions))
                         <li class="nav-item">
                             <a class="nav-link" href=" {{ route('driver.index') }}">Motorista</a>
+                        </li>
+                    @endif
+                    @if(in_array('VehicleView', $permissions))
+                        <li class="nav-item">
+                            <a class="nav-link" href=" {{ route('vehicle.index') }}">Veículo</a>
                         </li>
                     @endif
                 </ul>

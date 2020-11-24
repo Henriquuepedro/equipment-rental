@@ -112,6 +112,7 @@ class DriverController extends Controller
     {
         // data driver
         $dataDriver = $this->formatDataDriver($request);
+        $isAjax = $this->isAjax();
 
         $createDriver = $this->driver->insert(array(
             'company_id'    => $dataDriver->company_id,
@@ -129,12 +130,17 @@ class DriverController extends Controller
         $driverId = $createDriver->id;
 
         if($createDriver) {
-            DB::commit();
+
+            if ($isAjax)
+                return response()->json(['success' => true, 'message' => 'Motorista cadastrado com sucesso.', 'driver_id' => $driverId]);
+
             return redirect()->route('driver.index')
                 ->with('success', "Motorista com o código {$driverId}, cadastrado com sucesso!");
         }
 
-        DB::rollBack();
+        if ($isAjax)
+            return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o motorista, tente novamente!']);
+
         return redirect()->back()
             ->withErrors(['Não foi possível cadastrar o motorista, tente novamente!'])
             ->withInput();
@@ -219,5 +225,21 @@ class DriverController extends Controller
         $obj->driver_id     = isset($request->driver_id) ? (int)$request->driver_id : null;
 
         return $obj;
+    }
+
+    public function getDrivers(Request $request)
+    {
+        $company_id = $request->user()->company_id;
+        $driverData = [];
+        $lastId = 0;
+
+        $drivers = $this->driver->getDrivers($company_id);
+
+        foreach ($drivers as $driver) {
+            array_push($driverData, ['id' => $driver->id, 'name' => $driver->name]);
+            if ($driver->id > $lastId) $lastId = $driver->id;
+        }
+
+        return response()->json(['data' => $driverData, 'lastId' => $lastId]);
     }
 }

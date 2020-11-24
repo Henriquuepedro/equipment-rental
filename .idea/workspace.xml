@@ -2,11 +2,28 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/VehicleController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/VehicleCreatePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/VehicleDeletePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/VehicleUpdatePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/Vehicle.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2020_11_14_000214_create_vehicles_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/includes/driver/form.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/includes/driver/modal-create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/includes/driver/modal-script.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/vehicle/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/vehicle/index.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/vehicle/update.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CompanyController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2014_10_11_160802_create_companies_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2014_10_11_160802_create_companies_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/DriverController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/DriverController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/DriverCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/DriverCreatePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/UserCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/UserCreatePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Driver.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Driver.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/demo_.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/demo_.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/config/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/config/index.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -163,7 +180,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/public/assets/js/views" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -171,19 +188,20 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2018.3.3\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Projetos\locacao\resources\views\includes\driver" />
       <recent name="C:\Projetos\locacao\resources\views\vendor\adminlte\partials\sidebar" />
       <recent name="C:\Projetos\locacao\resources\views\config" />
       <recent name="C:\Projetos\locacao\public\assets\js" />
       <recent name="C:\Projetos\locacao\public\assets\css" />
-      <recent name="C:\Projetos\locacao\public\assets\images" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Projetos\locacao\public\assets\js\views" />
       <recent name="C:\Projetos\locacao\resources\views" />
+      <recent name="C:\Projetos\locacao\public\assets\js\views" />
       <recent name="C:\Projetos\locacao\resources\lang" />
       <recent name="C:\Projetos\locacao\resources\views\config" />
       <recent name="C:\Projetos\locacao\resources\views\profile" />
@@ -244,6 +262,14 @@
       <workItem from="1605130310964" duration="3713000" />
       <workItem from="1605185138865" duration="298000" />
       <workItem from="1605223829510" duration="3353000" />
+      <workItem from="1605237031391" duration="732000" />
+      <workItem from="1605311283905" duration="2832000" />
+      <workItem from="1605390707803" duration="39000" />
+      <workItem from="1605405341916" duration="602000" />
+      <workItem from="1605444757734" duration="3675000" />
+      <workItem from="1606173980523" duration="702000" />
+      <workItem from="1606175392270" duration="81000" />
+      <workItem from="1606176202309" duration="7091000" />
     </task>
     <servers />
   </component>
@@ -259,23 +285,25 @@
     </state>
     <state x="1508" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1604369103478" />
     <state x="76" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.728@0.0.1366.728" timestamp="1603049996534" />
-    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1605131371750">
+    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1606184619605">
       <screen x="1366" y="0" width="2560" height="1040" />
     </state>
-    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1605131371750" />
+    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1605446688062" />
+    <state x="2376" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/1366.0.2560.1040/0.0.1366.728@1366.0.2560.1040" timestamp="1606184619605" />
     <state x="474" y="87" key="NewPhpClassDialog" timestamp="1604256122243">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="474" y="87" key="NewPhpClassDialog/0.0.1366.728@0.0.1366.728" timestamp="1604256122243" />
-    <state x="2463" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1603251919454">
+    <state x="2463" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605313633998">
       <screen x="1366" y="0" width="2560" height="1040" />
     </state>
-    <state x="2463" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1603251919454" />
-    <state x="1820" y="256" width="650" height="682" key="find.popup" timestamp="1605058931332">
+    <state x="2463" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1605313633998" />
+    <state x="1820" y="256" width="650" height="682" key="find.popup" timestamp="1606176716334">
       <screen x="1366" y="0" width="2560" height="1040" />
     </state>
     <state x="1820" y="256" width="650" height="682" key="find.popup/0.0.1366.728/1366.0.2560.1040@1366.0.2560.1040" timestamp="1605058931332" />
     <state x="242" y="179" width="555" height="534" key="find.popup/0.0.1366.728@0.0.1366.728" timestamp="1604253447761" />
+    <state x="1820" y="256" width="650" height="682" key="find.popup/1366.0.2560.1040/0.0.1366.728@1366.0.2560.1040" timestamp="1606176716334" />
     <state x="499" y="168" key="run.anything.popup" timestamp="1604175865938">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
