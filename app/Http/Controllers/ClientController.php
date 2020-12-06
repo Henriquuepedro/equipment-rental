@@ -58,6 +58,7 @@ class ClientController extends Controller
         $rg_ie      = $request->rg_ie           ? filter_var(preg_replace('/[^0-9]/', '', $request->rg_ie), FILTER_SANITIZE_NUMBER_INT) : null;
         $contact    = $request->contact         ? filter_var($request->contact, FILTER_SANITIZE_STRING) : null;
         $observation= $request->observation     ? filter_var($request->observation, FILTER_SANITIZE_STRING) : null;
+        $isAjax     = $this->isAjax();
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
@@ -99,10 +100,15 @@ class ClientController extends Controller
             $verifyAddressStep_2 = $address && $number && $neigh && $city && $state;
 
             // verifica se foi digitado algo no endereço para validar
-            if ($verifyAddressStep_1 && !$verifyAddressStep_2)
+            if ($verifyAddressStep_1 && !$verifyAddressStep_2) {
+
+                if ($isAjax)
+                    return response()->json(['success' => false, 'message' => 'É necessário informar os campos de endereço obrigatório. Identificação do Endereço, Endereço, Número, Bairro, Cidade e Estado.']);
+
                 return redirect()->back()
                     ->withErrors(['É necessário informar os campos de endereço obrigatório. Identificação do Endereço, Endereço, Número, Bairro, Cidade e Estado.'])
                     ->withInput();
+            }
 
             $createAddress = $this->address->insert(array(
                 'company_id'    => $company_id,
@@ -124,11 +130,19 @@ class ClientController extends Controller
 
         if($createClient && $createAddress) {
             DB::commit();
+
+            if ($isAjax)
+                return response()->json(['success' => true, 'message' => 'Cliente cadastrado com sucesso!', 'client_id' => $clientId]);
+
             return redirect()->route('client.index')
                 ->with('success', "Cliente com o código {$clientId}, cadastrado com sucesso!");
         }
 
         DB::rollBack();
+
+        if ($isAjax)
+            return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o cliente, tente novamente!']);
+
         return redirect()->back()
             ->withErrors(['Não foi possível cadastrar o cliente, tente novamente!'])
             ->withInput();
@@ -332,5 +346,21 @@ class ClientController extends Controller
         );
 
         return response()->json($output);
+    }
+
+    public function getClients(Request $request)
+    {
+        $company_id = $request->user()->company_id;
+        $clientData = [];
+        $lastId = 0;
+
+        $clients = $this->client->getClients($company_id);
+
+        foreach ($clients as $client) {
+            array_push($clientData, ['id' => $client->id, 'name' => $client->name]);
+            if ($client->id > $lastId) $lastId = $client->id;
+        }
+
+        return response()->json(['data' => $clientData, 'lastId' => $lastId]);
     }
 }

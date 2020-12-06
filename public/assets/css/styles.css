@@ -29,7 +29,7 @@
     left: 5px;
     font-size: 0.75em;
     color: #555;
-    z-index: 1;
+    z-index: 4;
 }
 
 table td .form-group>label {
@@ -692,9 +692,9 @@ select.form-control {
 .input-group select.form-control{
     margin-top: 0;
 }
-.alert.alert-success,
-.alert.alert-warning,
-.alert.alert-danger {
+.alert-animate.alert-success,
+.alert-animate.alert-warning,
+.alert-animate.alert-danger {
     display: none !important;
 }
 .swal2-content ol li {
@@ -789,6 +789,23 @@ table .form-group {
 .form-control:disabled {
     background-color: #fff;
     cursor: not-allowed;
+}
+.btn-outline-primary, .wizard > .actions .disabled a{
+    color: #fff;
+    background: #2780c8;
+    cursor: no-drop;
+}
+#new-addressses table tr:nth-last-child(0) {
+    border-bottom: 1px solid #ccc;
+}
+#new-addressses table tr:nth-last-child(1) {
+    border-bottom: 1px solid #ccc;
+}
+#new-addressses table tr:last-of-type {
+    border-bottom: 1px solid #ccc;
+}
+#new-addressses table tr:last-child {
+    border-bottom: 1px solid #ccc;
 }
 
 

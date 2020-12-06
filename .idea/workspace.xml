@@ -2,26 +2,43 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/VehicleController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Requests/VehicleCreatePost.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Requests/VehicleDeletePost.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Requests/VehicleUpdatePost.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Models/Vehicle.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2020_11_14_000214_create_vehicles_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/driver/form.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/driver/modal-create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/driver/modal-script.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/vehicle/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/vehicle/index.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/vehicle/update.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/Rental.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2020_11_29_185157_create_rentals_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/includes/address/form.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/includes/client/form.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/includes/client/modal-create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/includes/client/modal-script.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/rental/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/rental/index.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/DriverController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/DriverController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/DriverCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/DriverCreatePost.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/UserCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/UserCreatePost.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Driver.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Driver.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AddressController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AddressController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/ClientCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/ClientCreatePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Address.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Address.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/js/demo_.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/demo_.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/shared/wizard.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/shared/wizard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/views/client/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/client/form.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/vendors/jquery-steps/jquery.steps.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/vendors/jquery-steps/jquery.steps.min.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/client/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/client/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/client/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/update.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/config/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/config/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/driver/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/driver/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/driver/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/driver/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/driver/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/driver/update.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/equipament/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipament/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/equipament/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipament/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/equipament/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipament/update.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/profile/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profile/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vehicle/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vehicle/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vehicle/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vehicle/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vehicle/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vehicle/update.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/master.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
@@ -180,7 +197,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/rental" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -192,19 +209,19 @@
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Projetos\locacao\resources\views\rental" />
+      <recent name="C:\Projetos\locacao\public\assets\js\views" />
+      <recent name="C:\Projetos\locacao\resources\views\includes\address" />
+      <recent name="C:\Projetos\locacao\resources\views\includes" />
+      <recent name="C:\Projetos\locacao\resources\views" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Projetos\locacao\resources\views\includes\driver" />
       <recent name="C:\Projetos\locacao\resources\views\vendor\adminlte\partials\sidebar" />
       <recent name="C:\Projetos\locacao\resources\views\config" />
       <recent name="C:\Projetos\locacao\public\assets\js" />
       <recent name="C:\Projetos\locacao\public\assets\css" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Projetos\locacao\resources\views" />
-      <recent name="C:\Projetos\locacao\public\assets\js\views" />
-      <recent name="C:\Projetos\locacao\resources\lang" />
-      <recent name="C:\Projetos\locacao\resources\views\config" />
-      <recent name="C:\Projetos\locacao\resources\views\profile" />
     </key>
   </component>
   <component name="RunManager">
@@ -269,7 +286,10 @@
       <workItem from="1605444757734" duration="3675000" />
       <workItem from="1606173980523" duration="702000" />
       <workItem from="1606175392270" duration="81000" />
-      <workItem from="1606176202309" duration="7091000" />
+      <workItem from="1606176202309" duration="7625000" />
+      <workItem from="1606673947849" duration="2923000" />
+      <workItem from="1607188250559" duration="8672000" />
+      <workItem from="1607262434843" duration="15973000" />
     </task>
     <servers />
   </component>

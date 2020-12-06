@@ -2,6 +2,7 @@
     $route = Route::current();
 
     $registerActive = '';
+    $controlActive = '';
     $dashboardActive = '';
 
     if ($route->getName() == 'dashboard') $dashboardActive = 'active';
@@ -11,6 +12,9 @@
         strstr($route->getName(),'driver') !== false ||
         strstr($route->getName(),'vehicle') !== false
     ) $registerActive = 'active';
+    elseif (
+        strstr($route->getName(),'rental') !== false
+    ) $controlActive = 'active';
 @endphp
 
 <!-- partial -->
@@ -23,6 +27,7 @@
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
+        @if(in_array('ClientView', $permissions) || in_array('EquipamentView', $permissions) || in_array('DriverView', $permissions) || in_array('VehicleView', $permissions))
         <li class="nav-item {{ $registerActive }}">
             <a class="nav-link" data-toggle="collapse" href="#register-dropdown" aria-expanded="false" aria-controls="register-dropdown">
                 <i class="menu-icon typcn typcn-plus-outline"></i>
@@ -54,5 +59,24 @@
                 </ul>
             </div>
         </li>
+        @endif
+        @if(in_array('RentalView', $permissions))
+            <li class="nav-item {{ $controlActive }}">
+                <a class="nav-link" data-toggle="collapse" href="#control-dropdown" aria-expanded="false" aria-controls="control-dropdown">
+                    <i class="menu-icon typcn typcn-cog-outline"></i>
+                    <span class="menu-title">Controle</span>
+                    <i class="menu-arrow"></i>
+                </a>
+                <div class="collapse" id="control-dropdown">
+                    <ul class="nav flex-column sub-menu">
+                        @if(in_array('RentalView', $permissions))
+                            <li class="nav-item">
+                                <a class="nav-link" href=" {{ route('rental.index') }}">Locação</a>
+                            </li>
+                        @endif
+                    </ul>
+                </div>
+            </li>
+        @endif
     </ul>
 </nav>

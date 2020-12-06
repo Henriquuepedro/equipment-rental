@@ -73,4 +73,19 @@ class ClientCreatePost extends FormRequest
             'email.email'           => 'O endereço de e-mail deve ser um e-mail válido'
         ];
     }
+
+    /**
+     * Get the proper failed validation response for the request.
+     *
+     * @param  array  $errors
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function response(array $errors)
+    {
+        if ($this->isAjax()) return response()->json(['errors' => $errors]);
+
+        return $this->redirector->to($this->getRedirectUrl())
+            ->withInput($this->except($this->dontFlash))
+            ->withErrors($errors, $this->errorBag);
+    }
 }

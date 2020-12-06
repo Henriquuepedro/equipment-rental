@@ -74,12 +74,12 @@
     <!-- inject:js -->
     <script src="{{ asset('assets/js/demo_.js') }}?v=1.02"></script>
     {{-- Custom Scripts --}}
-    @yield('adminlte_js')
     <script src="{{ asset('assets/js/shared/off-canvas.js') }}"></script>
     <script src="{{ asset('assets/js/shared/hoverable-collapse.js') }}"></script>
     <script src="{{ asset('assets/js/shared/misc.js') }}"></script>
     <script src="{{ asset('assets/js/shared/settings.js') }}"></script>
     <script src="{{ asset('assets/js/shared/todolist.js') }}"></script>
+    @yield('adminlte_js')
 
 </body>
 

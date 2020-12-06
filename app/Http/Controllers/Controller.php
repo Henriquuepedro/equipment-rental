@@ -24,7 +24,11 @@ class Controller extends BaseController
     public function hasPermission($permission)
     {
         $permissions = empty(auth()->user()->permission) ? [] : json_decode(auth()->user()->permission);
-        $permission = Permission::query()->where('name', $permission)->first()->id;
+        $permission = Permission::query()->where('name', $permission)->first();
+        if (!$permission) return false;
+
+        $permission = $permission->id;
+
         return in_array($permission, $permissions) || $this->hasAdmin();
     }
 

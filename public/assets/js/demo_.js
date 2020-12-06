@@ -67,24 +67,24 @@ var Toast = Swal.mixin({
             $('.label-focus').removeClass('label-focus');
         });
 
-        if ($('.alert.alert-success').length) {
+        if ($('.alert-animate.alert-success').length) {
             Toast.fire({
                 icon: 'success',
-                title: $('.alert.alert-success').text()
+                title: $('.alert-animate.alert-success').text()
             });
         }
 
-        if ($('.alert.alert-warning ol li').length) {
+        if ($('.alert-animate.alert-warning ol li').length) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Atenção',
-                html: $('.alert.alert-warning').html()
+                html: $('.alert-animate.alert-warning').html()
             })
         }
-        if ($('.alert.alert-danger').length) {
+        if ($('.alert-animate.alert-danger').length) {
             Toast.fire({
                 icon: 'error',
-                title: $('.alert.alert-danger').text()
+                title: $('.alert-animate.alert-danger').text()
             });
         }
 
@@ -217,4 +217,66 @@ const inArray = (needle, haystack) => {
         }
     }
     return false;
+}
+
+// Formata data yyyy-mm-dd -> dd/mm/yyyy
+const transformDateForBr = data => {
+    if(data == null) return false;
+
+    const length = data.length;
+    let splitDateTime = [data];
+
+    if (length !== 10 && length !== 16 && length !== 19) return false;
+
+    if(data.includes('T')) splitDateTime = data.split("T");
+    if(data.includes(' ')) splitDateTime = data.split(" ");
+
+    const splitData = splitDateTime[0].split("-");
+
+    const dia = splitData[2];
+    const mes = splitData[1];
+    const ano = splitData[0];
+
+    let dataFormatada = '';
+
+    dataFormatada += `${dia}/${mes}/${ano}`;
+
+    if (length === 16 || length === 19) {
+        const splitTime = splitDateTime[1].split(":");
+
+        const min = splitTime[1];
+        const hr  = splitTime[0];
+
+        dataFormatada += ` ${hr}:${min}`;
+    }
+    return dataFormatada;
+}
+// Formata data dd/mm/yyyy -> yyyy-mm-dd
+const transformDateForEn = data => {
+    if(data == null) return false;
+
+    const length = data.length;
+
+    if (length !== 10 && length !== 16) return false;
+
+    const splitDateTime = data.split(' ');
+    const splitData = splitDateTime[0].split('/');
+
+    const ano = splitData[2];
+    const mes = splitData[1];
+    const dia = splitData[0];
+
+    let dataFormatada = '';
+
+    dataFormatada += `${ano}-${mes}-${dia}`;
+
+    if (length === 16) {
+        const splitTime = splitDateTime[1].split(":");
+
+        const min = splitTime[1];
+        const hr  = splitTime[0];
+
+        dataFormatada += ` ${hr}:${min}`;
+    }
+    return dataFormatada;
 }

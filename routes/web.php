@@ -86,11 +86,29 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
 
+    // Locação
+    Route::group(['prefix' => '/locacao', 'as' => 'rental.'], function () {
+
+        Route::get('/', [App\Http\Controllers\RentalController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\RentalController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\RentalController::class, 'insert'])->name('insert');
+
+        Route::get('/{id}', [App\Http\Controllers\RentalController::class, 'edit'])->name('edit');
+        Route::post('/atualizar', [App\Http\Controllers\RentalController::class, 'update'])->name('update');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
             Route::post('/buscar', [App\Http\Controllers\ClientController::class, 'fetchClients'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\ClientController::class, 'delete'])->name('delete');
+            Route::get('/visualizar-clientes', [App\Http\Controllers\ClientController::class, 'getClients'])->name('get-clients');
+            Route::post('/novo-cliente', [App\Http\Controllers\ClientController::class, 'insert'])->name('new-client');
+        });
+        Route::group(['prefix' => '/endereco', 'as' => 'address.'], function () {
+            Route::post('/visualizar-enderecos', [App\Http\Controllers\AddressController::class, 'getAddresses'])->name('get-addresses');
+            Route::post('/visualizar-endereco', [App\Http\Controllers\AddressController::class, 'getAddress'])->name('get-address');
         });
         Route::group(['prefix' => '/equipamento', 'as' => 'equipament.'], function () {
             Route::post('/buscar', [App\Http\Controllers\EquipamentController::class, 'fetchEquipaments'])->name('fetch');

@@ -1,6 +1,6 @@
 (function ($) {
   'use strict';
-  var form = $("#example-form");
+  var form = $("#formCreateRental");
   form.children("div").steps({
     headerTag: "h3",
     bodyTag: "section",

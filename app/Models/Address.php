@@ -37,6 +37,11 @@ class Address extends Model
         return $this->create($data);
     }
 
+    public function getAddress($company_id, $client_id, $address_id)
+    {
+        return $this->where(['id' => $address_id, 'client_id' => $client_id, 'company_id' => $company_id])->first();
+    }
+
     public function getAddressClient($company_id, $client_id)
     {
         return $this->where(['client_id' => $client_id, 'company_id' => $company_id])->get();

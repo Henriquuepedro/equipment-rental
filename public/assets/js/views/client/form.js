@@ -6,7 +6,7 @@ var icon;
 var element;
 
 $(() => {
-    $('[name="cep[]"]').mask('00.000-000');
+    $('[name="cep[]"], [name="cep"]').mask('00.000-000');
     $('[name="phone_1"],[name="phone_2"]').mask('(00) 000000000');
     $('[name="rg_ie"]').mask('0#');
     if ($('[name="type_person"]:checked').length) {
@@ -163,7 +163,7 @@ $('[name="type_person"]').on('change', function(){
     });
 });
 
-$(document).on('blur', '[name="cep[]"], #cep_new', function (){
+$(document).on('blur', '[name="cep[]"], [name="cep"], #cep_new', function (){
     const cep = $(this).val().replace(/\D/g, '');
     let el;
     if ($(this).closest('#new-addressses').length)
@@ -183,9 +183,9 @@ $(document).on('blur', '[name="cep[]"], #cep_new', function (){
 
         if (!("erro" in dados)) {
             if(dados.logradouro !== '') el.find('[name^="address"], #address_new').val(dados.logradouro).parent().addClass("label-animate");
-            if(dados.bairro !== '')     el.find('[name="neigh[]"], #neigh_new').val(dados.bairro).parent().addClass("label-animate");
-            if(dados.localidade !== '') el.find('[name="city[]"], #city_new').val(dados.localidade).parent().addClass("label-animate");
-            if(dados.uf !== '')         el.find('[name="state[]"], #state_new').val(dados.uf).parent().addClass("label-animate");
+            if(dados.bairro !== '')     el.find('[name^="neigh"], #neigh_new').val(dados.bairro).parent().addClass("label-animate");
+            if(dados.localidade !== '') el.find('[name^="city"], #city_new').val(dados.localidade).parent().addClass("label-animate");
+            if(dados.uf !== '')         el.find('[name^="state"], #state_new').val(dados.uf).parent().addClass("label-animate");
         } //end if.
         else {
             Toast.fire({

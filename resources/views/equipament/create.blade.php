@@ -74,7 +74,7 @@
             <div class="row flex-grow">
                 <div class="col-12">
                     @if ($errors->any())
-                    <div class="alert alert-warning">
+                    <div class="alert-animate alert-warning">
                         <ol>
                             @foreach($errors->all() as $error)
                                 <li><label id="name-error" class="error">{{ $error }}</label></li>
