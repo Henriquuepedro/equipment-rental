@@ -46,3 +46,10 @@
         <input type="text" name="state" class="form-control">
     </div>
 </div>
+<div class="row show-address mt-2">
+    <div class="form-group col-md-12 text-center">
+        <button type="button" class="btn btn-primary col-md-9" id="confirmAddressMap">Confirmar Endereço no Mapa</button>
+    </div>
+</div>
+<input type="hidden" name="lat">
+<input type="hidden" name="lng">
