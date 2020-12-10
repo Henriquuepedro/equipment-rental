@@ -4,7 +4,7 @@
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/includes/address/form.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/address/form.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/rental/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rental/create.blade.php" afterDir="false" />
     </list>
@@ -257,7 +257,8 @@
       <workItem from="1606673947849" duration="2923000" />
       <workItem from="1607188250559" duration="8672000" />
       <workItem from="1607262434843" duration="16170000" />
-      <workItem from="1607381768640" duration="3891000" />
+      <workItem from="1607381768640" duration="4014000" />
+      <workItem from="1607555499811" duration="10563000" />
     </task>
     <servers />
   </component>

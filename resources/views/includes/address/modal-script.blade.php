@@ -1,4 +1,21 @@
 <script>
+    var targetRental;
+    var markerRental;
+    // Where you want to render the map.
+    var elementRental = document.getElementById('mapRental');
+    // Create Leaflet map on map element.
+    var mapRental = L.map(elementRental, {
+        // fullscreenControl: true,
+        // OR
+        fullscreenControl: {
+            pseudoFullscreen: false // if true, fullscreen to page width and height
+        }
+    });
+    // Add OSM tile leayer to the Leaflet map.
+    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mapRental);
+
     $(() => {
         $('[name="cep"]').mask('00.000-000');
         getLocationRental();
@@ -21,10 +38,39 @@
         let address_id = $(this).val();
         let client_id = $('select[name="client"]').val();
 
-        if (!address_id || !client_id) return false;
+        if (!address_id || !client_id) {
+            $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
+            return false;
+        }
 
         loadAddress(address_id, client_id);
     });
+
+    $('#confirmAddressMap').on('click', function (){
+        let verifyAddress = verifyAddressCompletRental();
+        if (!verifyAddress[0]) {
+            Toast.fire({
+                icon: 'warning',
+                title: `Complete o cadastro do endereço, para confirmar.`
+            });
+            return false;
+        }
+
+        if ($('#formCreateRental input[name="lat"]').val() === '')
+            setTimeout(() => {
+                updateLocationRental($('#formCreateRental'))
+            }, 250);
+        else
+            setTimeout(() => {
+                locationLatLngRental($('#formCreateRental [name="lat"]').val(), $('#formCreateRental [name="lng"]').val());
+            }, 250);
+
+        $('#confirmAddressRental').modal();
+    });
+
+    $('#updateLocationMapRental').click(function (){
+        updateLocationRental($('#formCreateRental'));
+    })
 
     const loadAddresses = (client_id = null) => {
 
@@ -96,6 +142,8 @@
                 $('input[name="neigh"]').val(response.neigh ?? '');
                 $('input[name="city"]').val(response.city ?? '');
                 $('input[name="state"]').val(response.state ?? '');
+                $('input[name="lat"]').val(response.lat ?? '');
+                $('input[name="lng"]').val(response.lng ?? '');
                 checkLabelAnimate();
                 $('[name="cep"]').unmask().mask('00.000-000');
 
@@ -144,22 +192,6 @@
         $('input[name="state"]').attr('disabled', false).parent().find('label').text('Estado');
     }
 
-    var targetRental;
-    var markerRental;
-    // Where you want to render the map.
-    var elementRental = document.getElementById('mapRental');
-    // Create Leaflet map on map element.
-    var mapRental = L.map(elementRental, {
-        // fullscreenControl: true,
-        // OR
-        fullscreenControl: {
-            pseudoFullscreen: false // if true, fullscreen to page width and height
-        }
-    });
-    // Add OSM tile leayer to the Leaflet map.
-    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mapRental);
     // VERIFICAR SE HAVERÁ ALGUM ERRO
     const getLocationRental = () => {
         mapRental.on('locationfound', onLocationFoundRental);
@@ -227,21 +259,6 @@
             mapRental.invalidateSize();
         }, 1000);
     }
-
-    $('#confirmAddressMap').on('click', function (){
-        let verifyAddress = verifyAddressCompletRental();
-        if (!verifyAddress[0]) {
-            Toast.fire({
-                icon: 'warning',
-                title: `Complete o cadastro do endereço, para confirmar.`
-            });
-            return false;
-        }
-
-        if ($('#formCreateRental input[name="lat"]').val() == '')
-            updateLocationRental($(this).parents('form'));
-        $('#confirmAddressRental').modal();
-    });
 
     const verifyAddressCompletRental = () => {
         cleanBorderAddressRental();
@@ -317,10 +334,5 @@
         mapRental.setView(newLatLng, 15);
         mapRental.invalidateSize();
     }
-
-    $('#updateLocationMapRental').click(function (){
-        const element = $('#formCreateRental');
-        updateLocationRental(element);
-    })
 
 </script>

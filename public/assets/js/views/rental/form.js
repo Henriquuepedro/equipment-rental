@@ -18,6 +18,7 @@
                     if ($('input[name="neigh"]').val() === '') arrErrors.push('Informe um bairro.');
                     if ($('input[name="city"]').val() === '') arrErrors.push('Informe uma cidade.');
                     if ($('input[name="state"]').val() === '') arrErrors.push('Informe um estado.');
+                    if ($('input[name="lat"]').val() === '' || $('input[name="lng"]').val() === '') arrErrors.push('Confirme o endereço no mapa.');
                 }
 
                 if (arrErrors.length) {

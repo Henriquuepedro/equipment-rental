@@ -22,20 +22,52 @@
         .show-address {
             display: none;
         }
+        .flatpickr a.input-button{
+            height: calc(1.5em + 0.75rem + 4px);
+            width: 50%;
+            text-align: center;
+            padding-top: 13%;
+            cursor: pointer;
+        }
+        .flatpickr a.input-button:last-child{
+            border-bottom-right-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        [name="date_withdrawal"], [name="date_delivery"] {
+            border-bottom-right-radius: 0 !important;
+            border-top-right-radius: 0 !important;;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
 @stop
 
 @section('js')
 <script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}"></script>
 <script src="{{ asset('assets/js/views/rental/form.js') }}"></script>
 <script src="{{ asset('assets/js/views/client/form.js') }}" type="application/javascript"></script>
-
 <script src="{{ asset('assets/vendors/inputmask/jquery.inputmask.bundle.js') }}"></script>
+<script src="{{ asset('assets/vendors/moment/moment.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js"></script>
+
 <script>
     $(function() {
         $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
         // $('[name="date_withdrawal"], [name="date_delivery"]').mask('00/00/0000 00:00');
         $('[name="date_withdrawal"], [name="date_delivery"]').inputmask();
+        $('.flatpickr').flatpickr({
+            enableTime: true,
+            dateFormat: "d/m/Y H:i",
+            time_24hr: true,
+            wrap: true,
+            clickOpens: false,
+            allowInput: true,
+            locale: "pt",
+            onClose: function(selectedDates, dateStr, instance){
+                checkLabelAnimate();
+            }
+        });
     });
 
     // Validar dados
@@ -100,7 +132,7 @@
                                     @include('includes.address.form')
                                     <div class="row">
                                         <div class="form-group col-md-12 mt-2">
-                                            <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa, isso pode acarretar uma má precisão da localização.</div>
+                                            <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa no cadastro do cliente, isso pode acarretar uma má precisão da localização.</div>
                                         </div>
                                     </div>
                                 </section>
@@ -108,14 +140,39 @@
                                 <section>
                                     <h6>Datas</h6>
                                     <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <label>Data Prevista de Entrega</label>
-                                            <input type="text" name="date_delivery" class="form-control" value="{{ date('d/m/Y H:i') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false">
+                                        <div class="col-md-6">
+                                            <div class="form-group flatpickr">
+                                                <label>Data Prevista de Entrega</label>
+                                                <input type="text" name="date_delivery" class="form-control col-md-9 pull-left" value="{{ date('d/m/Y H:i') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 pull-right no-padding">
+
+                                                    <a class="input-button pull-left btn-info" title="toggle" data-toggle>
+                                                        <i class="fa fa-calendar text-white"></i>
+                                                    </a>
+
+                                                    <a class="input-button pull-right btn-info" title="clear" data-clear>
+                                                        <i class="fa fa-times text-white"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-6">
-                                            <label>Data Prevista de Retirada</label>
-                                            <input type="text" name="date_withdrawal" class="form-control" value="{{ date('d/m/Y H:i', strtotime('+1 minute', time())) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false">
+                                        <div class="col-md-6">
+                                            <div class="form-group flatpickr">
+                                                <label>Data Prevista de Retirada</label>
+                                                <input type="text" name="date_withdrawal" class="form-control col-md-9 pull-left" value="{{ date('d/m/Y H:i', strtotime('+1 minute', time())) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 pull-right no-padding">
+
+                                                    <a class="input-button pull-left btn-info" title="toggle" data-toggle>
+                                                        <i class="fa fa-calendar text-white"></i>
+                                                    </a>
+
+                                                    <a class="input-button pull-right btn-info" title="clear" data-clear>
+                                                        <i class="fa fa-times text-white"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </section>
                                 <h3>Equipamento</h3>
@@ -160,11 +217,13 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12 form-group text-center mb-2">
-                            <button type="button" class="btn btn-primary" id="updateLocationMapRental"><i class="fas fa-sync-alt"></i> Atualizar Localização</button>
+                            <button type="button" class="btn btn-primary" id="updateLocationMapRental"><i class="fas fa-search"></i> Buscar endereço do formulário</button>
                         </div>
                     </div>
                     <div class="row">
-                        <div id="mapRental" style="height: 400px"></div>
+                        <div class="col-md-12 form-group">
+                            <div id="mapRental" style="height: 400px"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
