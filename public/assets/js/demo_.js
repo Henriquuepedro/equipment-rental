@@ -92,6 +92,9 @@ var Toast = Swal.mixin({
 
         checkLabelAnimate();
 
+        if ($('[data-toggle="tooltip"]').length)
+            $('[data-toggle="tooltip"]').tooltip();
+
     });
 })(jQuery);
 

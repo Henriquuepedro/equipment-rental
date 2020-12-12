@@ -58,4 +58,18 @@ class Controller extends BaseController
         }
         return $maskared;
     }
+
+    /**
+     * Consulta string em uma parte de outra string
+     *
+     * @param   string  $needle     Valor a ser procurado
+     * @param   string  $haystack   Valor real para comparação
+     * @return  bool                Retorna o status da consulta
+     */
+    public function likeText($needle, $haystack)
+    {
+        $regex = '/' . str_replace('%', '.*?', $needle) . '/';
+
+        return preg_match($regex, $haystack) > 0;
+    }
 }

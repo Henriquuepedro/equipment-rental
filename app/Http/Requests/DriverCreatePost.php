@@ -76,8 +76,8 @@ class DriverCreatePost extends FormRequest
     /**
      * Get the proper failed validation response for the request.
      *
-     * @param  array  $errors
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param array $errors
+     * @return JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function response(array $errors)
     {

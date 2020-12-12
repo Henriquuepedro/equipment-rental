@@ -37,21 +37,77 @@
             border-bottom-right-radius: 0 !important;
             border-top-right-radius: 0 !important;;
         }
+        .input-group-append.btn-primary{
+            background: #2196f3;
+            cursor: pointer;
+        }
+        .list-equipament .equipament {
+            cursor: pointer;
+        }
+        .list-equipament .equipament:hover {
+            background: #f5f5f5;
+        }
+        .wizard > .content > .body {
+            position: unset;
+        }
+        .accordion .card .card-header a{
+            background: #2196f3 !important;
+        }
+        .remove-equipament i {
+            cursor: pointer;
+        }
+        .accordion.accordion-multiple-filled .card .card-header a:last-child {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            overflow: unset;
+        }
+        i.fa.input-group-text.text-white {
+            font-size: 15px;
+        }
+        .stepRental.body {
+            width: 100% !important;
+        }
+        .content-equipament {
+            max-height: 300px;
+        }
+
+        .content-equipament::-webkit-scrollbar-track
+        {
+            -webkit-box-shadow: inset 0 0 6px #2196f3;
+            border-radius: 10px;
+            background-color: #F5F5F5;
+        }
+
+        .content-equipament::-webkit-scrollbar
+        {
+            width: 12px;
+            background-color: #F5F5F5;
+        }
+
+        .content-equipament::-webkit-scrollbar-thumb
+        {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px #2196f3;
+            background-color: #52a4e5;
+        }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
 @stop
 
 @section('js')
-<script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}"></script>
-<script src="{{ asset('assets/js/views/rental/form.js') }}"></script>
+<script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}" type="application/javascript"></script>
+<script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
 <script src="{{ asset('assets/js/views/client/form.js') }}" type="application/javascript"></script>
-<script src="{{ asset('assets/vendors/inputmask/jquery.inputmask.bundle.js') }}"></script>
-<script src="{{ asset('assets/vendors/moment/moment.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js"></script>
+<script src="{{ asset('assets/js/views/equipament/form.js') }}" type="application/javascript"></script>
+<script src="{{ asset('assets/vendors/inputmask/jquery.inputmask.bundle.js') }}" type="application/javascript"></script>
+<script src="{{ asset('assets/vendors/moment/moment.min.js') }}" type="application/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
+<script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
 
 <script>
+    var searchEquipamentOld = '';
+
     $(function() {
         $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
         // $('[name="date_withdrawal"], [name="date_delivery"]').mask('00/00/0000 00:00');
@@ -70,7 +126,6 @@
         });
     });
 
-    // Validar dados
     $("#formCreateRental").validate({
         rules: {
 
@@ -97,9 +152,213 @@
             form.submit();
         }
     });
+
+    $('#searchEquipament').on('blur keyup', function (e){
+
+        if(e.keyCode !== 13 && e.type === 'keyup') return false;
+
+        const searchEquipament = $(this).val();
+        let equipamentInUse = [];
+
+        if (searchEquipament === searchEquipamentOld) return false;
+
+        $('#equipaments-selected .card-header').each(function(){
+            equipamentInUse.push(parseInt($(this).attr('id-equipament')));
+        });
+
+        $('table.list-equipament tbody').empty();
+
+        searchEquipamentOld = searchEquipament;
+
+        $('table.list-equipament tbody').empty();
+
+        if (searchEquipament === '') {
+            equipamentMessageDefault('<i class="fas fa-search"></i> Pesquise por um equipamento');
+            return false;
+        }
+
+        equipamentMessageDefault('<i class="fas fa-spinner fa-spin"></i> Carregando equipamentos ...');
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'POST',
+            url: "{{ route('ajax.equipament.get-equipaments') }}",
+            data: { searchEquipament, equipamentInUse },
+            success: response => {
+
+                $('table.list-equipament tbody').empty();
+
+                if (!response.length) {
+                    equipamentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
+                    return false;
+                }
+
+                let badgeStock = '';
+                $.each(response, function (key, val) {
+                    badgeStock = val.stock <= 0 ? 'danger' : 'primary';
+                    $('table.list-equipament tbody').append(`
+                        <tr class="equipament" id-equipament="${val.id}">
+                            <td class="text-left"><h6 class="mb-1 text-left">${val.name}</h6></td>
+                            <td><div class="badge badge-pill badge-lg badge-info">${val.reference}</div></td>
+                            <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>
+                            <td class="text-right">
+                                <button type="button" class="badge badge-lg badge-pill badge-success">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }, error: e => {
+                console.log(e);
+            },
+            complete: function(xhr) {
+                if (xhr.status === 403) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Você não tem permissão para fazer essa operação!'
+                    });
+                }
+            }
+        });
+    });
+
+    $('#cleanSearchEquipament').on('click', function (){
+        $('#searchEquipament').val('').trigger('blur');
+    });
+
+    $('table.list-equipament').on('click', '.equipament', function(){
+        const idEquipament = $(this).attr('id-equipament');
+
+        $(`.equipament[id-equipament="${idEquipament}"]`).empty().toggleClass('equipament load-equipament').append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'POST',
+            url: "{{ route('ajax.equipament.get-equipament') }}",
+            data: { idEquipament, validStock: false },
+            success: response => {
+
+                console.log(response);
+
+                if (!response.success) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: `<ol><li>${response.data}</li></ol>`
+                    });
+                    searchEquipamentOld = '';
+                    $('#searchEquipament').trigger('blur');
+                    return false;
+                }
+
+                response = response.data;
+
+                $('#equipaments-selected').append(`
+                    <div class="card">
+                        <div class="card-header" role="tab" id="headingThree-${response.id}" id-equipament="${response.id}">
+                            <h5 class="mb-0 d-flex align-items-center">
+                                <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseThree-${response.id}" aria-expanded="false" aria-controls="collapseThree-${response.id}">
+                                    ${response.name}
+                                </a>
+                                <a class="remove-equipament pull-right"><i class="fa fa-trash"></i></a>
+                            </h5>
+                        </div>
+                        <div id="collapseThree-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingThree-${response.id}" data-parent="#equipaments-selected">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label>Referência</label>
+                                        <input type="text" class="form-control" value="${response.reference}" disabled>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label>Quantidade</label>
+                                        <input type="tel" class="form-control" value="0">
+                                        <small class="text-danger font-weight-bold">Disponível: ${response.stock}</small>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label>Resíduo</label>
+                                        <select class="form-control">
+                                            <option>Selecione ...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label>Veículo</label>
+                                        <select class="form-control">
+                                            <option>Selecione ...</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Motorista</label>
+                                        <select class="form-control">
+                                            <option>Selecione ...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                $(`.load-equipament[id-equipament="${idEquipament}"]`).hide(300);
+                showSeparatorEquipamentSelected();
+                setTimeout(() => {
+                    $(`.load-equipament[id-equipament="${idEquipament}"]`).remove();
+
+                    if (!$(`.list-equipament tbody tr`).length) {
+                        equipamentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
+                    }
+                    checkLabelAnimate();
+                    $(`[href="#collapseThree-${idEquipament}"]`).trigger('click');
+                }, 350);
+            }, error: e => {
+                console.log(e);
+            },
+            complete: function(xhr) {
+                if (xhr.status === 403) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Você não tem permissão para fazer essa operação!'
+                    });
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.remove-equipament i', function (){
+        $(this).closest('.card').slideUp(500);
+        setTimeout(() => {
+            $(this).closest('.card').remove();
+            searchEquipamentOld = '';
+            $('#searchEquipament').trigger('blur');
+            showSeparatorEquipamentSelected();
+        }, 550);
+    });
+
+    const equipamentMessageDefault = message => {
+        $('table.list-equipament tbody').append(`
+            <tr>
+                <td class="text-left"><h6 class="text-center">${message}</h6></td>
+            </tr>
+        `);
+    }
+
+    const showSeparatorEquipamentSelected = () => {
+        if ($('#equipaments-selected div').length)
+            $('.equipaments-selected hr.separator-dashed').slideDown(300);
+        else
+            $('.equipaments-selected hr.separator-dashed').slideUp(300);
+    }
+
 </script>
 @include('includes.client.modal-script')
 @include('includes.address.modal-script')
+@include('includes.equipament.modal-script')
 @stop
 
 @section('content')
@@ -117,12 +376,30 @@
                     </div>
                 @endif
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route(('rental.insert')) }}" method="POST" enctype="multipart/form-data" id="formCreateRental">
+                            <form action="{{ route(('rental.insert')) }}" method="POST" enctype="multipart/form-data" id="formCreateRental" class="pb-2">
+                                <h3>Tipo de Locação</h3>
+                                <div class="stepRental">
+                                    <h6>Tipo de Locação <i class="fa fa-info-circle" data-toggle="tooltip" title="Defina se haverá ou não cobrança para essa locação."></i></h6>
+                                    <div class="row">
+                                        <div class="d-flex justify-content-around col-md-12">
+                                            <div class="form-radio form-radio-flat">
+                                                <label class="form-check-label">
+                                                    <input type="radio" class="form-check-input" name="type_rental" value="0" @if(old('type_person') === '0') checked @endif> Com Cobrança <i class="input-helper"></i>
+                                                </label>
+                                            </div>
+                                            <div class="form-radio form-radio-flat">
+                                                <label class="form-check-label">
+                                                    <input type="radio" class="form-check-input" name="type_rental" value="1" @if(old('type_person') === '1') checked @endif> Sem Cobrança <i class="input-helper"></i>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <h3>Cliente</h3>
-                                <section>
+                                <div class="stepRental">
                                     <h6>Cliente e Endereço</h6>
                                     <div class="row">
                                         <div class="form-group col-md-12 label-animate">
@@ -135,9 +412,9 @@
                                             <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa no cadastro do cliente, isso pode acarretar uma má precisão da localização.</div>
                                         </div>
                                     </div>
-                                </section>
+                                </div>
                                 <h3>Datas</h3>
-                                <section>
+                                <div class="stepRental">
                                     <h6>Datas</h6>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -145,11 +422,9 @@
                                                 <label>Data Prevista de Entrega</label>
                                                 <input type="text" name="date_delivery" class="form-control col-md-9 pull-left" value="{{ date('d/m/Y H:i') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
                                                 <div class="input-button-calendar col-md-3 pull-right no-padding">
-
                                                     <a class="input-button pull-left btn-info" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
-
                                                     <a class="input-button pull-right btn-info" title="clear" data-clear>
                                                         <i class="fa fa-times text-white"></i>
                                                     </a>
@@ -161,11 +436,9 @@
                                                 <label>Data Prevista de Retirada</label>
                                                 <input type="text" name="date_withdrawal" class="form-control col-md-9 pull-left" value="{{ date('d/m/Y H:i', strtotime('+1 minute', time())) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
                                                 <div class="input-button-calendar col-md-3 pull-right no-padding">
-
                                                     <a class="input-button pull-left btn-info" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
-
                                                     <a class="input-button pull-right btn-info" title="clear" data-clear>
                                                         <i class="fa fa-times text-white"></i>
                                                     </a>
@@ -174,15 +447,59 @@
                                         </div>
 
                                     </div>
-                                </section>
-                                <h3>Equipamento</h3>
-                                <section>
-                                    <h6>Equipamento</h6>
-                                </section>
-                                <h3>Finish</h3>
-                                <section>
-                                    <h6>Finish</h6>
-                                </section>
+                                </div>
+                                <h3>Equipamentos</h3>
+                                <div class="stepRental">
+                                    <h6>Equipamentos</h6>
+                                    <div class="row">
+                                        <div class="form-group col-md-12 mt-2 equipaments-selected">
+                                            <div class="accordion accordion-multiple-filled" id="equipaments-selected" role="tablist">
+                                            </div>
+                                            <hr class="separator-dashed mt-4 display-none">
+                                        </div>
+                                        <div class="form-group col-md-12 mt-2">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="searchEquipament" placeholder="Pesquise por nome, referência ou código">
+                                                <div class="input-group-addon input-group-append btn-primary">
+                                                    <i class="fa fa-search input-group-text text-white"></i>
+                                                </div>
+                                                <div class="input-group-addon input-group-append btn-primary" id="cleanSearchEquipament">
+                                                    <i class="fa fa-times input-group-text text-white"></i>
+                                                </div>
+                                                <div class="input-group-addon input-group-append btn-primary" id="newEquipament" data-toggle="modal" data-target="#newEquipamentModal">
+                                                    <i class="fa fa-plus input-group-text text-white"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-12 mt-2 table-responsive content-equipament">
+                                            <table class="table list-equipament d-table">
+                                                <tbody>
+                                                    <tr class="equipament">
+                                                        <td class="text-left"><h6 class="text-center"><i class="fas fa-search"></i> Pesquise por um equipamento</h6></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3>Pagamento</h3>
+                                <div class="stepRental">
+                                    <h6>Pagamento</h6>
+                                    <div class="row">
+                                        <div class="form-group col-md-12 text-center mt-5">
+                                            <h4><i class="fa fa-warning"></i> Em andamento, em breve estará disponível</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3>Finalizar</h3>
+                                <div class="stepRental">
+                                    <h6>Finalizar</h6>
+                                    <div class="row">
+                                        <div class="form-group col-md-12 text-center mt-5">
+                                            <h4><i class="fa fa-warning"></i> Em andamento, em breve estará disponível</h4>
+                                        </div>
+                                    </div>
+                                </div>
                                 {{ csrf_field() }}
                             </form>
                         </div>
@@ -194,17 +511,18 @@
 {{--                        </div>--}}
 {{--                    </div>--}}
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <p>Em andamento ...</p>
-                        </div>
-                    </div>
-                </div>
+{{--                <div class="col-md-4">--}}
+{{--                    <div class="card">--}}
+{{--                        <div class="card-body">--}}
+{{--                            <p>Em andamento ...</p>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
             </div>
         </div>
     </div>
     @include('includes.client.modal-create')
+    @include('includes.equipament.modal-create')
     <div class="modal fade" tabindex="-1" role="dialog" id="confirmAddressRental">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">

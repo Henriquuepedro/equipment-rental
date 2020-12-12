@@ -1,29 +1,29 @@
 $(() => {
-    $('[name="cep"]').mask('00.000-000');
-    $('[name="phone_1"],[name="phone_2"]').mask('(00) 000000000');
-    $('[name="stock"]').mask('0#');
-    $('[name="value"]').mask('#.##0,00', { reverse: true });
-    $('[name="day_start[]"], [name="day_end[]"]').mask('0#');
-    $('[name="value_period[]"]').mask('#.##0,00', { reverse: true });
-    if ($('[name="type_equipament"]:checked').length) {
-        $('[name="type_equipament"]:checked').trigger('change');
+    $('#formEquipament [name="cep"]').mask('00.000-000');
+    $('#formEquipament [name="phone_1"],#formEquipament [name="phone_2"]').mask('(00) 000000000');
+    $('#formEquipament [name="stock"]').mask('0#');
+    $('#formEquipament [name="value"]').mask('#.##0,00', { reverse: true });
+    $('#formEquipament [name="day_start[]"], #formEquipament [name="day_end[]"]').mask('0#');
+    $('#formEquipament [name="value_period[]"]').mask('#.##0,00', { reverse: true });
+    if ($('#formEquipament [name="type_equipament"]:checked').length) {
+        $('#formEquipament [name="type_equipament"]:checked').trigger('change');
     }
 });
 
-$('[name="type_equipament"]').on('change', function(){
+$('#formEquipament [name="type_equipament"]').on('change', function(){
     const type = $(this).val();
 
     if (type === 'cacamba') {
-        $('#name').val('').closest('.form-group').addClass('d-none');
-        $('#volume').closest('.form-group').removeClass('d-none');
+        $('#formEquipament #name').val('').closest('.form-group').addClass('d-none');
+        $('#formEquipament #volume').closest('.form-group').removeClass('d-none');
     }
     else if (type === 'others') {
-        $('#volume').val($('#volume option:eq(0)').val()).closest('.form-group').addClass('d-none');
-        $('#name').closest('.form-group').removeClass('d-none');
+        $('#formEquipament #volume').val($('#volume option:eq(0)').val()).closest('.form-group').addClass('d-none');
+        $('#formEquipament #name').closest('.form-group').removeClass('d-none');
     }
 
     $('.error-form').slideUp('slow');
-    $(".card").each(function() {
+    $("#formEquipament .card").each(function() {
         $(this).slideDown('slow');
     });
 });
@@ -39,7 +39,7 @@ jQuery.validator.addMethod("volume", function(value, element) {
 
 }, 'Selecione um volume para a caçamba');
 
-$('#add-new-period').on('click', function () {
+$('#formEquipament #add-new-period').on('click', function () {
 
     const verifyPeriod = verifyPeriodComplet();
     if (!verifyPeriod[0]) {
@@ -61,42 +61,42 @@ $('#add-new-period').on('click', function () {
     let countPeriod = 0;
     countPeriod = $('.period').length + 1;
 
-    $('#new-periods').append(`
-            <div class="period display-none">
-                <div class="row">
-                    <div class="form-group col-md-2">
-                        <label>${countPeriod}º Período</label>
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Dia Inicial</label>
-                        <input type="text" class="form-control" name="day_start[]" autocomplete="nope">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Dia Final</label>
-                        <input type="text" class="form-control" name="day_end[]" autocomplete="nope">
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Valor</label>
-                        <input type="text" class="form-control" name="value_period[]" autocomplete="nope">
-                    </div>
-                    <div class="form-group col-md-1">
-                        <label>&nbsp;</label>
-                        <button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>
-                    </div>
+    $('#formEquipament #new-periods').append(`
+        <div class="period display-none">
+            <div class="row">
+                <div class="form-group col-md-2">
+                    <label>${countPeriod}º Período</label>
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Dia Inicial</label>
+                    <input type="text" class="form-control" name="day_start[]" autocomplete="nope">
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Dia Final</label>
+                    <input type="text" class="form-control" name="day_end[]" autocomplete="nope">
+                </div>
+                <div class="form-group col-md-3">
+                    <label>Valor</label>
+                    <input type="text" class="form-control" name="value_period[]" autocomplete="nope">
+                </div>
+                <div class="col-md-1">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>
                 </div>
             </div>
-        `).find('.period').slideDown('slow');
+        </div>
+    `).find('.period').slideDown('slow');
 
-    $('[name="day_start[]"], [name="day_end[]"]').mask('0#');
-    $('[name="value_period[]"]').mask('#.##0,00', { reverse: true });
+    $('#formEquipament [name="day_start[]"], #formEquipament [name="day_end[]"]').mask('0#');
+    $('#formEquipament [name="value_period[]"]').mask('#.##0,00', { reverse: true });
 });
 
-$(document).on('click', '.remove-period', function (){
+$(document).on('click', '#formEquipament .remove-period', function (){
     $(this).closest('.period').slideUp(500);
     setTimeout(() => { $(this).closest('.period').remove() }, 500);
 });
 
-$(document).on('keydown', function(e){
+$(document).on('keydown', '#formEquipament', function(e){
     if(e.keyCode == 13){
         return false;
     }
@@ -115,9 +115,9 @@ const verifyPeriodComplet = () => {
     let arrDaysVerify = [];
     for (let countPeriod = 0; countPeriod < periodCount; countPeriod++) {
         periodUser++;
-        day_start   = $(`[name="day_start[]"]:eq(${countPeriod})`);
-        day_end     = $(`[name="day_end[]"]:eq(${countPeriod})`);
-        value       = $(`[name="value_period[]"]:eq(${countPeriod})`);
+        day_start   = $(`#formEquipament [name="day_start[]"]:eq(${countPeriod})`);
+        day_end     = $(`#formEquipament [name="day_end[]"]:eq(${countPeriod})`);
+        value       = $(`#formEquipament [name="value_period[]"]:eq(${countPeriod})`);
         if (!day_start.val().length) {
             day_start.css('border', '1px solid red');
             arrErrors.push('Dia inicial do período precisa ser preenchido.');
@@ -156,7 +156,7 @@ const verifyValuesOutRange = (day_start, day_end, arrDaysVerify) => {
 }
 
 const cleanBorderPeriod = () => {
-    $('[name="day_start[]"]').removeAttr('style');
-    $('[name="day_end[]"]').removeAttr('style');
-    $('[name="value_period[]"]').removeAttr('style');
+    $('#formEquipament [name="day_start[]"]').removeAttr('style');
+    $('#formEquipament [name="day_end[]"]').removeAttr('style');
+    $('#formEquipament [name="value_period[]"]').removeAttr('style');
 }

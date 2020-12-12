@@ -82,4 +82,27 @@ class Equipament extends Model
     {
         return $this->where(['id' => $equipament_id, 'company_id' => $company_id])->first();
     }
+
+    public function getEquipamentRental($company_id, $searchEquipament, $getCacamba, $equipamentInUse)
+    {
+        // faço essa engembra pra pegar o volume da caçmba
+        // não salvo no banco o nome caçamba, então faço o
+        // explode e tento pegar o volume digitado
+        $_searchEquipament = explode(' ', str_replace(['m³', 'm3', 'm'],'',$searchEquipament));
+
+        $equipaments = $this->where('company_id', $company_id)
+                    ->where(function($query) use ($searchEquipament, $_searchEquipament) {
+                        $query->where('id', 'like', "%{$searchEquipament}%")
+                            ->orWhere('name', 'like', "%{$searchEquipament}%")
+                            ->orWhere('reference', 'like', "%{$searchEquipament}%")
+                            ->orWhereIn('volume', $_searchEquipament);
+                    });
+        if ($equipamentInUse && count($equipamentInUse))
+            $equipaments = $equipaments->whereNotIn('id', $equipamentInUse);
+
+        if ($getCacamba)
+            $equipaments->orWhere('name', null);
+
+        return $equipaments->get();
+    }
 }

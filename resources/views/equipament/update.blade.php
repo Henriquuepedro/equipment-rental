@@ -13,7 +13,7 @@
 <script src="{{ asset('assets/js/views/equipament/form.js') }}" type="application/javascript"></script>
 <script>
     // validate the form when it is submitted
-    $("#formUpdateEquipament").validate({
+    $("#formEquipament").validate({
         rules: {
             name: {
                 name_valid: true
@@ -63,7 +63,7 @@
                 return false;
             }
 
-            $('#formUpdateEquipament [type="submit"]').attr('disabled', true);
+            $('#formEquipament [type="submit"]').attr('disabled', true);
             form.submit();
         }
     });
@@ -90,7 +90,7 @@
                         </ol>
                     </div>
                     @endif
-                    <form action="{{ route(('equipament.update')) }}" method="POST" enctype="multipart/form-data" id="formUpdateEquipament">
+                    <form action="{{ route(('equipament.update')) }}" method="POST" enctype="multipart/form-data" id="formEquipament">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">
@@ -179,7 +179,7 @@
                                                     <label>Valor</label>
                                                     <input {{ $disabled }} type="text" class="form-control" name="value_period[]" autocomplete="nope" value="{{ $period->value }}">
                                                 </div>
-                                                <div class="form-group col-md-1">
+                                                <div class="col-md-1">
                                                     <label>&nbsp;</label>
                                                     @if ($btns)<button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>@endif
                                                 </div>
@@ -209,7 +209,7 @@
                                                     <label>Valor</label>
                                                     <input {{ $disabled }} type="text" class="form-control" name="value_period[]" autocomplete="nope" value="{{ old('value_period')[$period] }}">
                                                 </div>
-                                                <div class="form-group col-md-1">
+                                                <div class="col-md-1">
                                                     <label>&nbsp;</label>
                                                     @if ($btns)<button type="button" class="btn btn-danger remove-period col-md-12"><i class="fa fa-trash"></i></button>@endif
                                                 </div>

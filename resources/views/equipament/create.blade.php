@@ -13,7 +13,7 @@
 <script src="{{ asset('assets/js/views/equipament/form.js') }}" type="application/javascript"></script>
 <script>
     // validate the form when it is submitted
-    $("#formCreateEquipament").validate({
+    $("#formEquipament").validate({
         rules: {
             name: {
                 name_valid: true
@@ -61,7 +61,7 @@
                 }
                 return false;
             }
-            $('#formCreateEquipament [type="submit"]').attr('disabled', true);
+            $('#formEquipament [type="submit"]').attr('disabled', true);
             form.submit();
         }
     });
@@ -77,12 +77,12 @@
                     <div class="alert-animate alert-warning">
                         <ol>
                             @foreach($errors->all() as $error)
-                                <li><label id="name-error" class="error">{{ $error }}</label></li>
+                                <li><label class="error">{{ $error }}</label></li>
                             @endforeach
                         </ol>
                     </div>
                     @endif
-                    <form action="{{ route(('equipament.insert')) }}" method="POST" enctype="multipart/form-data" id="formCreateEquipament">
+                    <form action="{{ route(('equipament.insert')) }}" method="POST" enctype="multipart/form-data" id="formEquipament">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">

@@ -113,6 +113,9 @@ Route::group(['middleware' => 'auth'], function (){
         Route::group(['prefix' => '/equipamento', 'as' => 'equipament.'], function () {
             Route::post('/buscar', [App\Http\Controllers\EquipamentController::class, 'fetchEquipaments'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\EquipamentController::class, 'delete'])->name('delete');
+            Route::post('/visualizar-equipamentos', [App\Http\Controllers\EquipamentController::class, 'getEquipaments'])->name('get-equipaments');
+            Route::post('/visualizar-equipamento', [App\Http\Controllers\EquipamentController::class, 'getEquipament'])->name('get-equipament');
+            Route::post('/novo-equipamento', [App\Http\Controllers\EquipamentController::class, 'insert'])->name('new-equipament');
         });
         Route::group(['prefix' => '/meu-perfil', 'as' => 'profile.'], function () {
             Route::post('/atualizar-imagem', [App\Http\Controllers\UserController::class, 'updateImage'])->name('update.image');

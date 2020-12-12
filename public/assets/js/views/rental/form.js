@@ -3,13 +3,35 @@
     var form = $("#formCreateRental");
     form.steps({
         headerTag: "h3",
-        bodyTag: "section",
+        bodyTag: "div.stepRental",
         transitionEffect: "slideLeft",
+        stepsOrientation: "vertical",
         onStepChanging: function (event, currentIndex, newIndex)
         {
+            let debug = true;
             let arrErrors = [];
             if (currentIndex === 0) {
+                if (debug) {
+                    changeStepPosAbsolute();
+                    return true;
+                }
+                if (!$('input[name="type_rental"]:checked').length) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>Selecione um tipo de locação.</li></ol>'
+                    });
+                    return false;
+                }
 
+                changeStepPosAbsolute();
+                return true;
+            }
+            else if (currentIndex === 1) {
+                if (debug) {
+                    changeStepPosAbsolute();
+                    return true;
+                }
                 if ($('select[name="client"]').val() === '0') arrErrors.push('Selecione um cliente.');
 
                 if (arrErrors.length === 0) {
@@ -29,9 +51,16 @@
                     });
                 }
 
-                return arrErrors.length === 0;
-            } else if (currentIndex === 1) {
-
+                if (arrErrors.length === 0) {
+                    changeStepPosAbsolute();
+                    return true;
+                }
+                return false;
+            } else if (currentIndex === 2) {
+                if (debug) {
+                    changeStepPosAbsolute();
+                    return true;
+                }
                 let dateDelivery = $('input[name="date_delivery"]').val();
                 let dateWithdrawal = $('input[name="date_withdrawal"]').val();
 
@@ -53,15 +82,21 @@
                     });
                 }
 
-                return arrErrors.length === 0;
+                if (arrErrors.length === 0) {
+                    changeStepPosAbsolute();
+                    return true;
+                }
+                return false;
             }
 
+            changeStepPosAbsolute();
             return true;
         },
         onStepChanged: function (event, currentIndex, priorIndex)
         {
+            changeStepPosUnset();
             // height custom screen
-            $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
+            //$('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
 
             // Used to skip the "Warning" step if the user is old enough.
             // form.steps("next");
@@ -118,3 +153,11 @@
         }
     });
 })(jQuery);
+
+const changeStepPosAbsolute = () => {
+    $('.wizard > .content > .body').css('position', 'absolute');
+}
+
+const changeStepPosUnset = () => {
+    setTimeout(() => { $('.wizard > .content > .body').css('position', 'unset') }, 100);
+}

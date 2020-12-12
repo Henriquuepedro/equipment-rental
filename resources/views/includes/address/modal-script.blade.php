@@ -27,7 +27,7 @@
         if (client_id == 0) {
             $('.show-address').slideUp('slow');
             $('.alert-mark-map').slideUp('slow');
-            setTimeout( () => { $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500) }, 750);
+            //setTimeout( () => { $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500) }, 750);
             return false;
         }
 
@@ -39,7 +39,7 @@
         let client_id = $('select[name="client"]').val();
 
         if (!address_id || !client_id) {
-            $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
+            //$('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
             return false;
         }
 
@@ -75,7 +75,7 @@
     const loadAddresses = (client_id = null) => {
 
         $('.show-address').css('display', 'flex');
-        $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
+        //$('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
         disabledFieldAddress();
         $('select[name="name_address"]').empty().append('<option>Carregando ...</option>');
 
@@ -134,22 +134,22 @@
 
                 enabledFieldAddress();
 
-                $('input[name="cep"]').val(response.cep ?? '');
-                $('input[name="address"]').val(response.address ?? '');
-                $('input[name="number"]').val(response.number ?? '');
-                $('input[name="complement"]').val(response.complement ?? '');
-                $('input[name="reference"]').val(response.reference ?? '');
-                $('input[name="neigh"]').val(response.neigh ?? '');
-                $('input[name="city"]').val(response.city ?? '');
-                $('input[name="state"]').val(response.state ?? '');
-                $('input[name="lat"]').val(response.lat ?? '');
-                $('input[name="lng"]').val(response.lng ?? '');
+                $('.show-address input[name="cep"]').val(response.cep ?? '');
+                $('.show-address input[name="address"]').val(response.address ?? '');
+                $('.show-address input[name="number"]').val(response.number ?? '');
+                $('.show-address input[name="complement"]').val(response.complement ?? '');
+                $('.show-address input[name="reference"]').val(response.reference ?? '');
+                $('.show-address input[name="neigh"]').val(response.neigh ?? '');
+                $('.show-address input[name="city"]').val(response.city ?? '');
+                $('.show-address input[name="state"]').val(response.state ?? '');
+                $('.show-address input[name="lat"]').val(response.lat ?? '');
+                $('.show-address input[name="lng"]').val(response.lng ?? '');
                 checkLabelAnimate();
                 $('[name="cep"]').unmask().mask('00.000-000');
 
                 if (response.address != null && response.lat == null) $('.alert-mark-map').slideDown('slow');
 
-                setTimeout( () => { $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500) }, 750);
+                //setTimeout( () => { $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500) }, 750);
 
             }, error: e => {
 
@@ -182,14 +182,14 @@
     const enabledFieldAddress = () => {
 
         $('select[name="name_address"], select[name="client"]').attr('disabled', false);
-        $('input[name="cep"]').attr('disabled', false).parent().find('label').text('CEP');
-        $('input[name="address"]').attr('disabled', false).parent().find('label').text('Endereço');
-        $('input[name="number"]').attr('disabled', false).parent().find('label').text('Número');
-        $('input[name="complement"]').attr('disabled', false).parent().find('label').text('Complemento');
-        $('input[name="reference"]').attr('disabled', false).parent().find('label').text('Referência');
-        $('input[name="neigh"]').attr('disabled', false).parent().find('label').text('Bairro');
-        $('input[name="city"]').attr('disabled', false).parent().find('label').text('Cidade');
-        $('input[name="state"]').attr('disabled', false).parent().find('label').text('Estado');
+        $('.show-address input[name="cep"]').attr('disabled', false).parent().find('label').text('CEP');
+        $('.show-address input[name="address"]').attr('disabled', false).parent().find('label').text('Endereço');
+        $('.show-address input[name="number"]').attr('disabled', false).parent().find('label').text('Número');
+        $('.show-address input[name="complement"]').attr('disabled', false).parent().find('label').text('Complemento');
+        $('.show-address input[name="reference"]').attr('disabled', false).parent().find('label').text('Referência');
+        $('.show-address input[name="neigh"]').attr('disabled', false).parent().find('label').text('Bairro');
+        $('.show-address input[name="city"]').attr('disabled', false).parent().find('label').text('Cidade');
+        $('.show-address input[name="state"]').attr('disabled', false).parent().find('label').text('Estado');
     }
 
     // VERIFICAR SE HAVERÁ ALGUM ERRO

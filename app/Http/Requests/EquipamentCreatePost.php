@@ -55,4 +55,19 @@ class EquipamentCreatePost extends FormRequest
             'reference.required'    => 'Digite a referência do equipamento'
         ];
     }
+
+    /**
+     * Get the proper failed validation response for the request.
+     *
+     * @param array $errors
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function response(array $errors)
+    {
+        if ($this->isAjax()) return response()->json(['errors' => $errors]);
+
+        return $this->redirector->to($this->getRedirectUrl())
+            ->withInput($this->except($this->dontFlash))
+            ->withErrors($errors, $this->errorBag);
+    }
 }

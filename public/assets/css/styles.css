@@ -809,6 +809,11 @@ table .form-group {
 #new-addressses table tr:last-child {
     border-bottom: 1px solid #ccc;
 }
+.separator-dashed {
+    border-style: dashed;
+    border-width: 1px;
+    border-color: #ddd;
+}
 
 
 
