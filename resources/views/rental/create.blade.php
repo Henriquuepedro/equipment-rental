@@ -450,10 +450,10 @@
                                                 <label>Data Prevista de Entrega</label>
                                                 <input type="text" name="date_delivery" class="form-control col-md-9 pull-left" value="{{ date('d/m/Y H:i') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
                                                 <div class="input-button-calendar col-md-3 pull-right no-padding">
-                                                    <a class="input-button pull-left btn-info" title="toggle" data-toggle>
+                                                    <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
-                                                    <a class="input-button pull-right btn-info" title="clear" data-clear>
+                                                    <a class="input-button pull-right btn-primary" title="clear" data-clear>
                                                         <i class="fa fa-times text-white"></i>
                                                     </a>
                                                 </div>
@@ -464,10 +464,10 @@
                                                 <label>Data Prevista de Retirada</label>
                                                 <input type="text" name="date_withdrawal" class="form-control col-md-9 pull-left" value="{{ date('d/m/Y H:i', strtotime('+1 minute', time())) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
                                                 <div class="input-button-calendar col-md-3 pull-right no-padding">
-                                                    <a class="input-button pull-left btn-info" title="toggle" data-toggle>
+                                                    <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
-                                                    <a class="input-button pull-right btn-info" title="clear" data-clear>
+                                                    <a class="input-button pull-right btn-primary" title="clear" data-clear>
                                                         <i class="fa fa-times text-white"></i>
                                                     </a>
                                                 </div>
