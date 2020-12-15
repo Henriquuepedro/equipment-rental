@@ -8,7 +8,7 @@
         stepsOrientation: "vertical",
         onStepChanging: function (event, currentIndex, newIndex)
         {
-            let debug = true;
+            let debug = false;
             let arrErrors = [];
             if (currentIndex === 0) {
                 if (debug) {
@@ -87,14 +87,104 @@
                     return true;
                 }
                 return false;
+            } else if (currentIndex === 3) {
+                // if (debug) {
+                //     changeStepPosAbsolute();
+                //     return true;
+                // }
+
+                if ($('#equipaments-selected div').length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>Selecione um equipamento.</li></ol>'
+                    });
+                    return false;
+                }
+
+                let idEquipament,stockEquipament,referenceEquipament,nameEquipament,stockMax;
+                $('#equipaments-selected div.card').each(function() {
+                    idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
+                    stockEquipament     = parseInt($('[name="stock_equipament"]', this).val());
+                    referenceEquipament = $('[name="reference_equipament"]', this).val();
+                    nameEquipament      = $('.card-header a:eq(0)', this).text();
+                    stockMax            = parseInt($('[name="stock_equipament"]', this).attr('max-stock'));
+
+                    if (isNaN(stockEquipament) || stockEquipament === 0)
+                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado uma quantidade.`);
+
+                    else if (stockEquipament > stockMax)
+                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
+                });
+
+                if (arrErrors.length) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>' + arrErrors.join('</li><li>') + '</li></ol>'
+                    });
+                }
+
+                if (arrErrors.length === 0) {
+                    $('div[id^=collapseEquipament-]').collapse('hide');
+                    $('#formCreateRental .actions a[href="#next"]').hide();
+                    changeStepPosAbsolute();
+                    return true;
+                }
+                return false;
             }
 
             changeStepPosAbsolute();
             return true;
         },
-        onStepChanged: function (event, currentIndex, priorIndex)
+        onStepChanged: async function (event, currentIndex, priorIndex)
         {
             changeStepPosUnset();
+            let arrErrors = [];
+
+            if (priorIndex === 3 && currentIndex === 4  ) {
+
+                let returnAjax;
+                let dataEquipaments = [];
+                let idEquipament,stockEquipament,referenceEquipament,nameEquipament;
+                await $('#equipaments-selected div.card').each(async function() {
+                    idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
+                    stockEquipament     = parseInt($('[name="stock_equipament"]', this).val());
+                    referenceEquipament = $('[name="reference_equipament"]', this).val();
+                    nameEquipament      = $('.card-header a:eq(0)', this).text();
+                    dataEquipaments.push([idEquipament, stockEquipament, nameEquipament]);
+                });
+
+                await Promise.all(dataEquipaments.map(async equipament => {
+                    returnAjax = await checkStockEquipament(equipament[0]);
+                    if (equipament[1] > returnAjax) {
+                        $(`#collapseEquipament-${equipament[0]}`).find('input[name="stock_equipament"]').attr('max-stock', returnAjax).val(returnAjax);
+                        $(`#collapseEquipament-${equipament[0]}`).find('.stock_available').text('Disponível: ' + returnAjax);
+                        arrErrors.push(`O equipamento ( <strong>${equipament[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${returnAjax} un</strong>`);
+                    }
+                }));
+
+                $('#formCreateRental .actions a[href="#next"]').show();
+
+                if (arrErrors.length) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>' + arrErrors.join('</li><li>') + '</li></ol>'
+                    });
+                    changeStepPosUnset();
+                    form.steps("previous");
+                    let countMenuIndex = 0;
+                    $('#formCreateRental .steps ul li').each(function (){
+                        countMenuIndex++;
+                        if (countMenuIndex > 4)
+                            $(this).removeClass('done').addClass('disabled last');
+                    });
+                    $('#formCreateRental .steps ul li.current').addClass('error');
+                }
+            }
+            if (priorIndex === 3 && currentIndex !== 4)
+                $('#formCreateRental .actions a[href="#next"]').show();
             // height custom screen
             //$('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
 
@@ -111,47 +201,6 @@
             alert("Submitted!");
         }
     });
-    var validationForm = $("#example-validation-form");
-    validationForm.val({
-        errorPlacement: function errorPlacement(error, element) {
-            element.before(error);
-        },
-        rules: {
-            confirm: {
-                equalTo: "#password"
-            }
-        }
-    });
-    validationForm.children("div").steps({
-        headerTag: "h3",
-        bodyTag: "section",
-        transitionEffect: "slideLeft",
-        onStepChanging: function (event, currentIndex, newIndex) {
-            validationForm.val({
-                ignore: [":disabled", ":hidden"]
-            })
-            return validationForm.val();
-        },
-        onFinishing: function (event, currentIndex) {
-            validationForm.val({
-                ignore: [':disabled']
-            })
-            return validationForm.val();
-        },
-        onFinished: function (event, currentIndex) {
-            alert("Submitted!");
-        }
-    });
-    var verticalForm = $("#example-vertical-wizard");
-    verticalForm.children("div").steps({
-        headerTag: "h3",
-        bodyTag: "section",
-        transitionEffect: "slideLeft",
-        stepsOrientation: "vertical",
-        onFinished: function (event, currentIndex) {
-            alert("Submitted!");
-        }
-    });
 })(jQuery);
 
 const changeStepPosAbsolute = () => {
@@ -160,4 +209,21 @@ const changeStepPosAbsolute = () => {
 
 const changeStepPosUnset = () => {
     setTimeout(() => { $('.wizard > .content > .body').css('position', 'unset') }, 100);
+}
+
+const checkStockEquipament = async idEquipament => {
+    let stockReal = await $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: $('#routeGetStockEquipament').val(),
+        data: { idEquipament },
+        async: true,
+        success: response => {
+            return response;
+        }
+    });
+
+    return stockReal;
 }

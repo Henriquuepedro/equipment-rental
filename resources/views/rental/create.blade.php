@@ -240,10 +240,8 @@
             },
             type: 'POST',
             url: "{{ route('ajax.equipament.get-equipament') }}",
-            data: { idEquipament, validStock: false },
+            data: { idEquipament, validStock: true },
             success: response => {
-
-                console.log(response);
 
                 if (!response.success) {
                     Swal.fire({
@@ -260,25 +258,25 @@
 
                 $('#equipaments-selected').append(`
                     <div class="card">
-                        <div class="card-header" role="tab" id="headingThree-${response.id}" id-equipament="${response.id}">
+                        <div class="card-header" role="tab" id="headingEquipament-${response.id}" id-equipament="${response.id}">
                             <h5 class="mb-0 d-flex align-items-center">
-                                <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseThree-${response.id}" aria-expanded="false" aria-controls="collapseThree-${response.id}">
+                                <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseEquipament-${response.id}" aria-expanded="false" aria-controls="collapseEquipament-${response.id}">
                                     ${response.name}
                                 </a>
                                 <a class="remove-equipament pull-right"><i class="fa fa-trash"></i></a>
                             </h5>
                         </div>
-                        <div id="collapseThree-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingThree-${response.id}" data-parent="#equipaments-selected">
+                        <div id="collapseEquipament-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipament-${response.id}" data-parent="#equipaments-selected">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="form-group col-md-4">
                                         <label>Referência</label>
-                                        <input type="text" class="form-control" value="${response.reference}" disabled>
+                                        <input type="text" class="form-control" value="${response.reference}" name="reference_equipament" disabled>
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label>Quantidade</label>
-                                        <input type="tel" class="form-control" value="0">
-                                        <small class="text-danger font-weight-bold">Disponível: ${response.stock}</small>
+                                        <input type="tel" class="form-control" value="0" name="stock_equipament" max-stock="${response.stock}">
+                                        <small class="text-danger font-weight-bold stock_available">Disponível: ${response.stock}</small>
                                     </div>
                                     <div class="form-group col-md-5">
                                         <label>Resíduo</label>
@@ -301,6 +299,11 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="form-group col-md-12 mt-2">
+                                        <button type="button" class="btn btn-primary pull-right hideEquipament" id-equipament="${response.id}"><i class="fa fa-angle-up"></i> Ocultar</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -314,7 +317,7 @@
                         equipamentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
                     }
                     checkLabelAnimate();
-                    $(`[href="#collapseThree-${idEquipament}"]`).trigger('click');
+                    $(`#collapseEquipament-${idEquipament}`).collapse('show').find('[name="stock_equipament"]').mask('0#');
                 }, 350);
             }, error: e => {
                 console.log(e);
@@ -338,6 +341,31 @@
             $('#searchEquipament').trigger('blur');
             showSeparatorEquipamentSelected();
         }, 550);
+    });
+
+    $(document).on('click', '.hideEquipament', function (){
+        const idEquipament = parseInt($(this).attr('id-equipament'));
+        console.log(idEquipament);
+        $(`#collapseEquipament-${idEquipament}`).collapse('hide');
+    });
+
+    $(document).on('blur change', '[name="stock_equipament"]', function (){
+        const maxStock      = parseInt($(this).attr('max-stock'));
+        const stock         = parseInt($(this).val());
+        const idEquipament  = parseInt($(this).closest('.card').find('.card-header').attr('id-equipament'));
+
+        if (stock > maxStock) {
+            Toast.fire({
+                icon: 'error',
+                title: `A quantidade não pode ser superior a ${maxStock} un.`
+            });
+            $(this).val(maxStock);
+            console.log(idEquipament);
+            setTimeout(() => {
+                $(`#collapseEquipament-${idEquipament}`).collapse('show');
+                $(this).focus();
+            }, 550);
+        }
     });
 
     const equipamentMessageDefault = message => {
@@ -550,5 +578,6 @@
             </div>
         </div>
     </div>
+    <input type="hidden" id="routeGetStockEquipament" value="{{ route('ajax.equipament.get-stock') }}">
 
 @stop

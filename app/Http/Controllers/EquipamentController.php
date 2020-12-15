@@ -390,4 +390,14 @@ class EquipamentController extends Controller
 
         return response()->json(['success' => true, 'data' => $equipamentData]);
     }
+
+    public function getStockEquipament(Request $request)
+    {
+        $company_id         = $request->user()->company_id;
+        $equipament_id      = $request->idEquipament;
+
+        $equipament = $this->equipament->getEquipament($equipament_id, $company_id);
+
+        return response()->json($equipament->stock);
+    }
 }

@@ -142,8 +142,8 @@
                 $('.show-address input[name="neigh"]').val(response.neigh ?? '');
                 $('.show-address input[name="city"]').val(response.city ?? '');
                 $('.show-address input[name="state"]').val(response.state ?? '');
-                $('.show-address input[name="lat"]').val(response.lat ?? '');
-                $('.show-address input[name="lng"]').val(response.lng ?? '');
+                $('input[name="lat"]').val(response.lat ?? '');
+                $('input[name="lng"]').val(response.lng ?? '');
                 checkLabelAnimate();
                 $('[name="cep"]').unmask().mask('00.000-000');
 

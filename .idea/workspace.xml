@@ -2,21 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/equipament/modal-create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/equipament/modal-script.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/DriverCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/DriverCreatePost.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/EquipamentCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/EquipamentCreatePost.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Equipament.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Equipament.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/js/demo_.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/demo_.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/js/views/equipament/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/equipament/form.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/equipament/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipament/create.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/equipament/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipament/update.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/rental/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rental/create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
@@ -278,7 +266,10 @@
       <workItem from="1607735674791" duration="1579000" />
       <workItem from="1607740713325" duration="1393000" />
       <workItem from="1607794224888" duration="5830000" />
-      <workItem from="1607809939356" duration="4798000" />
+      <workItem from="1607809939356" duration="7206000" />
+      <workItem from="1607879743411" duration="6783000" />
+      <workItem from="1607982995381" duration="1166000" />
+      <workItem from="1607985599521" duration="6472000" />
     </task>
     <servers />
   </component>
