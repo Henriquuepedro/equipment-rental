@@ -8,8 +8,11 @@
         stepsOrientation: "vertical",
         onStepChanging: function (event, currentIndex, newIndex)
         {
-            let debug = false;
+            let debug = true;
             let arrErrors = [];
+            let typeLocation;
+            let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
+
             if (currentIndex === 0) {
                 if (debug) {
                     changeStepPosAbsolute();
@@ -56,22 +59,24 @@
                     return true;
                 }
                 return false;
-            } else if (currentIndex === 2) {
-                if (debug) {
-                    changeStepPosAbsolute();
-                    return true;
-                }
+            }
+            else if (currentIndex === 2) {
+                // if (debug) {
+                //     changeStepPosAbsolute();
+                //     return true;
+                // }
                 let dateDelivery = $('input[name="date_delivery"]').val();
                 let dateWithdrawal = $('input[name="date_withdrawal"]').val();
 
                 if (dateDelivery.length < 16) arrErrors.push('Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy.');
-                if (dateWithdrawal.length < 16) arrErrors.push('Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy.');
+                if (!notUseDateWithdrawal && dateWithdrawal.length < 16) arrErrors.push('Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy.');
 
                 if (arrErrors.length === 0) {
                     let dateDeliveryTime = new Date(transformDateForEn(dateDelivery)).getTime();
                     let dateWithdrawalTime = new Date(transformDateForEn(dateWithdrawal)).getTime();
 
-                    if (dateDeliveryTime >= dateWithdrawalTime) arrErrors.push('Data prevista de entrega não pode ser maior ou igual que a data prevista de retirada.');
+                    if (dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0)) arrErrors.push('Data prevista de entrega e data prevista de retirada devem ser informadas corretamente.');
+                    else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) arrErrors.push('Data prevista de entrega não pode ser maior ou igual que a data prevista de retirada.');
                 }
 
                 if (arrErrors.length) {
@@ -84,10 +89,12 @@
 
                 if (arrErrors.length === 0) {
                     changeStepPosAbsolute();
+                    fixEquipmentDates();
                     return true;
                 }
                 return false;
-            } else if (currentIndex === 3) {
+            }
+            else if (currentIndex === 3) {
                 // if (debug) {
                 //     changeStepPosAbsolute();
                 //     return true;
@@ -102,7 +109,7 @@
                     return false;
                 }
 
-                let idEquipament,stockEquipament,referenceEquipament,nameEquipament,stockMax;
+                let idEquipament,stockEquipament,referenceEquipament,nameEquipament,stockMax,dateDeliveryTime,dateWithdrawalTime;
                 $('#equipaments-selected div.card').each(function() {
                     idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
                     stockEquipament     = parseInt($('[name="stock_equipament"]', this).val());
@@ -115,6 +122,14 @@
 
                     else if (stockEquipament > stockMax)
                         arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
+
+                    notUseDateWithdrawal = $('.not_use_date_withdrawal', this).is(':checked');
+
+                    dateDeliveryTime = new Date(transformDateForEn($('input[name="date_delivery_equipament"]', this).val())).getTime();
+                    dateWithdrawalTime = new Date(transformDateForEn($('input[name="date_withdrawal_equipament"]', this).val())).getTime();
+
+                    if (dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0)) arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento ( <strong>${nameEquipament}</strong> ) deve ser informada corretamente.`);
+                    else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) arrErrors.push(`A data prevista de entrega do equipamento ( <strong>${nameEquipament}</strong> ) não pode ser maior ou igual que a data prevista de retirada.`);
                 });
 
                 if (arrErrors.length) {
@@ -202,6 +217,22 @@
         }
     });
 })(jQuery);
+
+const fixEquipmentDates = () => {
+    let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
+    let dateDelivery = $('input[name="date_delivery"]').val();
+    let dateWithdrawal = $('input[name="date_withdrawal"]').val();
+
+    $('#equipaments-selected div.card').each(function() {
+        if (!$('.use_date_diff_equip', this).is(':checked')) {
+            $('input[name="date_delivery_equipament"]', this).val(dateDelivery);
+            $('input[name="date_withdrawal_equipament"]', this).val(dateWithdrawal);
+            $('.not_use_date_withdrawal', this).prop('checked', notUseDateWithdrawal);
+        }
+    });
+    checkLabelAnimate();
+
+}
 
 const changeStepPosAbsolute = () => {
     $('.wizard > .content > .body').css('position', 'absolute');

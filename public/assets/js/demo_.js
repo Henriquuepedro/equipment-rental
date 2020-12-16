@@ -283,3 +283,23 @@ const transformDateForEn = data => {
     }
     return dataFormatada;
 }
+
+const getTodayDateBr = (returnTime = true) => {
+    let dateTime = new Date();
+    let dd = dateTime.getDate();
+    let mm = dateTime.getMonth();
+    let YYYY = dateTime.getFullYear();
+    let HH = dateTime.getHours();
+    let ii = dateTime.getMinutes();
+
+    dd = dd < 10 ? `0${dd}` : dd;
+    mm = mm < 10 ? `0${mm}` : mm;
+    HH = HH < 10 ? `0${HH}` : HH;
+    ii = ii < 10 ? `0${ii}` : ii;
+
+    let currentDate = `${dd}/${mm}/${YYYY}`;
+
+    if (returnTime) return currentDate+=` ${HH}:${ii}`;
+
+    return currentDate;
+}

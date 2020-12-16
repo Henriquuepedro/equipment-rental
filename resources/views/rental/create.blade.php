@@ -7,6 +7,8 @@
 @stop
 
 @section('css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
     <style>
         .wizard > .actions > ul {
             display: flex;
@@ -33,7 +35,7 @@
             border-bottom-right-radius: 5px;
             border-top-right-radius: 5px;
         }
-        [name="date_withdrawal"], [name="date_delivery"] {
+        [name^="date_withdrawal"], [name^="date_delivery"] {
             border-bottom-right-radius: 0 !important;
             border-top-right-radius: 0 !important;;
         }
@@ -70,29 +72,31 @@
         .content-equipament {
             max-height: 300px;
         }
-
-        .content-equipament::-webkit-scrollbar-track
-        {
+        .content-equipament::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px #2196f3;
             border-radius: 10px;
             background-color: #F5F5F5;
         }
-
-        .content-equipament::-webkit-scrollbar
-        {
+        .content-equipament::-webkit-scrollbar {
             width: 12px;
             background-color: #F5F5F5;
         }
-
-        .content-equipament::-webkit-scrollbar-thumb
-        {
+        .content-equipament::-webkit-scrollbar-thumb {
             border-radius: 10px;
             -webkit-box-shadow: inset 0 0 6px #2196f3;
             background-color: #52a4e5;
         }
+        .calendar_equipament a {
+            height: calc(1.5em + 0.75rem + 3px) !important;
+        }
+        .calendar_equipament i {
+            font-size: 14px !important;;
+        }
+        a[disabled] {
+            pointer-events: none;
+            cursor: no-drop;
+        }
     </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
 @stop
 
 @section('js')
@@ -231,6 +235,7 @@
 
     $('table.list-equipament').on('click', '.equipament', function(){
         const idEquipament = $(this).attr('id-equipament');
+        let date_delivery, date_withdrawal;
 
         $(`.equipament[id-equipament="${idEquipament}"]`).empty().toggleClass('equipament load-equipament').append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
 
@@ -253,6 +258,9 @@
                     $('#searchEquipament').trigger('blur');
                     return false;
                 }
+
+                date_delivery = $('input[name="date_delivery"]').val();
+                date_withdrawal = $('input[name="date_withdrawal"]').val();
 
                 response = response.data;
 
@@ -300,6 +308,52 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-check form-check-flat mb-0">
+                                            <label class="form-check-label">
+                                                <input type="checkbox" class="form-check-input use_date_diff_equip" name="use_date_diff_equip"> Usar datas diferentes <i class="input-helper"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group flatpickr">
+                                            <label>Data Prevista de Entrega</label>
+                                            <input type="text" name="date_delivery_equipament" class="form-control col-md-9 pull-left" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                            <div class="input-button-calendar col-md-3 pull-right no-padding calendar_equipament">
+                                                <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                                    <i class="fa fa-calendar text-white"></i>
+                                                </a>
+                                                <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                                    <i class="fa fa-times text-white"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group flatpickr">
+                                            <label>Data Prevista de Retirada</label>
+                                            <input type="text" name="date_withdrawal_equipament" class="form-control col-md-9 pull-left" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                            <div class="input-button-calendar col-md-3 pull-right no-padding calendar_equipament">
+                                                <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                                    <i class="fa fa-calendar text-white"></i>
+                                                </a>
+                                                <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                                    <i class="fa fa-times text-white"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="form-group pt-3">
+                                            <div class="form-check form-check-flat">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" class="form-check-input not_use_date_withdrawal" name="not_use_date_withdrawal" disabled> Não informar data de retirada <i class="input-helper"></i>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="form-group col-md-12 mt-2">
                                         <button type="button" class="btn btn-primary pull-right hideEquipament" id-equipament="${response.id}"><i class="fa fa-angle-up"></i> Ocultar</button>
                                     </div>
@@ -317,7 +371,27 @@
                         equipamentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
                     }
                     checkLabelAnimate();
-                    $(`#collapseEquipament-${idEquipament}`).collapse('show').find('[name="stock_equipament"]').mask('0#');
+                    $(`#collapseEquipament-${idEquipament}`).collapse('show');
+                    $(`#collapseEquipament-${idEquipament} input[name="stock_equipament"]`).mask('0#');
+                    $(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).inputmask();
+                    $(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).inputmask();
+
+                    $(`#collapseEquipament-${idEquipament} .flatpickr`).flatpickr({
+                        enableTime: true,
+                        dateFormat: "d/m/Y H:i",
+                        time_24hr: true,
+                        wrap: true,
+                        clickOpens: false,
+                        allowInput: true,
+                        locale: "pt",
+                        onClose: function(selectedDates, dateStr, instance){
+                            checkLabelAnimate();
+                        }
+                    });
+                    if ($('#not_use_date_withdrawal').is(':checked')) {
+                        $(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val('');
+                        $(`#collapseEquipament-${idEquipament} .not_use_date_withdrawal`).prop('checked', true);
+                    }
                 }, 350);
             }, error: e => {
                 console.log(e);
@@ -349,6 +423,35 @@
         $(`#collapseEquipament-${idEquipament}`).collapse('hide');
     });
 
+    $(document).on('click', '.use_date_diff_equip', function (){
+        const elEquip = $(this).closest('.card-body');
+        let date_delivery, date_withdrawal;
+
+        elEquip.find('input[name="date_delivery_equipament"]').attr('disabled', !$(this).is(':checked'));
+        elEquip.find('.not_use_date_withdrawal').attr('disabled', !$(this).is(':checked'));
+
+        if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
+            elEquip.find('input[name="date_withdrawal_equipament"]').attr('disabled', !$(this).is(':checked'));
+
+        if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
+            elEquip.find('.calendar_equipament a:eq(1)').attr('disabled', !$(this).is(':checked'));
+
+        elEquip.find('.calendar_equipament a:eq(0)').attr('disabled', !$(this).is(':checked'));
+
+        if (!$(this).is(':checked')) {
+            date_delivery = $('input[name="date_delivery"]').val();
+            date_withdrawal = $('input[name="date_withdrawal"]').val();
+
+            elEquip.find('input[name="date_delivery_equipament"]').val(date_delivery);
+            elEquip.find('input[name="date_withdrawal_equipament"]').val(date_withdrawal);
+
+            if ($('#not_use_date_withdrawal').is(':checked'))
+                elEquip.find('.not_use_date_withdrawal').prop('checked', true);
+
+            checkLabelAnimate();
+        }
+    });
+
     $(document).on('blur change', '[name="stock_equipament"]', function (){
         const maxStock      = parseInt($(this).attr('max-stock'));
         const stock         = parseInt($(this).val());
@@ -366,6 +469,34 @@
                 $(this).focus();
             }, 550);
         }
+    });
+
+    $('#not_use_date_withdrawal').on('click', function (){
+        const elEquip = $(this).closest('.col-md-6');
+
+        elEquip.find('input[name="date_withdrawal"]').attr('disabled', $(this).is(':checked'));
+        elEquip.find('.flatpickr a').attr('disabled', $(this).is(':checked'));
+
+        elEquip.find('input[name="date_withdrawal"]').val('');
+
+        if (!$(this).is(':checked')) {
+            elEquip.find('input[name="date_withdrawal"]').val(getTodayDateBr());
+        }
+        checkLabelAnimate();
+    });
+
+    $(document).on('click', '.not_use_date_withdrawal', function (){
+        const elEquip = $(this).closest('.col-md-6');
+
+        elEquip.find('input[name="date_withdrawal_equipament"]').attr('disabled', $(this).is(':checked'));
+        elEquip.find('.flatpickr a').attr('disabled', $(this).is(':checked'));
+
+        elEquip.find('input[name="date_withdrawal_equipament"]').val('');
+
+        if (!$(this).is(':checked'))
+            elEquip.find('input[name="date_withdrawal_equipament"]').val(getTodayDateBr());
+
+        checkLabelAnimate();
     });
 
     const equipamentMessageDefault = message => {
@@ -472,8 +603,14 @@
                                                     </a>
                                                 </div>
                                             </div>
+                                            <div class="form-group pt-3">
+                                                <div class="form-check form-check-flat">
+                                                    <label class="form-check-label">
+                                                        <input type="checkbox" class="form-check-input" name="not_use_date_withdrawal" id="not_use_date_withdrawal"> Não informar data de retirada <i class="input-helper"></i>
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
-
                                     </div>
                                 </div>
                                 <h3>Equipamentos</h3>
