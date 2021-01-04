@@ -128,6 +128,8 @@
                 checkLabelAnimate();
             }
         });
+
+        $('#discount_value, #extra_value').mask('#.##0,00', { reverse: true });
     });
 
     $("#formCreateRental").validate({
@@ -499,6 +501,14 @@
         checkLabelAnimate();
     });
 
+    $(document).on('blur', '.price-equipament', function() {
+        reloadTotalRental();
+    });
+
+    $('#extra_value, #discount_value').on('blur', function() {
+        reloadTotalRental();
+    });
+
     const equipamentMessageDefault = message => {
         $('table.list-equipament tbody').append(`
             <tr>
@@ -651,8 +661,61 @@
                                 <div class="stepRental">
                                     <h6>Pagamento</h6>
                                     <div class="row">
-                                        <div class="form-group col-md-12 text-center mt-5">
-                                            <h4><i class="fa fa-warning"></i> Em andamento, em breve estará disponível</h4>
+                                        <div class="payment-yes col-md-12 mt-3">
+                                            <div class="col-md-12 grid-margin stretch-card">
+                                                <ul class="bullet-line-list pl-3 col-md-12 list-equipaments-payment"></ul>
+                                                <div class="pl-3 col-md-12 list-equipaments-payment-load text-center">
+                                                    <h4>Carregando equipamentos <i class="fa fa-spinner fa-spin"></i></h4>
+                                                </div>
+                                            </div>
+                                            <hr class="separator-dashed">
+                                            <div class="col-md-12">
+                                                <div class="d-flex justify-content-end align-items-center mb-2">
+                                                    <label class="mb-0 mr-md-2">Valor Bruto</label>
+                                                    <div class="input-group col-md-4 no-padding">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><strong>R$</strong></span>
+                                                        </div>
+                                                        <input type="text" class="form-control" id="gross_value" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-end align-items-center mb-2">
+                                                    <label class="mb-0 mr-md-2">Acréscimo</label>
+                                                    <div class="input-group col-md-4 no-padding">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><strong>R$</strong></span>
+                                                        </div>
+                                                        <input type="text" class="form-control" value="0,00" id="extra_value">
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-end align-items-center mb-2">
+                                                    <label class="mb-0 mr-md-2">Desconto</label>
+                                                    <div class="input-group col-md-4 no-padding">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><strong>R$</strong></span>
+                                                        </div>
+                                                        <input type="text" class="form-control" value="0,00" id="discount_value">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="separator-dashed">
+                                            <div class="col-md-12">
+                                                <div class="d-flex justify-content-end align-items-center mb-2">
+                                                    <label class="mb-0 mr-md-2">Valor Líquido</label>
+                                                    <div class="input-group col-md-4 no-padding">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><strong>R$</strong></span>
+                                                        </div>
+                                                        <input type="text" class="form-control" id="net_value" disabled>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="payment-no col-md-12 mt-5">
+                                            <div class="form-group text-center">
+                                                <h4><i class="fa fa-check"></i> Locação sem cobrança.</h4>
+                                                <h5>Prossiga para a próxima etapa.</h5>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -716,5 +779,7 @@
         </div>
     </div>
     <input type="hidden" id="routeGetStockEquipament" value="{{ route('ajax.equipament.get-stock') }}">
+    <input type="hidden" id="routeGetPriceEquipament" value="{{ route('ajax.equipament.get-price') }}">
+    <input type="hidden" id="routeGetEquipament" value="{{ route('ajax.equipament.get-equipament') }}">
 
 @stop

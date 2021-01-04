@@ -3094,7 +3094,7 @@ input[type="button"].btn-block {
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center; }
-  
+
   .btn-group-vertical > .btn,
   .ajax-upload-dragdrop .btn-group-vertical > .ajax-file-upload,
   .swal2-modal .swal2-buttonswrapper .btn-group-vertical > .swal2-styled,
@@ -3398,7 +3398,7 @@ input[type="button"].btn-block {
   .asColorPicker-wrap > .custom-select:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0; }
-  
+
   .input-group > .custom-file,
   .asColorPicker-wrap > .custom-file {
     display: -webkit-box;
@@ -8822,7 +8822,7 @@ a.text-dark:hover, a.text-dark:focus {
     border: 1px solid #000; }
   .table, .jsgrid .jsgrid-table {
     border-collapse: collapse !important; }
-    
+
     .table td,
     .jsgrid .jsgrid-table td, .table th, .jsgrid .jsgrid-table th {
       background-color: #ffffff !important; }
@@ -13653,7 +13653,7 @@ ul {
       margin-left: 0.325rem; }
   .table tbody td, .jsgrid .jsgrid-table tbody td {
     border-top-color: #dee2e6; }
-  
+
   .table td,
   .jsgrid .jsgrid-table td, .table th, .jsgrid .jsgrid-table th {
     vertical-align: middle;
@@ -13685,7 +13685,7 @@ ul {
     .jsgrid .jsgrid-table th .form-radio {
       margin-top: 0;
       margin-bottom: -0px; }
-  
+
   .table td,
   .jsgrid .jsgrid-table td {
     color: #212529; }
@@ -17559,7 +17559,8 @@ div.tagsinput {
       padding: 2.5%;
       overflow-y: auto; }
       .wizard > .content > .body ul {
-        list-style: disc !important; }
+        /*list-style: disc !important; */
+      }
         .wizard > .content > .body ul > li {
           display: list-item; }
       .wizard > .content > .body > iframe {

@@ -117,6 +117,7 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/visualizar-equipamento', [App\Http\Controllers\EquipamentController::class, 'getEquipament'])->name('get-equipament');
             Route::post('/novo-equipamento', [App\Http\Controllers\EquipamentController::class, 'insert'])->name('new-equipament');
             Route::post('/visualizar-estoque', [App\Http\Controllers\EquipamentController::class, 'getStockEquipament'])->name('get-stock');
+            Route::post('/visualizar-preco', [App\Http\Controllers\EquipamentController::class, 'getPriceEquipament'])->name('get-price');
         });
         Route::group(['prefix' => '/meu-perfil', 'as' => 'profile.'], function () {
             Route::post('/atualizar-imagem', [App\Http\Controllers\UserController::class, 'updateImage'])->name('update.image');

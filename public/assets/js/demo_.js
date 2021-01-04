@@ -303,3 +303,18 @@ const getTodayDateBr = (returnTime = true) => {
 
     return currentDate;
 }
+
+// TRANSFORMAR NUMERO EM MOEDA REAL
+const numberToReal = numero => {
+    numero = parseFloat(numero);
+    numero = numero.toFixed(2).split('.');
+    numero[0] = numero[0].split(/(?=(?:...)*$)/).join('.');
+    return numero.join(',');
+}
+// TRANSFORMAR MOEDA REAL EM NUMERO
+const realToNumber = numero => {
+    if(numero === undefined) return false;
+    numero = numero.toString();
+    numero = numero.replace(/\./g, "").replace(/,/g, ".");
+    return parseFloat(numero);
+}

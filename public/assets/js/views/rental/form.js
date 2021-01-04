@@ -8,9 +8,8 @@
         stepsOrientation: "vertical",
         onStepChanging: function (event, currentIndex, newIndex)
         {
-            let debug = true;
+            let debug = false;
             let arrErrors = [];
-            let typeLocation;
             let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
 
             if (currentIndex === 0) {
@@ -61,10 +60,11 @@
                 return false;
             }
             else if (currentIndex === 2) {
-                // if (debug) {
-                //     changeStepPosAbsolute();
-                //     return true;
-                // }
+                if (debug) {
+                    changeStepPosAbsolute();
+                    fixEquipmentDates();
+                    return true;
+                }
                 let dateDelivery = $('input[name="date_delivery"]').val();
                 let dateWithdrawal = $('input[name="date_withdrawal"]').val();
 
@@ -95,10 +95,10 @@
                 return false;
             }
             else if (currentIndex === 3) {
-                // if (debug) {
-                //     changeStepPosAbsolute();
-                //     return true;
-                // }
+                if (debug) {
+                    changeStepPosAbsolute();
+                    return true;
+                }
 
                 if ($('#equipaments-selected div').length === 0) {
                     Swal.fire({
@@ -148,6 +148,22 @@
                 }
                 return false;
             }
+            else if (currentIndex === 4) {
+                if (debug) {
+                    changeStepPosAbsolute();
+                    return true;
+                }
+                if (reloadTotalRental() < 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>Valor líquido da locação não pode ser negativo.</li></ol>'
+                    });
+                    return false;
+                }
+                changeStepPosAbsolute();
+                return true;
+            }
 
             changeStepPosAbsolute();
             return true;
@@ -156,11 +172,22 @@
         {
             changeStepPosUnset();
             let arrErrors = [];
+            let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
+
+            if (priorIndex === 0) {
+                // Com cobrança
+                let paymentYes  = $('#formCreateRental-p-4 .payment-yes');
+                let paymentNo   = $('#formCreateRental-p-4 .payment-no');
+
+                typeLocation === 0 ? paymentYes.show() : paymentNo.show();
+                typeLocation === 0 ? paymentNo.hide() : paymentYes.hide();
+            }
 
             if (priorIndex === 3 && currentIndex === 4  ) {
 
                 let returnAjax;
                 let dataEquipaments = [];
+                let dataEquipamentsPayCheck = [];
                 let idEquipament,stockEquipament,referenceEquipament,nameEquipament;
                 await $('#equipaments-selected div.card').each(async function() {
                     idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
@@ -170,14 +197,31 @@
                     dataEquipaments.push([idEquipament, stockEquipament, nameEquipament]);
                 });
 
+                $('.list-equipaments-payment-load').show();
+                $('.list-equipaments-payment').hide();
+
                 await Promise.all(dataEquipaments.map(async equipament => {
-                    returnAjax = await checkStockEquipament(equipament[0]);
+                    returnAjax = await getStockEquipament(equipament[0]);
+                    dataEquipamentsPayCheck.push(equipament[0]);
                     if (equipament[1] > returnAjax) {
                         $(`#collapseEquipament-${equipament[0]}`).find('input[name="stock_equipament"]').attr('max-stock', returnAjax).val(returnAjax);
                         $(`#collapseEquipament-${equipament[0]}`).find('.stock_available').text('Disponível: ' + returnAjax);
                         arrErrors.push(`O equipamento ( <strong>${equipament[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${returnAjax} un</strong>`);
                     }
+
+                    if (!$(`.list-equipaments-payment li[id-equipament="${equipament[0]}"]`).length)
+                        await createEquipamentPayment(equipament[0]);
                 }));
+
+                await $('.list-equipaments-payment li').each(async function() {
+                    idEquipament = parseInt($(this).attr('id-equipament'));
+                    if (!dataEquipamentsPayCheck.includes(idEquipament))
+                        $(`.list-equipaments-payment li[id-equipament="${idEquipament}"]`).remove()
+                });
+
+                reloadTotalRental();
+                $('.list-equipaments-payment-load').hide();
+                $('.list-equipaments-payment').slideDown('slow');
 
                 $('#formCreateRental .actions a[href="#next"]').show();
 
@@ -242,7 +286,7 @@ const changeStepPosUnset = () => {
     setTimeout(() => { $('.wizard > .content > .body').css('position', 'unset') }, 100);
 }
 
-const checkStockEquipament = async idEquipament => {
+const getStockEquipament = async idEquipament => {
     let stockReal = await $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -257,4 +301,94 @@ const checkStockEquipament = async idEquipament => {
     });
 
     return stockReal;
+}
+
+const getPriceEquipament = async idEquipament => {
+
+    let dateDelivery    = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).val().split(' ')[0]).replace(/-/g,'/'));
+    let dateWithdrawal  = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val().split(' ')[0]).replace(/-/g,'/'));
+
+    var timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
+    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    let price = await $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: $('#routeGetPriceEquipament').val(),
+        data: { idEquipament, diffDays },
+        async: true,
+        success: response => {
+            return response;
+        }, error: e => { console.log(e) }
+    });
+
+    return price;
+}
+
+const getEquipament = async equipament => {
+
+    let data = await $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: $('#routeGetEquipament').val(),
+        data: { idEquipament: equipament },
+        async: true,
+        success: response => {
+            return response;
+        }, error: e => { console.log(e) }
+    });
+
+    return data.success ? data.data : false;
+}
+
+const createEquipamentPayment = async equipament => {
+
+    let priceEquipament = numberToReal(await getPriceEquipament(equipament));
+    let dataEquipament = await getEquipament(equipament);
+    let stockEquipament = $(`#collapseEquipament-${equipament} input[name="stock_equipament"]`).val();
+
+    if (!dataEquipament) return false;
+
+    let paymentEquipament = `
+        <li class="pb-3" id-equipament="${equipament}">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex col-md-8 no-padding">
+                    <div class="ml-3">
+                        <h6 class="mb-0">${dataEquipament.name}</h6>
+                        <small class="text-muted"> <strong>${dataEquipament.reference}</strong> - ${stockEquipament} un. </small>
+                    </div>
+                </div>
+                <div class="input-group col-md-4 no-padding">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><strong>R$</strong></span>
+                    </div>
+                    <input type="text" class="form-control price-equipament" name="priceEquipament[]" id="price-equipament-${equipament}" value="${priceEquipament}">
+                </div>
+            </div>
+        </li>
+    `;
+
+    $('.list-equipaments-payment').append(paymentEquipament);
+
+    setTimeout(() => { $(`#price-equipament-${equipament}`).mask('#.##0,00', { reverse: true }) }, 250);
+}
+
+const reloadTotalRental = () => {
+
+    let grossValue  = 0;
+    let discount    = realToNumber($('#discount_value').val());
+    let extra       = realToNumber($('#extra_value').val());
+
+    $('.list-equipaments-payment li').each(function() {
+        grossValue += realToNumber($('.price-equipament', this).val());
+    });
+
+    $('#gross_value').val(numberToReal(grossValue));
+    $('#net_value').val(numberToReal(grossValue - discount + extra));
+
+    return grossValue - discount + extra;
 }

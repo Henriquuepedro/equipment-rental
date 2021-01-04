@@ -57,5 +57,12 @@ class EquipamentWallet extends Model
         return $this->where(['equipament_id' => $equipament_id, 'company_id' => $company_id])->get();
     }
 
+    public function getValueWalletsEquipament($company_id, $equipament_id, $day)
+    {
+        return $this->where(['equipament_id' => $equipament_id, 'company_id' => $company_id])
+            ->where('day_start', '<=', $day)
+            ->where('day_end', '>=', $day)
+            ->first();
+    }
 
 }
