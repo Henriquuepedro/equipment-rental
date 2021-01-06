@@ -287,7 +287,7 @@ const transformDateForEn = data => {
 const getTodayDateBr = (returnTime = true) => {
     let dateTime = new Date();
     let dd = dateTime.getDate();
-    let mm = dateTime.getMonth();
+    let mm = dateTime.getMonth() + 1;
     let YYYY = dateTime.getFullYear();
     let HH = dateTime.getHours();
     let ii = dateTime.getMinutes();

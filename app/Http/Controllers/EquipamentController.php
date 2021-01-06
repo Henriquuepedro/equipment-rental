@@ -347,7 +347,7 @@ class EquipamentController extends Controller
     public function getEquipaments(Request $request)
     {
         $company_id         = $request->user()->company_id;
-        $searchEquipament   = $request->searchEquipament;
+        $searchEquipament   = str_replace('*','', filter_var($request->searchEquipament, FILTER_SANITIZE_STRING));
         $equipamentData     = [];
         $getCacamba         = false;
         $equipamentInUse    = $request->equipamentInUse;
@@ -420,5 +420,23 @@ class EquipamentController extends Controller
         if (!$equipamentWallet) return response()->json($equipament->value);
 
         return response()->json($equipamentWallet->value);
+    }
+
+    public function getPriceStockEquipament(Request $request)
+    {
+        $company_id     = $request->user()->company_id;
+        $equipament_id  = $request->idEquipament;
+        $diff_days      = $request->diffDays;
+
+        $equipament = $this->equipament->getEquipament($equipament_id, $company_id);
+
+        // não encontrou o equipamento, retorna zerioo
+        if (!$equipament) return response()->json(['price' => 0, 'stock' => 0]);
+
+        $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament_id, $diff_days);
+
+        if (!$equipamentWallet) return response()->json(['price' => $equipament->value, 'stock' => $equipament->stock]);
+
+        return response()->json(['price' => $equipamentWallet->value, 'stock' => $equipament->stock]);
     }
 }

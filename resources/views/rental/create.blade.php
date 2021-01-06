@@ -35,12 +35,20 @@
             border-bottom-right-radius: 5px;
             border-top-right-radius: 5px;
         }
-        [name^="date_withdrawal"], [name^="date_delivery"] {
+        [name^="date_withdrawal"], [name^="date_delivery"], [name="stock_equipament"] {
             border-bottom-right-radius: 0 !important;
             border-top-right-radius: 0 !important;;
         }
         .input-group-append.btn-primary{
             background: #2196f3;
+            cursor: pointer;
+        }
+        .input-group-append.btn-success{
+            background: #19d895;
+            cursor: pointer;
+        }
+        .input-group-append.btn-danger{
+            background: #ff6258;
             cursor: pointer;
         }
         .list-equipament .equipament {
@@ -95,6 +103,20 @@
         a[disabled] {
             pointer-events: none;
             cursor: no-drop;
+        }
+        .list-equipaments-payment li.one-li-list-equipaments-payment:after{
+            display: none;
+        }
+        .btn-view-price-period-equipament {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 5px;
+            height: calc(1.5em + 0.75rem + 3px);
+        }
+        .btn-view-price-period-equipament i {
+            font-size: 18px !important;
+            color: #fff;
         }
     </style>
 @stop
@@ -283,10 +305,17 @@
                                         <label>Referência</label>
                                         <input type="text" class="form-control" value="${response.reference}" name="reference_equipament" disabled>
                                     </div>
-                                    <div class="form-group col-md-3">
-                                        <label>Quantidade</label>
-                                        <input type="tel" class="form-control" value="0" name="stock_equipament" max-stock="${response.stock}">
-                                        <small class="text-danger font-weight-bold stock_available">Disponível: ${response.stock}</small>
+                                    <div class="col-md-3">
+                                        <div class="form-group flatpickr label-animate stock-group">
+                                            <label>Quantidade</label>
+                                            <input type="tel" name="stock_equipament" class="form-control col-md-9 pull-left flatpickr-input" value="1" max-stock="${response.stock}">
+                                            <div class="input-button-calendar col-md-3 pull-right no-padding">
+                                                <a href="#" class="input-button pull-right btn-primary w-100 btn-view-price-period-equipament" data-toggle="tootip" title="Visualizar valor por período">
+                                                    <i class="fas fa-file-invoice-dollar"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <small class="text-danger font-weight-bold stock_available pull-left">Disponível: ${response.stock}</small>
                                     </div>
                                     <div class="form-group col-md-5">
                                         <label>Resíduo</label>
@@ -377,8 +406,9 @@
                     $(`#collapseEquipament-${idEquipament} input[name="stock_equipament"]`).mask('0#');
                     $(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).inputmask();
                     $(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).inputmask();
+                    $(`#collapseEquipament-${idEquipament} .btn-view-price-period-equipament`).tooltip();
 
-                    $(`#collapseEquipament-${idEquipament} .flatpickr`).flatpickr({
+                    $(`#collapseEquipament-${idEquipament} .flatpickr:not(.stock-group)`).flatpickr({
                         enableTime: true,
                         dateFormat: "d/m/Y H:i",
                         time_24hr: true,
@@ -421,7 +451,6 @@
 
     $(document).on('click', '.hideEquipament', function (){
         const idEquipament = parseInt($(this).attr('id-equipament'));
-        console.log(idEquipament);
         $(`#collapseEquipament-${idEquipament}`).collapse('hide');
     });
 
@@ -436,9 +465,9 @@
             elEquip.find('input[name="date_withdrawal_equipament"]').attr('disabled', !$(this).is(':checked'));
 
         if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
-            elEquip.find('.calendar_equipament a:eq(1)').attr('disabled', !$(this).is(':checked'));
+            elEquip.find('.calendar_equipament:eq(1) a').attr('disabled', !$(this).is(':checked'));
 
-        elEquip.find('.calendar_equipament a:eq(0)').attr('disabled', !$(this).is(':checked'));
+        elEquip.find('.calendar_equipament:eq(0) a').attr('disabled', !$(this).is(':checked'));
 
         if (!$(this).is(':checked')) {
             date_delivery = $('input[name="date_delivery"]').val();
@@ -465,7 +494,6 @@
                 title: `A quantidade não pode ser superior a ${maxStock} un.`
             });
             $(this).val(maxStock);
-            console.log(idEquipament);
             setTimeout(() => {
                 $(`#collapseEquipament-${idEquipament}`).collapse('show');
                 $(this).focus();
@@ -501,12 +529,10 @@
         checkLabelAnimate();
     });
 
-    $(document).on('blur', '.price-equipament', function() {
+    $('#extra_value, #discount_value').on('keyup', () => {
         reloadTotalRental();
-    });
-
-    $('#extra_value, #discount_value').on('blur', function() {
-        reloadTotalRental();
+    }).on('blur', function(){
+        if ($(this).val() === '') $(this).val('0,00')
     });
 
     const equipamentMessageDefault = message => {
@@ -638,10 +664,10 @@
                                                 <div class="input-group-addon input-group-append btn-primary">
                                                     <i class="fa fa-search input-group-text text-white"></i>
                                                 </div>
-                                                <div class="input-group-addon input-group-append btn-primary" id="cleanSearchEquipament">
+                                                <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipament">
                                                     <i class="fa fa-times input-group-text text-white"></i>
                                                 </div>
-                                                <div class="input-group-addon input-group-append btn-primary" id="newEquipament" data-toggle="modal" data-target="#newEquipamentModal">
+                                                <div class="input-group-addon input-group-append btn-success" id="newEquipament" data-toggle="modal" data-target="#newEquipamentModal">
                                                     <i class="fa fa-plus input-group-text text-white"></i>
                                                 </div>
                                             </div>
@@ -676,7 +702,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
                                                         </div>
-                                                        <input type="text" class="form-control" id="gross_value" disabled>
+                                                        <span type="text" class="form-control d-flex align-items-center" id="gross_value"></span>
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
@@ -706,7 +732,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
                                                         </div>
-                                                        <input type="text" class="form-control" id="net_value" disabled>
+                                                        <span type="text" class="form-control d-flex align-items-center" id="net_value"></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -781,5 +807,6 @@
     <input type="hidden" id="routeGetStockEquipament" value="{{ route('ajax.equipament.get-stock') }}">
     <input type="hidden" id="routeGetPriceEquipament" value="{{ route('ajax.equipament.get-price') }}">
     <input type="hidden" id="routeGetEquipament" value="{{ route('ajax.equipament.get-equipament') }}">
+    <input type="hidden" id="routeGetPriceStockEquipament" value="{{ route('ajax.equipament.get-price-stock') }}">
 
 @stop

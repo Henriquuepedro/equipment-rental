@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Equipament extends Model
 {
@@ -80,17 +81,18 @@ class Equipament extends Model
 
     public function getEquipament($equipament_id, $company_id)
     {
-        return $this->where(['id' => $equipament_id, 'company_id' => $company_id])->first();
+        return $this->from(DB::raw('equipaments force index(id_company)'))->where(['id' => $equipament_id, 'company_id' => $company_id])->first();
     }
 
     public function getEquipamentRental($company_id, $searchEquipament, $getCacamba, $equipamentInUse)
     {
-        // faço essa engembra pra pegar o volume da caçmba
+        // faço essa engembra pra pegar o volume da caçamba
         // não salvo no banco o nome caçamba, então faço o
         // explode e tento pegar o volume digitado
         $_searchEquipament = explode(' ', str_replace(['m³', 'm3', 'm'],'',$searchEquipament));
 
-        $equipaments = $this->where('company_id', $company_id)
+        $equipaments = $this->from(DB::raw('equipaments force index(company_id_name_reference_volume)'))
+                    ->where('company_id', $company_id)
                     ->where(function($query) use ($searchEquipament, $_searchEquipament) {
                         $query->where('id', 'like', "%{$searchEquipament}%")
                             ->orWhere('name', 'like', "%{$searchEquipament}%")

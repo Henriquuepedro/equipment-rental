@@ -173,6 +173,7 @@
             changeStepPosUnset();
             let arrErrors = [];
             let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
+            let time0,time1,time2,time3,time4,time5,time6,time7,time8 = 0;
 
             if (priorIndex === 0) {
                 // Com cobrança
@@ -182,13 +183,20 @@
                 typeLocation === 0 ? paymentYes.show() : paymentNo.show();
                 typeLocation === 0 ? paymentNo.hide() : paymentYes.hide();
             }
+            let date = new Date();
+            time0 = date.getTime();
 
             if (priorIndex === 3 && currentIndex === 4  ) {
 
-                let returnAjax;
+                let priceStock;
                 let dataEquipaments = [];
                 let dataEquipamentsPayCheck = [];
+                let newPricesUpdate = [];
+                let newPricesUpdateNames = [];
+                let priceEquipament = 0;
                 let idEquipament,stockEquipament,referenceEquipament,nameEquipament;
+                date = new Date();
+                time1 = date.getTime();
                 await $('#equipaments-selected div.card').each(async function() {
                     idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
                     stockEquipament     = parseInt($('[name="stock_equipament"]', this).val());
@@ -196,34 +204,66 @@
                     nameEquipament      = $('.card-header a:eq(0)', this).text();
                     dataEquipaments.push([idEquipament, stockEquipament, nameEquipament]);
                 });
+                date = new Date();
+                time2 = date.getTime();
 
                 $('.list-equipaments-payment-load').show();
                 $('.list-equipaments-payment').hide();
+                $('#gross_value, #net_value').html('<i class="fa fa-spin fa-spinner"></i>&nbsp;&nbsp;Calculando');
 
+                date = new Date();
+                time3 = date.getTime();
                 await Promise.all(dataEquipaments.map(async equipament => {
-                    returnAjax = await getStockEquipament(equipament[0]);
+                    priceStock = await getPriceStockEquipament(equipament[0]);
                     dataEquipamentsPayCheck.push(equipament[0]);
-                    if (equipament[1] > returnAjax) {
-                        $(`#collapseEquipament-${equipament[0]}`).find('input[name="stock_equipament"]').attr('max-stock', returnAjax).val(returnAjax);
-                        $(`#collapseEquipament-${equipament[0]}`).find('.stock_available').text('Disponível: ' + returnAjax);
-                        arrErrors.push(`O equipamento ( <strong>${equipament[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${returnAjax} un</strong>`);
+                    if (equipament[1] > priceStock.stock) {
+                        $(`#collapseEquipament-${equipament[0]}`).find('input[name="stock_equipament"]').attr('max-stock', priceStock.stock).val(priceStock.stock);
+                        $(`#collapseEquipament-${equipament[0]}`).find('.stock_available').text('Disponível: ' + priceStock.stock);
+                        arrErrors.push(`O equipamento ( <strong>${equipament[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${priceStock.stock} un</strong>`);
                     }
 
-                    if (!$(`.list-equipaments-payment li[id-equipament="${equipament[0]}"]`).length)
-                        await createEquipamentPayment(equipament[0]);
+                    if (!$(`.list-equipaments-payment li[id-equipament="${equipament[0]}"]`).length) await createEquipamentPayment(equipament[0], priceStock);
+                    else {
+                        date = new Date();
+                        time4 = date.getTime();
+                        priceEquipament = priceStock.price;
+
+                        date = new Date();
+                        time5 = date.getTime();
+                        $(`#price-un-equipament-${equipament[0]}`).val(numberToReal(priceEquipament));
+
+                        if (numberToReal(priceEquipament * equipament[1]) !== $(`#price-total-equipament-${equipament[0]}`).val()) {
+                            newPricesUpdate.push({
+                                el: $(`#price-total-equipament-${equipament[0]}`),
+                                price: numberToReal(priceEquipament * equipament[1])
+                            });
+                            newPricesUpdateNames.push(equipament[2] + ' | R$' + $(`#price-total-equipament-${equipament[0]}`).val() + ' <i class="fas fa-long-arrow-alt-right"></i> R$' + numberToReal(priceEquipament * equipament[1]));
+                        }
+                        date = new Date();
+                        time6 = date.getTime();
+                    }
                 }));
+                date = new Date();
+                time7 = date.getTime();
 
                 await $('.list-equipaments-payment li').each(async function() {
                     idEquipament = parseInt($(this).attr('id-equipament'));
                     if (!dataEquipamentsPayCheck.includes(idEquipament))
                         $(`.list-equipaments-payment li[id-equipament="${idEquipament}"]`).remove()
                 });
+                date = new Date();
+                time8 = date.getTime();
 
-                reloadTotalRental();
-                $('.list-equipaments-payment-load').hide();
-                $('.list-equipaments-payment').slideDown('slow');
-
-                $('#formCreateRental .actions a[href="#next"]').show();
+                console.log([
+                    time1 - time0,
+                    time2 - time1,
+                    time3 - time2,
+                    time4 - time3,
+                    time5 - time4,
+                    time6 - time5,
+                    time7 - time6,
+                    time8 - time7,
+                ])
 
                 if (arrErrors.length) {
                     Swal.fire({
@@ -240,6 +280,38 @@
                             $(this).removeClass('done').addClass('disabled last');
                     });
                     $('#formCreateRental .steps ul li.current').addClass('error');
+                } else {
+
+                    if (newPricesUpdate.length) {
+                        Swal.fire({
+                            title: newPricesUpdate.length === 1 ? 'Valor de equipamento atualizado.' : 'Valores de equipamentos atualizados.',
+                            html: newPricesUpdate.length === 1 ? `O valor do equipamento abaixo foi alterado: <br><br><ol><li><b>${newPricesUpdateNames[0]}</b></li></ol><h4>Deseja atualizar?</h4>` : "Os valores dos equipamentos abaixo foram alterados: <br><br><ol><li><b>" + newPricesUpdateNames.join('</b></li><li><b>') + '</b></li></ol><h4>Deseja atualizar?</h4>',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#19d895',
+                            cancelButtonColor: '#bbb',
+                            confirmButtonText: 'Sim, atualizar',
+                            cancelButtonText: 'Não atualizar',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed)
+                                $.each(newPricesUpdate, function (key, val) {
+                                    val.el.val(val.price);
+                                });
+
+                            reloadTotalRental();
+                            $('.list-equipaments-payment-load').hide();
+                            $('.list-equipaments-payment').slideDown('slow');
+
+                            $('#formCreateRental .actions a[href="#next"]').show();
+                        })
+                    } else {
+                        reloadTotalRental();
+                        $('.list-equipaments-payment-load').hide();
+                        $('.list-equipaments-payment').slideDown('slow');
+
+                        $('#formCreateRental .actions a[href="#next"]').show();
+                    }
                 }
             }
             if (priorIndex === 3 && currentIndex !== 4)
@@ -345,28 +417,34 @@ const getEquipament = async equipament => {
     return data.success ? data.data : false;
 }
 
-const createEquipamentPayment = async equipament => {
+const createEquipamentPayment = async (equipament, priceStock = null) => {
 
-    let priceEquipament = numberToReal(await getPriceEquipament(equipament));
     let dataEquipament = await getEquipament(equipament);
     let stockEquipament = $(`#collapseEquipament-${equipament} input[name="stock_equipament"]`).val();
+    const priceEquipament = priceStock === null ? await getPriceEquipament(equipament) : priceStock.price;
+    let priceEquipamentFormat = numberToReal(priceEquipament);
+    let priceEquipamentTotal = numberToReal(priceEquipament * stockEquipament);
 
     if (!dataEquipament) return false;
 
     let paymentEquipament = `
         <li class="pb-3" id-equipament="${equipament}">
             <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex col-md-8 no-padding">
+                <div class="d-flex col-md-6 no-padding">
                     <div class="ml-3">
-                        <h6 class="mb-0">${dataEquipament.name}</h6>
-                        <small class="text-muted"> <strong>${dataEquipament.reference}</strong> - ${stockEquipament} un. </small>
+                        <h6 class="mb-1">${dataEquipament.name}</h6>
+                        <small class="text-muted"><strong>${dataEquipament.reference}</strong></small>
                     </div>
                 </div>
-                <div class="input-group col-md-4 no-padding">
+                <div class="input-group col-md-6 no-padding">
                     <div class="input-group-prepend">
-                        <span class="input-group-text"><strong>R$</strong></span>
+                        <span class="input-group-text pl-3 pr-3"><strong>${stockEquipament}un</strong></span>
                     </div>
-                    <input type="text" class="form-control price-equipament" name="priceEquipament[]" id="price-equipament-${equipament}" value="${priceEquipament}">
+                    <input type="text" class="form-control price-un-equipament" id="price-un-equipament-${equipament}" value="${priceEquipamentFormat}" disabled>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text pl-3 pr-3"><strong>R$</strong></span>
+                    </div>
+                    <input type="text" class="form-control price-total-equipament" name="priceTotalEquipament[]" id="price-total-equipament-${equipament}" value="${priceEquipamentTotal}">
                 </div>
             </div>
         </li>
@@ -374,21 +452,60 @@ const createEquipamentPayment = async equipament => {
 
     $('.list-equipaments-payment').append(paymentEquipament);
 
-    setTimeout(() => { $(`#price-equipament-${equipament}`).mask('#.##0,00', { reverse: true }) }, 250);
+    setTimeout(() => {
+        $(`#price-un-equipament-${equipament}, #price-total-equipament-${equipament}`).mask('#.##0,00', { reverse: true });
+        if ($('.list-equipaments-payment li').length === 1) $('.list-equipaments-payment li').addClass('one-li-list-equipaments-payment');
+        else $('.list-equipaments-payment li').removeClass('one-li-list-equipaments-payment');
+
+        $(`#price-total-equipament-${equipament}`).on('keyup', () => {
+            reloadTotalRental();
+        }).on('blur', function(){
+            if ($(this).val() === '') $(this).val('0,00')
+        });
+    }, 250);
 }
 
 const reloadTotalRental = () => {
 
     let grossValue  = 0;
+    let priceEquipament = 0;
     let discount    = realToNumber($('#discount_value').val());
     let extra       = realToNumber($('#extra_value').val());
 
+    discount    = isNaN(discount) ? 0 : discount;
+    extra       = isNaN(extra) ? 0 : extra;
+
     $('.list-equipaments-payment li').each(function() {
-        grossValue += realToNumber($('.price-equipament', this).val());
+        priceEquipament = realToNumber($('.price-total-equipament', this).val());
+        grossValue += isNaN(priceEquipament) ? 0 : priceEquipament;
     });
 
-    $('#gross_value').val(numberToReal(grossValue));
-    $('#net_value').val(numberToReal(grossValue - discount + extra));
+    $('#gross_value').text(numberToReal(grossValue));
+    $('#net_value').text(numberToReal(grossValue - discount + extra));
 
     return grossValue - discount + extra;
+}
+
+const getPriceStockEquipament = async idEquipament => {
+
+    let dateDelivery    = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).val().split(' ')[0]).replace(/-/g,'/'));
+    let dateWithdrawal  = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val().split(' ')[0]).replace(/-/g,'/'));
+
+    var timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
+    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    let priceStock = await $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: $('#routeGetPriceStockEquipament').val(),
+        data: { idEquipament, diffDays },
+        async: true,
+        success: response => {
+            return response;
+        }, error: e => { console.log(e) }
+    });
+
+    return priceStock;
 }
