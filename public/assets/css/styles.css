@@ -705,7 +705,7 @@ select.form-control {
 .swal2-content ol {
     /*margin-top: 25px;*/
 }
-.swal2-content ol li:not(:last-child) {
+.swal2-icon-warning .swal2-content ol li:not(:last-child) {
     border-bottom: 1px solid #ccc;
     margin-bottom: 5px;
 }

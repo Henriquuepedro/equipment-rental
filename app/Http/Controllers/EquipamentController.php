@@ -439,4 +439,14 @@ class EquipamentController extends Controller
 
         return response()->json(['price' => $equipamentWallet->value, 'stock' => $equipament->stock]);
     }
+
+    public function getPricePerPeriod(Request $request)
+    {
+        $company_id     = $request->user()->company_id;
+        $equipament_id  = $request->idEquipament;
+
+        $equipamentWallet = $this->equipament_wallet->getWalletsEquipament($company_id, $equipament_id);
+
+        return response()->json($equipamentWallet);
+    }
 }

@@ -8,7 +8,7 @@
         stepsOrientation: "vertical",
         onStepChanging: function (event, currentIndex, newIndex)
         {
-            let debug = false;
+            let debug = true;
             let arrErrors = [];
             let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
 

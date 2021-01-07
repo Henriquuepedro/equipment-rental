@@ -24,14 +24,17 @@
         .show-address {
             display: none;
         }
-        .flatpickr a.input-button{
-            height: calc(1.5em + 0.75rem + 4px);
+        .flatpickr a.input-button,
+        .flatpickr button.input-button{
+            height: calc(1.5em + 0.75rem + 3px);
             width: 50%;
             text-align: center;
             padding-top: 13%;
             cursor: pointer;
+            border: 1px solid transparent
         }
-        .flatpickr a.input-button:last-child{
+        .flatpickr a.input-button:last-child,
+        .flatpickr button.input-button:last-child{
             border-bottom-right-radius: 5px;
             border-top-right-radius: 5px;
         }
@@ -95,10 +98,10 @@
             background-color: #52a4e5;
         }
         .calendar_equipament a {
-            height: calc(1.5em + 0.75rem + 3px) !important;
+            height: calc(1.5em + 0.75rem + 4px) !important;
         }
         .calendar_equipament i {
-            font-size: 14px !important;;
+            font-size: 14px !important;
         }
         a[disabled] {
             pointer-events: none;
@@ -310,9 +313,9 @@
                                             <label>Quantidade</label>
                                             <input type="tel" name="stock_equipament" class="form-control col-md-9 pull-left flatpickr-input" value="1" max-stock="${response.stock}">
                                             <div class="input-button-calendar col-md-3 pull-right no-padding">
-                                                <a href="#" class="input-button pull-right btn-primary w-100 btn-view-price-period-equipament" data-toggle="tootip" title="Visualizar valor por período">
+                                                <button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipament" data-toggle="tootip" title="Visualizar valor por período" id-equipament="${response.id}">
                                                     <i class="fas fa-file-invoice-dollar"></i>
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                         <small class="text-danger font-weight-bold stock_available pull-left">Disponível: ${response.stock}</small>
@@ -533,6 +536,52 @@
         reloadTotalRental();
     }).on('blur', function(){
         if ($(this).val() === '') $(this).val('0,00')
+    });
+
+    $(document).on('click', '.btn-view-price-period-equipament', function (){
+        const btn = $(this);
+        const idEquipament = $(this).attr('id-equipament');
+
+        btn.attr('disable', true);
+
+        console.log(idEquipament);
+        let descPeriod = '';
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'POST',
+            url: "{{ route('ajax.equipament.get-price-per-period') }}",
+            data: { idEquipament },
+            success: response => {
+                if (response.length) {
+                    descPeriod += '<ol class="no-padding">';
+                    $.each(response, function (key, val) {
+                        descPeriod += `<li><b>${val.day_start} dias</b> até <b>${val.day_end} dias</b> por <b>R$${numberToReal(val.value)}</b></li>`;
+                    });
+                    descPeriod += '</ol>';
+                } else
+                    descPeriod += 'Equipamento não contém valor por período definido.';
+
+                btn.attr('disable', true);
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Valores Por Período',
+                    html: descPeriod
+                });
+            }, error: () => {
+                btn.attr('disable', true);
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Valores Por Período',
+                    html: 'Não foi possível localizar os valores do equipamento.'
+                });
+            }
+        });
+
+        return false;
     });
 
     const equipamentMessageDefault = message => {
