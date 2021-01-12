@@ -481,6 +481,8 @@
 
             if ($('#not_use_date_withdrawal').is(':checked'))
                 elEquip.find('.not_use_date_withdrawal').prop('checked', true);
+            else
+                elEquip.find('.not_use_date_withdrawal').prop('checked', false);
 
             checkLabelAnimate();
         }
@@ -583,6 +585,112 @@
 
         return false;
     });
+
+    $('#is_parceled').change(function (){
+        const check = $(this).is(':checked');
+
+        if (check) {
+            $('#add_parcel, #del_parcel, .automatic_parcel_distribution_parent').slideDown(500);
+            $('#parcels').show().append(
+                createParcel(0)
+            ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').mask('#.##0,00', { reverse: true });
+
+            recalculeParcels();
+        }
+        else {
+            $('#add_parcel, #del_parcel, #parcels, .automatic_parcel_distribution_parent').slideUp(500);
+            setTimeout(() => { $('#parcels .form-group').remove() }, 550)
+        }
+    })
+
+    $('#parcels').on('keyup change', '[name="due_day[]"]', function(){
+        let days = parseInt($(this).val());
+        const el = $(this).closest('.form-group');
+
+        el.find('[name="due_date[]"]').val(sumDaysDateNow(days));
+    });
+
+    $('#parcels').on('blur', '[name="due_date[]"]', function(){
+        const dataVctoInput = $(this).val();
+        if (dataVctoInput === '') return false;
+
+        const diasVcto = calculateDays(getTodayDateEn(false), dataVctoInput);
+        const el = $(this).closest('.form-group');
+
+        el.find('[name="due_day[]"]').val(diasVcto);
+    });
+
+    $('#add_parcel').click(function(){
+        const parcels = $('#parcels .form-group').length;
+
+        $('#parcels').show().append(
+            createParcel(parcels)
+        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').mask('#.##0,00', { reverse: true });
+
+        $('#del_parcel').attr('disabled', false);
+
+        recalculeParcels();
+    });
+
+    $('#del_parcel').click(function(){
+        const dues = $('#parcels .form-group').length - 1;
+
+        $(`#parcels .form-group:eq(${dues})`).remove();
+
+        if (dues === 1)
+            $('#del_parcel').attr('disabled', true);
+
+        recalculeParcels();
+
+    });
+
+    $('#automatic_parcel_distribution').change(function(){
+        const check = $(this).is(':checked');
+
+        if (check) {
+            $('#parcels .form-group [name="value_parcel[]"]').attr('disabled', true);
+            recalculeParcels();
+        } else
+            $('#parcels .form-group [name="value_parcel[]"]').attr('disabled', false);
+
+    })
+
+    const recalculeParcels = () => {
+        if ($('#automatic_parcel_distribution').is(':checked')) {
+            const parcels = $('#parcels .form-group').length;
+            const netValue = realToNumber($('#net_value').text());
+
+            let valueSumParcel = parseFloat(0.00);
+            let valueParcel = netValue / parcels;
+
+            for (let count = 0; count < parcels; count++) {
+
+                if((count + 1) === parcels) valueParcel = netValue - valueSumParcel;
+
+                valueSumParcel += parseFloat((netValue / parcels).toFixed(2));
+                $(`#parcels .form-group [name="value_parcel[]"]:eq(${count})`).val(numberToReal(valueParcel));
+            }
+        }
+    }
+
+    const createParcel = due => {
+        const disabledValue = $('#automatic_parcel_distribution').is(':checked') ? 'disabled' : '';
+        return `<div class="form-group mt-1 display-none">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="input-group col-md-12 no-padding">
+                    <div class="input-group-prepend stock-equipament-payment col-md-3 no-padding">
+                        <span class="input-group-text col-md-12 no-border-radius "><strong>${(due+1)}º Vencimento</strong></span>
+                    </div>
+                    <input type="text" class="form-control col-md-2 text-center" name="due_day[]" value="${(due*30)}">
+                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${sumDaysDateNow(due*30)}">
+                    <div class="input-group-prepend col-md-1 no-padding">
+                        <span class="input-group-text pl-3 pr-3 col-md-12"><strong>R$</strong></span>
+                    </div>
+                    <input type="text" class="form-control col-md-2 no-border-radius text-center" name="value_parcel[]" value="0,00" ${disabledValue}>
+                </div>
+            </div>
+        </div>`
+    }
 
     const equipamentMessageDefault = message => {
         $('table.list-equipament tbody').append(`
@@ -785,6 +893,30 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <hr class="separator-dashed">
+                                            <div class="col-md-12 d-flex justify-content-between">
+                                                <div class="form-group">
+                                                    <div class="form-check form-check-flat">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="is_parceled" id="is_parceled"> Gerar Parcelamento <i class="input-helper"></i>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group display-none automatic_parcel_distribution_parent">
+                                                    <div class="form-check form-check-flat">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="automatic_parcel_distribution" id="automatic_parcel_distribution" checked> Distribuir Valores <i class="input-helper"></i>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-success display-none" id="add_parcel"><i class="fa fa-plus"></i> Parcela</button>
+                                                </div>
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-danger display-none" id="del_parcel" disabled><i class="fa fa-trash"></i> Parcela</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 display-none" id="parcels"></div>
                                         </div>
                                         <div class="payment-no col-md-12 mt-5">
                                             <div class="form-group text-center">

@@ -815,6 +815,9 @@ table .form-group {
     border-width: 1px;
     border-color: #ddd;
 }
+.no-border-radius {
+    border-radius: 0 !important;
+}
 
 
 

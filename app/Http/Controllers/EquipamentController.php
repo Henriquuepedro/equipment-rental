@@ -415,7 +415,9 @@ class EquipamentController extends Controller
         // não encontrou o equipamento, retorna zerioo
         if (!$equipament) return 0;
 
-        $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament_id, $diff_days);
+        //recebeu false porque a data de retirada não foi definida
+        if ($diff_days == false) $equipamentWallet = false;
+        else $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament_id, $diff_days);
 
         if (!$equipamentWallet) return response()->json($equipament->value);
 
@@ -430,14 +432,16 @@ class EquipamentController extends Controller
 
         $equipament = $this->equipament->getEquipament($equipament_id, $company_id);
 
-        // não encontrou o equipamento, retorna zerioo
+        // não encontrou o equipamento, retorna zero para preço e estoque
         if (!$equipament) return response()->json(['price' => 0, 'stock' => 0]);
 
-        $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament_id, $diff_days);
+        //recebeu false porque a data de retirada não foi definida
+        if ($diff_days === "false") $equipamentWallet = false;
+        else $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament_id, $diff_days);
 
-        if (!$equipamentWallet) return response()->json(['price' => $equipament->value, 'stock' => $equipament->stock]);
+        if (!$equipamentWallet) return response()->json(['price' => $equipament->value, 'stock' => $equipament->stock, 'x'=>$diff_days]);
 
-        return response()->json(['price' => $equipamentWallet->value, 'stock' => $equipament->stock]);
+        return response()->json(['price' => $equipamentWallet->value, 'stock' => $equipament->stock, 'x'=>$diff_days]);
     }
 
     public function getPricePerPeriod(Request $request)

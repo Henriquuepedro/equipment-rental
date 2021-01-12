@@ -231,6 +231,7 @@
                         date = new Date();
                         time5 = date.getTime();
                         $(`#price-un-equipament-${equipament[0]}`).val(numberToReal(priceEquipament));
+                        $(`.list-equipaments-payment li[id-equipament="${equipament[0]}"] .stock-equipament-payment strong`).text(equipament[1]+'un');
 
                         if (numberToReal(priceEquipament * equipament[1]) !== $(`#price-total-equipament-${equipament[0]}`).val()) {
                             newPricesUpdate.push({
@@ -304,6 +305,8 @@
                             $('.list-equipaments-payment').slideDown('slow');
 
                             $('#formCreateRental .actions a[href="#next"]').show();
+
+                            recalculeParcels();
                         })
                     } else {
                         reloadTotalRental();
@@ -376,12 +379,16 @@ const getStockEquipament = async idEquipament => {
 }
 
 const getPriceEquipament = async idEquipament => {
+    const check_not_use_date_withdrawal = $(`#collapseEquipament-${idEquipament} input[name="not_use_date_withdrawal"]`).is(':checked');
+    let diffDays = false;
 
-    let dateDelivery    = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).val().split(' ')[0]).replace(/-/g,'/'));
-    let dateWithdrawal  = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val().split(' ')[0]).replace(/-/g,'/'));
+    if (!check_not_use_date_withdrawal) {
+        let dateDelivery = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).val().split(' ')[0]).replace(/-/g, '/'));
+        let dateWithdrawal = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val().split(' ')[0]).replace(/-/g, '/'));
 
-    var timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
-    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        let timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
+        diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    }
 
     let price = await $.ajax({
         headers: {
@@ -437,7 +444,7 @@ const createEquipamentPayment = async (equipament, priceStock = null) => {
                     </div>
                 </div>
                 <div class="input-group col-md-6 no-padding">
-                    <div class="input-group-prepend">
+                    <div class="input-group-prepend stock-equipament-payment">
                         <span class="input-group-text pl-3 pr-3"><strong>${stockEquipament}un</strong></span>
                     </div>
                     <input type="text" class="form-control price-un-equipament" id="price-un-equipament-${equipament}" value="${priceEquipamentFormat}" disabled>
@@ -487,12 +494,18 @@ const reloadTotalRental = () => {
 }
 
 const getPriceStockEquipament = async idEquipament => {
+    const check_not_use_date_withdrawal = $(`#collapseEquipament-${idEquipament} input[name="not_use_date_withdrawal"]`).is(':checked');
+    let diffDays = false;
 
-    let dateDelivery    = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).val().split(' ')[0]).replace(/-/g,'/'));
-    let dateWithdrawal  = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val().split(' ')[0]).replace(/-/g,'/'));
+    if (!check_not_use_date_withdrawal) {
+        let dateDelivery = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).val().split(' ')[0]).replace(/-/g, '/'));
+        let dateWithdrawal = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val().split(' ')[0]).replace(/-/g, '/'));
 
-    var timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
-    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        let timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
+        diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    }
+
+    console.log(diffDays);
 
     let priceStock = await $.ajax({
         headers: {
@@ -506,6 +519,7 @@ const getPriceStockEquipament = async idEquipament => {
             return response;
         }, error: e => { console.log(e) }
     });
+    console.log(priceStock);
 
     return priceStock;
 }

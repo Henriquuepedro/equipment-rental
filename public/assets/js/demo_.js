@@ -304,17 +304,56 @@ const getTodayDateBr = (returnTime = true) => {
     return currentDate;
 }
 
-// TRANSFORMAR NUMERO EM MOEDA REAL
+const getTodayDateEn = (returnTime = true) => {
+    let dateTime = new Date();
+    let dd = dateTime.getDate();
+    let mm = dateTime.getMonth() + 1;
+    let YYYY = dateTime.getFullYear();
+    let HH = dateTime.getHours();
+    let ii = dateTime.getMinutes();
+
+    dd = dd < 10 ? `0${dd}` : dd;
+    mm = mm < 10 ? `0${mm}` : mm;
+    HH = HH < 10 ? `0${HH}` : HH;
+    ii = ii < 10 ? `0${ii}` : ii;
+
+    let currentDate = `${YYYY}-${mm}-${dd}`;
+
+    if (returnTime) return currentDate+=` ${HH}:${ii}`;
+
+    return currentDate;
+}
+
+// converte valor de Float -> R$
 const numberToReal = numero => {
     numero = parseFloat(numero);
     numero = numero.toFixed(2).split('.');
     numero[0] = numero[0].split(/(?=(?:...)*$)/).join('.');
     return numero.join(',');
 }
-// TRANSFORMAR MOEDA REAL EM NUMERO
+
+// converte valor de R$ -> Float
 const realToNumber = numero => {
     if(numero === undefined) return false;
     numero = numero.toString();
     numero = numero.replace(/\./g, "").replace(/,/g, ".");
     return parseFloat(numero);
+}
+// Soma dias de acordo com a data de hoje
+const sumDaysDateNow = days => {
+    let dateNow = new Date();
+    dateNow.setDate(dateNow.getDate() + days);
+
+    const year = dateNow.getFullYear();
+    const month = dateNow.getMonth() + 1 <= 9 ? "0" + (dateNow.getMonth() + 1) : (dateNow.getMonth() + 1);
+    const day = dateNow.getDate() <= 9 ? "0" + dateNow.getDate() : dateNow.getDate();
+    return `${year}-${month}-${day}`;
+}
+
+const calculateDays = (date1, date2) => {
+    moment.locale('pt-br');
+    const data1 = moment(date1,'YYYY-MM-DD');
+    const data2 = moment(date2,'YYYY-MM-DD');
+    const diff  = data2.diff(data1, 'days');
+    return diff;
 }
