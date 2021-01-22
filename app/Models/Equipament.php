@@ -93,17 +93,16 @@ class Equipament extends Model
 
         $equipaments = $this->from(DB::raw('equipaments force index(company_id_name_reference_volume)'))
                     ->where('company_id', $company_id)
-                    ->where(function($query) use ($searchEquipament, $_searchEquipament) {
+                    ->where(function($query) use ($searchEquipament, $_searchEquipament, $getCacamba) {
                         $query->where('id', 'like', "%{$searchEquipament}%")
                             ->orWhere('name', 'like', "%{$searchEquipament}%")
                             ->orWhere('reference', 'like', "%{$searchEquipament}%")
                             ->orWhereIn('volume', $_searchEquipament);
+
+                        if ($getCacamba) $query->orWhere('name', null);
                     });
         if ($equipamentInUse && count($equipamentInUse))
             $equipaments = $equipaments->whereNotIn('id', $equipamentInUse);
-
-        if ($getCacamba)
-            $equipaments->orWhere('name', null);
 
         return $equipaments->get();
     }

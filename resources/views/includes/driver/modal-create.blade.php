@@ -1,4 +1,4 @@
-<div class="modal fade" id="newDriverModal" tabindex="-1" role="dialog" aria-labelledby="newDriverModalLabel" aria-hidden="true">
+<div class="modal fade" id="newDriverModal" tabindex="1" role="dialog" aria-labelledby="newDriverModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <form action="{{ route('ajax.driver.new-driver') }}" method="POST" id="formCreateDriverModal">

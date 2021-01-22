@@ -788,8 +788,7 @@ table .form-group {
     margin-left: 0;
     margin-right: 0;
 }
-.form-control:disabled,
-.form-control:read-only {
+.form-control:disabled {
     background-color: #fff;
     cursor: not-allowed;
 }
@@ -818,6 +817,56 @@ table .form-group {
 .no-border-radius {
     border-radius: 0 !important;
 }
+input[type=checkbox].check-style{
+    height: 0;
+    width: 0;
+    visibility: hidden;
+}
+label.check-style {
+    cursor: pointer;
+    text-indent: -9999px;
+    width: 50px;
+    height: 27px;
+    background: #ff6258;
+    display: block;
+    border-radius: 100px;
+    position: relative;
+}
+label.check-style:after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 25px;
+    height: 25px;
+    background: #fff;
+    border-radius: 90px;
+    transition: 0.3s;
+}
+input.check-style:checked + label.check-style {
+    background: #19d895;
+}
+input.check-style:checked + label.check-style:after {
+    left: calc(100% - 1px);
+    transform: translateX(-100%);
+}
+label.check-style:active:after {
+    width: 25px;
+}
+
+label.check-xs {
+    width: 32px;
+    height: 17px;
+    margin-top: 2px;
+}
+label.check-xs:after {
+    top: 1px;
+    left: 1px;
+    width: 15px;
+    height: 15px;
+}
+
+
 
 
 

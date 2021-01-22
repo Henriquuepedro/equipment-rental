@@ -133,6 +133,7 @@ class VehicleController extends Controller
     {
         // data driver
         $dataVehicle = $this->formatDataVehicle($request);
+        $isAjax = $this->isAjax();
 
         $updateVehicle = $this->vehicle->insert(
             array(
@@ -150,11 +151,19 @@ class VehicleController extends Controller
 
         if($updateVehicle) {
             DB::commit();
+
+            if ($isAjax)
+                return response()->json(['success' => true, 'message' => 'Veículo cadastrado com sucesso.', 'vehicle_id' => $updateVehicle->id]);
+
             return redirect()->route('vehicle.index')
                 ->with('success', "Veículo com o código {$updateVehicle->id}, cadastrado com sucesso!");
         }
 
         DB::rollBack();
+
+        if ($isAjax)
+            return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o veículo, tente novamente!']);
+
         return redirect()->back()
             ->withErrors(['Não foi possível cadastrar o veículo, tente novamente!'])
             ->withInput();
@@ -226,5 +235,44 @@ class VehicleController extends Controller
         $obj->vehicle_id    = isset($request->vehicle_id) ? (int)$request->vehicle_id : null;
 
         return $obj;
+    }
+
+    public function getVehicles(Request $request)
+    {
+        $company_id = $request->user()->company_id;
+        $vehicleData = [];
+        $lastId = 0;
+
+        $vehicles = $this->vehicle->getVehicles($company_id, null, null, null, array('field' => 'name', 'order' => 'ASC'));
+
+        foreach ($vehicles as $vehicle) {
+            array_push($vehicleData, ['id' => $vehicle->id, 'name' => $vehicle->name]);
+            if ($vehicle->id > $lastId) $lastId = $vehicle->id;
+        }
+
+        return response()->json(['data' => $vehicleData, 'lastId' => $lastId]);
+    }
+
+    public function getVehicle(Request $request)
+    {
+        $company_id = $request->user()->company_id;
+        $vehicle_id = $request->vehicle_id;
+        $driver = false;
+
+        $vehicles = $this->vehicle->getVehicle($vehicle_id, $company_id);
+        if ($vehicles->driver_id)
+            $driver = $this->driver->getDriver($vehicles->driver_id, $company_id);
+
+
+        return response()->json(array(
+            'name'          => $vehicles->name,
+            'brand'         => $vehicles->brand,
+            'model'         => $vehicles->model,
+            'reference'     => $vehicles->reference,
+            'board'         => $vehicles->board,
+            'observation'   => $vehicles->observation,
+            'driver_id'     => $vehicles->driver_id,
+            'driver_name'   => $driver->name ?? null
+        ));
     }
 }

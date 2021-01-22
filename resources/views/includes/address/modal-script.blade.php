@@ -58,7 +58,7 @@
 
         if ($('#formCreateRental input[name="lat"]').val() === '')
             setTimeout(() => {
-                updateLocationRental($('#formCreateRental'))
+                updateLocationRental($('#formCreateRental'));
             }, 250);
         else
             setTimeout(() => {
@@ -70,7 +70,12 @@
 
     $('#updateLocationMapRental').click(function (){
         updateLocationRental($('#formCreateRental'));
-    })
+    });
+
+    $("#confirmAddressRental").on("hidden.bs.modal", function () {
+        if ($('[name="lat"]').val() !== '' && $('[name="lng"]').val() !== '')
+            $('.alert-mark-map').slideUp('slow');
+    });
 
     const loadAddresses = (client_id = null) => {
 

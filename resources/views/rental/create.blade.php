@@ -155,6 +155,7 @@
         });
 
         $('#discount_value, #extra_value').mask('#.##0,00', { reverse: true });
+        loadDrivers(0, '#newVehicleModal [name="driver"]');
     });
 
     $("#formCreateRental").validate({
@@ -209,7 +210,7 @@
         }
 
         equipamentMessageDefault('<i class="fas fa-spinner fa-spin"></i> Carregando equipamentos ...');
-
+        console.log(searchEquipament, equipamentInUse);
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -218,6 +219,8 @@
             url: "{{ route('ajax.equipament.get-equipaments') }}",
             data: { searchEquipament, equipamentInUse },
             success: response => {
+
+                console.log(response);
 
                 $('table.list-equipament tbody').empty();
 
@@ -262,7 +265,6 @@
 
     $('table.list-equipament').on('click', '.equipament', function(){
         const idEquipament = $(this).attr('id-equipament');
-        let date_delivery, date_withdrawal;
 
         $(`.equipament[id-equipament="${idEquipament}"]`).empty().toggleClass('equipament load-equipament').append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
 
@@ -286,10 +288,14 @@
                     return false;
                 }
 
-                date_delivery = $('input[name="date_delivery"]').val();
-                date_withdrawal = $('input[name="date_withdrawal"]').val();
-
                 response = response.data;
+
+                const date_delivery = $('input[name="date_delivery"]').val();
+                const date_withdrawal = $('input[name="date_withdrawal"]').val();
+
+                const colRef = response.cacamba ? 'col-md-4' : 'col-md-8';
+                const colQty = response.cacamba ? 'col-md-3' : 'col-md-4';
+                const displayResidue = response.cacamba ? '' : 'display-none';
 
                 $('#equipaments-selected').append(`
                     <div class="card">
@@ -301,14 +307,14 @@
                                 <a class="remove-equipament pull-right"><i class="fa fa-trash"></i></a>
                             </h5>
                         </div>
-                        <div id="collapseEquipament-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipament-${response.id}" data-parent="#equipaments-selected">
+                        <div id="collapseEquipament-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipament-${response.id}" data-parent="#equipaments-selected" id-equipament="${response.id}">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group ${colRef}">
                                         <label>Referência</label>
                                         <input type="text" class="form-control" value="${response.reference}" name="reference_equipament" disabled>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="${colQty}">
                                         <div class="form-group flatpickr label-animate stock-group">
                                             <label>Quantidade</label>
                                             <input type="tel" name="stock_equipament" class="form-control col-md-9 pull-left flatpickr-input" value="1" max-stock="${response.stock}">
@@ -320,37 +326,49 @@
                                         </div>
                                         <small class="text-danger font-weight-bold stock_available pull-left">Disponível: ${response.stock}</small>
                                     </div>
-                                    <div class="form-group col-md-5">
+                                    <div class="form-group col-md-5 label-animate ${displayResidue}">
                                         <label>Resíduo</label>
-                                        <select class="form-control">
-                                            <option>Selecione ...</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-6">
-                                        <label>Veículo</label>
-                                        <select class="form-control">
-                                            <option>Selecione ...</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label>Motorista</label>
-                                        <select class="form-control">
-                                            <option>Selecione ...</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-check form-check-flat mb-0">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" class="form-check-input use_date_diff_equip" name="use_date_diff_equip"> Usar datas diferentes <i class="input-helper"></i>
-                                            </label>
+                                        <div class="input-group label-animate">
+                                            <select class="form-control" name="residue[]"></select>
+                                            <div class="input-group-addon input-group-append">
+                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo"><i class="fas fa-plus-circle"></i></button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="form-group col-md-6 label-animate">
+                                        <label>Veículo</label>
+                                        <div class="input-group label-animate">
+                                            <select class="form-control" name="vehicle[]">
+                                                <option>Selecione ...</option>
+                                            </select>
+                                            <div class="input-group-addon input-group-append">
+                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newVehicleModal" title="Novo Veículo"><i class="fas fa-plus-circle"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6 label-animate">
+                                        <label>Motorista</label>
+                                        <div class="input-group label-animate">
+                                            <select class="form-control" name="driver[]">
+                                                <option>Selecione ...</option>
+                                            </select>
+                                            <div class="input-group-addon input-group-append">
+                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newDriverModal" title="Novo Motorista"><i class="fas fa-plus-circle"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="switch pt-3">
+                                            <input type="checkbox" class="check-style check-xs use_date_diff_equip" name="use_date_diff_equip" id="use_date_diff_equip_${response.id}">
+                                            <label for="use_date_diff_equip_${response.id}" class="check-style check-xs"></label> Usar datas de entrega e/ou retirada diferentes para esse equipamento.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row display-none use_date_diff_equip_show">
                                     <div class="col-md-6">
                                         <div class="form-group flatpickr">
                                             <label>Data Prevista de Entrega</label>
@@ -378,11 +396,10 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <div class="form-group pt-3">
-                                            <div class="form-check form-check-flat">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input not_use_date_withdrawal" name="not_use_date_withdrawal" disabled> Não informar data de retirada <i class="input-helper"></i>
-                                                </label>
+                                        <div class="form-group">
+                                            <div class="switch pt-1">
+                                                <input type="checkbox" class="check-style check-xs not_use_date_withdrawal" name="use_date_diff_equip" id="not_use_date_withdrawal_${response.id}" disabled>
+                                                <label for="not_use_date_withdrawal_${response.id}" class="check-style check-xs"></label> Não informar data de retirada
                                             </div>
                                         </div>
                                     </div>
@@ -398,6 +415,7 @@
                 `);
                 $(`.load-equipament[id-equipament="${idEquipament}"]`).hide(300);
                 showSeparatorEquipamentSelected();
+                $('#cleanSearchEquipament').trigger('click')
                 setTimeout(() => {
                     $(`.load-equipament[id-equipament="${idEquipament}"]`).remove();
 
@@ -427,6 +445,10 @@
                         $(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val('');
                         $(`#collapseEquipament-${idEquipament} .not_use_date_withdrawal`).prop('checked', true);
                     }
+
+                    loadResidues(0,`#collapseEquipament-${idEquipament} select[name="residue[]"]`);
+                    loadDrivers(0, `#collapseEquipament-${idEquipament} select[name="driver[]"]`);
+                    loadVehicles(0,`#collapseEquipament-${idEquipament} select[name="vehicle[]"]`);
                 }, 350);
             }, error: e => {
                 console.log(e);
@@ -485,7 +507,16 @@
                 elEquip.find('.not_use_date_withdrawal').prop('checked', false);
 
             checkLabelAnimate();
-        }
+
+            elEquip.find('.use_date_diff_equip_show').slideUp('slow');
+        } else
+            elEquip.find('.use_date_diff_equip_show').slideDown({
+                start: function () {
+                    $(this).css({
+                        display: "flex"
+                    })
+                }
+            });
     });
 
     $(document).on('blur change', '[name="stock_equipament"]', function (){
@@ -599,6 +630,7 @@
         }
         else {
             $('#add_parcel, #del_parcel, #parcels, .automatic_parcel_distribution_parent').slideUp(500);
+            $('#automatic_parcel_distribution').prop('checked', true);
             setTimeout(() => { $('#parcels .form-group').remove() }, 550)
         }
     })
@@ -653,7 +685,29 @@
         } else
             $('#parcels .form-group [name="value_parcel[]"]').attr('disabled', false);
 
-    })
+    });
+
+    $(document).on('change', '[name="vehicle[]"]', function (){
+        const vehicle_id = $(this).val();
+        if (vehicle_id == 'Selecione ...') return false;
+
+        const el = $(this).closest('.card-body');
+
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'GET',
+            data: { vehicle_id },
+            url: "{{ route('ajax.vehicle.get-vehicle')  }}",
+            async: true,
+            success: response => {
+                if (response.driver_id)
+                    el.find('[name="driver[]"]').val(response.driver_id)
+            }
+        });
+    });
 
     const recalculeParcels = () => {
         if ($('#automatic_parcel_distribution').is(':checked')) {
@@ -711,6 +765,9 @@
 @include('includes.client.modal-script')
 @include('includes.address.modal-script')
 @include('includes.equipament.modal-script')
+@include('includes.driver.modal-script')
+@include('includes.vehicle.modal-script')
+@include('includes.residue.modal-script')
 @stop
 
 @section('content')
@@ -796,11 +853,10 @@
                                                     </a>
                                                 </div>
                                             </div>
-                                            <div class="form-group pt-3">
-                                                <div class="form-check form-check-flat">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input" name="not_use_date_withdrawal" id="not_use_date_withdrawal"> Não informar data de retirada <i class="input-helper"></i>
-                                                    </label>
+                                            <div class="form-group">
+                                                <div class="switch pt-1">
+                                                    <input type="checkbox" class="check-style check-xs" name="not_use_date_withdrawal" id="not_use_date_withdrawal">
+                                                    <label for="not_use_date_withdrawal" class="check-style check-xs"></label> Não informar data de retirada
                                                 </div>
                                             </div>
                                         </div>
@@ -896,17 +952,15 @@
                                             <hr class="separator-dashed">
                                             <div class="col-md-12 d-flex justify-content-between">
                                                 <div class="form-group">
-                                                    <div class="form-check form-check-flat">
-                                                        <label class="form-check-label">
-                                                            <input type="checkbox" class="form-check-input" name="is_parceled" id="is_parceled"> Gerar Parcelamento <i class="input-helper"></i>
-                                                        </label>
+                                                    <div class="switch">
+                                                        <input type="checkbox" class="check-style check-xs" name="is_parceled" id="is_parceled">
+                                                        <label for="is_parceled" class="check-style check-xs"></label> Gerar Parcelamento
                                                     </div>
                                                 </div>
                                                 <div class="form-group display-none automatic_parcel_distribution_parent">
-                                                    <div class="form-check form-check-flat">
-                                                        <label class="form-check-label">
-                                                            <input type="checkbox" class="form-check-input" name="automatic_parcel_distribution" id="automatic_parcel_distribution" checked> Distribuir Valores <i class="input-helper"></i>
-                                                        </label>
+                                                    <div class="switch">
+                                                        <input type="checkbox" class="check-style check-xs" name="automatic_parcel_distribution" id="automatic_parcel_distribution" checked>
+                                                        <label for="automatic_parcel_distribution" class="check-style check-xs"></label> Distribuir Valores
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -958,6 +1012,9 @@
     </div>
     @include('includes.client.modal-create')
     @include('includes.equipament.modal-create')
+    @include('includes.vehicle.modal-create')
+    @include('includes.driver.modal-create')
+    @include('includes.residue.modal-create')
     <div class="modal fade" tabindex="-1" role="dialog" id="confirmAddressRental">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">

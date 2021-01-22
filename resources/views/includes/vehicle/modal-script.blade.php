@@ -1,55 +1,14 @@
 <script>
-    $(() => {
-        $('#newDriverModal [name="cpf"]').mask('000.000.000-00');
-        $('#newDriverModal [name="phone"]').mask('(00) 000000000');
-        $('#newDriverModal [name="rg"], #newDriverModal [name="cnh"]').mask('0#');
-    });
-    $('#newDriverModal').on('hidden.bs.modal', function(e){
-        $("body").addClass("modal-open");
-    });
     // Validar dados
-    $("#formCreateDriverModal").validate({
+    $("#formCreateVehicleModal").validate({
         rules: {
             name: {
                 required: true
-            },
-            email: {
-                email: true
-            },
-            phone: {
-                rangelength: [13, 14]
-            },
-            cpf: {
-                cpf: true
-            },
-            rg: {
-                number: true
-            },
-            cnh: {
-                number: true
-            },
-            cnh_exp: {
-                date: true
             }
         },
         messages: {
             name: {
-                required: 'Informe um nome para o motorista'
-            },
-            email: {
-                email: 'Informe um endereço de e-mail válido'
-            },
-            phone: {
-                rangelength: "O número de telefone principal está inválido, informe um válido. (99) 999..."
-            },
-            rg: {
-                number: "O número de RG deve conter apenas números"
-            },
-            cnh: {
-                number: "O número da CNH deve conter apenas números"
-            },
-            cnh_exp: {
-                date: "A data de expiração da CNH deve ser uma data válida"
+                required: 'Informe um nome para o veículo'
             }
         },
         invalidHandler: function(event, validator) {
@@ -67,7 +26,7 @@
             }, 150);
         },
         submitHandler: function(form) {
-            let getForm = $('#formCreateDriverModal');
+            let getForm = $('#formCreateVehicleModal');
 
             getForm.find('button[type="submit"]').attr('disabled', true);
 
@@ -97,20 +56,19 @@
                         title: response.message
                     });
 
-                    $('#newDriverModal').modal('hide');
-                    cleanFormDriverModal();
+                    $('#newVehicleModal').modal('hide');
+                    cleanFormVehicleModal();
                     checkLabelAnimate();
                     @if(\Request::route()->getName() == 'rental.create')
-                        loadDrivers($('#newVehicleModal').is(':visible') ? 0 : response.driver_id, "div[id^='collapseEquipament-'].collapse.show [name='driver[]']");
-                        loadDrivers($('#newVehicleModal').is(':visible') ? response.driver_id : 0, '#newVehicleModal [name="driver"]');
+                        loadVehicles(response.vehicle_id, "div[id^='collapseEquipament-'].collapse.show [name='vehicle[]']");
 
                         $('#equipaments-selected [id^=collapseEquipament-]').each(function(){
                             if ($("div[id^='collapseEquipament-'].collapse.show").attr('id-equipament') !== $(this).attr('id-equipament')) {
-                                loadDrivers($('[name="driver[]"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name="driver[]"]`);
+                                loadVehicles($('[name="vehicle[]"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name="vehicle[]"]`);
                             }
                         });
                     @else
-                        loadDrivers(response.driver_id, null);
+                        loadVehicles(response.vehicle_id, null);
                     @endif
 
                 }, error: e => {
@@ -134,45 +92,39 @@
         }
     });
 
-    jQuery.validator.addMethod("cpf", function(value, element) {
-        value = jQuery.trim(value);
-
-        return this.optional(element) || validCPF(value);
-
-    }, 'Informe um CPF válido');
-
-    const cleanFormDriverModal = () => {
-        $('#newDriverModal [name="name"]').val('');
-        $('#newDriverModal [name="email"]').val('');
-        $('#newDriverModal [name="phone"]').val('');
-        $('#newDriverModal [name="cpf"]').val('');
-        $('#newDriverModal [name="rg"]').val('');
-        $('#newDriverModal [name="cnh"]').val('');
-        $('#newDriverModal [name="cnh_exp"]').val('');
-        $('#newDriverModal [name="observation"]').val('');
+    const cleanFormVehicleModal = () => {
+        $('#newVehicleModal [name="name"]').val('');
+        $('#newVehicleModal [name="reference"]').val('');
+        $('#newVehicleModal [name="driver"]').val('Selecione ...');
+        $('#newVehicleModal [name="brand"]').val('');
+        $('#newVehicleModal [name="model"]').val('');
+        $('#newVehicleModal [name="board"]').val('');
+        $('#newVehicleModal [name="observation"]').val('');
     }
 
-    const loadDrivers = (driver_id = null, el = null) => {
+    const loadVehicles = (vehicle_id = null, el = null) => {
 
-        $(el ?? '.driver-load [name="driver"]').empty().append('<option>Carregando ...</option>');
+        $(el).empty().append('<option>Carregando ...</option>');
 
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             type: 'GET',
-            url: '{{ route('ajax.driver.get-drivers') }}',
+            url: '{{ route('ajax.vehicle.get-vehicles') }}',
             dataType: 'json',
             success: response => {
 
                 let selected;
-                let driver_id_selected = driver_id ?? response.lastId;
+                let vehicle_id_selected = vehicle_id ?? response.lastId;
 
-                $(el ?? '.driver-load [name="driver"]').empty().append('<option>Selecione ...</option>');
+                $(el).empty().append('<option>Selecione ...</option>');
                 $.each(response.data, function( index, value ) {
-                    selected = value.id === parseInt(driver_id_selected) ? 'selected' : '';
-                    $(el ?? '.driver-load [name="driver"]').append(`<option value='${value.id}' ${selected}>${value.name}</option>`);
+                    selected = value.id === parseInt(vehicle_id_selected) ? 'selected' : '';
+                    $(el).append(`<option value='${value.id}' ${selected}>${value.name}</option>`);
                 });
+                // so executo o trigger se for um equipamento que está ativo
+                if ($(el).closest('[id^=collapseEquipament-]').hasClass('show')) $(el).trigger('change');
 
             }, error: e => {
                 $.each(e.responseJSON.errors, function( index, value ) {

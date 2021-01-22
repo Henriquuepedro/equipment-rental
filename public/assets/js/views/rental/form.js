@@ -8,7 +8,7 @@
         stepsOrientation: "vertical",
         onStepChanging: function (event, currentIndex, newIndex)
         {
-            let debug = true;
+            let debug = false;
             let arrErrors = [];
             let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
 
@@ -29,7 +29,7 @@
                 changeStepPosAbsolute();
                 return true;
             }
-            else if (currentIndex === 1) {
+            else if (currentIndex === 1 && newIndex > 1) {
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
@@ -59,7 +59,7 @@
                 }
                 return false;
             }
-            else if (currentIndex === 2) {
+            else if (currentIndex === 2 && newIndex > 2) {
                 if (debug) {
                     changeStepPosAbsolute();
                     fixEquipmentDates();
@@ -94,7 +94,7 @@
                 }
                 return false;
             }
-            else if (currentIndex === 3) {
+            else if (currentIndex === 3 && newIndex > 3) { // equipamento
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
@@ -109,13 +109,35 @@
                     return false;
                 }
 
-                let idEquipament,stockEquipament,referenceEquipament,nameEquipament,stockMax,dateDeliveryTime,dateWithdrawalTime;
+                let idEquipament,
+                    stockEquipament,
+                    referenceEquipament,
+                    nameEquipament,
+                    stockMax,
+                    dateDeliveryTime,
+                    dateWithdrawalTime,
+                    residueEquipament,
+                    vehicleEquipament,
+                    driveEquipament;
+
                 $('#equipaments-selected div.card').each(function() {
                     idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
                     stockEquipament     = parseInt($('[name="stock_equipament"]', this).val());
                     referenceEquipament = $('[name="reference_equipament"]', this).val();
                     nameEquipament      = $('.card-header a:eq(0)', this).text();
                     stockMax            = parseInt($('[name="stock_equipament"]', this).attr('max-stock'));
+                    residueEquipament   = parseInt($('[name="residue[]"]', this).val());
+                    vehicleEquipament   = parseInt($('[name="vehicle[]"]', this).val());
+                    driveEquipament     = parseInt($('[name="driver[]"]', this).val());
+
+                    if (!residueEquipament)
+                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado um resíduo.`);
+
+                    if (!vehicleEquipament)
+                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado um veículo.`);
+
+                    if (!driveEquipament)
+                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado um motorista.`);
 
                     if (isNaN(stockEquipament) || stockEquipament === 0)
                         arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado uma quantidade.`);
@@ -148,7 +170,7 @@
                 }
                 return false;
             }
-            else if (currentIndex === 4) {
+            else if (currentIndex === 4 && newIndex > 4) { // pagamento
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;

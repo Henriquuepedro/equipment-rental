@@ -346,6 +346,7 @@ class EquipamentController extends Controller
 
     public function getEquipaments(Request $request)
     {
+        //DB::enableQueryLog();
         $company_id         = $request->user()->company_id;
         $searchEquipament   = str_replace('*','', filter_var($request->searchEquipament, FILTER_SANITIZE_STRING));
         $equipamentData     = [];
@@ -387,7 +388,8 @@ class EquipamentController extends Controller
             'id'        => $equipament->id,
             'name'      => $equipament->name ?? "Caçamba {$equipament->volume}m³",
             'reference' => $equipament->reference,
-            'stock'     => $equipament->stock
+            'stock'     => $equipament->stock,
+            'cacamba'   => $equipament->volume ? true : false
         ];
 
 

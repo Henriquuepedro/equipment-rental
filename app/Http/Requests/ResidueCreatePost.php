@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
-class VehicleCreatePost extends FormRequest
+class ResidueCreatePost extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,37 +26,18 @@ class VehicleCreatePost extends FormRequest
     public function rules()
     {
         return [
-            'name'   => [
+            'name'      => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('vehicles')
-                        ->where(['name' => $this->name, 'company_id' => $this->user()->company_id])
-                        ->count();
-                    if ($exists) $fail('Nome do veículo já está em uso');
-                }
-            ],
-            'reference' => [
-                function ($attribute, $value, $fail) {
-                    if (!empty($this->reference)) {
-                        $exists = DB::table('vehicles')
-                            ->where(['reference' => $this->reference, 'company_id' => $this->user()->company_id])
-                            ->count();
-                        if ($exists) $fail('Referência do veículo já está em uso');
-                    }
-                }
-            ],
-            'board'     => [
-                function ($attribute, $value, $fail) {
-                    if (!empty($this->board)) {
-                        $exists = DB::table('vehicles')
-                            ->where(['board' => $this->board, 'company_id' => $this->user()->company_id])
-                            ->count();
-                        if ($exists) $fail('Placa do veículo já está em uso');
+                    $exists = DB::table('residues')->where(['name' => $this->name, 'company_id' => $this->user()->company_id])->count();
+                    if ($exists) {
+                        $fail('Nome do resíduo já está em uso');
                     }
                 }
             ]
         ];
     }
+
     /**
      * Get the error messages for the defined validation rules.
      *
@@ -65,7 +46,7 @@ class VehicleCreatePost extends FormRequest
     public function messages()
     {
         return [
-            'name.required'  => 'Nome do veículo é obrigatório',
+            'name.required' => 'O Nome é obrigatório',
         ];
     }
 
