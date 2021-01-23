@@ -9,6 +9,7 @@
 @section('css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
     <style>
         .wizard > .actions > ul {
             display: flex;
@@ -121,6 +122,12 @@
             font-size: 18px !important;
             color: #fff;
         }
+        .payment-yes input:disabled {
+            background-color: #eee;
+        }
+        .payment-yes .input-group-text {
+            background-color: #eee;
+        }
     </style>
 @stop
 
@@ -133,6 +140,7 @@
 <script src="{{ asset('assets/vendors/moment/moment.min.js') }}" type="application/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
 <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
+<script src="{{ asset('vendor/icheck/icheck.min.js') }}" type="application/javascript"></script>
 
 <script>
     var searchEquipamentOld = '';
@@ -153,9 +161,13 @@
                 checkLabelAnimate();
             }
         });
-
-        $('#discount_value, #extra_value').mask('#.##0,00', { reverse: true });
+        $('#discount_value, #extra_value, #net_value').mask('#.##0,00', { reverse: true });
         loadDrivers(0, '#newVehicleModal [name="driver"]');
+        $('[name="type_rental"]').iCheck({
+            checkboxClass: 'icheckbox_square',
+            radioClass: 'iradio_square-blue',
+            increaseArea: '20%' // optional
+        });
     });
 
     $("#formCreateRental").validate({
@@ -210,7 +222,6 @@
         }
 
         equipamentMessageDefault('<i class="fas fa-spinner fa-spin"></i> Carregando equipamentos ...');
-        console.log(searchEquipament, equipamentInUse);
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -219,8 +230,6 @@
             url: "{{ route('ajax.equipament.get-equipaments') }}",
             data: { searchEquipament, equipamentInUse },
             success: response => {
-
-                console.log(response);
 
                 $('table.list-equipament tbody').empty();
 
@@ -329,7 +338,9 @@
                                     <div class="form-group col-md-5 label-animate ${displayResidue}">
                                         <label>Resíduo</label>
                                         <div class="input-group label-animate">
-                                            <select class="form-control" name="residue[]"></select>
+                                            <select class="form-control" name="residue[]" disabled>
+                                                <option>Carregando ...</option>
+                                            </select>
                                             <div class="input-group-addon input-group-append">
                                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo"><i class="fas fa-plus-circle"></i></button>
                                             </div>
@@ -340,8 +351,8 @@
                                     <div class="form-group col-md-6 label-animate">
                                         <label>Veículo</label>
                                         <div class="input-group label-animate">
-                                            <select class="form-control" name="vehicle[]">
-                                                <option>Selecione ...</option>
+                                            <select class="form-control" name="vehicle[]" disabled>
+                                                <option>Carregando ...</option>
                                             </select>
                                             <div class="input-group-addon input-group-append">
                                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newVehicleModal" title="Novo Veículo"><i class="fas fa-plus-circle"></i></button>
@@ -351,8 +362,8 @@
                                     <div class="form-group col-md-6 label-animate">
                                         <label>Motorista</label>
                                         <div class="input-group label-animate">
-                                            <select class="form-control" name="driver[]">
-                                                <option>Selecione ...</option>
+                                            <select class="form-control" name="driver[]" disabled>
+                                                <option>Carregando ...</option>
                                             </select>
                                             <div class="input-group-addon input-group-append">
                                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newDriverModal" title="Novo Motorista"><i class="fas fa-plus-circle"></i></button>
@@ -446,9 +457,9 @@
                         $(`#collapseEquipament-${idEquipament} .not_use_date_withdrawal`).prop('checked', true);
                     }
 
-                    loadResidues(0,`#collapseEquipament-${idEquipament} select[name="residue[]"]`);
-                    loadDrivers(0, `#collapseEquipament-${idEquipament} select[name="driver[]"]`);
                     loadVehicles(0,`#collapseEquipament-${idEquipament} select[name="vehicle[]"]`);
+                    loadDrivers(0, `#collapseEquipament-${idEquipament} select[name="driver[]"]`);
+                    loadResidues(0,`#collapseEquipament-${idEquipament} select[name="residue[]"]`);
                 }, 350);
             }, error: e => {
                 console.log(e);
@@ -565,10 +576,10 @@
         checkLabelAnimate();
     });
 
-    $('#extra_value, #discount_value').on('keyup', () => {
+    $('#extra_value, #discount_value, #net_value').on('keyup', () => {
         reloadTotalRental();
     }).on('blur', function(){
-        if ($(this).val() === '') $(this).val('0,00')
+        if ($(this).val() === '') $(this).val('0,00');
     });
 
     $(document).on('click', '.btn-view-price-period-equipament', function (){
@@ -577,7 +588,6 @@
 
         btn.attr('disable', true);
 
-        console.log(idEquipament);
         let descPeriod = '';
 
         $.ajax({
@@ -693,7 +703,6 @@
 
         const el = $(this).closest('.card-body');
 
-
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -703,16 +712,39 @@
             url: "{{ route('ajax.vehicle.get-vehicle')  }}",
             async: true,
             success: response => {
-                if (response.driver_id)
+                if (response.driver_id && el.find('[name="driver[]"]').val() === 'Selecione ...')
                     el.find('[name="driver[]"]').val(response.driver_id)
+                else if(response.driver_id)
+                    Swal.fire({
+                        title: 'Alteração de Motorista',
+                        html: `O veículo selecionado contém relacionado o motorista <b>${response.driver_name}</b>. <br>Deseja atualizar?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#19d895',
+                        cancelButtonColor: '#bbb',
+                        confirmButtonText: 'Sim, atualizar',
+                        cancelButtonText: 'Não atualizar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed)
+                            el.find('[name="driver[]"]').val(response.driver_id)
+                    })
+
             }
         });
+    });
+
+    $('#calculate_net_amount_automatic').on('change', function(){
+        if ($(this).is(':checked')) {
+            $('#net_value').attr('disabled', true);
+            reloadTotalRental();
+        } else $('#net_value').attr('disabled', false);
     });
 
     const recalculeParcels = () => {
         if ($('#automatic_parcel_distribution').is(':checked')) {
             const parcels = $('#parcels .form-group').length;
-            const netValue = realToNumber($('#net_value').text());
+            const netValue = realToNumber($('#net_value').val());
 
             let valueSumParcel = parseFloat(0.00);
             let valueParcel = netValue / parcels;
@@ -794,15 +826,13 @@
                                     <h6>Tipo de Locação <i class="fa fa-info-circle" data-toggle="tooltip" title="Defina se haverá ou não cobrança para essa locação."></i></h6>
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
-                                            <div class="form-radio form-radio-flat">
-                                                <label class="form-check-label">
-                                                    <input type="radio" class="form-check-input" name="type_rental" value="0" @if(old('type_person') === '0') checked @endif> Com Cobrança <i class="input-helper"></i>
-                                                </label>
+                                            <div class="">
+                                                <input type="radio" name="type_rental" value="0" id="have-payment" @if(old('type_person') === '0') checked @endif>
+                                                <label for="have-payment">Com Cobrança</label>
                                             </div>
-                                            <div class="form-radio form-radio-flat">
-                                                <label class="form-check-label">
-                                                    <input type="radio" class="form-check-input" name="type_rental" value="1" @if(old('type_person') === '1') checked @endif> Sem Cobrança <i class="input-helper"></i>
-                                                </label>
+                                            <div class="">
+                                                <input type="radio" name="type_rental" id="no-have-payment" value="1" @if(old('type_person') === '1') checked @endif>
+                                                <label for="no-have-payment">Sem Cobrança</label>
                                             </div>
                                         </div>
                                     </div>
@@ -939,13 +969,19 @@
                                             </div>
                                             <hr class="separator-dashed">
                                             <div class="col-md-12">
-                                                <div class="d-flex justify-content-end align-items-center mb-2">
+                                                <div class="d-flex justify-content-end align-items-center mb-2 flex-wrap">
                                                     <label class="mb-0 mr-md-2">Valor Líquido</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
                                                         </div>
-                                                        <span type="text" class="form-control d-flex align-items-center" id="net_value"></span>
+                                                        <input type="text" class="form-control d-flex align-items-center" id="net_value" disabled>
+                                                    </div>
+                                                    <div class="form-group col-md-12 no-padding text-right mt-2">
+                                                        <div class="switch">
+                                                            <input type="checkbox" class="check-style check-xs" name="calculate_net_amount_automatic" id="calculate_net_amount_automatic" checked>
+                                                            <label for="calculate_net_amount_automatic" class="check-style check-xs"></label> Calcular Valor Líquido
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1045,6 +1081,6 @@
     <input type="hidden" id="routeGetStockEquipament" value="{{ route('ajax.equipament.get-stock') }}">
     <input type="hidden" id="routeGetPriceEquipament" value="{{ route('ajax.equipament.get-price') }}">
     <input type="hidden" id="routeGetEquipament" value="{{ route('ajax.equipament.get-equipament') }}">
-    <input type="hidden" id="routeGetPriceStockEquipament" value="{{ route('ajax.equipament.get-price-stock') }}">
+    <input type="hidden" id="routeGetPriceStockEquipaments" value="{{ route('ajax.equipament.get-price-stock-check') }}">
 
 @stop

@@ -100,7 +100,7 @@
 
     const loadResidues = (residue_id = null, el = null) => {
 
-        $(el).empty().append('<option>Carregando ...</option>');
+        $(el).attr('disabled', true).empty().append('<option>Carregando ...</option>');
 
         $.ajax({
             headers: {
@@ -133,6 +133,9 @@
                     title: 'Atenção',
                     html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
                 });
+            },
+            complete: () => {
+                $(el).attr('disabled', false);
             }
         });
     }

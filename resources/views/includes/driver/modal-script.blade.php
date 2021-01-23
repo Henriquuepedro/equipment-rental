@@ -154,7 +154,7 @@
 
     const loadDrivers = (driver_id = null, el = null) => {
 
-        $(el ?? '.driver-load [name="driver"]').empty().append('<option>Carregando ...</option>');
+        $(el ?? '.driver-load [name="driver"]').attr('disabled', true).empty().append('<option>Carregando ...</option>');
 
         $.ajax({
             headers: {
@@ -187,6 +187,9 @@
                     title: 'Atenção',
                     html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
                 });
+            },
+            complete: () => {
+                $(el ?? '.driver-load [name="driver"]').attr('disabled', false);
             }
         });
     }

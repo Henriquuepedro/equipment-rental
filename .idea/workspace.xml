@@ -2,24 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/ResidueController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Requests/ResidueCreatePost.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Models/Residue.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2020_11_29_185157_create_residues_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/residue/modal-create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/vehicle/modal-create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/includes/vehicle/modal-script.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/VehicleController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/VehicleController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/VehicleCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/VehicleCreatePost.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/Equipament.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Equipament.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/EquipamentWallet.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/EquipamentWallet.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/includes/driver/modal-create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/driver/modal-create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/includes/driver/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/driver/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/vehicle/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/vehicle/modal-script.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/rental/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rental/create.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
@@ -304,7 +294,9 @@
       <workItem from="1611182089253" duration="5403000" />
       <workItem from="1611187557125" duration="14000" />
       <workItem from="1611266243311" duration="3304000" />
-      <workItem from="1611350021496" duration="28000" />
+      <workItem from="1611350021496" duration="989000" />
+      <workItem from="1611359355864" duration="28000" />
+      <workItem from="1611414014611" duration="7571000" />
     </task>
     <servers />
   </component>

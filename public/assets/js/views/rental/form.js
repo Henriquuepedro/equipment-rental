@@ -197,7 +197,7 @@
             let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
             let time0,time1,time2,time3,time4,time5,time6,time7,time8 = 0;
 
-            if (priorIndex === 0) {
+            if (priorIndex === 0) { // tipo de cobrança
                 // Com cobrança
                 let paymentYes  = $('#formCreateRental-p-4 .payment-yes');
                 let paymentNo   = $('#formCreateRental-p-4 .payment-no');
@@ -208,13 +208,14 @@
             let date = new Date();
             time0 = date.getTime();
 
-            if (priorIndex === 3 && currentIndex === 4  ) {
+            if (priorIndex === 3 && currentIndex === 4  ) { // equipamento
 
-                let priceStock;
+                let pricesAndStocks;
                 let dataEquipaments = [];
                 let dataEquipamentsPayCheck = [];
                 let newPricesUpdate = [];
                 let newPricesUpdateNames = [];
+                let idEquipaments = [];
                 let priceEquipament = 0;
                 let idEquipament,stockEquipament,referenceEquipament,nameEquipament;
                 date = new Date();
@@ -225,30 +226,33 @@
                     referenceEquipament = $('[name="reference_equipament"]', this).val();
                     nameEquipament      = $('.card-header a:eq(0)', this).text();
                     dataEquipaments.push([idEquipament, stockEquipament, nameEquipament]);
+                    idEquipaments.push(idEquipament);
                 });
                 date = new Date();
                 time2 = date.getTime();
 
                 $('.list-equipaments-payment-load').show();
                 $('.list-equipaments-payment').hide();
-                $('#gross_value, #net_value').html('<i class="fa fa-spin fa-spinner"></i>&nbsp;&nbsp;Calculando');
+                $('#gross_value').html('<i class="fa fa-spin fa-spinner"></i>&nbsp;&nbsp;Calculando');
+                if ($('#calculate_net_amount_automatic').is(':checked'))
+                    $('#net_value').val('Calculando...');
 
                 date = new Date();
                 time3 = date.getTime();
+                pricesAndStocks = await getPriceStockEquipaments(idEquipaments);
                 await Promise.all(dataEquipaments.map(async equipament => {
-                    priceStock = await getPriceStockEquipament(equipament[0]);
                     dataEquipamentsPayCheck.push(equipament[0]);
-                    if (equipament[1] > priceStock.stock) {
-                        $(`#collapseEquipament-${equipament[0]}`).find('input[name="stock_equipament"]').attr('max-stock', priceStock.stock).val(priceStock.stock);
-                        $(`#collapseEquipament-${equipament[0]}`).find('.stock_available').text('Disponível: ' + priceStock.stock);
-                        arrErrors.push(`O equipamento ( <strong>${equipament[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${priceStock.stock} un</strong>`);
+                    if (equipament[1] > pricesAndStocks[equipament[0]].stock) {
+                        $(`#collapseEquipament-${equipament[0]}`).find('input[name="stock_equipament"]').attr('max-stock', pricesAndStocks[equipament[0]].stock).val(pricesAndStocks[equipament[0]].stock);
+                        $(`#collapseEquipament-${equipament[0]}`).find('.stock_available').text('Disponível: ' + pricesAndStocks[equipament[0]].stock);
+                        arrErrors.push(`O equipamento ( <strong>${equipament[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipament[0]].stock} un</strong>`);
                     }
 
-                    if (!$(`.list-equipaments-payment li[id-equipament="${equipament[0]}"]`).length) await createEquipamentPayment(equipament[0], priceStock);
+                    if (!$(`.list-equipaments-payment li[id-equipament="${equipament[0]}"]`).length) await createEquipamentPayment(equipament[0], pricesAndStocks[equipament[0]]);
                     else {
                         date = new Date();
                         time4 = date.getTime();
-                        priceEquipament = priceStock.price;
+                        priceEquipament = pricesAndStocks[equipament[0]].price;
 
                         date = new Date();
                         time5 = date.getTime();
@@ -327,8 +331,6 @@
                             $('.list-equipaments-payment').slideDown('slow');
 
                             $('#formCreateRental .actions a[href="#next"]').show();
-
-                            recalculeParcels();
                         })
                     } else {
                         reloadTotalRental();
@@ -510,32 +512,45 @@ const reloadTotalRental = () => {
     });
 
     $('#gross_value').text(numberToReal(grossValue));
-    $('#net_value').text(numberToReal(grossValue - discount + extra));
+
+    if ($('#calculate_net_amount_automatic').is(':checked'))
+        $('#net_value').val(numberToReal(grossValue - discount + extra));
+
+    if ($('#automatic_parcel_distribution').is(':checked'))
+        recalculeParcels();
 
     return grossValue - discount + extra;
 }
 
-const getPriceStockEquipament = async idEquipament => {
-    const check_not_use_date_withdrawal = $(`#collapseEquipament-${idEquipament} input[name="not_use_date_withdrawal"]`).is(':checked');
-    let diffDays = false;
+const getPriceStockEquipaments = async idEquipament => {
 
-    if (!check_not_use_date_withdrawal) {
-        let dateDelivery = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).val().split(' ')[0]).replace(/-/g, '/'));
-        let dateWithdrawal = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val().split(' ')[0]).replace(/-/g, '/'));
+    let arrDiffDays = [];
+    let arrEquipaments = [];
+    let dateDelivery, dateWithdrawal, timeDiff, diffDays;
 
-        let timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
-        diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    }
+    $('#equipaments-selected div.card').each(async function() {
+        idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
+        dateDelivery = new Date(transformDateForEn($('input[name="date_delivery_equipament"]', this).val().split(' ')[0]).replace(/-/g, '/'));
+        dateWithdrawal = new Date(transformDateForEn($('input[name="date_withdrawal_equipament"]', this).val().split(' ')[0]).replace(/-/g, '/'));
 
-    console.log(diffDays);
+        diffDays = false;
+        if (!$('input[name="not_use_date_withdrawal"]', this).is(':checked')) {
+            timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
+            diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        }
+        arrDiffDays[idEquipament] = diffDays;
+        arrEquipaments.push(idEquipament);
+    });
+
+    console.log(arrDiffDays, arrEquipaments);
 
     let priceStock = await $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
-        url: $('#routeGetPriceStockEquipament').val(),
-        data: { idEquipament, diffDays },
+        url: $('#routeGetPriceStockEquipaments').val(),
+        data: { arrEquipaments, arrDiffDays },
         async: true,
         success: response => {
             return response;

@@ -455,4 +455,34 @@ class EquipamentController extends Controller
 
         return response()->json($equipamentWallet);
     }
+
+    public function getCheckPriceStockEquipament(Request $request)
+    {
+        //DB::enableQueryLog();
+        $rsEquipament   = [];
+        $company_id     = $request->user()->company_id;
+        $equipamentsId  = $request->arrEquipaments;
+        $diffsDays      = $request->arrDiffDays;
+
+        $equipaments = $this->equipament->getMultipleEquipaments($equipamentsId, $company_id);
+
+        // não encontrou todos od equipamentos, retorna zero para preço e estoque
+        if (count($equipaments) !== count($equipamentsId)) return response()->json([0 => ['price' => 0, 'stock' => 0]]);
+
+        foreach ($equipaments as $equipament) {
+            //recebeu false porque a data de retirada não foi definida
+            if ($diffsDays[$equipament['id']] === "false") $equipamentWallet = false;
+            else $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament['id'], $diffsDays[$equipament['id']]);
+
+            if (!$equipamentWallet) $price = $equipament->value;
+            else $price = $equipamentWallet->value;
+
+            $rsEquipament[$equipament['id']] = [
+                'price' => $price,
+                'stock' => $equipament->stock
+            ];
+        }
+        //DB::getQueryLog()
+        return response()->json($rsEquipament);
+    }
 }
