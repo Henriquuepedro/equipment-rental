@@ -109,6 +109,6 @@ class Equipament extends Model
 
     public function getMultipleEquipaments(array $equipaments_id, $company_id)
     {
-        return $this->from(DB::raw('equipaments force index(id_company)'))->orWhereIn('id', $equipaments_id)->where('company_id', $company_id)->get();
+        return $this->from(DB::raw('equipaments force index(id_company)'))->where('company_id', $company_id)->whereIn('id', $equipaments_id)->get();
     }
 }
