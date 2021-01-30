@@ -62,13 +62,7 @@
                     cleanFormResidueModal();
                     checkLabelAnimate();
                     @if(\Request::route()->getName() == 'rental.create')
-                        loadResidues(response.residue_id, "div[id^='collapseEquipament-'].collapse.show [name='residue[]']");
-
-                        $('#equipaments-selected [id^=collapseEquipament-]').each(function(){
-                            if ($("div[id^='collapseEquipament-'].collapse.show").attr('id-equipament') !== $(this).attr('id-equipament')) {
-                                loadResidues($('[name="residue[]"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name="residue[]"]`);
-                            }
-                        });
+                        loadResidues(response.residue_id, '.container-residues select[name="residues"]');
                     @else
                         loadResidues(response.residue_id, null);
                     @endif
@@ -100,7 +94,9 @@
 
     const loadResidues = (residue_id = null, el = null) => {
 
-        $(el).attr('disabled', true).empty().append('<option>Carregando ...</option>');
+        const valuesSelected = $(el).val();
+
+        $(el).attr('disabled', true).empty();
 
         $.ajax({
             headers: {
@@ -114,9 +110,8 @@
                 let selected;
                 let residue_id_selected = residue_id ?? response.lastId;
 
-                $(el).empty().append('<option>Selecione ...</option>');
                 $.each(response.data, function( index, value ) {
-                    selected = value.id === parseInt(residue_id_selected) ? 'selected' : '';
+                    selected = value.id === parseInt(residue_id_selected) || valuesSelected.includes((value.id).toString()) ? 'selected' : '';
                     $(el).append(`<option value='${value.id}' ${selected}>${value.name}</option>`);
                 });
 
@@ -135,7 +130,7 @@
                 });
             },
             complete: () => {
-                $(el).attr('disabled', false);
+                $(el).attr('disabled', false).select2('destroy').select2();
             }
         });
     }

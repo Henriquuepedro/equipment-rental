@@ -135,6 +135,31 @@
             justify-content: flex-end !important;
             display: flex !important;;
         }
+        .wizard > .content > .body input.select2-search__field {
+            border: 0;
+        }
+        .wizard > .content > .body ul {
+            padding-top: 5px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #2196f3 !important;
+        }
+        .container-residues .select2.select2-container {
+            width: 100%;
+            position: relative;
+            -webkit-box-flex: 1;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            width: 1%;
+            margin-bottom: 0;
+        }
+        #observation {
+            border-top-right-radius: 0;
+            border-top-left-radius: 0;
+        }
+        .ql-tooltip {
+            left: 5% !important;
+        }
     </style>
 @stop
 
@@ -251,6 +276,15 @@
                                 <div class="stepRental">
                                     <h6>Equipamentos</h6>
                                     <div class="row">
+                                        <div class="form-group col-md-12 mt-2 label-animate container-residues display-none">
+                                            <label>Resíduos a serem utilizados</label>
+                                            <div class="input-group label-animate">
+                                                <select class="select2 form-control" multiple="multiple" name="residues"></select>
+                                                <div class="input-group-addon input-group-append">
+                                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo"><i class="fas fa-plus-circle"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="form-group col-md-12 mt-2 equipaments-selected">
                                             <div class="accordion accordion-multiple-filled" id="equipaments-selected" role="tablist">
                                             </div>
@@ -365,12 +399,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h3>Finalizar</h3>
+                                <h3>Finalização</h3>
                                 <div class="stepRental">
                                     <h6>Finalizar</h6>
                                     <div class="row">
-                                        <div class="form-group col-md-12 text-center mt-5">
-                                            <h4><i class="fa fa-warning"></i> Em andamento, em breve estará disponível</h4>
+                                        <div class="form-group col-md-12 mt-3">
+                                            <h5>Observação da Locação</h5>
+                                            <div id="observation" class="quill-container"></div>
                                         </div>
                                     </div>
                                 </div>

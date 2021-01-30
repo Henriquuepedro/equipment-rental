@@ -363,4 +363,16 @@ class ClientController extends Controller
 
         return response()->json(['data' => $clientData, 'lastId' => $lastId]);
     }
+
+    public function getClient(Request $request)
+    {
+        $company_id = $request->user()->company_id;
+        $client_id  = $request->client_id;
+
+        $client = $this->client->getClient($client_id, $company_id);
+
+        return response()->json([
+            'observation' => $client->observation
+        ]);
+    }
 }

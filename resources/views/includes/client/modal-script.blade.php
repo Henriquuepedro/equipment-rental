@@ -165,4 +165,44 @@
             }
         });
     }
+
+    $('select[name="client"]').on('change', function() {
+        let client_id = $(this).val();
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'GET',
+            url: '{{ route('ajax.client.get-client') }}',
+            data: { client_id },
+            dataType: 'json',
+            success: response => {
+
+                if (response.observation) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Observação do Cliente',
+                        html: '<hr><h5>'+response.observation+'</h5>'
+                    });
+                }
+
+
+
+            }, error: e => {
+                $.each(e.responseJSON.errors, function( index, value ) {
+                    arrErrors.push(value);
+                });
+
+                if (!arrErrors.length && e.responseJSON.message !== undefined)
+                    arrErrors.push('Você não tem permissão para fazer essa operação!');
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                });
+            }
+        });
+    });
 </script>

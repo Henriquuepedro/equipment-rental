@@ -115,10 +115,7 @@
                     nameEquipament,
                     stockMax,
                     dateDeliveryTime,
-                    dateWithdrawalTime,
-                    residueEquipament,
-                    vehicleEquipament,
-                    driveEquipament;
+                    dateWithdrawalTime;
 
                 $('#equipaments-selected div.card').each(function() {
                     idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
@@ -126,18 +123,6 @@
                     referenceEquipament = $('[name="reference_equipament"]', this).val();
                     nameEquipament      = $('.card-header a:eq(0)', this).text();
                     stockMax            = parseInt($('[name="stock_equipament"]', this).attr('max-stock'));
-                    residueEquipament   = parseInt($('[name="residue[]"]', this).val());
-                    vehicleEquipament   = parseInt($('[name="vehicle[]"]', this).val());
-                    driveEquipament     = parseInt($('[name="driver[]"]', this).val());
-
-                    /*if (!residueEquipament)
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado um resíduo.`);
-
-                    if (!vehicleEquipament)
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado um veículo.`);
-
-                    if (!driveEquipament)
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado um motorista.`);*/
 
                     if (isNaN(stockEquipament) || stockEquipament === 0)
                         arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado uma quantidade.`);
@@ -172,10 +157,10 @@
             }
             else if (currentIndex === 4 && newIndex > 4) { // pagamento
 
-                // if (debug) {
-                //     changeStepPosAbsolute();
-                //     return true;
-                // }
+                if (debug) {
+                    changeStepPosAbsolute();
+                    return true;
+                }
 
                 const netValue = realToNumber($('#net_value').val());
 
@@ -246,8 +231,14 @@
 
                 typeLocation === 0 ? payment.removeClass('payment-no').addClass('payment-yes') : payment.removeClass('payment-yes').addClass('payment-no');
 
-                if (typeLocation === 0) $('#formCreateRental-t-4').html('<span class="number">5.</span> Pagamento');
-                else $('#formCreateRental-t-4').html('<span class="number">5.</span> Resumo Equipamento');
+                if (typeLocation === 0) {
+                    $('#formCreateRental-p-4 h6').text('Pagamento');
+                    $('#formCreateRental-t-4').html('<span class="number">5.</span> Pagamento');
+                }
+                else {
+                    $('#formCreateRental-p-4 h6').text('Resumo Equipamento');
+                    $('#formCreateRental-t-4').html('<span class="number">5.</span> Resumo Equipamento');
+                }
             }
             let date = new Date();
             time0 = date.getTime();
@@ -431,11 +422,28 @@ $(function() {
         allowZero: true
     });
     loadDrivers(0, '#newVehicleModal [name="driver"]');
+    loadResidues(0, '.container-residues select[name="residues"]');
     $('[name="type_rental"]').iCheck({
         checkboxClass: 'icheckbox_square',
         radioClass: 'iradio_square-blue',
         increaseArea: '20%' // optional
     });
+
+    if ($('textarea[name="observation"]').length) {
+
+        var quill = new Quill('#observation', {
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'align': [] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link']
+                ]
+            },
+            theme: 'snow' // or 'bubble'
+        });
+    }
 });
 
 $("#formCreateRental").validate({
@@ -570,15 +578,11 @@ $('table.list-equipament').on('click', '.equipament', function(){
             const date_delivery = $('input[name="date_delivery"]').val();
             const date_withdrawal = $('input[name="date_withdrawal"]').val();
 
-            const colRef = response.cacamba ? 'col-md-4' : 'col-md-8';
-            const colQty = response.cacamba ? 'col-md-3' : 'col-md-4';
-            const displayResidue = response.cacamba ? '' : 'display-none';
-
             $('#equipaments-selected').append(`
                     <div class="card">
                         <div class="card-header" role="tab" id="headingEquipament-${response.id}" id-equipament="${response.id}">
                             <h5 class="mb-0 d-flex align-items-center">
-                                <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseEquipament-${response.id}" aria-expanded="false" aria-controls="collapseEquipament-${response.id}">
+                                <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseEquipament-${response.id}" aria-expanded="false" aria-controls="collapseEquipament-${response.id}" is-cacamba="${response.cacamba}">
                                     ${response.name}
                                 </a>
                                 <a class="remove-equipament pull-right"><i class="fa fa-trash"></i></a>
@@ -587,11 +591,11 @@ $('table.list-equipament').on('click', '.equipament', function(){
                         <div id="collapseEquipament-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipament-${response.id}" data-parent="#equipaments-selected" id-equipament="${response.id}">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="form-group ${colRef}">
+                                    <div class="form-group col-md-8">
                                         <label>Referência</label>
                                         <input type="text" class="form-control" value="${response.reference}" name="reference_equipament" disabled>
                                     </div>
-                                    <div class="${colQty}">
+                                    <div class="col-md-4">
                                         <div class="form-group flatpickr label-animate stock-group">
                                             <label>Quantidade</label>
                                             <input type="tel" name="stock_equipament" class="form-control col-md-9 pull-left flatpickr-input" value="1" max-stock="${response.stock}">
@@ -602,17 +606,6 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                             </div>
                                         </div>
                                         <small class="text-danger font-weight-bold stock_available pull-left">Disponível: ${response.stock}</small>
-                                    </div>
-                                    <div class="form-group col-md-5 label-animate ${displayResidue}">
-                                        <label>Resíduo</label>
-                                        <div class="input-group label-animate">
-                                            <select class="form-control" name="residue[]" disabled>
-                                                <option>Carregando ...</option>
-                                            </select>
-                                            <div class="input-group-addon input-group-append">
-                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo"><i class="fas fa-plus-circle"></i></button>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -724,10 +717,12 @@ $('table.list-equipament').on('click', '.equipament', function(){
                     $(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val('');
                     $(`#collapseEquipament-${idEquipament} .not_use_date_withdrawal`).prop('checked', true);
                 }
+                if (response.cacamba) {
+                    $('.container-residues').slideDown('slow');
+                }
 
                 loadVehicles(0,`#collapseEquipament-${idEquipament} select[name="vehicle[]"]`);
                 loadDrivers(0, `#collapseEquipament-${idEquipament} select[name="driver[]"]`);
-                loadResidues(0,`#collapseEquipament-${idEquipament} select[name="residue[]"]`);
             }, 350);
         }, error: e => {
             console.log(e);
@@ -750,6 +745,9 @@ $(document).on('click', '.remove-equipament i', function (){
         searchEquipamentOld = '';
         $('#searchEquipament').trigger('blur');
         showSeparatorEquipamentSelected();
+        if (!$('[href^="#collapseEquipament-"][is-cacamba="true"]').length){
+            $('.container-residues').slideUp('slow');
+        }
     }, 550);
 });
 

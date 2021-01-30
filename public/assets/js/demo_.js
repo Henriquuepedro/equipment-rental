@@ -95,6 +95,9 @@ var Toast = Swal.mixin({
         if ($('[data-toggle="tooltip"]').length)
             $('[data-toggle="tooltip"]').tooltip();
 
+        if ($('.select2').length)
+            $('.select2').select2();
+
     });
 })(jQuery);
 

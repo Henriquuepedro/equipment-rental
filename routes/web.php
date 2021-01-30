@@ -104,6 +104,7 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/buscar', [App\Http\Controllers\ClientController::class, 'fetchClients'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\ClientController::class, 'delete'])->name('delete');
             Route::get('/visualizar-clientes', [App\Http\Controllers\ClientController::class, 'getClients'])->name('get-clients');
+            Route::get('/visualizar-cliente', [App\Http\Controllers\ClientController::class, 'getClient'])->name('get-client');
             Route::post('/novo-cliente', [App\Http\Controllers\ClientController::class, 'insert'])->name('new-client');
         });
         Route::group(['prefix' => '/endereco', 'as' => 'address.'], function () {
