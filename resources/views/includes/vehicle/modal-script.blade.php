@@ -60,11 +60,11 @@
                     cleanFormVehicleModal();
                     checkLabelAnimate();
                     @if(\Request::route()->getName() == 'rental.create')
-                        loadVehicles(response.vehicle_id, "div[id^='collapseEquipament-'].collapse.show [name='vehicle[]']");
+                        loadVehicles(response.vehicle_id, "div[id^='collapseEquipament-'].collapse.show [name^='vehicle_']");
 
                         $('#equipaments-selected [id^=collapseEquipament-]').each(function(){
                             if ($("div[id^='collapseEquipament-'].collapse.show").attr('id-equipament') !== $(this).attr('id-equipament')) {
-                                loadVehicles($('[name="vehicle[]"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name="vehicle[]"]`);
+                                loadVehicles($('[name^="vehicle_"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name^="vehicle_"]`);
                             }
                         });
                     @else
@@ -95,7 +95,7 @@
     const cleanFormVehicleModal = () => {
         $('#newVehicleModal [name="name"]').val('');
         $('#newVehicleModal [name="reference"]').val('');
-        $('#newVehicleModal [name="driver"]').val('Selecione ...');
+        $('#newVehicleModal [name="driver"]').val('0');
         $('#newVehicleModal [name="brand"]').val('');
         $('#newVehicleModal [name="model"]').val('');
         $('#newVehicleModal [name="board"]').val('');
@@ -118,7 +118,7 @@
                 let selected;
                 let vehicle_id_selected = vehicle_id ?? response.lastId;
 
-                $(el).empty().append('<option>Selecione ...</option>');
+                $(el).empty().append('<option value="0">Selecione ...</option>');
                 $.each(response.data, function( index, value ) {
                     selected = value.id === parseInt(vehicle_id_selected) ? 'selected' : '';
                     $(el).append(`<option value='${value.id}' ${selected}>${value.name}</option>`);

@@ -93,9 +93,6 @@ Route::group(['middleware' => 'auth'], function (){
         Route::get('/novo', [App\Http\Controllers\RentalController::class, 'create'])->name('create');
         Route::post('/cadastro', [App\Http\Controllers\RentalController::class, 'insert'])->name('insert');
 
-        Route::get('/{id}', [App\Http\Controllers\RentalController::class, 'edit'])->name('edit');
-        Route::post('/atualizar', [App\Http\Controllers\RentalController::class, 'update'])->name('update');
-
     });
 
     // Consulta AJAX
@@ -153,6 +150,9 @@ Route::group(['middleware' => 'auth'], function (){
         Route::group(['prefix' => '/residuo', 'as' => 'residue.'], function () {
             Route::get('/visualizar-residuos', [App\Http\Controllers\ResidueController::class, 'getResidues'])->name('get-residues');
             Route::post('/novo-residuo', [App\Http\Controllers\ResidueController::class, 'insert'])->name('new-residue');
+        });
+        Route::group(['prefix' => '/locacao', 'as' => 'rental.'], function () {
+            Route::post('/nova-locacao', [App\Http\Controllers\RentalController::class, 'insert'])->name('new-rental');
         });
     });
 });

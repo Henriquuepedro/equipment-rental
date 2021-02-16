@@ -29,10 +29,13 @@
         .flatpickr button.input-button{
             height: calc(1.5em + 0.75rem + 3px);
             width: 50%;
-            text-align: center;
-            padding-top: 13%;
+            /*text-align: center;*/
+            /*padding-top: 13%;*/
             cursor: pointer;
-            border: 1px solid transparent
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .flatpickr a.input-button:last-child,
         .flatpickr button.input-button:last-child{
@@ -145,7 +148,6 @@
             background-color: #2196f3 !important;
         }
         .container-residues .select2.select2-container {
-            width: 100%;
             position: relative;
             -webkit-box-flex: 1;
             -ms-flex: 1 1 auto;
@@ -153,12 +155,15 @@
             width: 1%;
             margin-bottom: 0;
         }
-        #observation {
+        #observationDiv {
             border-top-right-radius: 0;
             border-top-left-radius: 0;
         }
         .ql-tooltip {
             left: 5% !important;
+        }
+        ul[id^="select2-residues"] li[aria-selected="true"] {
+            display: none;
         }
     </style>
 @stop
@@ -200,14 +205,14 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route(('rental.insert')) }}" method="POST" enctype="multipart/form-data" id="formCreateRental" class="pb-2">
+                            <form action="{{ route(('ajax.rental.new-rental')) }}" method="POST" enctype="multipart/form-data" id="formCreateRental" class="pb-2">
                                 <h3>Tipo de Locação</h3>
                                 <div class="stepRental">
                                     <h6>Tipo de Locação <i class="fa fa-info-circle" data-toggle="tooltip" title="Defina se haverá ou não cobrança para essa locação."></i></h6>
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
                                             <div class="">
-                                                <input type="radio" name="type_rental" value="0" id="have-payment" @if(old('type_person') === '0') checked @endif>
+                                                <input type="radio" name="type_rental" id="have-payment" value="0" @if(old('type_person') === '0') checked @endif>
                                                 <label for="have-payment">Com Cobrança</label>
                                             </div>
                                             <div class="">
@@ -237,10 +242,10 @@
                                     <h6>Datas</h6>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="form-group flatpickr">
-                                                <label>Data Prevista de Entrega</label>
-                                                <input type="text" name="date_delivery" class="form-control col-md-9 pull-left" value="{{ date('d/m/Y H:i') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
-                                                <div class="input-button-calendar col-md-3 pull-right no-padding">
+                                            <div class="form-group flatpickr d-flex">
+                                                <label class="label-date-btns">Data Prevista de Entrega</label>
+                                                <input type="text" name="date_delivery" class="form-control col-md-9" value="{{ date('d/m/Y H:i') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 no-padding">
                                                     <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
@@ -251,10 +256,10 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="form-group flatpickr">
-                                                <label>Data Prevista de Retirada</label>
-                                                <input type="text" name="date_withdrawal" class="form-control col-md-9 pull-left" value="{{ date('d/m/Y H:i', strtotime('+1 minute', time())) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
-                                                <div class="input-button-calendar col-md-3 pull-right no-padding">
+                                            <div class="form-group flatpickr d-flex">
+                                                <label class="label-date-btns">Data Prevista de Retirada</label>
+                                                <input type="text" name="date_withdrawal" class="form-control col-md-9" value="{{ date('d/m/Y H:i', strtotime('+1 minute', time())) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 no-padding">
                                                     <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
@@ -265,7 +270,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div class="switch pt-1">
-                                                    <input type="checkbox" class="check-style check-xs" name="not_use_date_withdrawal" id="not_use_date_withdrawal">
+                                                    <input type="checkbox" class="check-style check-xs" name="not_use_date_withdrawal" id="not_use_date_withdrawal" value="1">
                                                     <label for="not_use_date_withdrawal" class="check-style check-xs"></label> Não informar data de retirada
                                                 </div>
                                             </div>
@@ -279,7 +284,7 @@
                                         <div class="form-group col-md-12 mt-2 label-animate container-residues display-none">
                                             <label>Resíduos a serem utilizados</label>
                                             <div class="input-group label-animate">
-                                                <select class="select2 form-control" multiple="multiple" name="residues"></select>
+                                                <select class="select2 form-control" multiple="multiple" name="residues[]"></select>
                                                 <div class="input-group-addon input-group-append">
                                                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo"><i class="fas fa-plus-circle"></i></button>
                                                 </div>
@@ -343,7 +348,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
                                                         </div>
-                                                        <input type="text" class="form-control" value="0,00" id="extra_value">
+                                                        <input type="text" class="form-control" value="0,00" id="extra_value" name="extra_value">
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
@@ -352,7 +357,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
                                                         </div>
-                                                        <input type="text" class="form-control" value="0,00" id="discount_value">
+                                                        <input type="text" class="form-control" value="0,00" id="discount_value" name="discount_value">
                                                     </div>
                                                 </div>
                                             </div>
@@ -364,7 +369,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
                                                         </div>
-                                                        <input type="text" class="form-control d-flex align-items-center" id="net_value" disabled>
+                                                        <input type="text" class="form-control d-flex align-items-center" id="net_value" name="net_value" disabled>
                                                     </div>
                                                     <div class="form-group col-md-12 no-padding text-right mt-2">
                                                         <div class="switch">
@@ -405,7 +410,8 @@
                                     <div class="row">
                                         <div class="form-group col-md-12 mt-3">
                                             <h5>Observação da Locação</h5>
-                                            <div id="observation" class="quill-container"></div>
+                                            <div id="observationDiv" class="quill-container"></div>
+                                            <textarea type="hidden" class="d-none" name="observation" id="observation"></textarea>
                                         </div>
                                     </div>
                                 </div>

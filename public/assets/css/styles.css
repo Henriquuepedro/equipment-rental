@@ -792,6 +792,9 @@ table .form-group {
     background-color: #fff;
     cursor: not-allowed;
 }
+.form-control:read-only {
+    background-color: #fff;
+}
 .btn-outline-primary, .wizard > .actions .disabled a{
     color: #fff;
     background: #2780c8;
@@ -866,6 +869,16 @@ label.check-xs:after {
     height: 15px;
 }
 
+.label-date-btns {
+    top: 12px !important;
+    left: 20px !important;
+    position: absolute !important;
+    font-size: 1em;
+}
+
+.label-animate .label-date-btns {
+    top: -5px !important;
+}
 
 
 

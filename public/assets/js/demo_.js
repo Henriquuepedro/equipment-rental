@@ -201,6 +201,7 @@ const validCPF = cpf => {
         rev = 0;
     return rev === parseInt(cpf.charAt(10));
 }
+
 const validCPFCNPJ = cpf_cnpj => {
     cpf_cnpj = cpf_cnpj.replace(/[^\d]+/g,'');
 
@@ -226,105 +227,46 @@ const inArray = (needle, haystack) => {
 }
 
 // Formata data yyyy-mm-dd -> dd/mm/yyyy
-const transformDateForBr = data => {
-    if(data == null) return false;
+const transformDateForBr = date => {
+    if(date == null) return false;
 
-    const length = data.length;
-    let splitDateTime = [data];
+    const length = date.length;
 
     if (length !== 10 && length !== 16 && length !== 19) return false;
 
-    if(data.includes('T')) splitDateTime = data.split("T");
-    if(data.includes(' ')) splitDateTime = data.split(" ");
-
-    const splitData = splitDateTime[0].split("-");
-
-    const dia = splitData[2];
-    const mes = splitData[1];
-    const ano = splitData[0];
-
-    let dataFormatada = '';
-
-    dataFormatada += `${dia}/${mes}/${ano}`;
-
     if (length === 16 || length === 19) {
-        const splitTime = splitDateTime[1].split(":");
-
-        const min = splitTime[1];
-        const hr  = splitTime[0];
-
-        dataFormatada += ` ${hr}:${min}`;
+        if (!moment(date, "YYYY-MM-DD HH:mm").isValid()) return false;
+        return moment(date, "YYYY-MM-DD HH:mm").format("DD/MM/YYYY HH:mm");
     }
-    return dataFormatada;
+
+    if (!moment(date, "YYYY-MM-DD").isValid()) return false;
+    return moment(date, "YYYY-MM-DD").format("DD/MM/YYYY");
 }
 // Formata data dd/mm/yyyy -> yyyy-mm-dd
-const transformDateForEn = data => {
-    if(data == null) return false;
+const transformDateForEn = date => {
+    if(date == null) return false;
 
-    const length = data.length;
+    const length = date.length;
 
-    if (length !== 10 && length !== 16) return false;
+    if (length !== 10 && length !== 16 && length !== 19) return false;
 
-    const splitDateTime = data.split(' ');
-    const splitData = splitDateTime[0].split('/');
-
-    const ano = splitData[2];
-    const mes = splitData[1];
-    const dia = splitData[0];
-
-    let dataFormatada = '';
-
-    dataFormatada += `${ano}-${mes}-${dia}`;
-
-    if (length === 16) {
-        const splitTime = splitDateTime[1].split(":");
-
-        const min = splitTime[1];
-        const hr  = splitTime[0];
-
-        dataFormatada += ` ${hr}:${min}`;
+    if (length === 16 || length === 19) {
+        if (!moment(date, "DD/MM/YYYY HH:mm").isValid()) return false;
+        return moment(date, "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     }
-    return dataFormatada;
+
+    if (!moment(date, "DD/MM/YYYY").isValid()) return false;
+    return moment(date, "DD/MM/YYYY").format("YYYY-MM-DD");
 }
 
 const getTodayDateBr = (returnTime = true) => {
-    let dateTime = new Date();
-    let dd = dateTime.getDate();
-    let mm = dateTime.getMonth() + 1;
-    let YYYY = dateTime.getFullYear();
-    let HH = dateTime.getHours();
-    let ii = dateTime.getMinutes();
-
-    dd = dd < 10 ? `0${dd}` : dd;
-    mm = mm < 10 ? `0${mm}` : mm;
-    HH = HH < 10 ? `0${HH}` : HH;
-    ii = ii < 10 ? `0${ii}` : ii;
-
-    let currentDate = `${dd}/${mm}/${YYYY}`;
-
-    if (returnTime) return currentDate+=` ${HH}:${ii}`;
-
-    return currentDate;
+    if (returnTime) return moment().format("DD/MM/YYYY HH:mm:ss");
+    return moment().format("DD/MM/YYYY");
 }
 
 const getTodayDateEn = (returnTime = true) => {
-    let dateTime = new Date();
-    let dd = dateTime.getDate();
-    let mm = dateTime.getMonth() + 1;
-    let YYYY = dateTime.getFullYear();
-    let HH = dateTime.getHours();
-    let ii = dateTime.getMinutes();
-
-    dd = dd < 10 ? `0${dd}` : dd;
-    mm = mm < 10 ? `0${mm}` : mm;
-    HH = HH < 10 ? `0${HH}` : HH;
-    ii = ii < 10 ? `0${ii}` : ii;
-
-    let currentDate = `${YYYY}-${mm}-${dd}`;
-
-    if (returnTime) return currentDate+=` ${HH}:${ii}`;
-
-    return currentDate;
+    if (returnTime) return moment().format("YYYY-MM-DD HH:mm:ss");
+    return moment().format("YYYY-MM-DD");
 }
 
 // converte valor de Float -> R$
@@ -344,19 +286,16 @@ const realToNumber = numero => {
 }
 // Soma dias de acordo com a data de hoje
 const sumDaysDateNow = days => {
-    let dateNow = new Date();
-    dateNow.setDate(dateNow.getDate() + days);
-
-    const year = dateNow.getFullYear();
-    const month = dateNow.getMonth() + 1 <= 9 ? "0" + (dateNow.getMonth() + 1) : (dateNow.getMonth() + 1);
-    const day = dateNow.getDate() <= 9 ? "0" + dateNow.getDate() : dateNow.getDate();
-    return `${year}-${month}-${day}`;
+    return moment().add(days, 'd').format("YYYY-MM-DD");
 }
 
 const calculateDays = (date1, date2) => {
     moment.locale('pt-br');
     const data1 = moment(date1,'YYYY-MM-DD');
     const data2 = moment(date2,'YYYY-MM-DD');
-    const diff  = data2.diff(data1, 'days');
-    return diff;
+    return data2.diff(data1, 'days');
+}
+
+const sumMonthsDateNow = months => {
+    return moment().add(months, 'M').format("YYYY-MM-DD");
 }

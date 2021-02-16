@@ -101,12 +101,12 @@
                     cleanFormDriverModal();
                     checkLabelAnimate();
                     @if(\Request::route()->getName() == 'rental.create')
-                        loadDrivers($('#newVehicleModal').is(':visible') ? 0 : response.driver_id, "div[id^='collapseEquipament-'].collapse.show [name='driver[]']");
+                        loadDrivers($('#newVehicleModal').is(':visible') ? 0 : response.driver_id, "div[id^='collapseEquipament-'].collapse.show [name^='driver_']");
                         loadDrivers($('#newVehicleModal').is(':visible') ? response.driver_id : 0, '#newVehicleModal [name="driver"]');
 
                         $('#equipaments-selected [id^=collapseEquipament-]').each(function(){
                             if ($("div[id^='collapseEquipament-'].collapse.show").attr('id-equipament') !== $(this).attr('id-equipament')) {
-                                loadDrivers($('[name="driver[]"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name="driver[]"]`);
+                                loadDrivers($('[name^="driver_"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name^="driver_"]`);
                             }
                         });
                     @else
@@ -168,7 +168,7 @@
                 let selected;
                 let driver_id_selected = driver_id ?? response.lastId;
 
-                $(el ?? '.driver-load [name="driver"]').empty().append('<option>Selecione ...</option>');
+                $(el ?? '.driver-load [name="driver"]').empty().append('<option value="0">Selecione ...</option>');
                 $.each(response.data, function( index, value ) {
                     selected = value.id === parseInt(driver_id_selected) ? 'selected' : '';
                     $(el ?? '.driver-load [name="driver"]').append(`<option value='${value.id}' ${selected}>${value.name}</option>`);

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Residue extends Model
+class RentalEquipament extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,21 @@ class Residue extends Model
      * @var array
      */
     protected $fillable = [
-        'company_id', 'name', 'user_insert', 'user_update'
+        'company_id',
+        'rental_id',
+        'equipament_id',
+        'reference',
+        'quantity',
+        'unitary_value',
+        'total_value',
+        'vehicle_suggestion',
+        'driver_suggestion',
+        'use_date_diff_equip',
+        'expected_delivery_date',
+        'expected_withdrawal_date',
+        'not_use_date_withdrawal',
+        'user_insert',
+        'user_update'
     ];
 
     /**
@@ -32,18 +46,16 @@ class Residue extends Model
      */
     protected $casts = [];
 
-    public function getResidues(int $company_id)
-    {
-        return $this->where('company_id', $company_id)->get();
-    }
-
     public function insert(array $data)
     {
         return $this->create($data);
     }
 
-    public function getResidues_In(int $company_id, array $resideus)
+    public function inserts(array $datas)
     {
-        return $this->where('company_id', $company_id)->whereIn('id', $resideus)->get();
+        foreach ($datas as $data)
+            if (!$this->create($data)) return false;
+
+        return true;
     }
 }

@@ -12,8 +12,12 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    public $allowableTags = "<p><br><h1><h2><h3><h4><h5><h6><strong><b><em><i><u><small><ul><ol><li><div>";
+
     public function transformMoneyBr_En($value)
     {
+        if (!$value) return 0;
+
         $value = str_replace('.', '', $value);
         $value = str_replace(',', '.', $value);
         $value = filter_var($value, FILTER_VALIDATE_FLOAT);

@@ -111,4 +111,12 @@ class Equipament extends Model
     {
         return $this->from(DB::raw('equipaments force index(id_company)'))->where('company_id', $company_id)->whereIn('id', $equipaments_id)->get();
     }
+
+    public function getEquipaments_In($company_id, $equipaments_id)
+    {
+        return $this->from(DB::raw('equipaments force index(id_company)'))
+                    ->where('company_id', $company_id)
+                    ->whereIn('id', $equipaments_id)
+                    ->get();
+    }
 }

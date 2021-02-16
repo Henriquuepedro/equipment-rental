@@ -8,9 +8,10 @@
         stepsOrientation: "vertical",
         onStepChanging: function (event, currentIndex, newIndex)
         {
-            let debug = true;
+            let debug = false;
             let arrErrors = [];
             let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
+            let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
 
             if (currentIndex === 0) {// tipo locacao
                 if (debug) {
@@ -68,8 +69,8 @@
                 let dateDelivery = $('input[name="date_delivery"]').val();
                 let dateWithdrawal = $('input[name="date_withdrawal"]').val();
 
-                if (dateDelivery.length < 16) arrErrors.push('Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy.');
-                if (!notUseDateWithdrawal && dateWithdrawal.length < 16) arrErrors.push('Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy.');
+                if (dateDelivery.length < 16) arrErrors.push('Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm.');
+                if (!notUseDateWithdrawal && dateWithdrawal.length < 16) arrErrors.push('Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy hh:mm.');
 
                 if (arrErrors.length === 0) {
                     let dateDeliveryTime = new Date(transformDateForEn(dateDelivery)).getTime();
@@ -111,7 +112,6 @@
 
                 let idEquipament,
                     stockEquipament,
-                    referenceEquipament,
                     nameEquipament,
                     stockMax,
                     dateDeliveryTime,
@@ -119,10 +119,9 @@
 
                 $('#equipaments-selected div.card').each(function() {
                     idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
-                    stockEquipament     = parseInt($('[name="stock_equipament"]', this).val());
-                    referenceEquipament = $('[name="reference_equipament"]', this).val();
+                    stockEquipament     = parseInt($('[name^="stock_equipament_"]', this).val());
                     nameEquipament      = $('.card-header a:eq(0)', this).text();
-                    stockMax            = parseInt($('[name="stock_equipament"]', this).attr('max-stock'));
+                    stockMax            = parseInt($('[name^="stock_equipament_"]', this).attr('max-stock'));
 
                     if (isNaN(stockEquipament) || stockEquipament === 0)
                         arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado uma quantidade.`);
@@ -132,8 +131,8 @@
 
                     notUseDateWithdrawal = $('.not_use_date_withdrawal', this).is(':checked');
 
-                    dateDeliveryTime = new Date(transformDateForEn($('input[name="date_delivery_equipament"]', this).val())).getTime();
-                    dateWithdrawalTime = new Date(transformDateForEn($('input[name="date_withdrawal_equipament"]', this).val())).getTime();
+                    dateDeliveryTime = new Date(transformDateForEn($('input[name^="date_delivery_equipament_"]', this).val())).getTime();
+                    dateWithdrawalTime = new Date(transformDateForEn($('input[name^="date_withdrawal_equipament_"]', this).val())).getTime();
 
                     if (dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0)) arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento ( <strong>${nameEquipament}</strong> ) deve ser informada corretamente.`);
                     else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) arrErrors.push(`A data prevista de entrega do equipamento ( <strong>${nameEquipament}</strong> ) não pode ser maior ou igual que a data prevista de retirada.`);
@@ -173,40 +172,67 @@
                     return false;
                 }
 
-                // existe parcelamento
-                if ($('#is_parceled').is(':checked')) {
-                    let daysTemp;
-                    let priceTemp = 0;
-                    let haveErrorDays = false;
+                if (typeLocation == 0) {
 
-                    $('#parcels .parcel').each(function(){
-                         if (daysTemp === undefined) daysTemp = parseInt($('[name="due_day[]"]', this).val());
-                         else if (daysTemp >= parseInt($('[name="due_day[]"]', this).val())) {
-                             haveErrorDays = true;
-                             return false;
-                         } else daysTemp = parseInt($('[name="due_day[]"]', this).val());
+                    const grossValue    = realToNumber($('#gross_value').text());
+                    const netValue      = realToNumber($('#net_value').val());
+                    const extraValue    = realToNumber($('#extra_value').val());
+                    const discountValue = realToNumber($('#discount_value').val());
 
-                        priceTemp += realToNumber($('[name="value_parcel[]"]', this).val());
-                    });
-
-                    if (haveErrorDays) { // ecnontrou erro nas datas de vencimento
+                    if (netValue == 0) {
                         Swal.fire({
                             icon: 'warning',
                             title: 'Atenção',
-                            html: '<ol><li>A ordem dos vencimentos devem ser informados em ordem crescente.</li></ol>'
+                            html: '<ol><li>O valor líquido deve ser maior que zero.</li></ol>'
                         });
                         return false;
                     }
 
-                    if (priceTemp.toFixed(2) !== netValue.toFixed(2)) { // os valores das parcelas não corresponde ao valor líquido
-                        if ($('#automatic_parcel_distribution').is(':checked')) recalculeParcels();
-                        else {
+                    // valores divergente
+                    if (netValue != (grossValue - discountValue + extraValue)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atenção',
+                            html: '<ol><li>Soma de valores divergente, recalcule os valores.</li></ol>'
+                        });
+                        return false;
+                    }
+
+                    // existe parcelamento
+                    if ($('#is_parceled').is(':checked')) {
+                        let daysTemp;
+                        let priceTemp = 0;
+                        let haveErrorDays = false;
+
+                        $('#parcels .parcel').each(function () {
+                            if (daysTemp === undefined) daysTemp = parseInt($('[name="due_day[]"]', this).val());
+                            else if (daysTemp >= parseInt($('[name="due_day[]"]', this).val())) {
+                                haveErrorDays = true;
+                                return false;
+                            } else daysTemp = parseInt($('[name="due_day[]"]', this).val());
+
+                            priceTemp += realToNumber($('[name="value_parcel[]"]', this).val());
+                        });
+
+                        if (haveErrorDays) { // ecnontrou erro nas datas de vencimento
                             Swal.fire({
                                 icon: 'warning',
                                 title: 'Atenção',
-                                html: '<ol><li>A soma das parcelas deve corresponder ao valor líquido.</li></ol>'
+                                html: '<ol><li>A ordem dos vencimentos devem ser informados em ordem crescente.</li></ol>'
                             });
                             return false;
+                        }
+
+                        if (priceTemp.toFixed(2) !== netValue.toFixed(2)) { // os valores das parcelas não corresponde ao valor líquido
+                            if ($('#automatic_parcel_distribution').is(':checked')) recalculeParcels();
+                            else {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Atenção',
+                                    html: '<ol><li>A soma das parcelas deve corresponder ao valor líquido.</li></ol>'
+                                });
+                                return false;
+                            }
                         }
                     }
                 }
@@ -226,7 +252,7 @@
             let time0,time1,time2,time3,time4,time5,time6,time7,time8 = 0;
 
             if (priorIndex === 0) { // tipo de cobrança
-                // Com cobrança
+
                 let payment  = $('#formCreateRental-p-4 #payment');
 
                 typeLocation === 0 ? payment.removeClass('payment-no').addClass('payment-yes') : payment.removeClass('payment-yes').addClass('payment-no');
@@ -252,13 +278,12 @@
                 let newPricesUpdateNames = [];
                 let idEquipaments = [];
                 let priceEquipament = 0;
-                let idEquipament,stockEquipament,referenceEquipament,nameEquipament;
+                let idEquipament,stockEquipament,nameEquipament;
                 date = new Date();
                 time1 = date.getTime();
                 await $('#equipaments-selected div.card').each(async function() {
                     idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
-                    stockEquipament     = parseInt($('[name="stock_equipament"]', this).val());
-                    referenceEquipament = $('[name="reference_equipament"]', this).val();
+                    stockEquipament     = parseInt($('[name^="stock_equipament_"]', this).val());
                     nameEquipament      = $('.card-header a:eq(0)', this).text();
                     dataEquipaments.push([idEquipament, stockEquipament, nameEquipament]);
                     idEquipaments.push(idEquipament);
@@ -281,7 +306,7 @@
                     await Promise.all(dataEquipaments.map(async equipament => {
                         dataEquipamentsPayCheck.push(equipament[0]);
                         if (equipament[1] > pricesAndStocks[equipament[0]].stock) {
-                            $(`#collapseEquipament-${equipament[0]}`).find('input[name="stock_equipament"]').attr('max-stock', pricesAndStocks[equipament[0]].stock).val(pricesAndStocks[equipament[0]].stock);
+                            $(`#collapseEquipament-${equipament[0]}`).find('input[name^="stock_equipament_"]').attr('max-stock', pricesAndStocks[equipament[0]].stock).val(pricesAndStocks[equipament[0]].stock);
                             $(`#collapseEquipament-${equipament[0]}`).find('.stock_available').text('Disponível: ' + pricesAndStocks[equipament[0]].stock);
                             arrErrors.push(`O equipamento ( <strong>${equipament[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipament[0]].stock} un</strong>`);
                         }
@@ -346,7 +371,7 @@
                     $('#formCreateRental .steps ul li.current').addClass('error');
                 } else {
 
-                    if (newPricesUpdate.length) {
+                    if (typeLocation == 0 && newPricesUpdate.length) {
                         Swal.fire({
                             title: newPricesUpdate.length === 1 ? 'Valor de equipamento atualizado.' : 'Valores de equipamentos atualizados.',
                             html: newPricesUpdate.length === 1 ? `O valor do equipamento abaixo foi alterado: <br><br><ol><li><b>${newPricesUpdateNames[0]}</b></li></ol><h4>Deseja atualizar?</h4>` : "Os valores dos equipamentos abaixo foram alterados: <br><br><ol><li><b>" + newPricesUpdateNames.join('</b></li><li><b>') + '</b></li></ol><h4>Deseja atualizar?</h4>',
@@ -369,6 +394,18 @@
 
                             $('#formCreateRental .actions a[href="#next"]').show();
                         })
+                    } else if (typeLocation == 1 && newPricesUpdate.length) {
+
+                        $.each(newPricesUpdate, function (key, val) {
+                            val.el.val(val.price);
+                        });
+
+                        reloadTotalRental();
+                        $('.list-equipaments-payment-load').hide();
+                        $('.list-equipaments-payment').slideDown('slow');
+
+                        $('#formCreateRental .actions a[href="#next"]').show();
+
                     } else {
                         reloadTotalRental();
                         $('.list-equipaments-payment-load').hide();
@@ -393,7 +430,47 @@
             return form.valid();
         },
         onFinished: function (event, currentIndex) {
-            alert("Submitted!");
+
+            $("#observation").val($("#observationDiv .ql-editor").html());
+
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'POST',
+                url: $('#formCreateRental').attr('action'),
+                data: $('#formCreateRental').serialize(),
+                success: response => {
+
+                    console.log(response);
+
+                }, error: e => {
+                    console.log(e);
+
+                    let arrErrors = []
+
+                    $.each(e.responseJSON.errors, function( index, value ) {
+                        arrErrors.push(value);
+                    });
+
+                    if (!arrErrors.length && e.responseJSON.message !== undefined)
+                        arrErrors.push('Você não tem permissão para fazer essa operação!');
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                    });
+                },
+                complete: function(e) {
+                    if (e.status === 403) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Você não tem permissão para fazer essa operação!'
+                        });
+                    }
+                }
+            });
         }
     });
 })(jQuery);
@@ -422,16 +499,16 @@ $(function() {
         allowZero: true
     });
     loadDrivers(0, '#newVehicleModal [name="driver"]');
-    loadResidues(0, '.container-residues select[name="residues"]');
+    loadResidues(0, '.container-residues select[name="residues[]"]');
     $('[name="type_rental"]').iCheck({
         checkboxClass: 'icheckbox_square',
         radioClass: 'iradio_square-blue',
         increaseArea: '20%' // optional
     });
 
-    if ($('textarea[name="observation"]').length) {
+    if ($('#observationDiv').length) {
 
-        var quill = new Quill('#observation', {
+        var quill = new Quill('#observationDiv', {
             modules: {
                 toolbar: [
                     ['bold', 'italic', 'underline'],
@@ -589,17 +666,20 @@ $('table.list-equipament').on('click', '.equipament', function(){
                             </h5>
                         </div>
                         <div id="collapseEquipament-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipament-${response.id}" data-parent="#equipaments-selected" id-equipament="${response.id}">
+                            <input type="hidden" value="${response.id}" name="equipament_id[]">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="form-group col-md-8">
-                                        <label>Referência</label>
-                                        <input type="text" class="form-control" value="${response.reference}" name="reference_equipament" disabled>
+                                    <div class="col-md-8" style="margin-top: -20px">
+                                        <div class="form-group">
+                                            <label>Referência</label>
+                                            <input type="text" class="form-control" value="${response.reference}" name="reference_equipament_${response.id}" readonly>
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="form-group flatpickr label-animate stock-group">
-                                            <label>Quantidade</label>
-                                            <input type="tel" name="stock_equipament" class="form-control col-md-9 pull-left flatpickr-input" value="1" max-stock="${response.stock}">
-                                            <div class="input-button-calendar col-md-3 pull-right no-padding">
+                                        <div class="form-group flatpickr label-animate stock-group d-flex">
+                                            <label class="label-date-btns">Quantidade</label>
+                                            <input type="tel" name="stock_equipament_${response.id}" class="form-control col-md-9 flatpickr-input" value="1" max-stock="${response.stock}">
+                                            <div class="input-button-calendar col-md-3 no-padding">
                                                 <button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipament" data-toggle="tootip" title="Visualizar valor por período" id-equipament="${response.id}">
                                                     <i class="fas fa-file-invoice-dollar"></i>
                                                 </button>
@@ -612,7 +692,7 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                     <div class="form-group col-md-6 label-animate">
                                         <label>Veículo</label>
                                         <div class="input-group label-animate">
-                                            <select class="form-control" name="vehicle[]" disabled>
+                                            <select class="form-control" name="vehicle_${response.id}" disabled>
                                                 <option>Carregando ...</option>
                                             </select>
                                             <div class="input-group-addon input-group-append">
@@ -623,7 +703,7 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                     <div class="form-group col-md-6 label-animate">
                                         <label>Motorista</label>
                                         <div class="input-group label-animate">
-                                            <select class="form-control" name="driver[]" disabled>
+                                            <select class="form-control" name="driver_${response.id}" disabled>
                                                 <option>Carregando ...</option>
                                             </select>
                                             <div class="input-group-addon input-group-append">
@@ -635,17 +715,17 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="switch pt-3">
-                                            <input type="checkbox" class="check-style check-xs use_date_diff_equip" name="use_date_diff_equip" id="use_date_diff_equip_${response.id}">
+                                            <input type="checkbox" class="check-style check-xs use_date_diff_equip" name="use_date_diff_equip_${response.id}" id="use_date_diff_equip_${response.id}">
                                             <label for="use_date_diff_equip_${response.id}" class="check-style check-xs"></label> Usar datas de entrega e/ou retirada diferentes para esse equipamento.
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row display-none use_date_diff_equip_show">
+                                <div class="row display-none use_date_diff_equip_show mt-2">
                                     <div class="col-md-6">
-                                        <div class="form-group flatpickr">
-                                            <label>Data Prevista de Entrega</label>
-                                            <input type="text" name="date_delivery_equipament" class="form-control col-md-9 pull-left" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
-                                            <div class="input-button-calendar col-md-3 pull-right no-padding calendar_equipament">
+                                        <div class="form-group flatpickr d-flex">
+                                            <label class="label-date-btns">Data Prevista de Entrega</label>
+                                            <input type="text" name="date_delivery_equipament_${response.id}" class="form-control col-md-9" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                            <div class="input-button-calendar col-md-3 no-padding calendar_equipament">
                                                 <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
                                                     <i class="fa fa-calendar text-white"></i>
                                                 </a>
@@ -656,10 +736,10 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-group flatpickr">
-                                            <label>Data Prevista de Retirada</label>
-                                            <input type="text" name="date_withdrawal_equipament" class="form-control col-md-9 pull-left" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
-                                            <div class="input-button-calendar col-md-3 pull-right no-padding calendar_equipament">
+                                        <div class="form-group flatpickr d-flex">
+                                            <label class="label-date-btns">Data Prevista de Retirada</label>
+                                            <input type="text" name="date_withdrawal_equipament_${response.id}" class="form-control col-md-9" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                            <div class="input-button-calendar col-md-3 no-padding calendar_equipament">
                                                 <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
                                                     <i class="fa fa-calendar text-white"></i>
                                                 </a>
@@ -670,7 +750,7 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                         </div>
                                         <div class="form-group">
                                             <div class="switch pt-1">
-                                                <input type="checkbox" class="check-style check-xs not_use_date_withdrawal" name="not_use_date_withdrawal_equip" id="not_use_date_withdrawal_${response.id}" disabled>
+                                                <input type="checkbox" class="check-style check-xs not_use_date_withdrawal" name="not_use_date_withdrawal_equip_${response.id}" id="not_use_date_withdrawal_${response.id}" disabled>
                                                 <label for="not_use_date_withdrawal_${response.id}" class="check-style check-xs"></label> Não informar data de retirada
                                             </div>
                                         </div>
@@ -696,9 +776,9 @@ $('table.list-equipament').on('click', '.equipament', function(){
                 }
                 checkLabelAnimate();
                 $(`#collapseEquipament-${idEquipament}`).collapse('show');
-                $(`#collapseEquipament-${idEquipament} input[name="stock_equipament"]`).mask('0#');
-                $(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).inputmask();
-                $(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).inputmask();
+                $(`#collapseEquipament-${idEquipament} input[name^="stock_equipament_"]`).mask('0#');
+                $(`#collapseEquipament-${idEquipament} input[name^="date_withdrawal_equipament_"]`).inputmask();
+                $(`#collapseEquipament-${idEquipament} input[name^="date_delivery_equipament_"]`).inputmask();
                 $(`#collapseEquipament-${idEquipament} .btn-view-price-period-equipament`).tooltip();
 
                 $(`#collapseEquipament-${idEquipament} .flatpickr:not(.stock-group)`).flatpickr({
@@ -714,15 +794,15 @@ $('table.list-equipament').on('click', '.equipament', function(){
                     }
                 });
                 if ($('#not_use_date_withdrawal').is(':checked')) {
-                    $(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val('');
+                    $(`#collapseEquipament-${idEquipament} input[name^="date_withdrawal_equipament_"]`).val('');
                     $(`#collapseEquipament-${idEquipament} .not_use_date_withdrawal`).prop('checked', true);
                 }
                 if (response.cacamba) {
                     $('.container-residues').slideDown('slow');
                 }
 
-                loadVehicles(0,`#collapseEquipament-${idEquipament} select[name="vehicle[]"]`);
-                loadDrivers(0, `#collapseEquipament-${idEquipament} select[name="driver[]"]`);
+                loadVehicles(0,`#collapseEquipament-${idEquipament} select[name^="vehicle_"]`);
+                loadDrivers(0, `#collapseEquipament-${idEquipament} select[name^="driver_"]`);
             }, 350);
         }, error: e => {
             console.log(e);
@@ -760,11 +840,11 @@ $(document).on('click', '.use_date_diff_equip', function (){
     const elEquip = $(this).closest('.card-body');
     let date_delivery, date_withdrawal;
 
-    elEquip.find('input[name="date_delivery_equipament"]').attr('disabled', !$(this).is(':checked'));
+    elEquip.find('input[name^="date_delivery_equipament_"]').attr('disabled', !$(this).is(':checked'));
     elEquip.find('.not_use_date_withdrawal').attr('disabled', !$(this).is(':checked'));
 
     if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
-        elEquip.find('input[name="date_withdrawal_equipament"]').attr('disabled', !$(this).is(':checked'));
+        elEquip.find('input[name^="date_withdrawal_equipament_"]').attr('disabled', !$(this).is(':checked'));
 
     if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
         elEquip.find('.calendar_equipament:eq(1) a').attr('disabled', !$(this).is(':checked'));
@@ -775,8 +855,8 @@ $(document).on('click', '.use_date_diff_equip', function (){
         date_delivery = $('input[name="date_delivery"]').val();
         date_withdrawal = $('input[name="date_withdrawal"]').val();
 
-        elEquip.find('input[name="date_delivery_equipament"]').val(date_delivery);
-        elEquip.find('input[name="date_withdrawal_equipament"]').val(date_withdrawal);
+        elEquip.find('input[name^="date_delivery_equipament_"]').val(date_delivery);
+        elEquip.find('input[name^="date_withdrawal_equipament_"]').val(date_withdrawal);
 
         if ($('#not_use_date_withdrawal').is(':checked'))
             elEquip.find('.not_use_date_withdrawal').prop('checked', true);
@@ -796,7 +876,7 @@ $(document).on('click', '.use_date_diff_equip', function (){
         });
 });
 
-$(document).on('blur change', '[name="stock_equipament"]', function (){
+$(document).on('blur change', '[name^="stock_equipament_"]', function (){
     const maxStock      = parseInt($(this).attr('max-stock'));
     const stock         = parseInt($(this).val());
     const idEquipament  = parseInt($(this).closest('.card').find('.card-header').attr('id-equipament'));
@@ -831,13 +911,13 @@ $('#not_use_date_withdrawal').on('click', function (){
 $(document).on('click', '.not_use_date_withdrawal', function (){
     const elEquip = $(this).closest('.col-md-6');
 
-    elEquip.find('input[name="date_withdrawal_equipament"]').attr('disabled', $(this).is(':checked'));
+    elEquip.find('input[name^="date_withdrawal_equipament_"]').attr('disabled', $(this).is(':checked'));
     elEquip.find('.flatpickr a').attr('disabled', $(this).is(':checked'));
 
-    elEquip.find('input[name="date_withdrawal_equipament"]').val('');
+    elEquip.find('input[name^="date_withdrawal_equipament_"]').val('');
 
     if (!$(this).is(':checked'))
-        elEquip.find('input[name="date_withdrawal_equipament"]').val(getTodayDateBr());
+        elEquip.find('input[name^="date_withdrawal_equipament_"]').val(getTodayDateBr());
 
     checkLabelAnimate();
 });
@@ -991,9 +1071,9 @@ $('#automatic_parcel_distribution').change(function(){
 
 });
 
-$(document).on('change', '[name="vehicle[]"]', function (){
+$(document).on('change', '[name^="vehicle_"]', function (){
     const vehicle_id = $(this).val();
-    if (vehicle_id == 'Selecione ...') return false;
+    if (vehicle_id == '0') return false;
 
     const el = $(this).closest('.card-body');
 
@@ -1006,8 +1086,8 @@ $(document).on('change', '[name="vehicle[]"]', function (){
         url: $('#routeGetVehicle').val(),
         async: true,
         success: response => {
-            if (response.driver_id && el.find('[name="driver[]"]').val() === 'Selecione ...')
-                el.find('[name="driver[]"]').val(response.driver_id)
+            if (response.driver_id && el.find('[name^="driver_"]').val() === '0')
+                el.find('[name^="driver_"]').val(response.driver_id)
             else if(response.driver_id)
                 Swal.fire({
                     title: 'Alteração de Motorista',
@@ -1021,7 +1101,7 @@ $(document).on('change', '[name="vehicle[]"]', function (){
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed)
-                        el.find('[name="driver[]"]').val(response.driver_id)
+                        el.find('[name^="driver_"]').val(response.driver_id)
                 })
 
         }
@@ -1030,11 +1110,15 @@ $(document).on('change', '[name="vehicle[]"]', function (){
 
 $('#calculate_net_amount_automatic').on('change', function(){
     if ($(this).is(':checked')) {
-        $('#discount_value').val('0,00');
-        $('#extra_value').val('0,00');
+        $('#discount_value').attr('disabled', false).val('0,00');
+        $('#extra_value').attr('disabled', false).val('0,00');
         $('#net_value').attr('disabled', true);
         reloadTotalRental();
-    } else $('#net_value').attr('disabled', false);
+    } else {
+        $('#net_value').attr('disabled', false);
+        $('#discount_value').attr('disabled', true);
+        $('#extra_value').attr('disabled', true);
+    }
 });
 
 const recalculeParcels = () => {
@@ -1063,8 +1147,8 @@ const createParcel = due => {
                     <div class="input-group-prepend stock-equipament-payment col-md-3 no-padding">
                         <span class="input-group-text col-md-12 no-border-radius "><strong>${(due+1)}º Vencimento</strong></span>
                     </div>
-                    <input type="text" class="form-control col-md-2 text-center" name="due_day[]" value="${(due*30)}">
-                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${sumDaysDateNow(due*30)}">
+                    <input type="text" class="form-control col-md-2 text-center" name="due_day[]" value="${calculateDays(sumMonthsDateNow(0), sumMonthsDateNow(due))}">
+                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${sumMonthsDateNow(due)}">
                     <div class="input-group-prepend col-md-1 no-padding">
                         <span class="input-group-text pl-3 pr-3 col-md-12"><strong>R$</strong></span>
                     </div>
@@ -1096,8 +1180,8 @@ const fixEquipmentDates = () => {
 
     $('#equipaments-selected div.card').each(function() {
         if (!$('.use_date_diff_equip', this).is(':checked')) {
-            $('input[name="date_delivery_equipament"]', this).val(dateDelivery);
-            $('input[name="date_withdrawal_equipament"]', this).val(dateWithdrawal);
+            $('input[name^="date_delivery_equipament_"]', this).val(dateDelivery);
+            $('input[name^="date_withdrawal_equipament_"]', this).val(dateWithdrawal);
             $('.not_use_date_withdrawal', this).prop('checked', notUseDateWithdrawal);
         }
     });
@@ -1135,8 +1219,8 @@ const getPriceEquipament = async idEquipament => {
     let diffDays = false;
 
     if (!check_not_use_date_withdrawal) {
-        let dateDelivery = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_delivery_equipament"]`).val().split(' ')[0]).replace(/-/g, '/'));
-        let dateWithdrawal = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name="date_withdrawal_equipament"]`).val().split(' ')[0]).replace(/-/g, '/'));
+        let dateDelivery = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name^="date_delivery_equipament_"]`).val().split(' ')[0]).replace(/-/g, '/'));
+        let dateWithdrawal = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name^="date_withdrawal_equipament_"]`).val().split(' ')[0]).replace(/-/g, '/'));
 
         let timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
         diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -1179,7 +1263,7 @@ const getEquipament = async equipament => {
 const createEquipamentPayment = async (equipament, priceStock = null) => {
 
     let dataEquipament = await getEquipament(equipament);
-    let stockEquipament = $(`#collapseEquipament-${equipament} input[name="stock_equipament"]`).val();
+    let stockEquipament = $(`#collapseEquipament-${equipament} input[name^="stock_equipament_"]`).val();
     const priceEquipament = priceStock === null ? await getPriceEquipament(equipament) : priceStock.price;
     let priceEquipamentFormat = numberToReal(priceEquipament);
     let priceEquipamentTotal = numberToReal(priceEquipament * stockEquipament);
@@ -1203,7 +1287,7 @@ const createEquipamentPayment = async (equipament, priceStock = null) => {
                     <div class="input-group-prepend payment-hidden">
                         <span class="input-group-text pl-3 pr-3"><strong>R$</strong></span>
                     </div>
-                    <input type="text" class="form-control price-total-equipament payment-hidden" name="priceTotalEquipament[]" id="price-total-equipament-${equipament}" value="${priceEquipamentTotal}">
+                    <input type="text" class="form-control price-total-equipament payment-hidden" name="priceTotalEquipament_${equipament}" id="price-total-equipament-${equipament}" value="${priceEquipamentTotal}">
                 </div>
             </div>
         </li>
@@ -1230,10 +1314,11 @@ const createEquipamentPayment = async (equipament, priceStock = null) => {
 
 const reloadTotalRental = () => {
 
-    let grossValue  = 0;
+    let grossValue      = 0;
     let priceEquipament = 0;
-    let discount    = realToNumber($('#discount_value').val());
-    let extra       = realToNumber($('#extra_value').val());
+    let discount        = realToNumber($('#discount_value').val());
+    let extra           = realToNumber($('#extra_value').val());
+    let netAmount       = realToNumber($('#net_value').val());
 
     discount    = isNaN(discount) ? 0 : discount;
     extra       = isNaN(extra) ? 0 : extra;
@@ -1247,6 +1332,15 @@ const reloadTotalRental = () => {
 
     if ($('#calculate_net_amount_automatic').is(':checked'))
         $('#net_value').val(numberToReal(grossValue - discount + extra));
+    else {
+        if (grossValue > netAmount) {
+            $('#discount_value').val(numberToReal(grossValue - netAmount));
+            $('#extra_value').val('0,00');
+        } else {
+            $('#extra_value').val(numberToReal(netAmount - grossValue));
+            $('#discount_value').val('0,00');
+        }
+    }
 
     if ($('#automatic_parcel_distribution').is(':checked'))
         recalculeParcels();
@@ -1266,8 +1360,8 @@ const getPriceStockEquipaments = async idEquipament => {
         diffDays                = false;
 
         if (!not_use_date_withdrawal) {
-            dateDelivery = new Date(transformDateForEn($('input[name="date_delivery_equipament"]', this).val().split(' ')[0]).replace(/-/g, '/'));
-            dateWithdrawal = new Date(transformDateForEn($('input[name="date_withdrawal_equipament"]', this).val().split(' ')[0]).replace(/-/g, '/'));
+            dateDelivery = new Date(transformDateForEn($('input[name^="date_delivery_equipament_"]', this).val().split(' ')[0]).replace(/-/g, '/'));
+            dateWithdrawal = new Date(transformDateForEn($('input[name^="date_withdrawal_equipament_"]', this).val().split(' ')[0]).replace(/-/g, '/'));
 
             timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
             diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));

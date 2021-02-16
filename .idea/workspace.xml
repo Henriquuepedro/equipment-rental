@@ -2,14 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/RentalCreatePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/RentalEquipament.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/RentalPayment.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/RentalResidue.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2021_02_14_233616_create_rental_equipaments_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2021_02_15_000520_create_rental_residues_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2021_02_15_002116_create_rental_payments_table.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Equipament.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Equipament.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Rental.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Rental.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Residue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Residue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_10_17_024042_create_addresses_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_10_17_024042_create_addresses_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_11_29_185157_create_rentals_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_11_29_185157_create_rentals_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/js/demo_.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/demo_.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/includes/client/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/client/modal-script.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/driver/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/driver/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/vehicle/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/vehicle/modal-script.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/rental/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rental/create.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/master.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,6 +46,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/app/Http/Controllers/RentalController.php" root0="FORCE_HIGHLIGHTING" root1="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/public/assets/js/views/client/form.js" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/resources/views/rental/create.blade.php" root0="FORCE_HIGHLIGHTING" root1="SKIP_INSPECTION" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/public/assets/js/views/rental/form.js" root0="SKIP_INSPECTION" />
@@ -299,7 +313,11 @@
       <workItem from="1611414014611" duration="7998000" />
       <workItem from="1611432179267" duration="619000" />
       <workItem from="1611510010100" duration="9429000" />
-      <workItem from="1612022610205" duration="9780000" />
+      <workItem from="1612022610205" duration="10458000" />
+      <workItem from="1612180566255" duration="6000" />
+      <workItem from="1613167176614" duration="1385000" />
+      <workItem from="1613170436000" duration="6701000" />
+      <workItem from="1613235299613" duration="40189000" />
     </task>
     <servers />
   </component>
