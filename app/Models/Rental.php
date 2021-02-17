@@ -75,4 +75,62 @@ class Rental extends Model
 
         return 1;
     }
+
+    public function getRentals($company_id, $init = null, $length = null, $searchDriver = null, $orderBy = array())
+    {
+        $rental = $this ->select(
+                            'rentals.id',
+                            'rentals.code',
+                            'clients.name as client_name',
+                            'rentals.address_name',
+                            'rentals.address_number',
+                            'rentals.address_zipcode',
+                            'rentals.address_complement',
+                            'rentals.address_neigh',
+                            'rentals.address_city',
+                            'rentals.address_state',
+                            'rentals.created_at'
+                        )
+                        ->join('clients','clients.id','=','rentals.client_id')
+                        ->where('rentals.company_id', $company_id);
+        if ($searchDriver)
+            $rental->where(function($query) use ($searchDriver) {
+                $query->where('rentals.code', 'like', "%{$searchDriver}%")
+                    ->orWhere('clients.name', 'like', "%{$searchDriver}%")
+                    ->orWhere('rentals.address_name', 'like', "%{$searchDriver}%")
+                    ->orWhere('rentals.created_at', 'like', "%{$searchDriver}%");
+            });
+
+        if (count($orderBy) !== 0) $rental->orderBy($orderBy['field'], $orderBy['order']);
+        else $rental->orderBy('rentals.code', 'asc');
+
+        if ($init !== null && $length !== null) $rental->offset($init)->limit($length);
+
+        return $rental->get();
+    }
+
+    public function getCountRentals($company_id, $searchDriver = null)
+    {
+        $rental = $this ->join('clients','clients.id','=','rentals.client_id')
+            ->where('rentals.company_id', $company_id);
+        if ($searchDriver)
+            $rental->where(function($query) use ($searchDriver) {
+                $query->where('rentals.code', 'like', "%{$searchDriver}%")
+                    ->orWhere('clients.name', 'like', "%{$searchDriver}%")
+                    ->orWhere('rentals.address_name', 'like', "%{$searchDriver}%")
+                    ->orWhere('rentals.created_at', 'like', "%{$searchDriver}%");
+            });
+
+        return $rental->count();
+    }
+
+    public function getRental($rental_id, $company_id)
+    {
+        return $this->where(['id' => $rental_id, 'company_id' => $company_id])->first();
+    }
+
+    public function remove($rental_id, $company_id)
+    {
+        return $this->where(['id' => $rental_id, 'company_id' => $company_id])->delete();
+    }
 }

@@ -153,6 +153,8 @@ Route::group(['middleware' => 'auth'], function (){
         });
         Route::group(['prefix' => '/locacao', 'as' => 'rental.'], function () {
             Route::post('/nova-locacao', [App\Http\Controllers\RentalController::class, 'insert'])->name('new-rental');
+            Route::post('/buscar', [App\Http\Controllers\RentalController::class, 'fetchRentals'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\RentalController::class, 'delete'])->name('delete');
         });
     });
 });

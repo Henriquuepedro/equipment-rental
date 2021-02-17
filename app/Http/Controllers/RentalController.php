@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RentalCreatePost;
+use App\Http\Requests\RentalDeletePost;
 use App\Models\Driver;
 use App\Models\Equipament;
 use App\Models\EquipamentWallet;
@@ -63,6 +64,96 @@ class RentalController extends Controller
         }
 
         return view('rental.index');
+    }
+
+    public function fetchRentals(Request $request)
+    {
+        if (!$this->hasPermission('RentalView'))
+            return response()->json([]);
+
+        $orderBy    = array();
+        $result     = array();
+        $searchUser = null;
+
+        $ini        = $request->start;
+        $draw       = $request->draw;
+        $length     = $request->length;
+        $company_id = $request->user()->company_id;
+
+        $search = $request->search;
+        if ($search['value']) $searchUser = $search['value'];
+
+        if (isset($request->order)) {
+            if ($request->order[0]['dir'] == "asc") $direction = "asc";
+            else $direction = "desc";
+
+            $fieldsOrder = array('rentals.code','clients.name','rentals.address_name','rentals.created_at', '');
+            $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
+            if ($fieldOrder != "") {
+                $orderBy['field'] = $fieldOrder;
+                $orderBy['order'] = $direction;
+            }
+        }
+
+        if (!empty($searchUser)) $filtered = $this->rental->getCountRentals($company_id, $searchUser);
+        else $filtered = 0;
+
+
+        $data = $this->rental->getRentals($company_id, $ini, $length, $searchUser, $orderBy);
+
+        // get string query
+        // DB::getQueryLog();
+
+        $permissionUpdate = $this->hasPermission('RentalUpdatePost');
+        $permissionDelete = $this->hasPermission('RentalDeletePost');
+
+        $i = 0;
+        foreach ($data as $key => $value) {
+            $i++;
+            $buttons = $permissionDelete ? "<button class='btn btn-danger btnRemoveRental btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' rental-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+
+            $result[$key] = array(
+                $value['code'],
+                "<strong>{$value['client_name']}</strong><br>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}",
+                date('d/m/Y H:i', strtotime($value['created_at'])),
+                $buttons
+            );
+        }
+
+        if ($filtered == 0) $filtered = $i;
+
+        $output = array(
+            "draw" => $draw,
+            "recordsTotal" => $this->rental->getCountRentals($company_id),
+            "recordsFiltered" => $filtered,
+            "data" => $result
+        );
+
+        return response()->json($output);
+    }
+
+    public function delete(RentalDeletePost $request)
+    {
+        $company_id = $request->user()->company_id;
+        $rental_id  = $request->rental_id;
+
+        if (!$this->rental->getRental($rental_id, $company_id))
+            return response()->json(['success' => false, 'message' => 'Não foi possível localizar a locação!']);
+
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
+
+        $delPayment     = $this->rental_payment->remove($rental_id, $company_id);
+        $delResidue     = $this->rental_residue->remove($rental_id, $company_id);
+        $delEquipament  = $this->rental_equipament->remove($rental_id, $company_id);
+        $delRental      = $this->rental->remove($rental_id, $company_id);
+
+        if ($delEquipament && $delRental) {
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Locação excluída com sucesso!']);
+        }
+
+        DB::rollBack();
+        return response()->json(['success' => false, 'message' => 'Não foi possível excluir a locação!']);
     }
 
     public function create()
@@ -179,12 +270,12 @@ class RentalController extends Controller
 
         if ($insertRental) {
             DB::commit();
-            return response()->json(true);
+            return response()->json(['success' => true]);
         }
 
         DB::rollBack();
 
-        return response()->json(false);
+        return response()->json(['success' => false, 'message' => 'Não foi possível gravar a locação, recarregue a página e tente novamente.']);
 
     }
 
@@ -255,7 +346,7 @@ class RentalController extends Controller
                     $dateDiff = $dateDeliveryEquip->diff($dateWithdrawalEquip);
                     // recupera valores configurados para valor unitário
                     $walletsEquipament = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipamentId->id, $dateDiff->days);
-                    if ($walletsEquipament) $unitaryValue = $haveCharged ? (float)$unitaryValue->value : 0;
+                    if ($walletsEquipament) $unitaryValue = $haveCharged ? (float)$walletsEquipament->value : 0;
 
                 }
             }
@@ -375,6 +466,8 @@ class RentalController extends Controller
 
     private function setResidueRental($request)
     {
+        if (empty($request->residues)) return [];
+
         $company_id = $request->user()->company_id;
 
         $arrResidue = array();

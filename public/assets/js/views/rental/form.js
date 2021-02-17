@@ -343,7 +343,7 @@
                 date = new Date();
                 time8 = date.getTime();
 
-                console.log({
+                /*console.log({
                     0: time1-time0,
                     1: time2-time1,
                     2: time3-time2,
@@ -352,7 +352,7 @@
                     4: time6-time5,
                     5: time7-time6,
                     6: time8-time7,
-                })
+                })*/
 
                 if (arrErrors.length) {
                     Swal.fire({
@@ -443,6 +443,16 @@
                 success: response => {
 
                     console.log(response);
+
+                    if (response.success) {
+                        $('#createRental').modal();
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atenção',
+                            html: '<ol><li>'+response.message+'</li></ol>'
+                        });
+                    }
 
                 }, error: e => {
                     console.log(e);
@@ -1119,6 +1129,10 @@ $('#calculate_net_amount_automatic').on('change', function(){
         $('#discount_value').attr('disabled', true);
         $('#extra_value').attr('disabled', true);
     }
+});
+
+$("#createRental").on("hidden.bs.modal", function () {
+    window.location.reload();
 });
 
 const recalculeParcels = () => {

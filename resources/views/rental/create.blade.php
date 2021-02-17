@@ -475,5 +475,30 @@
     <input type="hidden" id="routeGetEquipaments" value="{{ route('ajax.equipament.get-equipaments') }}">
     <input type="hidden" id="routeGetPriceStockPeriodEquipament" value="{{ route('ajax.equipament.get-price-per-period') }}">
     <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
+    <div class="modal fade" tabindex="-1" role="dialog" id="createRental">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Locação criada com sucesso</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3 class="text-center">Locação criada com sucesso!</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 d-flex justify-content-around flex-wrap">
+                            <a href="{{ route('rental.index') }}" class="btn btn-primary col-md-4">Listagem de Locações</a>
+                            <a href="{{ route('rental.create') }}" class="btn btn-secondary col-md-4">Realizar nova Locação</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @stop

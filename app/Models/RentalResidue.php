@@ -49,4 +49,9 @@ class RentalResidue extends Model
 
         return true;
     }
+
+    public function remove($rental_id, $company_id)
+    {
+        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->delete();
+    }
 }
