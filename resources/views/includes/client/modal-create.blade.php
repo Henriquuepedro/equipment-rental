@@ -81,7 +81,7 @@
                                 <h4 class="card-title">Dados do Endereço</h4>
                                 <p class="card-description"> Preencha o formulário abaixo com as informações de endereço </p>
                             </div>
-                            <table class="table col-md-12 display-none">
+                            <table class="table col-md-12 display-none" id="tableAddressClient">
                                 <thead>
                                 <tr>
                                     <th>Identificação</th>

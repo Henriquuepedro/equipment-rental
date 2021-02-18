@@ -208,7 +208,7 @@ jQuery.validator.addMethod("cpf_cnpj", function(value, element) {
 $('#add-new-address').on('click', function () {
 
     const verifyAddress = verifyAddressComplet();
-    if (!verifyAddress[0] || $('.new-address-show').length || $('table tr td[colspan="5"]:visible').length) {
+    if (!verifyAddress[0] || $('.new-address-show').length || $('#tableAddressClient tr td[colspan="5"]:visible').length) {
         Toast.fire({
             icon: 'warning',
             title: `Finalize o cadastro/alteração do endereço, para adicionar um novo.`
@@ -295,7 +295,7 @@ $(document).on('click', '.edit-address', function(){
     if (!verifyAddressComplet()[0]) return false;
 
     if ($(this).closest('tr').next().is(':not(:visible)')) {
-        if ($('table tr td[colspan="5"]:visible').length) {
+        if ($('#tableAddressClient tr td[colspan="5"]:visible').length) {
             Toast.fire({
                 icon: 'warning',
                 title: `Retorne o cadastro de endereço aberto para editar um próximo.`
@@ -489,7 +489,7 @@ const cleanBorderAddress = () => {
 }
 
 const createNewAddress = (name_address, cep, address, number, complement, reference, neigh, city, state, lat, lng) => {
-    $('table tbody').append(`
+    $('#tableAddressClient tbody').append(`
     <tr>
         <td>${name_address}</td>
         <td>${cep}</td>
@@ -562,6 +562,6 @@ const createNewAddress = (name_address, cep, address, number, complement, refere
 }
 
 const showHideTableAddress = () => {
-    if ($('table tbody tr').length) $('table').slideDown('slow');
-    else  $('table').slideUp('slow');
+    if ($('#tableAddressClient tbody tr').length) $('#tableAddressClient').slideDown('slow');
+    else  $('#tableAddressClient').slideUp('slow');
 }

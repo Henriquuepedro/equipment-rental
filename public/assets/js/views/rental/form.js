@@ -26,11 +26,8 @@
                     });
                     return false;
                 }
-
-                changeStepPosAbsolute();
-                return true;
             }
-            else if (currentIndex === 1 && newIndex > 1) { // cliente e endereo
+            if (currentIndex <= 1 && newIndex > 1) { // cliente e endereo
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
@@ -47,20 +44,20 @@
                 }
 
                 if (arrErrors.length) {
+
+                    if (currentIndex !== 1)
+                        setErrorStepWrong(1);
+
                     Swal.fire({
                         icon: 'warning',
                         title: 'Atenção',
                         html: '<ol><li>' + arrErrors.join('</li><li>') + '</li></ol>'
                     });
-                }
 
-                if (arrErrors.length === 0) {
-                    changeStepPosAbsolute();
-                    return true;
+                    return false;
                 }
-                return false;
             }
-            else if (currentIndex === 2 && newIndex > 2) { // datas
+            if (currentIndex <= 2 && newIndex > 2) { // datas
                 if (debug) {
                     changeStepPosAbsolute();
                     fixEquipmentDates();
@@ -81,27 +78,31 @@
                 }
 
                 if (arrErrors.length) {
+
+                    if (currentIndex < 2)
+                        setErrorStepWrong(2);
+
                     Swal.fire({
                         icon: 'warning',
                         title: 'Atenção',
                         html: '<ol><li>' + arrErrors.join('</li><li>') + '</li></ol>'
                     });
+                    return false;
                 }
 
-                if (arrErrors.length === 0) {
-                    changeStepPosAbsolute();
-                    fixEquipmentDates();
-                    return true;
-                }
-                return false;
+                fixEquipmentDates();
             }
-            else if (currentIndex === 3 && newIndex > 3) { // equipamento
+            if (currentIndex <= 3 && newIndex > 3) { // equipamento
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
                 }
 
                 if ($('#equipaments-selected div').length === 0) {
+
+                    if (currentIndex < 3)
+                        setErrorStepWrong(3);
+
                     Swal.fire({
                         icon: 'warning',
                         title: 'Atenção',
@@ -139,22 +140,21 @@
                 });
 
                 if (arrErrors.length) {
+
+                    if (currentIndex < 3)
+                        setErrorStepWrong(3);
+
                     Swal.fire({
                         icon: 'warning',
                         title: 'Atenção',
                         html: '<ol><li>' + arrErrors.join('</li><li>') + '</li></ol>'
                     });
+                    return false;
                 }
 
-                if (arrErrors.length === 0) {
-                    $('div[id^=collapseEquipament-]').collapse('hide');
-                    $('#formCreateRental .actions a[href="#next"]').hide();
-                    changeStepPosAbsolute();
-                    return true;
-                }
-                return false;
+                $('div[id^=collapseEquipament-]').collapse('hide');
             }
-            else if (currentIndex === 4 && newIndex > 4) { // pagamento
+            if (currentIndex <= 4 && newIndex > 4) { // pagamento
 
                 if (debug) {
                     changeStepPosAbsolute();
@@ -164,6 +164,10 @@
                 const netValue = realToNumber($('#net_value').val());
 
                 if (netValue < 0) {
+
+                    if (currentIndex < 4)
+                        setErrorStepWrong(4);
+
                     Swal.fire({
                         icon: 'warning',
                         title: 'Atenção',
@@ -180,6 +184,10 @@
                     const discountValue = realToNumber($('#discount_value').val());
 
                     if (netValue == 0) {
+
+                        if (currentIndex < 4)
+                            setErrorStepWrong(4);
+
                         Swal.fire({
                             icon: 'warning',
                             title: 'Atenção',
@@ -190,6 +198,10 @@
 
                     // valores divergente
                     if (netValue != (grossValue - discountValue + extraValue)) {
+
+                        if (currentIndex < 4)
+                            setErrorStepWrong(4);
+
                         Swal.fire({
                             icon: 'warning',
                             title: 'Atenção',
@@ -208,13 +220,16 @@
                             if (daysTemp === undefined) daysTemp = parseInt($('[name="due_day[]"]', this).val());
                             else if (daysTemp >= parseInt($('[name="due_day[]"]', this).val())) {
                                 haveErrorDays = true;
-                                return false;
                             } else daysTemp = parseInt($('[name="due_day[]"]', this).val());
 
                             priceTemp += realToNumber($('[name="value_parcel[]"]', this).val());
                         });
 
                         if (haveErrorDays) { // ecnontrou erro nas datas de vencimento
+
+                            if (currentIndex < 4)
+                                setErrorStepWrong(4);
+
                             Swal.fire({
                                 icon: 'warning',
                                 title: 'Atenção',
@@ -226,6 +241,10 @@
                         if (priceTemp.toFixed(2) !== netValue.toFixed(2)) { // os valores das parcelas não corresponde ao valor líquido
                             if ($('#automatic_parcel_distribution').is(':checked')) recalculeParcels();
                             else {
+
+                                if (currentIndex < 4)
+                                    setErrorStepWrong(4);
+
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Atenção',
@@ -236,11 +255,10 @@
                         }
                     }
                 }
-
-                changeStepPosAbsolute();
-                return true;
             }
 
+            $('#formCreateRental .actions a').hide();
+            $('#formCreateRental .steps ul li a').attr('disabled', true);
             changeStepPosAbsolute();
             return true;
         },
@@ -269,7 +287,7 @@
             let date = new Date();
             time0 = date.getTime();
 
-            if (priorIndex <= 3 && currentIndex === 4) { // equipamento
+            if (priorIndex <= 3 && currentIndex >= 4) { // equipamento
 
                 let pricesAndStocks;
                 let dataEquipaments = [];
@@ -372,7 +390,7 @@
                 } else {
 
                     if (typeLocation == 0 && newPricesUpdate.length) {
-                        Swal.fire({
+                        await Swal.fire({
                             title: newPricesUpdate.length === 1 ? 'Valor de equipamento atualizado.' : 'Valores de equipamentos atualizados.',
                             html: newPricesUpdate.length === 1 ? `O valor do equipamento abaixo foi alterado: <br><br><ol><li><b>${newPricesUpdateNames[0]}</b></li></ol><h4>Deseja atualizar?</h4>` : "Os valores dos equipamentos abaixo foram alterados: <br><br><ol><li><b>" + newPricesUpdateNames.join('</b></li><li><b>') + '</b></li></ol><h4>Deseja atualizar?</h4>',
                             icon: 'warning',
@@ -391,8 +409,6 @@
                             reloadTotalRental();
                             $('.list-equipaments-payment-load').hide();
                             $('.list-equipaments-payment').slideDown('slow');
-
-                            $('#formCreateRental .actions a[href="#next"]').show();
                         })
                     } else if (typeLocation == 1 && newPricesUpdate.length) {
 
@@ -404,21 +420,16 @@
                         $('.list-equipaments-payment-load').hide();
                         $('.list-equipaments-payment').slideDown('slow');
 
-                        $('#formCreateRental .actions a[href="#next"]').show();
-
                     } else {
                         reloadTotalRental();
                         $('.list-equipaments-payment-load').hide();
                         $('.list-equipaments-payment').slideDown('slow');
-
-                        $('#formCreateRental .actions a[href="#next"]').show();
                     }
                 }
             }
-            if (priorIndex === 3 && currentIndex !== 4)
-                $('#formCreateRental .actions a[href="#next"]').show();
-            // height custom screen
-            //$('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
+
+            $('#formCreateRental .actions a').show();
+            $('#formCreateRental .steps ul li a').attr('disabled', false);
 
             // Used to skip the "Warning" step if the user is old enough.
             // form.steps("next");
@@ -426,11 +437,11 @@
         },
         onFinishing: function (event, currentIndex)
         {
+            $('#formCreateRental .actions a[href="#finish"]').attr('disabled', true);
             form.validate().settings.ignore = ":disabled";
             return form.valid();
         },
         onFinished: function (event, currentIndex) {
-
             $("#observation").val($("#observationDiv .ql-editor").html());
 
             $.ajax({
@@ -452,6 +463,7 @@
                             title: 'Atenção',
                             html: '<ol><li>'+response.message+'</li></ol>'
                         });
+                        $('#formCreateRental .actions a[href="#finish"]').attr('disabled', false);
                     }
 
                 }, error: e => {
@@ -464,13 +476,14 @@
                     });
 
                     if (!arrErrors.length && e.responseJSON.message !== undefined)
-                        arrErrors.push('Você não tem permissão para fazer essa operação!');
+                        arrErrors.push('Não foi possível identificar o motivo do erro, recarregue a página e tente novamente!');
 
                     Swal.fire({
                         icon: 'warning',
                         title: 'Atenção',
                         html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
                     });
+                    $('#formCreateRental .actions a[href="#finish"]').attr('disabled', false);
                 },
                 complete: function(e) {
                     if (e.status === 403) {
@@ -1009,7 +1022,11 @@ $('#is_parceled').change(function (){
         $('#add_parcel, #del_parcel, .automatic_parcel_distribution_parent').slideDown(500);
         $('#parcels').show().append(
             createParcel(0)
-        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').mask('#.##0,00', { reverse: true });
+        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({
+            thousands: '.',
+            decimal: ',',
+            allowZero: true
+        });;
 
         recalculeParcels();
     }
@@ -1051,7 +1068,11 @@ $('#add_parcel').click(function(){
 
     $('#parcels').show().append(
         createParcel(parcels)
-    ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').mask('#.##0,00', { reverse: true });
+    ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({
+        thousands: '.',
+        decimal: ',',
+        allowZero: true
+    });;
 
     $('#del_parcel').attr('disabled', false);
 
@@ -1134,6 +1155,17 @@ $('#calculate_net_amount_automatic').on('change', function(){
 $("#createRental").on("hidden.bs.modal", function () {
     window.location.reload();
 });
+
+const setErrorStepWrong = step => {
+
+    setTimeout(() => {
+        $('#formCreateRental .steps ul li').removeClass('error');
+        for (let i = 0; i < step; i++)
+            $(`#formCreateRental .steps ul li:eq(${i})`).removeClass('current').addClass('done');
+
+        $(`#formCreateRental .steps ul li:eq(${step})`).addClass('error').find('a').trigger('click');
+    }, 150);
+}
 
 const recalculeParcels = () => {
     if ($('#automatic_parcel_distribution').is(':checked')) {
