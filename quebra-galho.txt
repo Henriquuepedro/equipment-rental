@@ -1,0 +1,24 @@
+Deixar esses métodos no FormRequest por enquanto
+-------------------------------------------
+Illuminate\Foundation\Http\FormRequest
+-------------------------------------------
+public function hasPermission($permission)
+{
+    $permissions = empty(auth()->user()->permission) ? [] : json_decode(auth()->user()->permission);
+    $permission = Permission::query()->where('name', $permission)->first()->id;
+    return in_array($permission, $permissions) || $this->hasAdmin();
+}
+
+public function hasAdmin()
+{
+    return auth()->user()->type_user === 1 || auth()->user()->type_user === 2;
+}
+
+public function hasAdminMaster()
+{
+    return auth()->user()->type_user === 2;
+}
+
+public function isAjax(){
+    return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+}
