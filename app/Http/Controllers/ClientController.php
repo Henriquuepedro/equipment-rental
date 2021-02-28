@@ -305,13 +305,6 @@ class ClientController extends Controller
             }
         }
 
-
-        if (!empty($searchUser)) {
-            $filtered = $this->client->getCountClients($company_id, $searchUser);
-        } else {
-            $filtered = 0;
-        }
-
         $data = $this->client->getClients($company_id, $ini, $length, $searchUser, $orderBy);
 
         // get string query
@@ -320,9 +313,7 @@ class ClientController extends Controller
         $permissionUpdate = $this->hasPermission('ClientUpdatePost');
         $permissionDelete = $this->hasPermission('ClientDeletePost');
 
-        $i = 0;
         foreach ($data as $key => $value) {
-            $i++;
             $buttons = "<a href='".route('client.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
             $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
             $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' client-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
@@ -336,12 +327,10 @@ class ClientController extends Controller
             );
         }
 
-        if ($filtered == 0) $filtered = $i;
-
         $output = array(
             "draw" => $draw,
             "recordsTotal" => $this->client->getCountClients($company_id),
-            "recordsFiltered" => $filtered,
+            "recordsFiltered" => $this->client->getCountClients($company_id, $searchUser),
             "data" => $result
         );
 

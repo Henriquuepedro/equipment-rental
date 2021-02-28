@@ -10,10 +10,10 @@
 @stop
 
 @section('js')
-<script src="{{ asset('assets/js/views/equipament/form.js') }}" type="application/javascript"></script>
+<script src="{{ asset('assets/js/views/equipment/form.js') }}" type="application/javascript"></script>
 <script>
     // validate the form when it is submitted
-    $("#formEquipament").validate({
+    $("#formEquipment").validate({
         rules: {
             name: {
                 name_valid: true
@@ -61,7 +61,7 @@
                 }
                 return false;
             }
-            $('#formEquipament [type="submit"]').attr('disabled', true);
+            $('#formEquipment [type="submit"]').attr('disabled', true);
             form.submit();
         }
     });
@@ -82,17 +82,17 @@
                         </ol>
                     </div>
                     @endif
-                    <form action="{{ route(('equipament.insert')) }}" method="POST" enctype="multipart/form-data" id="formEquipament">
+                    <form action="{{ route(('equipment.insert')) }}" method="POST" enctype="multipart/form-data" id="formEquipment">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">
                                     <label class="form-check-label">
-                                        <input type="radio" class="form-check-input" name="type_equipament" value="cacamba" @if(old('type_equipament') === 'cacamba') checked @endif> Caçamba <i class="input-helper"></i>
+                                        <input type="radio" class="form-check-input" name="type_equipment" value="cacamba" @if(old('type_equipment') === 'cacamba') checked @endif> Caçamba <i class="input-helper"></i>
                                     </label>
                                 </div>
                                 <div class="form-radio form-radio-flat">
                                     <label class="form-check-label">
-                                        <input type="radio" class="form-check-input" name="type_equipament" value="others" @if(old('type_equipament') === 'others') checked @endif> Outros <i class="input-helper"></i>
+                                        <input type="radio" class="form-check-input" name="type_equipment" value="others" @if(old('type_equipment') === 'others') checked @endif> Outros <i class="input-helper"></i>
                                     </label>
                                 </div>
                             </div>
@@ -190,7 +190,7 @@
                         </div>
                         <div class="card display-none">
                             <div class="card-body d-flex justify-content-between">
-                                <a href="{{ route('equipament.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
+                                <a href="{{ route('equipment.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
                                 <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Cadastrar</button>
                             </div>
                         </div>

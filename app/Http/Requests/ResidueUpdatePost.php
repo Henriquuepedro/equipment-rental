@@ -3,9 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
-class VehicleDeletePost extends FormRequest
+class ResidueUpdatePost extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,17 +26,16 @@ class VehicleDeletePost extends FormRequest
     public function rules()
     {
         return [
-            'vehicle_id' => [
+            'name'      => [
                 'required',
-                'numeric',
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('rental_equipments')
-                        ->where(['vehicle_suggestion' => $value, 'company_id' => $this->user()->company_id])
+                    $exists = DB::table('residues')
+                        ->where(['name' => $this->name, 'company_id' => $this->user()->company_id])
+                        ->whereNotIn('id', [$this->residue_id])
                         ->count();
-                    if ($exists == 1) {
-                        $fail('Veículo está sendo utilizado em alguma locação. Realize a troca do veículo na locação para continuar.');
-                    } elseif ($exists > 1) {
-                        $fail('Veículo está sendo utilizado em algumas locações. Realize a troca do veículo nas locações para continuar.');
+
+                    if ($exists) {
+                        $fail('Nome do resíduo já está em uso');
                     }
                 }
             ]
@@ -50,7 +50,7 @@ class VehicleDeletePost extends FormRequest
     public function messages()
     {
         return [
-            'vehicle_id.*' => 'Não foi possível localizar o veículo!'
+            'name.required' => 'O Nome é obrigatório',
         ];
     }
 
@@ -58,7 +58,7 @@ class VehicleDeletePost extends FormRequest
      * Get the proper failed validation response for the request.
      *
      * @param array $errors
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function response(array $errors)
     {

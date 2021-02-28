@@ -63,6 +63,8 @@
                     checkLabelAnimate();
                     @if(\Request::route()->getName() == 'rental.create')
                         loadResidues(response.residue_id, '.container-residues select[name="residues"]');
+                    @elseif(\Request::route()->getName() == 'residue.index')
+                        reloadTable();
                     @else
                         loadResidues(response.residue_id, null);
                     @endif

@@ -5,9 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RentalEquipament extends Model
+class RentalEquipment extends Model
 {
     use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'rental_equipments';
 
     /**
      * The attributes that are mass assignable.
@@ -17,8 +24,10 @@ class RentalEquipament extends Model
     protected $fillable = [
         'company_id',
         'rental_id',
-        'equipament_id',
+        'equipment_id',
         'reference',
+        'name',
+        'volume',
         'quantity',
         'unitary_value',
         'total_value',
@@ -62,5 +71,10 @@ class RentalEquipament extends Model
     public function remove($rental_id, $company_id)
     {
         return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->delete();
+    }
+
+    public function getEquipments($company_id, $rental_id)
+    {
+        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->get();
     }
 }

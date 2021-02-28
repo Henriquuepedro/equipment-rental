@@ -50,15 +50,15 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
 
-    // Equipamento
-    Route::group(['prefix' => '/equipamento', 'as' => 'equipament.'], function () {
+    // Equipmento
+    Route::group(['prefix' => '/equipamento', 'as' => 'equipment.'], function () {
 
-        Route::get('/', [App\Http\Controllers\EquipamentController::class, 'index'])->name('index');
-        Route::get('/novo', [App\Http\Controllers\EquipamentController::class, 'create'])->name('create');
-        Route::post('/cadastro', [App\Http\Controllers\EquipamentController::class, 'insert'])->name('insert');
+        Route::get('/', [App\Http\Controllers\EquipmentController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\EquipmentController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\EquipmentController::class, 'insert'])->name('insert');
 
-        Route::get('/{id}', [App\Http\Controllers\EquipamentController::class, 'edit'])->name('edit');
-        Route::post('/atualizar', [App\Http\Controllers\EquipamentController::class, 'update'])->name('update');
+        Route::get('/{id}', [App\Http\Controllers\EquipmentController::class, 'edit'])->name('edit');
+        Route::post('/atualizar', [App\Http\Controllers\EquipmentController::class, 'update'])->name('update');
 
     });
 
@@ -95,6 +95,20 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
 
+    // Impressões
+    Route::group(['prefix' => '/impressao', 'as' => 'print.'], function () {
+
+        Route::get('/locacao/{rental}', [App\Http\Controllers\PrintController::class, 'rental'])->name('rental');
+
+    });
+
+    // Impressões
+    Route::group(['prefix' => '/residuo', 'as' => 'residue.'], function () {
+
+        Route::get('/', [App\Http\Controllers\ResidueController::class, 'index'])->name('index');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -108,17 +122,17 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/visualizar-enderecos', [App\Http\Controllers\AddressController::class, 'getAddresses'])->name('get-addresses');
             Route::post('/visualizar-endereco', [App\Http\Controllers\AddressController::class, 'getAddress'])->name('get-address');
         });
-        Route::group(['prefix' => '/equipamento', 'as' => 'equipament.'], function () {
-            Route::post('/buscar', [App\Http\Controllers\EquipamentController::class, 'fetchEquipaments'])->name('fetch');
-            Route::post('/delete', [App\Http\Controllers\EquipamentController::class, 'delete'])->name('delete');
-            Route::post('/visualizar-equipamentos', [App\Http\Controllers\EquipamentController::class, 'getEquipaments'])->name('get-equipaments');
-            Route::post('/visualizar-equipamento', [App\Http\Controllers\EquipamentController::class, 'getEquipament'])->name('get-equipament');
-            Route::post('/novo-equipamento', [App\Http\Controllers\EquipamentController::class, 'insert'])->name('new-equipament');
-            Route::post('/visualizar-estoque', [App\Http\Controllers\EquipamentController::class, 'getStockEquipament'])->name('get-stock');
-            Route::post('/visualizar-preco', [App\Http\Controllers\EquipamentController::class, 'getPriceEquipament'])->name('get-price');
-            Route::post('/visualizar-preco-estoque', [App\Http\Controllers\EquipamentController::class, 'getPriceStockEquipament'])->name('get-price-stock');
-            Route::post('/visualizar-preco-por-periodo', [App\Http\Controllers\EquipamentController::class, 'getPricePerPeriod'])->name('get-price-per-period');
-            Route::post('/visualizar-preco-estoque', [App\Http\Controllers\EquipamentController::class, 'getCheckPriceStockEquipament'])->name('get-price-stock-check');
+        Route::group(['prefix' => '/equipamento', 'as' => 'equipment.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\EquipmentController::class, 'fetchEquipments'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\EquipmentController::class, 'delete'])->name('delete');
+            Route::post('/visualizar-equipamentos', [App\Http\Controllers\EquipmentController::class, 'getEquipments'])->name('get-equipments');
+            Route::post('/visualizar-equipamento', [App\Http\Controllers\EquipmentController::class, 'getEquipment'])->name('get-equipment');
+            Route::post('/novo-equipamento', [App\Http\Controllers\EquipmentController::class, 'insert'])->name('new-equipment');
+            Route::post('/visualizar-estoque', [App\Http\Controllers\EquipmentController::class, 'getStockEquipment'])->name('get-stock');
+            Route::post('/visualizar-preco', [App\Http\Controllers\EquipmentController::class, 'getPriceEquipment'])->name('get-price');
+            Route::post('/visualizar-preco-estoque', [App\Http\Controllers\EquipmentController::class, 'getPriceStockEquipment'])->name('get-price-stock');
+            Route::post('/visualizar-preco-por-periodo', [App\Http\Controllers\EquipmentController::class, 'getPricePerPeriod'])->name('get-price-per-period');
+            Route::post('/visualizar-preco-estoque', [App\Http\Controllers\EquipmentController::class, 'getCheckPriceStockEquipment'])->name('get-price-stock-check');
         });
         Route::group(['prefix' => '/meu-perfil', 'as' => 'profile.'], function () {
             Route::post('/atualizar-imagem', [App\Http\Controllers\UserController::class, 'updateImage'])->name('update.image');
@@ -150,6 +164,9 @@ Route::group(['middleware' => 'auth'], function (){
         Route::group(['prefix' => '/residuo', 'as' => 'residue.'], function () {
             Route::get('/visualizar-residuos', [App\Http\Controllers\ResidueController::class, 'getResidues'])->name('get-residues');
             Route::post('/novo-residuo', [App\Http\Controllers\ResidueController::class, 'insert'])->name('new-residue');
+            Route::post('/atualizar-residuo', [App\Http\Controllers\ResidueController::class, 'update'])->name('edit-residue');
+            Route::post('/buscar', [App\Http\Controllers\ResidueController::class, 'fetchResidues'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\ResidueController::class, 'delete'])->name('delete');
         });
         Route::group(['prefix' => '/locacao', 'as' => 'rental.'], function () {
             Route::post('/nova-locacao', [App\Http\Controllers\RentalController::class, 'insert'])->name('new-rental');

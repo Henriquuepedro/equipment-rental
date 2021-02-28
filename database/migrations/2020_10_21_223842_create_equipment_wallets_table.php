@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEquipamentWalletsTable extends Migration
+class CreateEquipmentWalletsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateEquipamentWalletsTable extends Migration
      */
     public function up()
     {
-        Schema::create('equipament_wallets', function (Blueprint $table) {
+        Schema::create('equipment_wallets', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id')->unsigned();
-            $table->bigInteger('equipament_id')->unsigned();
+            $table->bigInteger('equipment_id')->unsigned();
             $table->integer('day_start');
             $table->integer('day_end')->nullable();
             $table->decimal('value', 12, 2);
@@ -26,7 +26,7 @@ class CreateEquipamentWalletsTable extends Migration
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->foreign('equipament_id')->references('id')->on('equipaments')->onDelete('cascade');
+            $table->foreign('equipment_id')->references('id')->on('equipments')->onDelete('cascade');
             $table->foreign('user_insert')->references('id')->on('users');
             $table->foreign('user_update')->references('id')->on('users');
         });
@@ -39,6 +39,6 @@ class CreateEquipamentWalletsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('equipament_wallets');
+        Schema::dropIfExists('equipment_wallets');
     }
 }

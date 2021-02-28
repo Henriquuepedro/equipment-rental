@@ -98,7 +98,7 @@
                     return true;
                 }
 
-                if ($('#equipaments-selected div').length === 0) {
+                if ($('#equipments-selected div').length === 0) {
 
                     if (currentIndex < 3)
                         setErrorStepWrong(3);
@@ -111,32 +111,32 @@
                     return false;
                 }
 
-                let idEquipament,
-                    stockEquipament,
-                    nameEquipament,
+                let idEquipment,
+                    stockEquipment,
+                    nameEquipment,
                     stockMax,
                     dateDeliveryTime,
                     dateWithdrawalTime;
 
-                $('#equipaments-selected div.card').each(function() {
-                    idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
-                    stockEquipament     = parseInt($('[name^="stock_equipament_"]', this).val());
-                    nameEquipament      = $('.card-header a:eq(0)', this).text();
-                    stockMax            = parseInt($('[name^="stock_equipament_"]', this).attr('max-stock'));
+                $('#equipments-selected div.card').each(function() {
+                    idEquipment        = parseInt($('.card-header', this).attr('id-equipment'));
+                    stockEquipment     = parseInt($('[name^="stock_equipment_"]', this).val());
+                    nameEquipment      = $('.card-header a:eq(0)', this).text();
+                    stockMax            = parseInt($('[name^="stock_equipment_"]', this).attr('max-stock'));
 
-                    if (isNaN(stockEquipament) || stockEquipament === 0)
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) deve ser informado uma quantidade.`);
+                    if (isNaN(stockEquipment) || stockEquipment === 0)
+                        arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) deve ser informado uma quantidade.`);
 
-                    else if (stockEquipament > stockMax)
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipament}</strong> ) não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
+                    else if (stockEquipment > stockMax)
+                        arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
 
                     notUseDateWithdrawal = $('.not_use_date_withdrawal', this).is(':checked');
 
-                    dateDeliveryTime = new Date(transformDateForEn($('input[name^="date_delivery_equipament_"]', this).val())).getTime();
-                    dateWithdrawalTime = new Date(transformDateForEn($('input[name^="date_withdrawal_equipament_"]', this).val())).getTime();
+                    dateDeliveryTime = new Date(transformDateForEn($('input[name^="date_delivery_equipment_"]', this).val())).getTime();
+                    dateWithdrawalTime = new Date(transformDateForEn($('input[name^="date_withdrawal_equipment_"]', this).val())).getTime();
 
-                    if (dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0)) arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento ( <strong>${nameEquipament}</strong> ) deve ser informada corretamente.`);
-                    else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) arrErrors.push(`A data prevista de entrega do equipamento ( <strong>${nameEquipament}</strong> ) não pode ser maior ou igual que a data prevista de retirada.`);
+                    if (dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0)) arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento ( <strong>${nameEquipment}</strong> ) deve ser informada corretamente.`);
+                    else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) arrErrors.push(`A data prevista de entrega do equipamento ( <strong>${nameEquipment}</strong> ) não pode ser maior ou igual que a data prevista de retirada.`);
                 });
 
                 if (arrErrors.length) {
@@ -152,7 +152,7 @@
                     return false;
                 }
 
-                $('div[id^=collapseEquipament-]').collapse('hide');
+                $('div[id^=collapseEquipment-]').collapse('hide');
             }
             if (currentIndex <= 4 && newIndex > 4) { // pagamento
 
@@ -290,60 +290,60 @@
             if (priorIndex <= 3 && currentIndex >= 4) { // equipamento
 
                 let pricesAndStocks;
-                let dataEquipaments = [];
-                let dataEquipamentsPayCheck = [];
+                let dataEquipments = [];
+                let dataEquipmentsPayCheck = [];
                 let newPricesUpdate = [];
                 let newPricesUpdateNames = [];
-                let idEquipaments = [];
-                let priceEquipament = 0;
-                let idEquipament,stockEquipament,nameEquipament;
+                let idEquipments = [];
+                let priceEquipment = 0;
+                let idEquipment,stockEquipment,nameEquipment;
                 date = new Date();
                 time1 = date.getTime();
-                await $('#equipaments-selected div.card').each(async function() {
-                    idEquipament        = parseInt($('.card-header', this).attr('id-equipament'));
-                    stockEquipament     = parseInt($('[name^="stock_equipament_"]', this).val());
-                    nameEquipament      = $('.card-header a:eq(0)', this).text();
-                    dataEquipaments.push([idEquipament, stockEquipament, nameEquipament]);
-                    idEquipaments.push(idEquipament);
+                await $('#equipments-selected div.card').each(async function() {
+                    idEquipment        = parseInt($('.card-header', this).attr('id-equipment'));
+                    stockEquipment     = parseInt($('[name^="stock_equipment_"]', this).val());
+                    nameEquipment      = $('.card-header a:eq(0)', this).text();
+                    dataEquipments.push([idEquipment, stockEquipment, nameEquipment]);
+                    idEquipments.push(idEquipment);
                 });
                 date = new Date();
                 time2 = date.getTime();
 
-                $('.list-equipaments-payment-load').show();
-                $('.list-equipaments-payment').hide();
+                $('.list-equipments-payment-load').show();
+                $('.list-equipments-payment').hide();
                 $('#gross_value').html('<i class="fa fa-spin fa-spinner"></i>&nbsp;&nbsp;Calculando');
                 if ($('#calculate_net_amount_automatic').is(':checked'))
                     $('#net_value').val('Calculando...');
 
                 date = new Date();
                 time3 = date.getTime();
-                pricesAndStocks = await getPriceStockEquipaments(idEquipaments);
+                pricesAndStocks = await getPriceStockEquipments(idEquipments);
                 date = new Date();
                 time4 = date.getTime();
                 if (pricesAndStocks) {
-                    await Promise.all(dataEquipaments.map(async equipament => {
-                        dataEquipamentsPayCheck.push(equipament[0]);
-                        if (equipament[1] > pricesAndStocks[equipament[0]].stock) {
-                            $(`#collapseEquipament-${equipament[0]}`).find('input[name^="stock_equipament_"]').attr('max-stock', pricesAndStocks[equipament[0]].stock).val(pricesAndStocks[equipament[0]].stock);
-                            $(`#collapseEquipament-${equipament[0]}`).find('.stock_available').text('Disponível: ' + pricesAndStocks[equipament[0]].stock);
-                            arrErrors.push(`O equipamento ( <strong>${equipament[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipament[0]].stock} un</strong>`);
+                    await Promise.all(dataEquipments.map(async equipment => {
+                        dataEquipmentsPayCheck.push(equipment[0]);
+                        if (equipment[1] > pricesAndStocks[equipment[0]].stock) {
+                            $(`#collapseEquipment-${equipment[0]}`).find('input[name^="stock_equipment_"]').attr('max-stock', pricesAndStocks[equipment[0]].stock).val(pricesAndStocks[equipment[0]].stock);
+                            $(`#collapseEquipment-${equipment[0]}`).find('.stock_available').text('Disponível: ' + pricesAndStocks[equipment[0]].stock);
+                            arrErrors.push(`O equipamento ( <strong>${equipment[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipment[0]].stock} un</strong>`);
                         }
 
-                        if (!$(`.list-equipaments-payment li[id-equipament="${equipament[0]}"]`).length) await createEquipamentPayment(equipament[0], pricesAndStocks[equipament[0]]);
+                        if (!$(`.list-equipments-payment li[id-equipment="${equipment[0]}"]`).length) await createEquipmentPayment(equipment[0], pricesAndStocks[equipment[0]]);
                         else {
-                            priceEquipament = pricesAndStocks[equipament[0]].price;
+                            priceEquipment = pricesAndStocks[equipment[0]].price;
 
                             date = new Date();
                             time5 = date.getTime();
-                            $(`#price-un-equipament-${equipament[0]}`).val(numberToReal(priceEquipament));
-                            $(`.list-equipaments-payment li[id-equipament="${equipament[0]}"] .stock-equipament-payment strong`).text(equipament[1] + 'un');
+                            $(`#price-un-equipment-${equipment[0]}`).val(numberToReal(priceEquipment));
+                            $(`.list-equipments-payment li[id-equipment="${equipment[0]}"] .stock-equipment-payment strong`).text(equipment[1] + 'un');
 
-                            if (numberToReal(priceEquipament * equipament[1]) !== $(`#price-total-equipament-${equipament[0]}`).val()) {
+                            if (numberToReal(priceEquipment * equipment[1]) !== $(`#price-total-equipment-${equipment[0]}`).val()) {
                                 newPricesUpdate.push({
-                                    el: $(`#price-total-equipament-${equipament[0]}`),
-                                    price: numberToReal(priceEquipament * equipament[1])
+                                    el: $(`#price-total-equipment-${equipment[0]}`),
+                                    price: numberToReal(priceEquipment * equipment[1])
                                 });
-                                newPricesUpdateNames.push(equipament[2] + ' | R$' + $(`#price-total-equipament-${equipament[0]}`).val() + ' <i class="fas fa-long-arrow-alt-right"></i> R$' + numberToReal(priceEquipament * equipament[1]));
+                                newPricesUpdateNames.push(equipment[2] + ' | R$' + $(`#price-total-equipment-${equipment[0]}`).val() + ' <i class="fas fa-long-arrow-alt-right"></i> R$' + numberToReal(priceEquipment * equipment[1]));
                             }
                             date = new Date();
                             time6 = date.getTime();
@@ -353,10 +353,10 @@
                 date = new Date();
                 time7 = date.getTime();
 
-                await $('.list-equipaments-payment li').each(async function() {
-                    idEquipament = parseInt($(this).attr('id-equipament'));
-                    if (!dataEquipamentsPayCheck.includes(idEquipament))
-                        $(`.list-equipaments-payment li[id-equipament="${idEquipament}"]`).remove()
+                await $('.list-equipments-payment li').each(async function() {
+                    idEquipment = parseInt($(this).attr('id-equipment'));
+                    if (!dataEquipmentsPayCheck.includes(idEquipment))
+                        $(`.list-equipments-payment li[id-equipment="${idEquipment}"]`).remove()
                 });
                 date = new Date();
                 time8 = date.getTime();
@@ -407,8 +407,8 @@
                                 });
 
                             reloadTotalRental();
-                            $('.list-equipaments-payment-load').hide();
-                            $('.list-equipaments-payment').slideDown('slow');
+                            $('.list-equipments-payment-load').hide();
+                            $('.list-equipments-payment').slideDown('slow');
                         })
                     } else if (typeLocation == 1 && newPricesUpdate.length) {
 
@@ -417,13 +417,13 @@
                         });
 
                         reloadTotalRental();
-                        $('.list-equipaments-payment-load').hide();
-                        $('.list-equipaments-payment').slideDown('slow');
+                        $('.list-equipments-payment-load').hide();
+                        $('.list-equipments-payment').slideDown('slow');
 
                     } else {
                         reloadTotalRental();
-                        $('.list-equipaments-payment-load').hide();
-                        $('.list-equipaments-payment').slideDown('slow');
+                        $('.list-equipments-payment-load').hide();
+                        $('.list-equipments-payment').slideDown('slow');
                     }
                 }
             }
@@ -457,6 +457,9 @@
 
                     if (response.success) {
                         $('#createRental').modal();
+                        $('#createRental h3.code_rental strong').text(response.code);
+                        $('#createRental a.rental_print').attr('href', response.urlPrint);
+
                     } else {
                         Swal.fire({
                             icon: 'warning',
@@ -498,7 +501,7 @@
     });
 })(jQuery);
 
-var searchEquipamentOld = '';
+var searchEquipmentOld = '';
 
 $(function() {
     $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
@@ -516,11 +519,7 @@ $(function() {
             checkLabelAnimate();
         }
     });
-    $('#discount_value, #extra_value, #net_value').maskMoney({
-        thousands: '.',
-        decimal: ',',
-        allowZero: true
-    });
+    $('#discount_value, #extra_value, #net_value').maskMoney({thousands: '.', decimal: ',', allowZero: true});
     loadDrivers(0, '#newVehicleModal [name="driver"]');
     loadResidues(0, '.container-residues select[name="residues[]"]');
     $('[name="type_rental"]').iCheck({
@@ -573,52 +572,52 @@ $("#formCreateRental").validate({
     }
 });
 
-$('#searchEquipament').on('blur keyup', function (e){
+$('#searchEquipment').on('blur keyup', function (e){
 
     if(e.keyCode !== 13 && e.type === 'keyup') return false;
 
-    const searchEquipament = $(this).val();
-    let equipamentInUse = [];
+    const searchEquipment = $(this).val();
+    let equipmentInUse = [];
 
-    if (searchEquipament === searchEquipamentOld) return false;
+    if (searchEquipment === searchEquipmentOld) return false;
 
-    $('#equipaments-selected .card-header').each(function(){
-        equipamentInUse.push(parseInt($(this).attr('id-equipament')));
+    $('#equipments-selected .card-header').each(function(){
+        equipmentInUse.push(parseInt($(this).attr('id-equipment')));
     });
 
-    $('table.list-equipament tbody').empty();
+    $('table.list-equipment tbody').empty();
 
-    searchEquipamentOld = searchEquipament;
+    searchEquipmentOld = searchEquipment;
 
-    $('table.list-equipament tbody').empty();
+    $('table.list-equipment tbody').empty();
 
-    if (searchEquipament === '') {
-        equipamentMessageDefault('<i class="fas fa-search"></i> Pesquise por um equipamento');
+    if (searchEquipment === '') {
+        equipmentMessageDefault('<i class="fas fa-search"></i> Pesquise por um equipamento');
         return false;
     }
 
-    equipamentMessageDefault('<i class="fas fa-spinner fa-spin"></i> Carregando equipamentos ...');
+    equipmentMessageDefault('<i class="fas fa-spinner fa-spin"></i> Carregando equipamentos ...');
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
-        url: $('#routeGetEquipaments').val(),
-        data: { searchEquipament, equipamentInUse },
+        url: $('#routeGetEquipments').val(),
+        data: { searchEquipment, equipmentInUse },
         success: response => {
 
-            $('table.list-equipament tbody').empty();
+            $('table.list-equipment tbody').empty();
 
             if (!response.length) {
-                equipamentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
+                equipmentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
                 return false;
             }
 
             let badgeStock = '';
             $.each(response, function (key, val) {
                 badgeStock = val.stock <= 0 ? 'danger' : 'primary';
-                $('table.list-equipament tbody').append(`
-                        <tr class="equipament" id-equipament="${val.id}">
+                $('table.list-equipment tbody').append(`
+                        <tr class="equipment" id-equipment="${val.id}">
                             <td class="text-left"><h6 class="mb-1 text-left">${val.name}</h6></td>
                             <td><div class="badge badge-pill badge-lg badge-info">${val.reference}</div></td>
                             <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>
@@ -644,22 +643,22 @@ $('#searchEquipament').on('blur keyup', function (e){
     });
 });
 
-$('#cleanSearchEquipament').on('click', function (){
-    $('#searchEquipament').val('').trigger('blur');
+$('#cleanSearchEquipment').on('click', function (){
+    $('#searchEquipment').val('').trigger('blur');
 });
 
-$('table.list-equipament').on('click', '.equipament', function(){
-    const idEquipament = $(this).attr('id-equipament');
+$('table.list-equipment').on('click', '.equipment', function(){
+    const idEquipment = $(this).attr('id-equipment');
 
-    $(`.equipament[id-equipament="${idEquipament}"]`).empty().toggleClass('equipament load-equipament').append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
+    $(`.equipment[id-equipment="${idEquipment}"]`).empty().toggleClass('equipment load-equipment').append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
 
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
-        url: $('#routeGetEquipament').val(),
-        data: { idEquipament, validStock: true },
+        url: $('#routeGetEquipment').val(),
+        data: { idEquipment, validStock: true },
         success: response => {
 
             if (!response.success) {
@@ -668,8 +667,8 @@ $('table.list-equipament').on('click', '.equipament', function(){
                     title: 'Atenção',
                     html: `<ol><li>${response.data}</li></ol>`
                 });
-                searchEquipamentOld = '';
-                $('#searchEquipament').trigger('blur');
+                searchEquipmentOld = '';
+                $('#searchEquipment').trigger('blur');
                 return false;
             }
 
@@ -678,32 +677,32 @@ $('table.list-equipament').on('click', '.equipament', function(){
             const date_delivery = $('input[name="date_delivery"]').val();
             const date_withdrawal = $('input[name="date_withdrawal"]').val();
 
-            $('#equipaments-selected').append(`
+            $('#equipments-selected').append(`
                     <div class="card">
-                        <div class="card-header" role="tab" id="headingEquipament-${response.id}" id-equipament="${response.id}">
+                        <div class="card-header" role="tab" id="headingEquipment-${response.id}" id-equipment="${response.id}">
                             <h5 class="mb-0 d-flex align-items-center">
-                                <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseEquipament-${response.id}" aria-expanded="false" aria-controls="collapseEquipament-${response.id}" is-cacamba="${response.cacamba}">
+                                <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseEquipment-${response.id}" aria-expanded="false" aria-controls="collapseEquipment-${response.id}" is-cacamba="${response.cacamba}">
                                     ${response.name}
                                 </a>
-                                <a class="remove-equipament pull-right"><i class="fa fa-trash"></i></a>
+                                <a class="remove-equipment pull-right"><i class="fa fa-trash"></i></a>
                             </h5>
                         </div>
-                        <div id="collapseEquipament-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipament-${response.id}" data-parent="#equipaments-selected" id-equipament="${response.id}">
-                            <input type="hidden" value="${response.id}" name="equipament_id[]">
+                        <div id="collapseEquipment-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipment-${response.id}" data-parent="#equipments-selected" id-equipment="${response.id}">
+                            <input type="hidden" value="${response.id}" name="equipment_id[]">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-8" style="margin-top: -20px">
                                         <div class="form-group">
                                             <label>Referência</label>
-                                            <input type="text" class="form-control" value="${response.reference}" name="reference_equipament_${response.id}" readonly>
+                                            <input type="text" class="form-control" value="${response.reference}" name="reference_equipment_${response.id}" readonly>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group flatpickr label-animate stock-group d-flex">
                                             <label class="label-date-btns">Quantidade</label>
-                                            <input type="tel" name="stock_equipament_${response.id}" class="form-control col-md-9 flatpickr-input" value="1" max-stock="${response.stock}">
+                                            <input type="tel" name="stock_equipment_${response.id}" class="form-control col-md-9 flatpickr-input" value="1" max-stock="${response.stock}">
                                             <div class="input-button-calendar col-md-3 no-padding">
-                                                <button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipament" data-toggle="tootip" title="Visualizar valor por período" id-equipament="${response.id}">
+                                                <button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipment" data-toggle="tootip" title="Visualizar valor por período" id-equipment="${response.id}">
                                                     <i class="fas fa-file-invoice-dollar"></i>
                                                 </button>
                                             </div>
@@ -747,8 +746,8 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                     <div class="col-md-6">
                                         <div class="form-group flatpickr d-flex">
                                             <label class="label-date-btns">Data Prevista de Entrega</label>
-                                            <input type="text" name="date_delivery_equipament_${response.id}" class="form-control col-md-9" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
-                                            <div class="input-button-calendar col-md-3 no-padding calendar_equipament">
+                                            <input type="text" name="date_delivery_equipment_${response.id}" class="form-control col-md-9" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                            <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
                                                 <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
                                                     <i class="fa fa-calendar text-white"></i>
                                                 </a>
@@ -761,8 +760,8 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                     <div class="col-md-6">
                                         <div class="form-group flatpickr d-flex">
                                             <label class="label-date-btns">Data Prevista de Retirada</label>
-                                            <input type="text" name="date_withdrawal_equipament_${response.id}" class="form-control col-md-9" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
-                                            <div class="input-button-calendar col-md-3 no-padding calendar_equipament">
+                                            <input type="text" name="date_withdrawal_equipment_${response.id}" class="form-control col-md-9" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                            <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
                                                 <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
                                                     <i class="fa fa-calendar text-white"></i>
                                                 </a>
@@ -781,30 +780,30 @@ $('table.list-equipament').on('click', '.equipament', function(){
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-12 mt-2">
-                                        <button type="button" class="btn btn-primary pull-right hideEquipament" id-equipament="${response.id}"><i class="fa fa-angle-up"></i> Ocultar</button>
+                                        <button type="button" class="btn btn-primary pull-right hideEquipment" id-equipment="${response.id}"><i class="fa fa-angle-up"></i> Ocultar</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `);
-            $(`.load-equipament[id-equipament="${idEquipament}"]`).hide(300);
-            showSeparatorEquipamentSelected();
-            $('#cleanSearchEquipament').trigger('click')
+            $(`.load-equipment[id-equipment="${idEquipment}"]`).hide(300);
+            showSeparatorEquipmentSelected();
+            $('#cleanSearchEquipment').trigger('click')
             setTimeout(() => {
-                $(`.load-equipament[id-equipament="${idEquipament}"]`).remove();
+                $(`.load-equipment[id-equipment="${idEquipment}"]`).remove();
 
-                if (!$(`.list-equipament tbody tr`).length) {
-                    equipamentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
+                if (!$(`.list-equipment tbody tr`).length) {
+                    equipmentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
                 }
                 checkLabelAnimate();
-                $(`#collapseEquipament-${idEquipament}`).collapse('show');
-                $(`#collapseEquipament-${idEquipament} input[name^="stock_equipament_"]`).mask('0#');
-                $(`#collapseEquipament-${idEquipament} input[name^="date_withdrawal_equipament_"]`).inputmask();
-                $(`#collapseEquipament-${idEquipament} input[name^="date_delivery_equipament_"]`).inputmask();
-                $(`#collapseEquipament-${idEquipament} .btn-view-price-period-equipament`).tooltip();
+                $(`#collapseEquipment-${idEquipment}`).collapse('show');
+                $(`#collapseEquipment-${idEquipment} input[name^="stock_equipment_"]`).mask('0#');
+                $(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).inputmask();
+                $(`#collapseEquipment-${idEquipment} input[name^="date_delivery_equipment_"]`).inputmask();
+                $(`#collapseEquipment-${idEquipment} .btn-view-price-period-equipment`).tooltip();
 
-                $(`#collapseEquipament-${idEquipament} .flatpickr:not(.stock-group)`).flatpickr({
+                $(`#collapseEquipment-${idEquipment} .flatpickr:not(.stock-group)`).flatpickr({
                     enableTime: true,
                     dateFormat: "d/m/Y H:i",
                     time_24hr: true,
@@ -817,15 +816,15 @@ $('table.list-equipament').on('click', '.equipament', function(){
                     }
                 });
                 if ($('#not_use_date_withdrawal').is(':checked')) {
-                    $(`#collapseEquipament-${idEquipament} input[name^="date_withdrawal_equipament_"]`).val('');
-                    $(`#collapseEquipament-${idEquipament} .not_use_date_withdrawal`).prop('checked', true);
+                    $(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).val('');
+                    $(`#collapseEquipment-${idEquipment} .not_use_date_withdrawal`).prop('checked', true);
                 }
                 if (response.cacamba) {
                     $('.container-residues').slideDown('slow');
                 }
 
-                loadVehicles(0,`#collapseEquipament-${idEquipament} select[name^="vehicle_"]`);
-                loadDrivers(0, `#collapseEquipament-${idEquipament} select[name^="driver_"]`);
+                loadVehicles(0,`#collapseEquipment-${idEquipment} select[name^="vehicle_"]`);
+                loadDrivers(0, `#collapseEquipment-${idEquipment} select[name^="driver_"]`);
             }, 350);
         }, error: e => {
             console.log(e);
@@ -841,45 +840,45 @@ $('table.list-equipament').on('click', '.equipament', function(){
     });
 });
 
-$(document).on('click', '.remove-equipament i', function (){
+$(document).on('click', '.remove-equipment i', function (){
     $(this).closest('.card').slideUp(500);
     setTimeout(() => {
         $(this).closest('.card').remove();
-        searchEquipamentOld = '';
-        $('#searchEquipament').trigger('blur');
-        showSeparatorEquipamentSelected();
-        if (!$('[href^="#collapseEquipament-"][is-cacamba="true"]').length){
+        searchEquipmentOld = '';
+        $('#searchEquipment').trigger('blur');
+        showSeparatorEquipmentSelected();
+        if (!$('[href^="#collapseEquipment-"][is-cacamba="true"]').length){
             $('.container-residues').slideUp('slow');
         }
     }, 550);
 });
 
-$(document).on('click', '.hideEquipament', function (){
-    const idEquipament = parseInt($(this).attr('id-equipament'));
-    $(`#collapseEquipament-${idEquipament}`).collapse('hide');
+$(document).on('click', '.hideEquipment', function (){
+    const idEquipment = parseInt($(this).attr('id-equipment'));
+    $(`#collapseEquipment-${idEquipment}`).collapse('hide');
 });
 
 $(document).on('click', '.use_date_diff_equip', function (){
     const elEquip = $(this).closest('.card-body');
     let date_delivery, date_withdrawal;
 
-    elEquip.find('input[name^="date_delivery_equipament_"]').attr('disabled', !$(this).is(':checked'));
+    elEquip.find('input[name^="date_delivery_equipment_"]').attr('disabled', !$(this).is(':checked'));
     elEquip.find('.not_use_date_withdrawal').attr('disabled', !$(this).is(':checked'));
 
     if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
-        elEquip.find('input[name^="date_withdrawal_equipament_"]').attr('disabled', !$(this).is(':checked'));
+        elEquip.find('input[name^="date_withdrawal_equipment_"]').attr('disabled', !$(this).is(':checked'));
 
     if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
-        elEquip.find('.calendar_equipament:eq(1) a').attr('disabled', !$(this).is(':checked'));
+        elEquip.find('.calendar_equipment:eq(1) a').attr('disabled', !$(this).is(':checked'));
 
-    elEquip.find('.calendar_equipament:eq(0) a').attr('disabled', !$(this).is(':checked'));
+    elEquip.find('.calendar_equipment:eq(0) a').attr('disabled', !$(this).is(':checked'));
 
     if (!$(this).is(':checked')) {
         date_delivery = $('input[name="date_delivery"]').val();
         date_withdrawal = $('input[name="date_withdrawal"]').val();
 
-        elEquip.find('input[name^="date_delivery_equipament_"]').val(date_delivery);
-        elEquip.find('input[name^="date_withdrawal_equipament_"]').val(date_withdrawal);
+        elEquip.find('input[name^="date_delivery_equipment_"]').val(date_delivery);
+        elEquip.find('input[name^="date_withdrawal_equipment_"]').val(date_withdrawal);
 
         if ($('#not_use_date_withdrawal').is(':checked'))
             elEquip.find('.not_use_date_withdrawal').prop('checked', true);
@@ -899,10 +898,10 @@ $(document).on('click', '.use_date_diff_equip', function (){
         });
 });
 
-$(document).on('blur change', '[name^="stock_equipament_"]', function (){
+$(document).on('blur change', '[name^="stock_equipment_"]', function (){
     const maxStock      = parseInt($(this).attr('max-stock'));
     const stock         = parseInt($(this).val());
-    const idEquipament  = parseInt($(this).closest('.card').find('.card-header').attr('id-equipament'));
+    const idEquipment  = parseInt($(this).closest('.card').find('.card-header').attr('id-equipment'));
 
     if (stock > maxStock) {
         Toast.fire({
@@ -911,7 +910,7 @@ $(document).on('blur change', '[name^="stock_equipament_"]', function (){
         });
         $(this).val(maxStock);
         setTimeout(() => {
-            $(`#collapseEquipament-${idEquipament}`).collapse('show');
+            $(`#collapseEquipment-${idEquipment}`).collapse('show');
             $(this).focus();
         }, 550);
     }
@@ -934,13 +933,13 @@ $('#not_use_date_withdrawal').on('click', function (){
 $(document).on('click', '.not_use_date_withdrawal', function (){
     const elEquip = $(this).closest('.col-md-6');
 
-    elEquip.find('input[name^="date_withdrawal_equipament_"]').attr('disabled', $(this).is(':checked'));
+    elEquip.find('input[name^="date_withdrawal_equipment_"]').attr('disabled', $(this).is(':checked'));
     elEquip.find('.flatpickr a').attr('disabled', $(this).is(':checked'));
 
-    elEquip.find('input[name^="date_withdrawal_equipament_"]').val('');
+    elEquip.find('input[name^="date_withdrawal_equipment_"]').val('');
 
     if (!$(this).is(':checked'))
-        elEquip.find('input[name^="date_withdrawal_equipament_"]').val(getTodayDateBr());
+        elEquip.find('input[name^="date_withdrawal_equipment_"]').val(getTodayDateBr());
 
     checkLabelAnimate();
 });
@@ -970,9 +969,9 @@ $('#net_value').on('keyup', function() {
     if ($(this).val() === '') $(this).val('0,00');
 });
 
-$(document).on('click', '.btn-view-price-period-equipament', function (){
+$(document).on('click', '.btn-view-price-period-equipment', function (){
     const btn = $(this);
-    const idEquipament = $(this).attr('id-equipament');
+    const idEquipment = $(this).attr('id-equipment');
 
     btn.attr('disable', true);
 
@@ -983,8 +982,8 @@ $(document).on('click', '.btn-view-price-period-equipament', function (){
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
-        url: $('#routeGetPriceStockPeriodEquipament').val(),
-        data: { idEquipament },
+        url: $('#routeGetPriceStockPeriodEquipment').val(),
+        data: { idEquipment },
         success: response => {
             if (response.length) {
                 descPeriod += '<ol class="no-padding">';
@@ -1022,11 +1021,7 @@ $('#is_parceled').change(function (){
         $('#add_parcel, #del_parcel, .automatic_parcel_distribution_parent').slideDown(500);
         $('#parcels').show().append(
             createParcel(0)
-        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({
-            thousands: '.',
-            decimal: ',',
-            allowZero: true
-        });;
+        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
 
         recalculeParcels();
     }
@@ -1068,11 +1063,7 @@ $('#add_parcel').click(function(){
 
     $('#parcels').show().append(
         createParcel(parcels)
-    ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({
-        thousands: '.',
-        decimal: ',',
-        allowZero: true
-    });;
+    ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
 
     $('#del_parcel').attr('disabled', false);
 
@@ -1190,7 +1181,7 @@ const createParcel = due => {
     return `<div class="form-group mt-1 parcel display-none">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="input-group col-md-12 no-padding">
-                    <div class="input-group-prepend stock-equipament-payment col-md-3 no-padding">
+                    <div class="input-group-prepend stock-Equipment-payment col-md-3 no-padding">
                         <span class="input-group-text col-md-12 no-border-radius "><strong>${(due+1)}º Vencimento</strong></span>
                     </div>
                     <input type="text" class="form-control col-md-2 text-center" name="due_day[]" value="${calculateDays(sumMonthsDateNow(0), sumMonthsDateNow(due))}">
@@ -1204,19 +1195,19 @@ const createParcel = due => {
         </div>`
 }
 
-const equipamentMessageDefault = message => {
-    $('table.list-equipament tbody').append(`
+const equipmentMessageDefault = message => {
+    $('table.list-equipment tbody').append(`
             <tr>
                 <td class="text-left"><h6 class="text-center">${message}</h6></td>
             </tr>
         `);
 }
 
-const showSeparatorEquipamentSelected = () => {
-    if ($('#equipaments-selected div').length)
-        $('.equipaments-selected hr.separator-dashed').slideDown(300);
+const showSeparatorEquipmentSelected = () => {
+    if ($('#equipments-selected div').length)
+        $('.equipments-selected hr.separator-dashed').slideDown(300);
     else
-        $('.equipaments-selected hr.separator-dashed').slideUp(300);
+        $('.equipments-selected hr.separator-dashed').slideUp(300);
 }
 
 const fixEquipmentDates = () => {
@@ -1224,10 +1215,10 @@ const fixEquipmentDates = () => {
     let dateDelivery = $('input[name="date_delivery"]').val();
     let dateWithdrawal = $('input[name="date_withdrawal"]').val();
 
-    $('#equipaments-selected div.card').each(function() {
+    $('#equipments-selected div.card').each(function() {
         if (!$('.use_date_diff_equip', this).is(':checked')) {
-            $('input[name^="date_delivery_equipament_"]', this).val(dateDelivery);
-            $('input[name^="date_withdrawal_equipament_"]', this).val(dateWithdrawal);
+            $('input[name^="date_delivery_equipment_"]', this).val(dateDelivery);
+            $('input[name^="date_withdrawal_equipment_"]', this).val(dateWithdrawal);
             $('.not_use_date_withdrawal', this).prop('checked', notUseDateWithdrawal);
         }
     });
@@ -1243,14 +1234,14 @@ const changeStepPosUnset = () => {
     setTimeout(() => { $('.wizard > .content > .body').css('position', 'unset') }, 100);
 }
 
-const getStockEquipament = async idEquipament => {
+const getStockEquipment = async idEquipment => {
     let stockReal = await $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
-        url: $('#routeGetStockEquipament').val(),
-        data: { idEquipament },
+        url: $('#routeGetStockEquipment').val(),
+        data: { idEquipment },
         async: true,
         success: response => {
             return response;
@@ -1260,13 +1251,13 @@ const getStockEquipament = async idEquipament => {
     return stockReal;
 }
 
-const getPriceEquipament = async idEquipament => {
-    const check_not_use_date_withdrawal = $(`#collapseEquipament-${idEquipament} input[name="not_use_date_withdrawal"]`).is(':checked');
+const getPriceEquipment = async idEquipment => {
+    const check_not_use_date_withdrawal = $(`#collapseEquipment-${idEquipment} input[name="not_use_date_withdrawal"]`).is(':checked');
     let diffDays = false;
 
     if (!check_not_use_date_withdrawal) {
-        let dateDelivery = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name^="date_delivery_equipament_"]`).val().split(' ')[0]).replace(/-/g, '/'));
-        let dateWithdrawal = new Date(transformDateForEn($(`#collapseEquipament-${idEquipament} input[name^="date_withdrawal_equipament_"]`).val().split(' ')[0]).replace(/-/g, '/'));
+        let dateDelivery = new Date(transformDateForEn($(`#collapseEquipment-${idEquipment} input[name^="date_delivery_equipment_"]`).val().split(' ')[0]).replace(/-/g, '/'));
+        let dateWithdrawal = new Date(transformDateForEn($(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).val().split(' ')[0]).replace(/-/g, '/'));
 
         let timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
         diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -1277,8 +1268,8 @@ const getPriceEquipament = async idEquipament => {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
-        url: $('#routeGetPriceEquipament').val(),
-        data: { idEquipament, diffDays },
+        url: $('#routeGetPriceEquipment').val(),
+        data: { idEquipment, diffDays },
         async: true,
         success: response => {
             return response;
@@ -1288,15 +1279,15 @@ const getPriceEquipament = async idEquipament => {
     return price;
 }
 
-const getEquipament = async equipament => {
+const getEquipment = async equipment => {
 
     let data = await $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
-        url: $('#routeGetEquipament').val(),
-        data: { idEquipament: equipament },
+        url: $('#routeGetEquipment').val(),
+        data: { idEquipment: equipment },
         async: true,
         success: response => {
             return response;
@@ -1306,51 +1297,47 @@ const getEquipament = async equipament => {
     return data.success ? data.data : false;
 }
 
-const createEquipamentPayment = async (equipament, priceStock = null) => {
+const createEquipmentPayment = async (equipment, priceStock = null) => {
 
-    let dataEquipament = await getEquipament(equipament);
-    let stockEquipament = $(`#collapseEquipament-${equipament} input[name^="stock_equipament_"]`).val();
-    const priceEquipament = priceStock === null ? await getPriceEquipament(equipament) : priceStock.price;
-    let priceEquipamentFormat = numberToReal(priceEquipament);
-    let priceEquipamentTotal = numberToReal(priceEquipament * stockEquipament);
+    let dataEquipment = await getEquipment(equipment);
+    let stockEquipment = $(`#collapseEquipment-${equipment} input[name^="stock_equipment_"]`).val();
+    const priceEquipment = priceStock === null ? await getPriceEquipment(equipment) : priceStock.price;
+    let priceEquipmentFormat = numberToReal(priceEquipment);
+    let priceEquipmentTotal = numberToReal(priceEquipment * stockEquipment);
 
-    if (!dataEquipament) return false;
+    if (!dataEquipment) return false;
 
-    let paymentEquipament = `
-        <li class="pb-3" id-equipament="${equipament}">
+    let paymentEquipment = `
+        <li class="pb-3" id-equipment="${equipment}">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex col-md-6 no-padding">
                     <div class="ml-3">
-                        <h6 class="mb-1">${dataEquipament.name}</h6>
-                        <small class="text-muted"><strong>${dataEquipament.reference}</strong></small>
+                        <h6 class="mb-1">${dataEquipment.name}</h6>
+                        <small class="text-muted"><strong>${dataEquipment.reference}</strong></small>
                     </div>
                 </div>
                 <div class="input-group col-md-6 no-padding payment-hidden-invert-stock">
-                    <div class="input-group-prepend stock-equipament-payment">
-                        <span class="input-group-text pl-3 pr-3"><strong>${stockEquipament}un</strong></span>
+                    <div class="input-group-prepend stock-equipment-payment">
+                        <span class="input-group-text pl-3 pr-3"><strong>${stockEquipment}un</strong></span>
                     </div>
-                    <input type="text" class="form-control price-un-equipament payment-hidden" id="price-un-equipament-${equipament}" value="${priceEquipamentFormat}" disabled>
+                    <input type="text" class="form-control price-un-equipment payment-hidden" id="price-un-equipment-${equipment}" value="${priceEquipmentFormat}" disabled>
                     <div class="input-group-prepend payment-hidden">
                         <span class="input-group-text pl-3 pr-3"><strong>R$</strong></span>
                     </div>
-                    <input type="text" class="form-control price-total-equipament payment-hidden" name="priceTotalEquipament_${equipament}" id="price-total-equipament-${equipament}" value="${priceEquipamentTotal}">
+                    <input type="text" class="form-control price-total-equipment payment-hidden" name="priceTotalEquipment_${equipment}" id="price-total-equipment-${equipment}" value="${priceEquipmentTotal}">
                 </div>
             </div>
         </li>
     `;
 
-    $('.list-equipaments-payment').append(paymentEquipament);
+    $('.list-equipments-payment').append(paymentEquipment);
 
     setTimeout(() => {
-        $(`#price-un-equipament-${equipament}, #price-total-equipament-${equipament}`).maskMoney({
-            thousands: '.',
-            decimal: ',',
-            allowZero: true
-        });
-        if ($('.list-equipaments-payment li').length === 1) $('.list-equipaments-payment li').addClass('one-li-list-equipaments-payment');
-        else $('.list-equipaments-payment li').removeClass('one-li-list-equipaments-payment');
+        $(`#price-un-equipment-${equipment}, #price-total-equipment-${equipment}`).maskMoney({thousands: '.', decimal: ',', allowZero: true});
+        if ($('.list-equipments-payment li').length === 1) $('.list-equipments-payment li').addClass('one-li-list-equipments-payment');
+        else $('.list-equipments-payment li').removeClass('one-li-list-equipments-payment');
 
-        $(`#price-total-equipament-${equipament}`).on('keyup', () => {
+        $(`#price-total-equipment-${equipment}`).on('keyup', () => {
             reloadTotalRental();
         }).on('blur', function(){
             if ($(this).val() === '') $(this).val('0,00')
@@ -1361,7 +1348,7 @@ const createEquipamentPayment = async (equipament, priceStock = null) => {
 const reloadTotalRental = () => {
 
     let grossValue      = 0;
-    let priceEquipament = 0;
+    let priceEquipment = 0;
     let discount        = realToNumber($('#discount_value').val());
     let extra           = realToNumber($('#extra_value').val());
     let netAmount       = realToNumber($('#net_value').val());
@@ -1369,9 +1356,9 @@ const reloadTotalRental = () => {
     discount    = isNaN(discount) ? 0 : discount;
     extra       = isNaN(extra) ? 0 : extra;
 
-    $('.list-equipaments-payment li').each(function() {
-        priceEquipament = realToNumber($('.price-total-equipament', this).val());
-        grossValue += isNaN(priceEquipament) ? 0 : priceEquipament;
+    $('.list-equipments-payment li').each(function() {
+        priceEquipment = realToNumber($('.price-total-equipment', this).val());
+        grossValue += isNaN(priceEquipment) ? 0 : priceEquipment;
     });
 
     $('#gross_value').text(numberToReal(grossValue));
@@ -1394,37 +1381,37 @@ const reloadTotalRental = () => {
     return grossValue - discount + extra;
 }
 
-const getPriceStockEquipaments = async idEquipament => {
+const getPriceStockEquipments = async idEquipment => {
 
     let arrDiffDays = [];
-    let arrEquipaments = [];
+    let arrEquipments = [];
     let dateDelivery, dateWithdrawal, timeDiff, diffDays, not_use_date_withdrawal;
 
-    $('#equipaments-selected div.card').each(async function() {
+    $('#equipments-selected div.card').each(async function() {
         not_use_date_withdrawal = $('.not_use_date_withdrawal', this).is(':checked');
-        idEquipament            = parseInt($('.card-header', this).attr('id-equipament'));
+        idEquipment            = parseInt($('.card-header', this).attr('id-equipment'));
         diffDays                = false;
 
         if (!not_use_date_withdrawal) {
-            dateDelivery = new Date(transformDateForEn($('input[name^="date_delivery_equipament_"]', this).val().split(' ')[0]).replace(/-/g, '/'));
-            dateWithdrawal = new Date(transformDateForEn($('input[name^="date_withdrawal_equipament_"]', this).val().split(' ')[0]).replace(/-/g, '/'));
+            dateDelivery = new Date(transformDateForEn($('input[name^="date_delivery_equipment_"]', this).val().split(' ')[0]).replace(/-/g, '/'));
+            dateWithdrawal = new Date(transformDateForEn($('input[name^="date_withdrawal_equipment_"]', this).val().split(' ')[0]).replace(/-/g, '/'));
 
             timeDiff = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
             diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
         }
-        arrDiffDays[idEquipament] = diffDays;
-        arrEquipaments.push(idEquipament);
+        arrDiffDays[idEquipment] = diffDays;
+        arrEquipments.push(idEquipment);
     });
 
-    if (!arrDiffDays.length || !arrEquipaments.length) return false;
+    if (!arrDiffDays.length || !arrEquipments.length) return false;
 
     let priceStock = await $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
-        url: $('#routeGetPriceStockEquipaments').val(),
-        data: { arrEquipaments, arrDiffDays },
+        url: $('#routeGetPriceStockEquipments').val(),
+        data: { arrEquipments, arrDiffDays },
         async: true,
         success: response => {
             return response;

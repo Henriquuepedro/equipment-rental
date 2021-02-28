@@ -1,9 +1,9 @@
-<div class="modal fade" id="newEquipamentModal" tabindex="-1" role="dialog" aria-labelledby="newEquipamentModalLabel" aria-hidden="true">
+<div class="modal fade" id="newEquipmentModal" tabindex="-1" role="dialog" aria-labelledby="newEquipmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
-            <form action="{{ route('ajax.equipament.new-equipament') }}" method="POST" id="formEquipament">
+            <form action="{{ route('ajax.equipment.new-equipment') }}" method="POST" id="formEquipment">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="newEquipamentModalLabel">Cadastro de novo equipamento</h5>
+                    <h5 class="modal-title" id="newEquipmentModalLabel">Cadastro de novo equipamento</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -13,12 +13,12 @@
                         <div class="card-body d-flex justify-content-around">
                             <div class="form-radio form-radio-flat">
                                 <label class="form-check-label">
-                                    <input type="radio" class="form-check-input" name="type_equipament" value="cacamba"> Caçamba <i class="input-helper"></i>
+                                    <input type="radio" class="form-check-input" name="type_equipment" value="cacamba"> Caçamba <i class="input-helper"></i>
                                 </label>
                             </div>
                             <div class="form-radio form-radio-flat">
                                 <label class="form-check-label">
-                                    <input type="radio" class="form-check-input" name="type_equipament" value="others"> Outros <i class="input-helper"></i>
+                                    <input type="radio" class="form-check-input" name="type_equipment" value="others"> Outros <i class="input-helper"></i>
                                 </label>
                             </div>
                         </div>

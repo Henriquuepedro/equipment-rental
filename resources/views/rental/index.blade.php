@@ -13,10 +13,10 @@
     <script>
         var tableRental;
         $(function () {
-            tableRental = getTable();
+            tableRental = getTable(false);
         });
 
-        const getTable = () => {
+        const getTable = (stateSave = true) => {
             return $("#tableRentals").DataTable({
                 "responsive": true,
                 "processing": true,
@@ -24,6 +24,7 @@
                 "serverSide": true,
                 "sortable": true,
                 "searching": true,
+                "stateSave": stateSave,
                 "serverMethod": "post",
                 "order": [[ 0, 'desc' ]],
                 "ajax": {
@@ -115,22 +116,21 @@
                     </div>
                     <table id="tableRentals" class="table table-bordered">
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Cliente/Endereço</th>
-                            <th>Criado Em</th>
-                            <th>Ação</th>
-                        </tr>
+                            <tr>
+                                <th>Código</th>
+                                <th>Cliente/Endereço</th>
+                                <th>Criado Em</th>
+                                <th>Ação</th>
+                            </tr>
                         </thead>
-                        <tbody>
-                        </tbody>
+                        <tbody></tbody>
                         <tfoot>
-                        <tr>
-                            <th>#</th>
-                            <th>Cliente/Endereço</th>
-                            <th>Criado Em</th>
-                            <th>Ação</th>
-                        </tr>
+                            <tr>
+                                <th>Código</th>
+                                <th>Cliente/Endereço</th>
+                                <th>Criado Em</th>
+                                <th>Ação</th>
+                            </tr>
                         </tfoot>
                     </table>
                 </div>

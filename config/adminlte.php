@@ -250,9 +250,9 @@ return [
                     'active'  => ['client.index', 'client.create', 'client.edit']
                 ],
                 [
-                    'text' => 'Equipamentos',
-                    'route'  => 'equipament.index',
-                    'active'  => ['equipament.index', 'equipament.create', 'equipament.edit']
+                    'text' => 'Equipmentos',
+                    'route'  => 'equipment.index',
+                    'active'  => ['equipment.index', 'equipment.create', 'equipment.edit']
                 ]
             ],
         ]

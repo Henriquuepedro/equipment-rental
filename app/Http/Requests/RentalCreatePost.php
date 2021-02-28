@@ -38,15 +38,15 @@ class RentalCreatePost extends FormRequest
             'state' => 'required',
             'date_delivery' => 'required|date_format:"d/m/Y H:i"',
             'date_withdrawal' => 'required_without:not_use_date_withdrawal',
-            'equipament_id' => [
+            'equipment_id' => [
                 'required',
                 function ($attribute, $value, $fail) {
                     foreach ($value as $v) {
-                        $reference = $this->{'reference_equipament_'.$v};
-                        $qty = $this->{'stock_equipament_'.$v};
+                        $reference = $this->{'reference_equipment_'.$v};
+                        $qty = $this->{'stock_equipment_'.$v};
                         $use_date_diff = $this->{'use_date_diff_equip_'.$v};
-                        $date_delivery = $this->{'date_delivery_equipament_'.$v};
-                        $date_withdrawal = $this->{'date_withdrawal_equipament_'.$v};
+                        $date_delivery = $this->{'date_delivery_equipment_'.$v};
+                        $date_withdrawal = $this->{'date_withdrawal_equipment_'.$v};
                         $not_use_date_withdrawal = $this->{'not_use_date_withdrawal_equip_'.$v};
 
                         if ($qty <= 0) {

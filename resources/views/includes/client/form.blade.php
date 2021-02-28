@@ -1,7 +1,7 @@
 @php
     $clientSelected = old() ? old('client') : (isset($rental) ? $rental->client_id : '');
 @endphp
-<label>Cliente</label>
+<label>Cliente <sup>*</sup></label>
 <div class="input-group client-load" data-target="#timepicker-example" data-toggle="datetimepicker">
     <select {{ $disabled ?? '' }} class="form-control label-animate required" name="client" required></select>
     <div class="input-group-addon input-group-append">

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 
-class VehicleDeletePost extends FormRequest
+class ResidueDeletePost extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,17 +25,17 @@ class VehicleDeletePost extends FormRequest
     public function rules()
     {
         return [
-            'vehicle_id' => [
+            'residue_id' => [
                 'required',
                 'numeric',
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('rental_equipments')
-                        ->where(['vehicle_suggestion' => $value, 'company_id' => $this->user()->company_id])
+                    $exists = DB::table('rental_residues')
+                        ->where(['residue_id' => $value, 'company_id' => $this->user()->company_id])
                         ->count();
                     if ($exists == 1) {
-                        $fail('Veículo está sendo utilizado em alguma locação. Realize a troca do veículo na locação para continuar.');
+                        $fail('Resíduo está sendo utilizado em alguma locação. Realize a troca do resíduo na locação para continuar.');
                     } elseif ($exists > 1) {
-                        $fail('Veículo está sendo utilizado em algumas locações. Realize a troca do veículo nas locações para continuar.');
+                        $fail('Resíduo está sendo utilizado em algumas locações. Realize a troca do resíduo nas locações para continuar.');
                     }
                 }
             ]
@@ -50,7 +50,7 @@ class VehicleDeletePost extends FormRequest
     public function messages()
     {
         return [
-            'vehicle_id.*' => 'Não foi possível localizar o veículo!'
+            'residue_id.*' => 'Não foi possível localizar o resíduo!'
         ];
     }
 

@@ -188,13 +188,13 @@
 
         $('select[name="name_address"], select[name="client"]').attr('disabled', false);
         $('.show-address input[name="cep"]').attr('disabled', false).parent().find('label').text('CEP');
-        $('.show-address input[name="address"]').attr('disabled', false).parent().find('label').text('Endereço');
-        $('.show-address input[name="number"]').attr('disabled', false).parent().find('label').text('Número');
+        $('.show-address input[name="address"]').attr('disabled', false).parent().find('label').html('Endereço <sup>*</sup>');
+        $('.show-address input[name="number"]').attr('disabled', false).parent().find('label').html('Número <sup>*</sup>');
         $('.show-address input[name="complement"]').attr('disabled', false).parent().find('label').text('Complemento');
         $('.show-address input[name="reference"]').attr('disabled', false).parent().find('label').text('Referência');
-        $('.show-address input[name="neigh"]').attr('disabled', false).parent().find('label').text('Bairro');
-        $('.show-address input[name="city"]').attr('disabled', false).parent().find('label').text('Cidade');
-        $('.show-address input[name="state"]').attr('disabled', false).parent().find('label').text('Estado');
+        $('.show-address input[name="neigh"]').attr('disabled', false).parent().find('label').html('Bairro <sup>*</sup>');
+        $('.show-address input[name="city"]').attr('disabled', false).parent().find('label').html('Cidade <sup>*</sup>');
+        $('.show-address input[name="state"]').attr('disabled', false).parent().find('label').html('Estado <sup>*</sup>');
     }
 
     // VERIFICAR SE HAVERÁ ALGUM ERRO

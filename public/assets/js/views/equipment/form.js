@@ -1,29 +1,29 @@
 $(() => {
-    $('#formEquipament [name="cep"]').mask('00.000-000');
-    $('#formEquipament [name="phone_1"],#formEquipament [name="phone_2"]').mask('(00) 000000000');
-    $('#formEquipament [name="stock"]').mask('0#');
-    $('#formEquipament [name="value"]').mask('#.##0,00', { reverse: true });
-    $('#formEquipament [name="day_start[]"], #formEquipament [name="day_end[]"]').mask('0#');
-    $('#formEquipament [name="value_period[]"]').mask('#.##0,00', { reverse: true });
-    if ($('#formEquipament [name="type_equipament"]:checked').length) {
-        $('#formEquipament [name="type_equipament"]:checked').trigger('change');
+    $('#formEquipment [name="cep"]').mask('00.000-000');
+    $('#formEquipment [name="phone_1"],#formEquipment [name="phone_2"]').mask('(00) 000000000');
+    $('#formEquipment [name="stock"]').mask('0#');
+    $('#formEquipment [name="value"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
+    $('#formEquipment [name="day_start[]"], #formEquipment [name="day_end[]"]').mask('0#');
+    $('#formEquipment [name="value_period[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
+    if ($('#formEquipment [name="type_equipment"]:checked').length) {
+        $('#formEquipment [name="type_equipment"]:checked').trigger('change');
     }
 });
 
-$('#formEquipament [name="type_equipament"]').on('change', function(){
+$('#formEquipment [name="type_equipment"]').on('change', function(){
     const type = $(this).val();
 
     if (type === 'cacamba') {
-        $('#formEquipament #name').val('').closest('.form-group').addClass('d-none');
-        $('#formEquipament #volume').closest('.form-group').removeClass('d-none');
+        $('#formEquipment #name').val('').closest('.form-group').addClass('d-none');
+        $('#formEquipment #volume').closest('.form-group').removeClass('d-none');
     }
     else if (type === 'others') {
-        $('#formEquipament #volume').val($('#volume option:eq(0)').val()).closest('.form-group').addClass('d-none');
-        $('#formEquipament #name').closest('.form-group').removeClass('d-none');
+        $('#formEquipment #volume').val($('#volume option:eq(0)').val()).closest('.form-group').addClass('d-none');
+        $('#formEquipment #name').closest('.form-group').removeClass('d-none');
     }
 
     $('.error-form').slideUp('slow');
-    $("#formEquipament .card").each(function() {
+    $("#formEquipment .card").each(function() {
         $(this).slideDown('slow');
     });
 });
@@ -31,7 +31,7 @@ jQuery.validator.addMethod("name_valid", function(value, element) {
     value = jQuery.trim(value);
     return value !== "";
 
-}, 'Informe um nome para o equipamento');
+}, 'Informe um nome para o Equipmento');
 
 jQuery.validator.addMethod("volume", function(value, element) {
     value = jQuery.trim(value);
@@ -39,7 +39,7 @@ jQuery.validator.addMethod("volume", function(value, element) {
 
 }, 'Selecione um volume para a caçamba');
 
-$('#formEquipament #add-new-period').on('click', function () {
+$('#formEquipment #add-new-period').on('click', function () {
 
     const verifyPeriod = verifyPeriodComplet();
     if (!verifyPeriod[0]) {
@@ -61,7 +61,7 @@ $('#formEquipament #add-new-period').on('click', function () {
     let countPeriod = 0;
     countPeriod = $('.period').length + 1;
 
-    $('#formEquipament #new-periods').append(`
+    $('#formEquipment #new-periods').append(`
         <div class="period display-none">
             <div class="row">
                 <div class="form-group col-md-2">
@@ -87,16 +87,16 @@ $('#formEquipament #add-new-period').on('click', function () {
         </div>
     `).find('.period').slideDown('slow');
 
-    $('#formEquipament [name="day_start[]"], #formEquipament [name="day_end[]"]').mask('0#');
-    $('#formEquipament [name="value_period[]"]').mask('#.##0,00', { reverse: true });
+    $('#formEquipment [name="day_start[]"], #formEquipment [name="day_end[]"]').mask('0#');
+    $('#formEquipment [name="value_period[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
 });
 
-$(document).on('click', '#formEquipament .remove-period', function (){
+$(document).on('click', '#formEquipment .remove-period', function (){
     $(this).closest('.period').slideUp(500);
     setTimeout(() => { $(this).closest('.period').remove() }, 500);
 });
 
-$(document).on('keydown', '#formEquipament', function(e){
+$(document).on('keydown', '#formEquipment', function(e){
     if(e.keyCode == 13){
         return false;
     }
@@ -115,9 +115,9 @@ const verifyPeriodComplet = () => {
     let arrDaysVerify = [];
     for (let countPeriod = 0; countPeriod < periodCount; countPeriod++) {
         periodUser++;
-        day_start   = $(`#formEquipament [name="day_start[]"]:eq(${countPeriod})`);
-        day_end     = $(`#formEquipament [name="day_end[]"]:eq(${countPeriod})`);
-        value       = $(`#formEquipament [name="value_period[]"]:eq(${countPeriod})`);
+        day_start   = $(`#formEquipment [name="day_start[]"]:eq(${countPeriod})`);
+        day_end     = $(`#formEquipment [name="day_end[]"]:eq(${countPeriod})`);
+        value       = $(`#formEquipment [name="value_period[]"]:eq(${countPeriod})`);
         if (!day_start.val().length) {
             day_start.css('border', '1px solid red');
             arrErrors.push('Dia inicial do período precisa ser preenchido.');
@@ -156,7 +156,7 @@ const verifyValuesOutRange = (day_start, day_end, arrDaysVerify) => {
 }
 
 const cleanBorderPeriod = () => {
-    $('#formEquipament [name="day_start[]"]').removeAttr('style');
-    $('#formEquipament [name="day_end[]"]').removeAttr('style');
-    $('#formEquipament [name="value_period[]"]').removeAttr('style');
+    $('#formEquipment [name="day_start[]"]').removeAttr('style');
+    $('#formEquipment [name="day_end[]"]').removeAttr('style');
+    $('#formEquipment [name="value_period[]"]').removeAttr('style');
 }
