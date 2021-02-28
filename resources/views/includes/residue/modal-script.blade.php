@@ -62,7 +62,7 @@
                     cleanFormResidueModal();
                     checkLabelAnimate();
                     @if(\Request::route()->getName() == 'rental.create')
-                        loadResidues(response.residue_id, '.container-residues select[name="residues"]');
+                        loadResidues(response.residue_id, '.container-residues select[name="residues[]"]');
                     @elseif(\Request::route()->getName() == 'residue.index')
                         reloadTable();
                     @else

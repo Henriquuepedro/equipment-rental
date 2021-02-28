@@ -140,25 +140,26 @@ $(document).on('keydown', function(e){
 
 $('[name="type_person"]').on('change', function(){
     const type = $(this).val();
+    const form = $(this).closest('form');
 
     if (type === 'pf') {
-        $('label[for="name_client"]').html('Nome do Cliente <sup>*</sup>');
-        $('#name_client').closest('.form-group').removeClass('col-md-6').addClass('col-md-12');
-        $('label[for="cpf_cnpj"]').text('CPF');
-        $('label[for="rg_ie"]').text('RG');
-        $('#fantasy_client').val('').closest('.form-group').addClass('d-none');
-        $('[name="cpf_cnpj"]').mask('000.000.000-00');
+        form.find('label[for="name_client"]').html('Nome do Cliente <sup>*</sup>');
+        form.find('#name_client').closest('.form-group').removeClass('col-md-6').addClass('col-md-12');
+        form.find('label[for="cpf_cnpj"]').text('CPF');
+        form.find('label[for="rg_ie"]').text('RG');
+        form.find('#fantasy_client').val('').closest('.form-group').addClass('d-none');
+        form.find('[name="cpf_cnpj"]').mask('000.000.000-00');
     }
     else if (type === 'pj') {
-        $('label[for="name_client"]').html('Razão Social <sup>*</sup>');
-        $('#name_client').closest('.form-group').removeClass('col-md-12').addClass('col-md-6');
-        $('label[for="cpf_cnpj"]').text('CNPJ');
-        $('label[for="rg_ie"]').text('IE');
-        $('#fantasy_client').closest('.form-group').removeClass('d-none');
-        $('[name="cpf_cnpj"]').mask('00.000.000/0000-00');
+        form.find('label[for="name_client"]').html('Razão Social <sup>*</sup>');
+        form.find('#name_client').closest('.form-group').removeClass('col-md-12').addClass('col-md-6');
+        form.find('label[for="cpf_cnpj"]').text('CNPJ');
+        form.find('label[for="rg_ie"]').text('IE');
+        form.find('#fantasy_client').closest('.form-group').removeClass('d-none');
+        form.find('[name="cpf_cnpj"]').mask('00.000.000/0000-00');
     }
 
-    $(".card").each(function() {
+    form.find(".card").each(function() {
         $(this).slideDown('slow');
     });
 });

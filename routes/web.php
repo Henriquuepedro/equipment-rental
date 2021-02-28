@@ -30,6 +30,7 @@ Route::group(['middleware' => 'auth'], function (){
     Route::group(['prefix' => '/configurar', 'as' => 'config.'], function () {
         Route::get('/', [App\Http\Controllers\CompanyController::class, 'index'])->name('index');
         Route::post('/atualizar-empresa', [App\Http\Controllers\CompanyController::class, 'updateCompany'])->name('update.company');
+        Route::post('/atualizar-configuracao', [App\Http\Controllers\ConfigController::class, 'updateConfig'])->name('update.config');
     });
 
     // Perfil

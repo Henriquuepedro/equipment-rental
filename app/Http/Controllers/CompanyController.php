@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyUpdatePost;
 use App\Models\Company;
+use App\Models\Config;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,12 +15,14 @@ class CompanyController extends Controller
     private $user;
     private $company;
     private $permission;
+    private $config;
 
-    public function __construct(User $user, Company $company, Permission $permission)
+    public function __construct(User $user, Company $company, Permission $permission, Config $config)
     {
         $this->user         = $user;
         $this->company      = $company;
         $this->permission   = $permission;
+        $this->config       = $config;
     }
 
     public function index()
@@ -69,7 +72,25 @@ class CompanyController extends Controller
               </div>';
         }
 
-        return view('config.index', compact('company', 'htmlPermissions'));
+        $dataConfigCompany   = $this->config->getConfigColumnAndValue($company_id);
+        $configCompanyColumn = $dataConfigCompany['column'];
+        $configCompanyValue  = $dataConfigCompany['value'];
+        $configCompany       = new \StdClass();
+
+        $fromToNameConfig    = [
+            'view_obervation_client_rental' => 'Visualizar Observação Do Cliente Na Locação'
+        ];
+
+        foreach ($configCompanyColumn as $configIndex) {
+            if (in_array($configIndex, ['id', 'company_id', 'user_update', 'created_at', 'updated_at'])) continue;
+            $configCompany->$configIndex = [
+                'status'        => $configCompanyValue->$configIndex ? true : false,
+                'name'          => $configIndex,
+                'description'   => $fromToNameConfig[$configIndex]
+            ];
+        }
+
+        return view('config.index', compact('company', 'htmlPermissions', 'configCompany'));
     }
 
     public function updateCompany(CompanyUpdatePost $request)

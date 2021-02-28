@@ -389,8 +389,12 @@ class EquipmentController extends Controller
             'cacamba'   => $equipment->volume ? true : false
         ];
 
+        $permissions = [
+            'vehicle' => $this->hasPermission('VehicleCreatePost'),
+            'driver' => $this->hasPermission('DriverCreatePost')
+        ];
 
-        return response()->json(['success' => true, 'data' => $equipmentData]);
+        return response()->json(['success' => true, 'data' => $equipmentData, 'permissions' => $permissions]);
     }
 
     public function getStockEquipment(Request $request)

@@ -171,16 +171,19 @@
 @section('js')
 <script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}" type="application/javascript"></script>
 <script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
-<script src="{{ asset('assets/js/views/client/form.js') }}" type="application/javascript"></script>
-<script src="{{ asset('assets/js/views/equipment/form.js') }}" type="application/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
 <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
+
 @include('includes.client.modal-script')
 @include('includes.address.modal-script')
 @include('includes.equipment.modal-script')
 @include('includes.driver.modal-script')
 @include('includes.vehicle.modal-script')
 @include('includes.residue.modal-script')
+
+    @if(in_array('ClientCreatePost', $permissions))    <script src="{{ asset('assets/js/views/client/form.js') }}" type="application/javascript"></script>    @endif
+    @if(in_array('EquipmentCreatePost', $permissions)) <script src="{{ asset('assets/js/views/equipment/form.js') }}" type="application/javascript"></script> @endif
+
 @stop
 
 @section('content')
@@ -282,7 +285,7 @@
                                             <div class="input-group label-animate">
                                                 <select class="select2 form-control" multiple="multiple" name="residues[]"></select>
                                                 <div class="input-group-addon input-group-append">
-                                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo"><i class="fas fa-plus-circle"></i></button>
+                                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo" @if(!in_array('ResidueCreatePost', $permissions)) disabled @endif><i class="fas fa-plus-circle"></i></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -300,7 +303,7 @@
                                                 <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipment">
                                                     <i class="fa fa-times input-group-text text-white"></i>
                                                 </div>
-                                                <div class="input-group-addon input-group-append btn-success" id="newEquipment" data-toggle="modal" data-target="#newEquipmentModal">
+                                                <div class="input-group-addon input-group-append btn-success" @if(in_array('EquipmentCreatePost', $permissions))id="newEquipment" data-toggle="modal" data-target="#newEquipmentModal"@else disabled @endif>
                                                     <i class="fa fa-plus input-group-text text-white"></i>
                                                 </div>
                                             </div>
@@ -308,7 +311,7 @@
                                         <div class="form-group col-md-12 mt-2 table-responsive content-equipment">
                                             <table class="table list-equipment d-table">
                                                 <tbody>
-                                                    <tr class="equipment">
+                                                    <tr>
                                                         <td class="text-left"><h6 class="text-center"><i class="fas fa-search"></i> Pesquise por um equipamento</h6></td>
                                                     </tr>
                                                 </tbody>
@@ -432,11 +435,11 @@
             </div>
         </div>
     </div>
-    @include('includes.client.modal-create')
-    @include('includes.equipment.modal-create')
-    @include('includes.vehicle.modal-create')
-    @include('includes.driver.modal-create')
-    @include('includes.residue.modal-create')
+    @if(in_array('ClientCreatePost', $permissions))    @include('includes.client.modal-create')    @endif
+    @if(in_array('EquipmentCreatePost', $permissions)) @include('includes.equipment.modal-create') @endif
+    @if(in_array('VehicleCreatePost', $permissions))   @include('includes.vehicle.modal-create')   @endif
+    @if(in_array('DriverCreatePost', $permissions))    @include('includes.driver.modal-create')    @endif
+    @if(in_array('ResidueCreatePost', $permissions))   @include('includes.residue.modal-create')   @endif
     <div class="modal fade" tabindex="-1" role="dialog" id="confirmAddressRental">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">

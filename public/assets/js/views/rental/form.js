@@ -672,10 +672,13 @@ $('table.list-equipment').on('click', '.equipment', function(){
                 return false;
             }
 
+            const permissions = response.permissions;
             response = response.data;
 
             const date_delivery = $('input[name="date_delivery"]').val();
             const date_withdrawal = $('input[name="date_withdrawal"]').val();
+            const disabledVehicle = permissions.vehicle ? '' : 'disabled';
+            const disabledDriver = permissions.driver ? '' : 'disabled';
 
             $('#equipments-selected').append(`
                     <div class="card">
@@ -700,7 +703,7 @@ $('table.list-equipment').on('click', '.equipment', function(){
                                     <div class="col-md-4">
                                         <div class="form-group flatpickr label-animate stock-group d-flex">
                                             <label class="label-date-btns">Quantidade</label>
-                                            <input type="tel" name="stock_equipment_${response.id}" class="form-control col-md-9 flatpickr-input" value="1" max-stock="${response.stock}">
+                                            <input type="tel" name="stock_equipment_${response.id}" class="form-control col-md-9 flatpickr-input bbr-r-0 btr-r-0" value="1" max-stock="${response.stock}">
                                             <div class="input-button-calendar col-md-3 no-padding">
                                                 <button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipment" data-toggle="tootip" title="Visualizar valor por período" id-equipment="${response.id}">
                                                     <i class="fas fa-file-invoice-dollar"></i>
@@ -718,7 +721,7 @@ $('table.list-equipment').on('click', '.equipment', function(){
                                                 <option>Carregando ...</option>
                                             </select>
                                             <div class="input-group-addon input-group-append">
-                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newVehicleModal" title="Novo Veículo"><i class="fas fa-plus-circle"></i></button>
+                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newVehicleModal" title="Novo Veículo" ${disabledVehicle}><i class="fas fa-plus-circle"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -729,7 +732,7 @@ $('table.list-equipment').on('click', '.equipment', function(){
                                                 <option>Carregando ...</option>
                                             </select>
                                             <div class="input-group-addon input-group-append">
-                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newDriverModal" title="Novo Motorista"><i class="fas fa-plus-circle"></i></button>
+                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newDriverModal" title="Novo Motorista" ${disabledDriver}><i class="fas fa-plus-circle"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -908,11 +911,11 @@ $(document).on('blur change', '[name^="stock_equipment_"]', function (){
             icon: 'error',
             title: `A quantidade não pode ser superior a ${maxStock} un.`
         });
-        $(this).val(maxStock);
+        // $(this).val(maxStock);
         setTimeout(() => {
             $(`#collapseEquipment-${idEquipment}`).collapse('show');
             $(this).focus();
-        }, 550);
+        }, 250);
     }
 });
 
