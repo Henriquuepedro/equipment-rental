@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClientCreatePost;
 use App\Http\Requests\ClientDeletePost;
 use App\Http\Requests\ClientUpdatePost;
+use App\Models\Config;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Address;
@@ -16,11 +17,13 @@ class ClientController extends Controller
     private $client;
     private $address;
     private $cpf_cnpj;
+    private $config;
 
-    public function __construct(Client $client, Address $address)
+    public function __construct(Client $client, Address $address, Config $config)
     {
         $this->client = $client;
         $this->address = $address;
+        $this->config = $config;
     }
 
     public function index()
@@ -360,8 +363,10 @@ class ClientController extends Controller
 
         $client = $this->client->getClient($client_id, $company_id);
 
+        $configObs = $this->config->getConfigCompany(auth()->user()->company_id, 'view_obervation_client_rental');
+
         return response()->json([
-            'observation' => $client->observation
+            'observation' => $configObs ? $client->observation : null
         ]);
     }
 }

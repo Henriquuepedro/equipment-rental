@@ -856,7 +856,6 @@ input.check-style:checked + label.check-style:after {
 label.check-style:active:after {
     width: 25px;
 }
-
 label.check-xs {
     width: 32px;
     height: 17px;
@@ -868,7 +867,17 @@ label.check-xs:after {
     width: 15px;
     height: 15px;
 }
-
+label.check-md {
+    width: 42px;
+    height: 22px;
+    margin-top: 2px;
+}
+label.check-md:after {
+    top: 1px;
+    left: 1px;
+    width: 20px;
+    height: 20px;
+}
 .label-date-btns {
     top: 12px !important;
     left: 20px !important;
@@ -879,6 +888,31 @@ label.check-xs:after {
 .label-animate .label-date-btns {
     top: -5px !important;
 }
+.btr-r-0 {
+    border-top-right-radius: 0 !important;
+}
+.btl-r-0 {
+    border-top-left-radius: 0 !important;
+}
+.bbr-r-0 {
+    border-bottom-right-radius: 0 !important;
+}
+.bbl-r-0 {
+    border-bottom-left-radius: 0 !important;
+}
+div[disabled] {
+    cursor: no-drop !important;
+}
+div[disabled].btn-success {
+    background: #14aa75 !important;;
+}
+div[disabled].btn-danger {
+    background: #ff3225 !important;;
+}
+div[disabled].btn-primary {
+    background: #0c7cd5 !important;;
+}
+
 
 
 
