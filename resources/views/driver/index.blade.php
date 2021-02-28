@@ -13,10 +13,10 @@
     <script>
         var tableDriver;
         $(function () {
-            tableDriver = getTable();
+            tableDriver = getTable(false);
         });
 
-        const getTable = () => {
+        const getTable = (stateSave = true) => {
             return $("#tableDrivers").DataTable({
                 "responsive": true,
                 "processing": true,
@@ -24,6 +24,7 @@
                 "serverSide": true,
                 "sortable": true,
                 "searching": true,
+                "stateSave": stateSave,
                 "serverMethod": "post",
                 "order": [[ 0, 'desc' ]],
                 "ajax": {
@@ -78,7 +79,8 @@
                                 title: response.message
                             })
                         }, error: e => {
-                            console.log(e);
+                            if (e.status !== 403 && e.status !== 422)
+                                console.log(e);
                         },
                         complete: function(xhr) {
                             if (xhr.status === 403) {
@@ -87,6 +89,23 @@
                                     title: 'Você não tem permissão para fazer essa operação!'
                                 });
                                 $(`button[driver-id="${driver_id}"]`).trigger('blur');
+                            }
+                            if (xhr.status === 422) {
+
+                                let arrErrors = [];
+
+                                $.each(xhr.responseJSON.errors, function( index, value ) {
+                                    arrErrors.push(value);
+                                });
+
+                                if (!arrErrors.length && xhr.responseJSON.message !== undefined)
+                                    arrErrors.push('Você não tem permissão para fazer essa operação!');
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Atenção',
+                                    html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                                });
                             }
                         }
                     });

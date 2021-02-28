@@ -42,7 +42,7 @@
             border-bottom-right-radius: 5px;
             border-top-right-radius: 5px;
         }
-        [name^="date_withdrawal"], [name^="date_delivery"], [name="stock_equipament"] {
+        [name^="date_withdrawal"], [name^="date_delivery"], [name="stock_equipment"] {
             border-bottom-right-radius: 0 !important;
             border-top-right-radius: 0 !important;;
         }
@@ -58,10 +58,10 @@
             background: #ff6258;
             cursor: pointer;
         }
-        .list-equipament .equipament {
+        .list-equipment .equipment {
             cursor: pointer;
         }
-        .list-equipament .equipament:hover {
+        .list-equipment .equipment:hover {
             background: #f5f5f5;
         }
         .wizard > .content > .body {
@@ -70,7 +70,7 @@
         .accordion .card .card-header a{
             background: #2196f3 !important;
         }
-        .remove-equipament i {
+        .remove-equipment i {
             cursor: pointer;
         }
         .accordion.accordion-multiple-filled .card .card-header a:last-child {
@@ -84,44 +84,44 @@
         .stepRental.body {
             width: 100% !important;
         }
-        .content-equipament {
+        .content-equipment {
             max-height: 300px;
         }
-        .content-equipament::-webkit-scrollbar-track {
+        .content-equipment::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px #2196f3;
             border-radius: 10px;
             background-color: #F5F5F5;
         }
-        .content-equipament::-webkit-scrollbar {
+        .content-equipment::-webkit-scrollbar {
             width: 12px;
             background-color: #F5F5F5;
         }
-        .content-equipament::-webkit-scrollbar-thumb {
+        .content-equipment::-webkit-scrollbar-thumb {
             border-radius: 10px;
             -webkit-box-shadow: inset 0 0 6px #2196f3;
             background-color: #52a4e5;
         }
-        .calendar_equipament a {
+        .calendar_equipment a {
             height: calc(1.5em + 0.75rem + 4px) !important;
         }
-        .calendar_equipament i {
+        .calendar_equipment i {
             font-size: 14px !important;
         }
         a[disabled] {
             pointer-events: none;
             cursor: no-drop;
         }
-        .list-equipaments-payment li.one-li-list-equipaments-payment:after{
+        .list-equipments-payment li.one-li-list-equipments-payment:after{
             display: none;
         }
-        .btn-view-price-period-equipament {
+        .btn-view-price-period-equipment {
             display: flex;
             align-items: center;
             justify-content: center;
             padding-bottom: 5px;
             height: calc(1.5em + 0.75rem + 3px);
         }
-        .btn-view-price-period-equipament i {
+        .btn-view-price-period-equipment i {
             font-size: 18px !important;
             color: #fff;
         }
@@ -172,16 +172,12 @@
 <script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}" type="application/javascript"></script>
 <script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
 <script src="{{ asset('assets/js/views/client/form.js') }}" type="application/javascript"></script>
-<script src="{{ asset('assets/js/views/equipament/form.js') }}" type="application/javascript"></script>
-<script src="{{ asset('assets/vendors/inputmask/jquery.inputmask.bundle.js') }}" type="application/javascript"></script>
-<script src="{{ asset('assets/vendors/moment/moment.min.js') }}" type="application/javascript"></script>
+<script src="{{ asset('assets/js/views/equipment/form.js') }}" type="application/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
 <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
-<script src="{{ asset('vendor/icheck/icheck.min.js') }}" type="application/javascript"></script>
-<script src="https://cdn.rawgit.com/plentz/jquery-maskmoney/master/dist/jquery.maskMoney.min.js"></script>
 @include('includes.client.modal-script')
 @include('includes.address.modal-script')
-@include('includes.equipament.modal-script')
+@include('includes.equipment.modal-script')
 @include('includes.driver.modal-script')
 @include('includes.vehicle.modal-script')
 @include('includes.residue.modal-script')
@@ -243,7 +239,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group flatpickr d-flex">
-                                                <label class="label-date-btns">Data Prevista de Entrega</label>
+                                                <label class="label-date-btns">Data Prevista de Entrega <sup>*</sup></label>
                                                 <input type="text" name="date_delivery" class="form-control col-md-9" value="{{ date('d/m/Y H:i') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
                                                 <div class="input-button-calendar col-md-3 no-padding">
                                                     <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
@@ -290,29 +286,29 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-12 mt-2 equipaments-selected">
-                                            <div class="accordion accordion-multiple-filled" id="equipaments-selected" role="tablist">
+                                        <div class="form-group col-md-12 mt-2 equipments-selected">
+                                            <div class="accordion accordion-multiple-filled" id="equipments-selected" role="tablist">
                                             </div>
                                             <hr class="separator-dashed mt-4 display-none">
                                         </div>
                                         <div class="form-group col-md-12 mt-2">
                                             <div class="input-group">
-                                                <input type="text" class="form-control" id="searchEquipament" placeholder="Pesquise por nome, referência ou código">
+                                                <input type="text" class="form-control" id="searchEquipment" placeholder="Pesquise por nome, referência ou código">
                                                 <div class="input-group-addon input-group-append btn-primary">
                                                     <i class="fa fa-search input-group-text text-white"></i>
                                                 </div>
-                                                <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipament">
+                                                <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipment">
                                                     <i class="fa fa-times input-group-text text-white"></i>
                                                 </div>
-                                                <div class="input-group-addon input-group-append btn-success" id="newEquipament" data-toggle="modal" data-target="#newEquipamentModal">
+                                                <div class="input-group-addon input-group-append btn-success" id="newEquipment" data-toggle="modal" data-target="#newEquipmentModal">
                                                     <i class="fa fa-plus input-group-text text-white"></i>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-12 mt-2 table-responsive content-equipament">
-                                            <table class="table list-equipament d-table">
+                                        <div class="form-group col-md-12 mt-2 table-responsive content-equipment">
+                                            <table class="table list-equipment d-table">
                                                 <tbody>
-                                                    <tr class="equipament">
+                                                    <tr class="equipment">
                                                         <td class="text-left"><h6 class="text-center"><i class="fas fa-search"></i> Pesquise por um equipamento</h6></td>
                                                     </tr>
                                                 </tbody>
@@ -326,8 +322,8 @@
                                     <div class="row">
                                         <div id="payment" class="col-md-12 mt-3">
                                             <div class="col-md-12 grid-margin stretch-card">
-                                                <ul class="bullet-line-list pl-3 col-md-12 list-equipaments-payment"></ul>
-                                                <div class="pl-3 col-md-12 list-equipaments-payment-load text-center">
+                                                <ul class="bullet-line-list pl-3 col-md-12 list-equipments-payment"></ul>
+                                                <div class="pl-3 col-md-12 list-equipments-payment-load text-center">
                                                     <h4>Carregando equipamentos <i class="fa fa-spinner fa-spin"></i></h4>
                                                 </div>
                                             </div>
@@ -437,7 +433,7 @@
         </div>
     </div>
     @include('includes.client.modal-create')
-    @include('includes.equipament.modal-create')
+    @include('includes.equipment.modal-create')
     @include('includes.vehicle.modal-create')
     @include('includes.driver.modal-create')
     @include('includes.residue.modal-create')
@@ -468,12 +464,12 @@
             </div>
         </div>
     </div>
-    <input type="hidden" id="routeGetStockEquipament" value="{{ route('ajax.equipament.get-stock') }}">
-    <input type="hidden" id="routeGetPriceEquipament" value="{{ route('ajax.equipament.get-price') }}">
-    <input type="hidden" id="routeGetEquipament" value="{{ route('ajax.equipament.get-equipament') }}">
-    <input type="hidden" id="routeGetPriceStockEquipaments" value="{{ route('ajax.equipament.get-price-stock-check') }}">
-    <input type="hidden" id="routeGetEquipaments" value="{{ route('ajax.equipament.get-equipaments') }}">
-    <input type="hidden" id="routeGetPriceStockPeriodEquipament" value="{{ route('ajax.equipament.get-price-per-period') }}">
+    <input type="hidden" id="routeGetStockEquipment" value="{{ route('ajax.equipment.get-stock') }}">
+    <input type="hidden" id="routeGetPriceEquipment" value="{{ route('ajax.equipment.get-price') }}">
+    <input type="hidden" id="routeGetEquipment" value="{{ route('ajax.equipment.get-equipment') }}">
+    <input type="hidden" id="routeGetPriceStockEquipments" value="{{ route('ajax.equipment.get-price-stock-check') }}">
+    <input type="hidden" id="routeGetEquipments" value="{{ route('ajax.equipment.get-equipments') }}">
+    <input type="hidden" id="routeGetPriceStockPeriodEquipment" value="{{ route('ajax.equipment.get-price-per-period') }}">
     <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
     <div class="modal fade" tabindex="-1" role="dialog" id="createRental">
         <div class="modal-dialog modal-md" role="document">
@@ -487,11 +483,16 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="text-center">Locação criada com sucesso!</h3>
+                            <h3 class="text-center code_rental">Locação código <strong></strong> criada com sucesso!</h3>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12 d-flex justify-content-around flex-wrap">
+                        <div class="col-md-12 mt-3 text-center">
+                            <a href="" target="_blank" class="col-md-4 btn btn-primary rental_print"> <i class="fa fa-print"></i> Imprimir Recibo</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 d-flex justify-content-around flex-wrap mt-5">
                             <a href="{{ route('rental.index') }}" class="btn btn-primary col-md-4">Listagem de Locações</a>
                             <a href="{{ route('rental.create') }}" class="btn btn-secondary col-md-4">Realizar nova Locação</a>
                         </div>

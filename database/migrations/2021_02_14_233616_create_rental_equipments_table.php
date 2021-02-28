@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRentalEquipamentsTable extends Migration
+class CreateRentalEquipmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,20 @@ class CreateRentalEquipamentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('rental_equipaments', function (Blueprint $table) {
+        Schema::create('rental_equipments', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id')->unsigned();
             $table->bigInteger('rental_id')->unsigned();
-            $table->bigInteger('equipament_id')->unsigned();
+            $table->bigInteger('equipment_id')->unsigned();
 
             $table->string('reference', 256);
+            $table->string('name', 256)->nullable();
+            $table->integer('volume')->nullable();
             $table->integer('quantity');
             $table->decimal('unitary_value', 12,2)->nullable();
             $table->decimal('total_value', 12,2)->nullable();
-            $table->integer('vehicle_suggestion')->nullable();
-            $table->integer('driver_suggestion')->nullable();
+            $table->bigInteger('vehicle_suggestion')->unsigned()->nullable();
+            $table->bigInteger('driver_suggestion')->unsigned()->nullable();
             $table->tinyInteger('use_date_diff_equip');
 
             $table->dateTime('expected_delivery_date');
@@ -37,10 +39,12 @@ class CreateRentalEquipamentsTable extends Migration
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->foreign('equipament_id')->references('id')->on('equipaments');
+            $table->foreign('equipment_id')->references('id')->on('equipments');
             $table->foreign('rental_id')->references('id')->on('rentals');
             $table->foreign('user_insert')->references('id')->on('users');
             $table->foreign('user_update')->references('id')->on('users');
+            $table->foreign('vehicle_suggestion')->references('id')->on('vehicles');
+            $table->foreign('driver_suggestion')->references('id')->on('drivers');
         });
     }
 
@@ -51,6 +55,6 @@ class CreateRentalEquipamentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('rental_equipaments');
+        Schema::dropIfExists('rental_equipments');
     }
 }

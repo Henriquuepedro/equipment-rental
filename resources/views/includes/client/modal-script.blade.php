@@ -167,7 +167,9 @@
     }
 
     $('select[name="client"]').on('change', function() {
-        let client_id = $(this).val();
+        let client_id = parseInt($(this).val());
+
+        if (client_id === 0) return false;
 
         $.ajax({
             headers: {

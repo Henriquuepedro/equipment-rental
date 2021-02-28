@@ -21,7 +21,7 @@ class CreateVehiclesTable extends Migration
             $table->string('model', 256)->nullable();
             $table->string('reference', 256)->nullable();
             $table->string('board', 256)->nullable();
-            $table->string('driver_id', 256)->nullable();
+            $table->bigInteger('driver_id')->unsigned()->nullable();
             $table->longText('observation')->nullable();
             $table->bigInteger('user_insert')->unsigned();
             $table->bigInteger('user_update')->unsigned()->nullable();
@@ -30,6 +30,7 @@ class CreateVehiclesTable extends Migration
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreign('user_insert')->references('id')->on('users');
             $table->foreign('user_update')->references('id')->on('users');
+            $table->foreign('driver_id')->references('id')->on('drivers');
         });
     }
 

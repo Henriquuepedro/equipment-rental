@@ -1,11 +1,11 @@
 <script>
     $(() => {
-        $('#newEquipamentModal [name="cpf"]').mask('000.000.000-00');
-        $('#newEquipamentModal [name="phone"]').mask('(00) 000000000');
-        $('#newEquipamentModal [name="rg"], #newEquipamentModal [name="cnh"]').mask('0#');
+        $('#newEquipmentModal [name="cpf"]').mask('000.000.000-00');
+        $('#newEquipmentModal [name="phone"]').mask('(00) 000000000');
+        $('#newEquipmentModal [name="rg"], #newEquipmentModal [name="cnh"]').mask('0#');
     });
 
-    $("#formEquipament").validate({
+    $("#formEquipment").validate({
         rules: {
             name: {
                 name_valid: true
@@ -19,11 +19,11 @@
         },
         messages: {
             reference: {
-                required: "Informe uma referência/código/numeração para seu equipamento"
+                required: "Informe uma referência/código/numeração para seu Equipmento"
             }
         },
         invalidHandler: function(event, validator) {
-            $('#newEquipamentModal').animate({scrollTop:0}, 200);
+            $('#newEquipmentModal').animate({scrollTop:0}, 200);
             let arrErrors = [];
             $.each(validator.errorMap, function (key, val) {
                 arrErrors.push(val);
@@ -53,7 +53,7 @@
                 }
                 return false;
             }
-            let getForm = $('#formEquipament');
+            let getForm = $('#formEquipment');
 
             getForm.find('button[type="submit"]').attr('disabled', true);
 
@@ -83,10 +83,9 @@
                         title: response.message
                     });
 
-                    $('#newEquipamentModal').modal('hide');
-                    cleanFormEquipamentModal();
-                    searchEquipamentOld = '';
-                    $('#searchEquipament').trigger('blur');
+                    $('#newEquipmentModal').modal('hide');
+                    $('#searchEquipment').val(getForm.find('input[name="reference"]').val()).trigger('blur');
+                    cleanFormEquipmentModal();
                 }, error: e => {
                     getForm.find('button[type="submit"]').attr('disabled', false);
                     let arrErrors = [];
@@ -109,19 +108,19 @@
     });
 
 
-    $('#formEquipament [name="type_equipament"]').on('change', function(){
-        $('#formEquipament [type="submit"]').show('slow');
+    $('#formEquipment [name="type_equipment"]').on('change', function(){
+        $('#formEquipment [type="submit"]').show('slow');
     });
 
-    const cleanFormEquipamentModal = () => {
-        $('#formEquipament .remove-period').trigger('click');
-        $('#formEquipament [name="volume"]').val('Selecione ...');
-        $('#formEquipament [name="reference"]').val('');
-        $('#formEquipament [name="manufacturer"]').val('');
-        $('#formEquipament [name="value"]').val('');
-        $('#formEquipament [name="stock"]').val('');
-        $('#formEquipament [name="type_equipament"]').prop('checked', false);
-        $('#formEquipament .card.display-none').hide();
-        $('#formEquipament [type="submit"]').hide();
+    const cleanFormEquipmentModal = () => {
+        $('#formEquipment .remove-period').trigger('click');
+        $('#formEquipment [name="volume"]').val('Selecione ...');
+        $('#formEquipment [name="reference"]').val('');
+        $('#formEquipment [name="manufacturer"]').val('');
+        $('#formEquipment [name="value"]').val('');
+        $('#formEquipment [name="stock"]').val('');
+        $('#formEquipment [name="type_equipment"]').prop('checked', false);
+        $('#formEquipment .card.display-none').hide();
+        $('#formEquipment [type="submit"]').hide();
     }
 </script>

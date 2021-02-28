@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\RentalCreatePost;
 use App\Http\Requests\RentalDeletePost;
 use App\Models\Driver;
-use App\Models\Equipament;
-use App\Models\EquipamentWallet;
+use App\Models\Equipment;
+use App\Models\EquipmentWallet;
 use App\Models\Rental;
-use App\Models\RentalEquipament;
+use App\Models\RentalEquipment;
 use App\Models\RentalPayment;
 use App\Models\RentalResidue;
 use App\Models\Residue;
@@ -17,41 +17,42 @@ use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
 
 class RentalController extends Controller
 {
     private $client;
-    private $equipament;
+    private $equipment;
     private $driver;
     private $vehicle;
-    private $equipament_wallet;
+    private $equipment_wallet;
     private $residue;
     private $rental;
-    private $rental_equipament;
+    private $rental_equipment;
     private $rental_payment;
     private $rental_residue;
 
     public function __construct(
         Client $client,
-        Equipament $equipament,
+        Equipment $equipment,
         Driver $driver,
         Vehicle $vehicle,
-        EquipamentWallet $equipament_wallet,
+        EquipmentWallet $equipment_wallet,
         Residue $residue,
         Rental $rental,
-        RentalEquipament $rental_equipament,
+        RentalEquipment $rental_equipment,
         RentalPayment $rental_payment,
         RentalResidue $rental_residue
     )
     {
         $this->rental = $rental;
         $this->client = $client;
-        $this->equipament = $equipament;
+        $this->equipment = $equipment;
         $this->driver = $driver;
         $this->vehicle = $vehicle;
-        $this->equipament_wallet = $equipament_wallet;
+        $this->equipment_wallet = $equipment_wallet;
         $this->residue = $residue;
-        $this->rental_equipament = $rental_equipament;
+        $this->rental_equipment = $rental_equipment;
         $this->rental_payment = $rental_payment;
         $this->rental_residue = $rental_residue;
     }
@@ -66,7 +67,7 @@ class RentalController extends Controller
         return view('rental.index');
     }
 
-    public function fetchRentals(Request $request)
+    public function fetchRentals(Request $request): JsonResponse
     {
         if (!$this->hasPermission('RentalView'))
             return response()->json([]);
@@ -95,10 +96,6 @@ class RentalController extends Controller
             }
         }
 
-        if (!empty($searchUser)) $filtered = $this->rental->getCountRentals($company_id, $searchUser);
-        else $filtered = 0;
-
-
         $data = $this->rental->getRentals($company_id, $ini, $length, $searchUser, $orderBy);
 
         // get string query
@@ -107,32 +104,29 @@ class RentalController extends Controller
         $permissionUpdate = $this->hasPermission('RentalUpdatePost');
         $permissionDelete = $this->hasPermission('RentalDeletePost');
 
-        $i = 0;
         foreach ($data as $key => $value) {
-            $i++;
             $buttons = $permissionDelete ? "<button class='btn btn-danger btnRemoveRental btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' rental-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+            $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='btn btn-primary btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Imprimir'><i class='fas fa-print'></i></a>";
 
             $result[$key] = array(
-                $value['code'],
-                "<strong>{$value['client_name']}</strong><br>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}",
+                str_pad($value['code'], 5, 0, STR_PAD_LEFT),
+                "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>{$value['client_name']}</span><span class='mt-1 w-100'>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}</span></div>",
                 date('d/m/Y H:i', strtotime($value['created_at'])),
                 $buttons
             );
         }
 
-        if ($filtered == 0) $filtered = $i;
-
         $output = array(
             "draw" => $draw,
             "recordsTotal" => $this->rental->getCountRentals($company_id),
-            "recordsFiltered" => $filtered,
+            "recordsFiltered" => $this->rental->getCountRentals($company_id, $searchUser),
             "data" => $result
         );
 
         return response()->json($output);
     }
 
-    public function delete(RentalDeletePost $request)
+    public function delete(RentalDeletePost $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
         $rental_id  = $request->rental_id;
@@ -144,10 +138,10 @@ class RentalController extends Controller
 
         $delPayment     = $this->rental_payment->remove($rental_id, $company_id);
         $delResidue     = $this->rental_residue->remove($rental_id, $company_id);
-        $delEquipament  = $this->rental_equipament->remove($rental_id, $company_id);
+        $delEquipment  = $this->rental_equipment->remove($rental_id, $company_id);
         $delRental      = $this->rental->remove($rental_id, $company_id);
 
-        if ($delEquipament && $delRental) {
+        if ($delEquipment && $delRental) {
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Locação excluída com sucesso!']);
         }
@@ -188,6 +182,16 @@ class RentalController extends Controller
         $lat        = $request->lat ? filter_var($request->lat, FILTER_SANITIZE_STRING) : null;
         $lng        = $request->lng ? filter_var($request->lng, FILTER_SANITIZE_STRING) : null;
 
+        if (empty($clientId) || !$this->client->getClient($clientId, $company_id))
+            return response()->json(['success' => false, 'message' => "Cliente não foi encontrado. Revise a aba de Cliente e Endereço."]);
+
+        if ($address == '') return response()->json(['success' => false, 'message' => 'Informe um endereço. Revise a aba de Cliente e Endereço.']);
+        if ($number == '') return response()->json(['success' => false, 'message' => 'Informe um número para o endereço. Revise a aba de Cliente e Endereço.']);
+        if ($neigh == '') return response()->json(['success' => false, 'message' => 'Informe um bairro. Revise a aba de Cliente e Endereço.']);
+        if ($city == '') return response()->json(['success' => false, 'message' => 'Informe uma cidade. Revise a aba de Cliente e Endereço.']);
+        if ($state == '') return response()->json(['success' => false, 'message' => 'Informe um estado. Revise a aba de Cliente e Endereço.']);
+        if ($lat == '' || $lng == '') return response()->json(['success' => false, 'message' => 'Confirme o endereço no mapa. Revise a aba de Cliente e Endereço.']);
+
         // datas da locação
         $dateDelivery = $request->date_delivery ? \DateTime::createFromFormat('d/m/Y H:i', $request->date_delivery) : null;
         $dateWithdrawal = $request->date_withdrawal ? \DateTime::createFromFormat('d/m/Y H:i', $request->date_withdrawal) : null;
@@ -206,17 +210,17 @@ class RentalController extends Controller
         }
 
         // Equipamentos
-        $responseEquipament = $this->setEquipamentRental($request);
-        if (isset($responseEquipament->error))
-            return response()->json(['success' => false, 'message' => $responseEquipament->error]);
-        $arrEquipament = $responseEquipament->arrEquipament;
+        $responseEquipment = $this->setEquipmentRental($request);
+        if (isset($responseEquipment->error))
+            return response()->json(['success' => false, 'message' => $responseEquipment->error]);
+        $arrEquipment = $responseEquipment->arrEquipment;
 
         // Pagamento
         $arrPayment = array();
         if ($haveCharged) {
-            $responsePayment = $this->setPaymentRental($request, $responseEquipament->grossValue);
-            if (isset($arrPayment->error))
-                return response()->json(['success' => false, 'message' => $arrPayment->error]);
+            $responsePayment = $this->setPaymentRental($request, $responseEquipment->grossValue);
+            if (isset($responsePayment->error))
+                return response()->json(['success' => false, 'message' => $responsePayment->error]);
 
             $arrPayment = $responsePayment->arrPayment;
         }
@@ -245,7 +249,7 @@ class RentalController extends Controller
             'expected_delivery_date' => $dateDelivery->format('Y-m-d H:i:s'),
             'expected_withdrawal_date' => $dateWithdrawal ? $dateWithdrawal->format('Y-m-d H:i:s') : null,
             'not_use_date_withdrawal' => $notUseDateWithdrawal,
-            'gross_value' => $haveCharged ? $responseEquipament->grossValue : null,
+            'gross_value' => $haveCharged ? $responseEquipment->grossValue : null,
             'extra_value'   => $haveCharged ? $responsePayment->extraValue : null,
             'discount_value' => $haveCharged ? $responsePayment->discountValue : null,
             'net_value' => $haveCharged ? $responsePayment->netValue : null,
@@ -260,17 +264,17 @@ class RentalController extends Controller
 
         $insertRental = $this->rental->insert($arrRental);
 
-        $arrEquipament = $this->addRentalIdArray($arrEquipament, $insertRental->id);
+        $arrEquipment = $this->addRentalIdArray($arrEquipment, $insertRental->id);
         $arrResidue = $this->addRentalIdArray($arrResidue, $insertRental->id);
         $arrPayment = $this->addRentalIdArray($arrPayment, $insertRental->id);
 
-        $this->rental_equipament->inserts($arrEquipament);
+        $this->rental_equipment->inserts($arrEquipment);
         $this->rental_residue->inserts($arrResidue);
         if (count($arrPayment)) $this->rental_payment->inserts($arrPayment);
 
         if ($insertRental) {
             DB::commit();
-            return response()->json(['success' => true]);
+            return response()->json(['success' => true, 'urlPrint' => route('print.rental', ['rental' => $insertRental->id]), 'code' => $insertRental->code]);
         }
 
         DB::rollBack();
@@ -279,10 +283,10 @@ class RentalController extends Controller
 
     }
 
-    private function setEquipamentRental($request)
+    private function setEquipmentRental($request)
     {
         $response = new \StdClass();
-        $response->arrEquipament = array();
+        $response->arrEquipment = array();
         $response->grossValue = 0;
 
         $company_id = $request->user()->company_id;
@@ -292,24 +296,24 @@ class RentalController extends Controller
         $notUseDateWithdrawal = $request->not_use_date_withdrawal ? true : false;
         $haveCharged = $request->type_rental ? false : true; // true = com cobrança
 
-        $equipaments = $this->equipament->getEquipaments_In($company_id, $request->equipament_id);
+        $equipments = $this->equipment->getEquipments_In($company_id, $request->equipment_id);
 
-        if (count($request->equipament_id) != count($equipaments))
+        if (count($request->equipment_id) != count($equipments))
             return $response->error = 'Não foram encontrados os equipamentos listado, reveja os equipamentos.';
 
-        foreach ($equipaments as $equipamentId) {
+        foreach ($equipments as $equipmentId) {
 
-            $stockRequest = (int)$request->{"stock_equipament_{$equipamentId->id}"};
-            $stockDb = (int)$equipamentId->stock;
-            $reference = $request->{"reference_equipament_{$equipamentId->id}"};
-            $useDateDiff = $request->{"use_date_diff_equip_{$equipamentId->id}"} ? true : false;
-            $notUseDateWithdrawalEquip = $request->{"not_use_date_withdrawal_equip_{$equipamentId->id}"} ? true : false;
-            $dateDeliveryEquip = $request->{"date_delivery_equipament_{$equipamentId->id}"};
-            $dateWithdrawalEquip = $request->{"date_withdrawal_equipament_{$equipamentId->id}"};
-            $driverEquip = (int)$request->{"driver_{$equipamentId->id}"};
-            $vehicleEquip = (int)$request->{"vehicle_{$equipamentId->id}"};
-            $priceTotalEquip = $haveCharged ? $this->transformMoneyBr_En($request->{"priceTotalEquipament_{$equipamentId->id}"}) : 0;
-            $unitaryValue = $haveCharged ? $equipamentId->value : 0;
+            $stockRequest = (int)$request->{"stock_equipment_{$equipmentId->id}"};
+            $stockDb = (int)$equipmentId->stock;
+            $reference = $request->{"reference_equipment_{$equipmentId->id}"};
+            $useDateDiff = $request->{"use_date_diff_equip_{$equipmentId->id}"} ? true : false;
+            $notUseDateWithdrawalEquip = $request->{"not_use_date_withdrawal_equip_{$equipmentId->id}"} ? true : false;
+            $dateDeliveryEquip = $request->{"date_delivery_equipment_{$equipmentId->id}"};
+            $dateWithdrawalEquip = $request->{"date_withdrawal_equipment_{$equipmentId->id}"};
+            $driverEquip = (int)$request->{"driver_{$equipmentId->id}"};
+            $vehicleEquip = (int)$request->{"vehicle_{$equipmentId->id}"};
+            $priceTotalEquip = $haveCharged ? $this->transformMoneyBr_En($request->{"priceTotalEquipment_{$equipmentId->id}"}) : 0;
+            $unitaryValue = $haveCharged ? $equipmentId->value : 0;
             $response->grossValue += $priceTotalEquip;
 
             $dateDeliveryEquip = $dateDeliveryEquip ? \DateTime::createFromFormat('d/m/Y H:i', $dateDeliveryEquip) : null;
@@ -334,7 +338,7 @@ class RentalController extends Controller
                     // diferença entre as datas
                     $dateDiff = $dateDeliveryEquip->diff($dateWithdrawalEquip);
                     // recupera valores configurados para valor unitário
-                    $unitaryValue = $haveCharged ? $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipamentId->id, $dateDiff->days) : 0;
+                    $unitaryValue = $haveCharged ? $this->equipment_wallet->getValueWalletsEquipment($company_id, $equipmentId->id, $dateDiff->days) : 0;
                 }
             } else { // será utilizada a data da locação
 
@@ -345,8 +349,8 @@ class RentalController extends Controller
                     // diferença entre as datas
                     $dateDiff = $dateDeliveryEquip->diff($dateWithdrawalEquip);
                     // recupera valores configurados para valor unitário
-                    $walletsEquipament = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipamentId->id, $dateDiff->days);
-                    if ($walletsEquipament) $unitaryValue = $haveCharged ? (float)$walletsEquipament->value : 0;
+                    $walletsEquipment = $this->equipment_wallet->getValueWalletsEquipment($company_id, $equipmentId->id, $dateDiff->days);
+                    if ($walletsEquipment) $unitaryValue = $haveCharged ? (float)$walletsEquipment->value : 0;
 
                 }
             }
@@ -361,16 +365,18 @@ class RentalController extends Controller
                 if (!$this->vehicle->getVehicle($vehicleEquip, $company_id))
                     return $response->error = "Veículo não foi encontrado no equipamento ( <strong>{$reference}</strong> ).";
 
-            array_push($response->arrEquipament, array(
+            array_push($response->arrEquipment, array(
                 'company_id'                => $company_id,
                 'rental_id'                 => 0,
-                'equipament_id'             => $equipamentId->id,
-                'reference'                 => $equipamentId->reference,
+                'equipment_id'             => $equipmentId->id,
+                'reference'                 => $equipmentId->reference,
+                'name'                      => $equipmentId->name,
+                'volume'                    => $equipmentId->volume,
                 'quantity'                  => $stockRequest,
                 'unitary_value'             => $unitaryValue,
                 'total_value'               => $priceTotalEquip,
-                'vehicle_suggestion'        => $vehicleEquip,
-                'driver_suggestion'         => $driverEquip,
+                'vehicle_suggestion'        => empty($vehicleEquip) ? null : $vehicleEquip,
+                'driver_suggestion'         => empty($driverEquip) ? null : $driverEquip,
                 'use_date_diff_equip'       => $useDateDiff,
                 'expected_delivery_date'    => $dateDeliveryEquip->format('Y-m-d H:i:s'),
                 'expected_withdrawal_date'  => $dateWithdrawalEquip ? $dateWithdrawalEquip->format('Y-m-d H:i:s') : null,
@@ -382,25 +388,41 @@ class RentalController extends Controller
         return $response;
     }
 
-    private function setPaymentRental($request, $grossValue)
+    private function setPaymentRental(object $request, $grossValue): \StdClass
     {
         $company_id = $request->user()->company_id;
         $response = new \StdClass();
         $response->arrPayment = array();
 
-        $extraValue = $this->transformMoneyBr_En($request->extra_value);
-        $discountValue = $this->transformMoneyBr_En($request->discount_value);
+        $extraValue = 0;
+        $discountValue = 0;
         $calculateNetAmountAutomatic = $request->calculate_net_amount_automatic ? true : false;
-        if ($calculateNetAmountAutomatic) $netValue = $grossValue - $discountValue + $extraValue;
-        else $netValue = $this->transformMoneyBr_En($request->net_value);
+        if ($calculateNetAmountAutomatic) { // valor liquido sera calculado automatico
+            $extraValue = $this->transformMoneyBr_En($request->extra_value);
+            $discountValue = $this->transformMoneyBr_En($request->discount_value);
+            $netValue = $grossValue - $discountValue + $extraValue;
+        } else { // valor liquido será definido pelo usuario
+            $netValue = $this->transformMoneyBr_En($request->net_value);
+            // devo comparar o valor liquido com o bruto para definir desconto e acrescimo
+            if ($netValue > $grossValue) {
+                $extraValue = $netValue - $grossValue;
+                $discountValue = 0;
+            } elseif ($netValue < $grossValue) {
+                $extraValue = 0;
+                $discountValue = $grossValue - $netValue;
+            }
+        }
 
         // valores divergente
-        if ($netValue != ($grossValue - $discountValue + $extraValue))
-            return $response->error = 'Soma de valores divergente, recalcule os valores.';
+        if ($netValue != ($grossValue - $discountValue + $extraValue)) {
+            $response->error = 'Soma de valores divergente, recalcule os valores.';
+            return $response;
+        }
 
         $is_parceled = $request->is_parceled ? true : false;
         $automaticParcelDistribution = $request->automatic_parcel_distribution ? true : false;
 
+        // existe parcelamento
         if ($is_parceled) {
 
             $daysTemp = null;
@@ -421,8 +443,10 @@ class RentalController extends Controller
 
 
                 if ($daysTemp === null) $daysTemp = $request->due_day[$parcel];
-                elseif ($daysTemp >= $request->due_day[$parcel])
-                    return $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
+                elseif ($daysTemp >= $request->due_day[$parcel]) {
+                    $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
+                    return $response;
+                }
                 else $daysTemp = $request->due_day[$parcel];
 
                 $priceTemp += $valueParcel;
@@ -434,14 +458,14 @@ class RentalController extends Controller
                     'due_day'       => $request->due_day[$parcel],
                     'due_date'      => $request->due_date[$parcel],
                     'due_value'     => $valueParcel,
-                    'payment_id'    => 0,
-                    'payment_name'  => '',
                     'user_insert'   => $request->user()->id
                 ));
             }
 
-            if (number_format($priceTemp,2, '.','') != number_format($netValue,2, '.','')) // os valores das parcelas não corresponde ao valor líquido
-                return $response->error = 'A soma das parcelas deve corresponder ao valor líquido.';
+            if (number_format($priceTemp,2, '.','') != number_format($netValue,2, '.','')) { // os valores das parcelas não corresponde ao valor líquido
+                $response->error = 'A soma das parcelas deve corresponder ao valor líquido.';
+                return $response;
+            }
 
         } else {
             // 1x o pagamento, vencimento para hoje
@@ -464,7 +488,7 @@ class RentalController extends Controller
         return $response;
     }
 
-    private function setResidueRental($request)
+    private function setResidueRental(object $request): array
     {
         if (empty($request->residues)) return [];
 
@@ -489,7 +513,7 @@ class RentalController extends Controller
         return $arrResidue;
     }
 
-    private function addRentalIdArray(array $array, $rentalId)
+    private function addRentalIdArray(array $array, int $rentalId): array
     {
         foreach ($array as $key => $value)
              if (isset($value['rental_id'])) $array[$key]['rental_id'] = $rentalId;

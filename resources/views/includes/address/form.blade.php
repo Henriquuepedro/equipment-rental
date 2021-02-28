@@ -12,13 +12,13 @@
         <input type="tel" name="cep" class="form-control">
     </div>
     <div class="form-group col-md-8">
-        <label>Endereço</label>
+        <label>Endereço <sup>*</sup></label>
         <input type="text" name="address" class="form-control">
     </div>
 </div>
 <div class="row show-address">
     <div class="form-group col-md-4">
-        <label>Número</label>
+        <label>Número <sup>*</sup></label>
         <input type="text" name="number" class="form-control">
     </div>
     <div class="form-group col-md-8">
@@ -32,17 +32,17 @@
         <input type="text" name="reference" class="form-control">
     </div>
     <div class="form-group col-md-5">
-        <label>Bairro</label>
+        <label>Bairro <sup>*</sup></label>
         <input type="text" name="neigh" class="form-control">
     </div>
 </div>
 <div class="row show-address">
     <div class="form-group col-md-6">
-        <label>Cidade</label>
+        <label>Cidade <sup>*</sup></label>
         <input type="text" name="city" class="form-control">
     </div>
     <div class="form-group col-md-6">
-        <label>Estado</label>
+        <label>Estado <sup>*</sup></label>
         <input type="text" name="state" class="form-control">
     </div>
 </div>

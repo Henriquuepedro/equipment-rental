@@ -11,23 +11,24 @@
 
 @section('js')
     <script>
-        var tableEquipaments;
+        var tableEquipments;
         $(function () {
-            tableEquipaments = getTable();
+            tableEquipments = getTable(false);
         });
 
-        const getTable = () => {
-            return $("#tableEquipaments").DataTable({
+        const getTable = (stateSave = true) => {
+            return $("#tableEquipments").DataTable({
                 "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,
                 "sortable": true,
                 "searching": true,
+                "stateSave": stateSave,
                 "serverMethod": "post",
                 "order": [[ 0, 'desc' ]],
                 "ajax": {
-                    url: '{{ route('ajax.equipament.fetch') }}',
+                    url: '{{ route('ajax.equipment.fetch') }}',
                     pages: 2,
                     type: 'POST',
                     data: { "_token": $('meta[name="csrf-token"]').attr('content') },
@@ -44,13 +45,13 @@
             });
         }
 
-        $(document).on('click', '.btnRemoveEquipament', function (){
-            const equipament_id = $(this).attr('equipament-id');
-            const equipament_name = $(this).closest('tr').find('td:eq(1)').text();
+        $(document).on('click', '.btnRemoveEquipment', function (){
+            const equipment_id = $(this).attr('equipment-id');
+            const equipment_name = $(this).closest('tr').find('td:eq(1)').text();
 
             Swal.fire({
                 title: 'Exclusão de Equipamento',
-                html: "Você está prestes a excluir definitivamente o equipamento <br><strong>"+equipament_name+"</strong><br>Deseja continuar?",
+                html: "Você está prestes a excluir definitivamente o equipamento <br><strong>"+equipment_name+"</strong><br>Deseja continuar?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -65,20 +66,21 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         type: 'POST',
-                        url: "{{ route('ajax.equipament.delete') }}",
-                        data: { equipament_id },
+                        url: "{{ route('ajax.equipment.delete') }}",
+                        data: { equipment_id },
                         dataType: 'json',
                         success: response => {
                             $('[data-toggle="tooltip"]').tooltip('dispose')
-                            tableEquipaments.destroy();
-                            $("#tableEquipaments tbody").empty();
-                            tableEquipaments = getTable();
+                            tableEquipments.destroy();
+                            $("#tableEquipments tbody").empty();
+                            tableEquipments = getTable();
                             Toast.fire({
                                 icon: response.success ? 'success' : 'error',
                                 title: response.message
-                            })
+                            });
                         }, error: e => {
-                            console.log(e);
+                            if (e.status !== 403 && e.status !== 422)
+                                console.log(e);
                         },
                         complete: function(xhr) {
                             if (xhr.status === 403) {
@@ -86,7 +88,24 @@
                                     icon: 'error',
                                     title: 'Você não tem permissão para fazer essa operação!'
                                 });
-                                $(`button[equipament-id="${equipament_id}"]`).trigger('blur');
+                                $(`button[equipment-id="${equipment_id}"]`).trigger('blur');
+                            }
+                            if (xhr.status === 422) {
+
+                                let arrErrors = [];
+
+                                $.each(xhr.responseJSON.errors, function( index, value ) {
+                                    arrErrors.push(value);
+                                });
+
+                                if (!arrErrors.length && xhr.responseJSON.message !== undefined)
+                                    arrErrors.push('Você não tem permissão para fazer essa operação!');
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Atenção',
+                                    html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                                });
                             }
                         }
                     });
@@ -109,11 +128,11 @@
                 <div class="card-body">
                     <div class="header-card-body justify-content-between flex-wrap">
                         <h4 class="card-title no-border">Equipamentos Cadastrados</h4>
-                        @if(in_array('EquipamentCreatePost', $permissions))
-                        <a href="{{ route('equipament.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
+                        @if(in_array('EquipmentCreatePost', $permissions))
+                        <a href="{{ route('equipment.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
                         @endif
                     </div>
-                    <table id="tableEquipaments" class="table table-bordered">
+                    <table id="tableEquipments" class="table table-bordered">
                         <thead>
                         <tr>
                             <th>#</th>

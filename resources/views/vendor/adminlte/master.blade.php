@@ -84,7 +84,11 @@
     <script src="{{ asset('assets/js/shared/misc.js') }}"></script>
     <script src="{{ asset('assets/js/shared/settings.js') }}"></script>
     <script src="{{ asset('assets/js/shared/todolist.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="{{ asset('assets/vendors/inputmask/jquery.inputmask.bundle.js') }}" type="application/javascript"></script>
+    <script src="{{ asset('assets/vendors/moment/moment.min.js') }}" type="application/javascript"></script>
+{{--    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>--}}
+    <script src="{{ asset('vendor/icheck/icheck.min.js') }}" type="application/javascript"></script>
+    <script src="https://cdn.rawgit.com/plentz/jquery-maskmoney/master/dist/jquery.maskMoney.min.js"></script>
     @yield('adminlte_js')
 
 </body>

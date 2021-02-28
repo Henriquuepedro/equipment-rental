@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class EquipamentWallet extends Model
+class EquipmentWallet extends Model
 {
     use HasFactory;
 
@@ -16,7 +16,7 @@ class EquipamentWallet extends Model
      * @var array
      */
     protected $fillable = [
-        'company_id', 'equipament_id', 'day_start', 'day_end', 'value', 'active', 'user_insert', 'user_update'
+        'company_id', 'equipment_id', 'day_start', 'day_end', 'value', 'active', 'user_insert', 'user_update'
     ];
 
     /**
@@ -38,9 +38,9 @@ class EquipamentWallet extends Model
         return $this->create($data);
     }
 
-    public function remove($equipament_wallet_id)
+    public function remove($equipment_wallet_id)
     {
-        return $this->where(['id' => $equipament_wallet_id])->delete();
+        return $this->where(['id' => $equipment_wallet_id])->delete();
     }
 
     public function edit($data, $client_id)
@@ -48,20 +48,20 @@ class EquipamentWallet extends Model
         return $this->where('id', $client_id)->update($data);
     }
 
-    public function removeAllEquipament($equipament_id, $company_id)
+    public function removeAllEquipment($equipment_id, $company_id)
     {
-        return $this->where(['equipament_id' => $equipament_id, 'company_id' => $company_id])->delete();
+        return $this->where(['equipment_id' => $equipment_id, 'company_id' => $company_id])->delete();
     }
 
-    public function getWalletsEquipament($company_id, $equipament_id)
+    public function getWalletsEquipment($company_id, $equipment_id)
     {
-        return $this->where(['equipament_id' => $equipament_id, 'company_id' => $company_id])->get();
+        return $this->where(['equipment_id' => $equipment_id, 'company_id' => $company_id])->get();
     }
 
-    public function getValueWalletsEquipament($company_id, $equipament_id, $day)
+    public function getValueWalletsEquipment($company_id, $equipment_id, $day)
     {
-        return $this->from(DB::raw('equipament_wallets force index(equipament_company_day_start_end)'))
-            ->where(['equipament_id' => $equipament_id, 'company_id' => $company_id])
+        return $this->from(DB::raw('equipment_wallets force index(equipment_company_day_start_end)'))
+            ->where(['equipment_id' => $equipment_id, 'company_id' => $company_id])
             ->where('day_start', '<=', $day)
             ->where('day_end', '>=', $day)
             ->first();

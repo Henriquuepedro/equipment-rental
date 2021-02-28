@@ -60,11 +60,11 @@
                     cleanFormVehicleModal();
                     checkLabelAnimate();
                     @if(\Request::route()->getName() == 'rental.create')
-                        loadVehicles(response.vehicle_id, "div[id^='collapseEquipament-'].collapse.show [name^='vehicle_']");
+                        loadVehicles(response.vehicle_id, "div[id^='collapseEquipment-'].collapse.show [name^='vehicle_']");
 
-                        $('#equipaments-selected [id^=collapseEquipament-]').each(function(){
-                            if ($("div[id^='collapseEquipament-'].collapse.show").attr('id-equipament') !== $(this).attr('id-equipament')) {
-                                loadVehicles($('[name^="vehicle_"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name^="vehicle_"]`);
+                        $('#equipments-selected [id^=collapseEquipment-]').each(function(){
+                            if ($("div[id^='collapseEquipment-'].collapse.show").attr('id-equipment') !== $(this).attr('id-equipment')) {
+                                loadVehicles($('[name^="vehicle_"]', this).val(), `#collapseEquipment-${$(this).attr('id-equipment')} [name^="vehicle_"]`);
                             }
                         });
                     @else
@@ -124,7 +124,7 @@
                     $(el).append(`<option value='${value.id}' ${selected}>${value.name}</option>`);
                 });
                 // so executo o trigger se for um equipamento que está ativo
-                if ($(el).closest('[id^=collapseEquipament-]').hasClass('show')) $(el).trigger('change');
+                if ($(el).closest('[id^=collapseEquipment-]').hasClass('show')) $(el).trigger('change');
 
             }, error: e => {
                 $.each(e.responseJSON.errors, function( index, value ) {

@@ -7,10 +7,11 @@
 
     if ($route->getName() == 'dashboard') $dashboardActive = 'active';
     elseif (
-        strstr($route->getName(),'client') !== false ||
-        strstr($route->getName(),'equipament') !== false ||
-        strstr($route->getName(),'driver') !== false ||
-        strstr($route->getName(),'vehicle') !== false
+        strstr($route->getName(),'client')      !== false ||
+        strstr($route->getName(),'equipment')   !== false ||
+        strstr($route->getName(),'driver')      !== false ||
+        strstr($route->getName(),'vehicle')     !== false ||
+        strstr($route->getName(),'residue')     !== false
     ) $registerActive = 'active';
     elseif (
         strstr($route->getName(),'rental') !== false
@@ -27,7 +28,7 @@
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
-        @if(in_array('ClientView', $permissions) || in_array('EquipamentView', $permissions) || in_array('DriverView', $permissions) || in_array('VehicleView', $permissions))
+        @if(in_array('ClientView', $permissions) || in_array('EquipmentView', $permissions) || in_array('DriverView', $permissions) || in_array('VehicleView', $permissions))
         <li class="nav-item {{ $registerActive }}">
             <a class="nav-link" data-toggle="collapse" href="#register-dropdown" aria-expanded="false" aria-controls="register-dropdown">
                 <i class="menu-icon typcn typcn-plus-outline"></i>
@@ -41,9 +42,9 @@
                         <a class="nav-link" href=" {{ route('client.index') }}">Cliente</a>
                     </li>
                     @endif
-                    @if(in_array('EquipamentView', $permissions))
+                    @if(in_array('EquipmentView', $permissions))
                         <li class="nav-item">
-                            <a class="nav-link" href=" {{ route('equipament.index') }}">Equipamento</a>
+                            <a class="nav-link" href=" {{ route('equipment.index') }}">Equipamento</a>
                         </li>
                     @endif
                     @if(in_array('DriverView', $permissions))
@@ -54,6 +55,11 @@
                     @if(in_array('VehicleView', $permissions))
                         <li class="nav-item">
                             <a class="nav-link" href=" {{ route('vehicle.index') }}">Veículo</a>
+                        </li>
+                    @endif
+                    @if(in_array('ResidueView', $permissions))
+                        <li class="nav-item">
+                            <a class="nav-link" href=" {{ route('residue.index') }}">Resíduo</a>
                         </li>
                     @endif
                 </ul>

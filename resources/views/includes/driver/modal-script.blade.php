@@ -101,12 +101,12 @@
                     cleanFormDriverModal();
                     checkLabelAnimate();
                     @if(\Request::route()->getName() == 'rental.create')
-                        loadDrivers($('#newVehicleModal').is(':visible') ? 0 : response.driver_id, "div[id^='collapseEquipament-'].collapse.show [name^='driver_']");
+                        loadDrivers($('#newVehicleModal').is(':visible') ? 0 : response.driver_id, "div[id^='collapseEquipment-'].collapse.show [name^='driver_']");
                         loadDrivers($('#newVehicleModal').is(':visible') ? response.driver_id : 0, '#newVehicleModal [name="driver"]');
 
-                        $('#equipaments-selected [id^=collapseEquipament-]').each(function(){
-                            if ($("div[id^='collapseEquipament-'].collapse.show").attr('id-equipament') !== $(this).attr('id-equipament')) {
-                                loadDrivers($('[name^="driver_"]', this).val(), `#collapseEquipament-${$(this).attr('id-equipament')} [name^="driver_"]`);
+                        $('#equipments-selected [id^=collapseEquipment-]').each(function(){
+                            if ($("div[id^='collapseEquipment-'].collapse.show").attr('id-equipment') !== $(this).attr('id-equipment')) {
+                                loadDrivers($('[name^="driver_"]', this).val(), `#collapseEquipment-${$(this).attr('id-equipment')} [name^="driver_"]`);
                             }
                         });
                     @else

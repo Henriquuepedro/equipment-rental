@@ -2,67 +2,67 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\EquipamentCreatePost;
-use App\Http\Requests\EquipamentDeletePost;
-use App\Http\Requests\EquipamentUpdatePost;
+use App\Http\Requests\EquipmentCreatePost;
+use App\Http\Requests\EquipmentDeletePost;
+use App\Http\Requests\EquipmentUpdatePost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Equipament;
-use App\Models\EquipamentWallet;
+use App\Models\Equipment;
+use App\Models\EquipmentWallet;
 
-class EquipamentController extends Controller
+class EquipmentController extends Controller
 {
-    public $equipament;
-    public $equipament_wallet;
+    public $equipment;
+    public $equipment_wallet;
 
-    public function __construct(Equipament $equipament, EquipamentWallet $equipament_wallet)
+    public function __construct(Equipment $equipment, EquipmentWallet $equipment_wallet)
     {
-        $this->equipament = $equipament;
-        $this->equipament_wallet = $equipament_wallet;
+        $this->equipment = $equipment;
+        $this->equipment_wallet = $equipment_wallet;
     }
 
     public function index()
     {
-        if (!$this->hasPermission('EquipamentView')) {
+        if (!$this->hasPermission('EquipmentView')) {
             return redirect()->route('dashboard')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        return view('equipament.index');
+        return view('equipment.index');
     }
 
     public function create()
     {
-        if (!$this->hasPermission('EquipamentCreatePost')) {
-            return redirect()->route('equipament.index')
+        if (!$this->hasPermission('EquipmentCreatePost')) {
+            return redirect()->route('equipment.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        return view('equipament.create');
+        return view('equipment.create');
     }
 
-    public function insert(EquipamentCreatePost $request)
+    public function insert(EquipmentCreatePost $request)
     {
-        // data equipament
-        $dataEquipament = $this->formatDataEquipament($request);
+        // data equipment
+        $dataEquipment = $this->formatDataEquipment($request);
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
-        $createEquipament = $this->equipament->insert(array(
-            'company_id'    => $dataEquipament->company_id,
-            'name'          => $dataEquipament->name,
-            'reference'     => $dataEquipament->reference,
-            'stock'         => $dataEquipament->stock,
-            'value'         => $dataEquipament->value,
-            'manufacturer'  => $dataEquipament->manufacturer,
-            'volume'        => $dataEquipament->volume,
-            'user_insert'   => $dataEquipament->user_id
+        $createEquipment = $this->equipment->insert(array(
+            'company_id'    => $dataEquipment->company_id,
+            'name'          => $dataEquipment->name,
+            'reference'     => $dataEquipment->reference,
+            'stock'         => $dataEquipment->stock,
+            'value'         => $dataEquipment->value,
+            'manufacturer'  => $dataEquipment->manufacturer,
+            'volume'        => $dataEquipment->volume,
+            'user_insert'   => $dataEquipment->user_id
         ));
         $isAjax = $this->isAjax();
 
         $createPeriods = true;
-        $equipamentId = $createEquipament->id;
+        $equipmentId = $createEquipment->id;
 
         // data period
         $qtyPeriods = isset($request->day_start) ? count($request->day_start) : 0;
@@ -106,24 +106,24 @@ class EquipamentController extends Controller
                     ->withInput();
             }
 
-            $queryPeriods = $this->equipament_wallet->insert(array(
-                'company_id'    => $dataEquipament->company_id,
-                'equipament_id' => $equipamentId,
+            $queryPeriods = $this->equipment_wallet->insert(array(
+                'company_id'    => $dataEquipment->company_id,
+                'equipment_id' => $equipmentId,
                 'day_start'     => $dataPeriod->day_start,
                 'day_end'       => $dataPeriod->day_end,
                 'value'         => $dataPeriod->value_period,
-                'user_insert'   => $dataEquipament->user_id
+                'user_insert'   => $dataEquipment->user_id
             ));
             if (!$queryPeriods) $createPeriods = false;
         }
 
-        if($createEquipament && $createPeriods) {
+        if($createEquipment && $createPeriods) {
             DB::commit();
             if ($isAjax)
-                return response()->json(['success' => true, 'message' => 'Equipamento cadastrado com sucesso!']);
+                return response()->json(['success' => true, 'message' => 'Equipmento cadastrado com sucesso!']);
 
-            return redirect()->route('equipament.index')
-                ->with('success', "Equipamento com o código {$equipamentId}, cadastrado com sucesso!");
+            return redirect()->route('equipment.index')
+                ->with('success', "Equipamento com o código {$equipmentId}, cadastrado com sucesso!");
         }
 
         DB::rollBack();
@@ -139,38 +139,38 @@ class EquipamentController extends Controller
     {
         $company_id = Auth::user()->company_id;
 
-        $equipament = $this->equipament->getEquipament($id, $company_id);
-        if (!$equipament)
-            return redirect()->route('equipament.index');
+        $equipment = $this->equipment->getEquipment($id, $company_id);
+        if (!$equipment)
+            return redirect()->route('equipment.index');
 
-        $equipament_wallet = $this->equipament_wallet->getWalletsEquipament($company_id, $id);
+        $equipment_wallet = $this->equipment_wallet->getWalletsEquipment($company_id, $id);
 
-        return view('equipament.update', compact('equipament', 'equipament_wallet'));
+        return view('equipment.update', compact('equipment', 'equipment_wallet'));
     }
 
-    public function update(EquipamentUpdatePost $request)
+    public function update(EquipmentUpdatePost $request)
     {
-        // data equipament
-        $dataEquipament = $this->formatDataEquipament($request);
+        // data equipment
+        $dataEquipment = $this->formatDataEquipment($request);
 
-        if (!$this->equipament->getEquipament($dataEquipament->equipament_id, $dataEquipament->company_id))
+        if (!$this->equipment->getEquipment($dataEquipment->equipment_id, $dataEquipment->company_id))
             return redirect()->back()
                 ->withErrors(['Não foi possível localizar o equipamento para atualizar!'])
                 ->withInput();
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
-        $updateEquipament = $this->equipament->edit(
+        $updateEquipment = $this->equipment->edit(
             array(
-                'name'          => $dataEquipament->name,
-                'reference'     => $dataEquipament->reference,
-                'stock'         => $dataEquipament->stock,
-                'value'         => $dataEquipament->value,
-                'manufacturer'  => $dataEquipament->manufacturer,
-                'volume'        => $dataEquipament->volume,
-                'user_update'   => $dataEquipament->user_id
+                'name'          => $dataEquipment->name,
+                'reference'     => $dataEquipment->reference,
+                'stock'         => $dataEquipment->stock,
+                'value'         => $dataEquipment->value,
+                'manufacturer'  => $dataEquipment->manufacturer,
+                'volume'        => $dataEquipment->volume,
+                'user_update'   => $dataEquipment->user_id
             ),
-            $dataEquipament->equipament_id
+            $dataEquipment->equipment_id
         );
 
         $updatePeriods = true;
@@ -178,7 +178,7 @@ class EquipamentController extends Controller
         // data period
         $qtyPeriods = isset($request->day_start) ? count($request->day_start) : 0;
         // remover todos os períodos do equipamento
-        $this->equipament_wallet->removeAllEquipament($dataEquipament->equipament_id, $dataEquipament->company_id);
+        $this->equipment_wallet->removeAllEquipment($dataEquipment->equipment_id, $dataEquipment->company_id);
         $arrDaysVerify = array();
         for ($per = 0; $per < $qtyPeriods; $per++) {
             $periodUser = $per+1;
@@ -207,22 +207,22 @@ class EquipamentController extends Controller
                     ->withErrors(['Existem erros no período. Dia inicial não pode ser negativo. Dia final e valor deve ser maior que zero.'])
                     ->withInput();
 
-            $queryPeriods = $this->equipament_wallet->insert(array(
-                'company_id'    => $dataEquipament->company_id,
-                'equipament_id' => $dataEquipament->equipament_id,
+            $queryPeriods = $this->equipment_wallet->insert(array(
+                'company_id'    => $dataEquipment->company_id,
+                'equipment_id' => $dataEquipment->equipment_id,
                 'day_start'     => $dataPeriod->day_start,
                 'day_end'       => $dataPeriod->day_end,
                 'value'         => $dataPeriod->value_period,
-                'user_insert'   => $dataEquipament->user_id
+                'user_insert'   => $dataEquipment->user_id
             ));
 
             if (!$queryPeriods) $updatePeriods = false;
         }
 
-        if($updateEquipament && $updatePeriods) {
+        if($updateEquipment && $updatePeriods) {
             DB::commit();
-            return redirect()->route('equipament.index')
-                ->with('success', "Equipamento com o código {$dataEquipament->equipament_id}, alterado com sucesso!");
+            return redirect()->route('equipment.index')
+                ->with('success', "Equipamento com o código {$dataEquipment->equipment_id}, alterado com sucesso!");
         }
 
         DB::rollBack();
@@ -231,28 +231,30 @@ class EquipamentController extends Controller
             ->withInput();
     }
 
-    public function delete(EquipamentDeletePost $request)
+    public function delete(EquipmentDeletePost $request)
     {
         $company_id = $request->user()->company_id;
-        $equipament_id = $request->equipament_id;
+        $equipment_id = $request->equipment_id;
 
-        if (!$this->equipament->getEquipament($equipament_id, $company_id))
+        if (!$this->equipment->getEquipment($equipment_id, $company_id))
             return response()->json(['success' => false, 'message' => 'Não foi possível localizar o equipamento!']);
 
-        if (!$this->equipament->remove($equipament_id, $company_id))
+        if (!$this->equipment->remove($equipment_id, $company_id))
             return response()->json(['success' => false, 'message' => 'Não foi possível excluir o equipamento!']);
 
         return response()->json(['success' => true, 'message' => 'Equipamento excluído com sucesso!']);
     }
 
-    public function fetchEquipaments(Request $request)
+    public function fetchEquipments(Request $request)
     {
-        if (!$this->hasPermission('EquipamentView'))
+//        DB::enableQueryLog();
+        if (!$this->hasPermission('EquipmentView'))
             return response()->json([]);
 
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
+        $getCacamba = false;
 
         $ini        = $request->start;
         $draw       = $request->draw;
@@ -260,6 +262,11 @@ class EquipamentController extends Controller
         $company_id = $request->user()->company_id;
 
         $search = $request->search;
+        $search['value'] = str_replace('*','', filter_var($search['value'], FILTER_SANITIZE_STRING));
+
+        if ($this->likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$search['value'])).'%', 'cacamba'))
+            $getCacamba = true;
+
         if ($search['value']) $searchUser = $search['value'];
 
         if (isset($request->order)) {
@@ -274,26 +281,18 @@ class EquipamentController extends Controller
             }
         }
 
-        if (!empty($searchUser)) {
-            $filtered = $this->equipament->getCountEquipaments($company_id, $searchUser);
-        } else {
-            $filtered = 0;
-        }
-
-        $data = $this->equipament->getEquipaments($company_id, $ini, $length, $searchUser, $orderBy);
+        $data = $this->equipment->getEquipments($company_id, $ini, $length, $searchUser, $orderBy, $getCacamba);
 
         // get string query
-        // DB::getQueryLog();
+//         DB::getQueryLog();
 
-        $permissionUpdate = $this->hasPermission('EquipamentUpdatePost');
-        $permissionDelete = $this->hasPermission('EquipamentDeletePost');
+        $permissionUpdate = $this->hasPermission('EquipmentUpdatePost');
+        $permissionDelete = $this->hasPermission('EquipmentDeletePost');
 
-        $i = 0;
         foreach ($data as $key => $value) {
-            $i++;
-            $buttons = "<a href='".route('equipament.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
+            $buttons = "<a href='".route('equipment.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
             $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveEquipament btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' equipament-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveEquipment btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' equipment-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
 
             $result[$key] = array(
                 $value['id'],
@@ -304,31 +303,29 @@ class EquipamentController extends Controller
             );
         }
 
-        if ($filtered == 0) $filtered = $i;
-
         $output = array(
             "draw" => $draw,
-            "recordsTotal" => $this->equipament->getCountEquipaments($company_id),
-            "recordsFiltered" => $filtered,
+            "recordsTotal" => $this->equipment->getCountEquipments($company_id),
+            "recordsFiltered" => $this->equipment->getCountEquipments($company_id, $searchUser, $getCacamba),
             "data" => $result
         );
 
         return response()->json($output);
     }
 
-    private function formatDataEquipament($request)
+    private function formatDataEquipment($request)
     {
         $obj = new \stdClass;
 
         $obj->company_id    = $request->user()->company_id;
         $obj->user_id       = $request->user()->id;
-        $obj->name          = $request->type_equipament === "cacamba" ? null : filter_var($request->name, FILTER_SANITIZE_STRING);
-        $obj->volume        = $request->type_equipament === "others" ? null : filter_var($request->volume, FILTER_VALIDATE_INT);
+        $obj->name          = $request->type_equipment === "cacamba" ? null : filter_var($request->name, FILTER_SANITIZE_STRING);
+        $obj->volume        = $request->type_equipment === "others" ? null : filter_var($request->volume, FILTER_VALIDATE_INT);
         $obj->reference     = filter_var($request->reference, FILTER_SANITIZE_STRING);
         $obj->manufacturer  = $request->manufacturer ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
         $obj->value         = $request->value ? $this->transformMoneyBr_En($request->value) : 0.00;
         $obj->stock         = $request->stock ? filter_var($request->stock, FILTER_VALIDATE_INT) : 0;
-        $obj->equipament_id = isset($request->equipament_id) ? (int)$request->equipament_id : null;
+        $obj->equipment_id = isset($request->equipment_id) ? (int)$request->equipment_id : null;
 
         return $obj;
     }
@@ -344,145 +341,145 @@ class EquipamentController extends Controller
         return $obj;
     }
 
-    public function getEquipaments(Request $request)
+    public function getEquipments(Request $request)
     {
         //DB::enableQueryLog();
         $company_id         = $request->user()->company_id;
-        $searchEquipament   = str_replace('*','', filter_var($request->searchEquipament, FILTER_SANITIZE_STRING));
-        $equipamentData     = [];
+        $searchEquipment   = str_replace('*','', filter_var($request->searchEquipment, FILTER_SANITIZE_STRING));
+        $equipmentData     = [];
         $getCacamba         = false;
-        $equipamentInUse    = $request->equipamentInUse;
+        $equipmentInUse    = $request->equipmentInUse;
 
-        if ($this->likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$searchEquipament)).'%', 'cacamba'))
+        if ($this->likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$searchEquipment)).'%', 'cacamba'))
             $getCacamba = true;
 
-        $equipaments = $this->equipament->getEquipamentRental($company_id, $searchEquipament, $getCacamba, $equipamentInUse);
+        $equipments = $this->equipment->getEquipmentRental($company_id, $searchEquipment, $getCacamba, $equipmentInUse);
 
-        foreach ($equipaments as $equipament)
-            array_push($equipamentData, [
-                'id'        => $equipament->id,
-                'name'      => $equipament->name ?? "Caçamba {$equipament->volume}m³",
-                'reference' => $equipament->reference,
-                'stock'     => $equipament->stock
+        foreach ($equipments as $equipment)
+            array_push($equipmentData, [
+                'id'        => $equipment->id,
+                'name'      => $equipment->name ?? "Caçamba {$equipment->volume}m³",
+                'reference' => $equipment->reference,
+                'stock'     => $equipment->stock
             ]);
 
-        return response()->json($equipamentData);
+        return response()->json($equipmentData);
     }
 
-    public function getEquipament(Request $request)
+    public function getEquipment(Request $request)
     {
         $company_id     = $request->user()->company_id;
-        $equipament_id  = $request->idEquipament;
+        $equipment_id  = $request->idEquipment;
 
         $validStock = $request->validStock ? true : false;
 
-        $equipament = $this->equipament->getEquipament($equipament_id, $company_id);
+        $equipment = $this->equipment->getEquipment($equipment_id, $company_id);
 
-        if (!$equipament)
+        if (!$equipment)
             return response()->json(['success' => false, 'data' => 'Equipamento não encontrado.']);
 
-        if ($validStock && $equipament->stock <= 0)
-            return response()->json(['success' => false, 'data' => 'Equipamento sem estoque para uso.']);
+        if ($validStock && $equipment->stock <= 0)
+            return response()->json(['success' => false, 'data' => 'equipmento sem estoque para uso.']);
 
-        $equipamentData = [
-            'id'        => $equipament->id,
-            'name'      => $equipament->name ?? "Caçamba {$equipament->volume}m³",
-            'reference' => $equipament->reference,
-            'stock'     => $equipament->stock,
-            'cacamba'   => $equipament->volume ? true : false
+        $equipmentData = [
+            'id'        => $equipment->id,
+            'name'      => $equipment->name ?? "Caçamba {$equipment->volume}m³",
+            'reference' => $equipment->reference,
+            'stock'     => $equipment->stock,
+            'cacamba'   => $equipment->volume ? true : false
         ];
 
 
-        return response()->json(['success' => true, 'data' => $equipamentData]);
+        return response()->json(['success' => true, 'data' => $equipmentData]);
     }
 
-    public function getStockEquipament(Request $request)
+    public function getStockEquipment(Request $request)
     {
         $company_id     = $request->user()->company_id;
-        $equipament_id  = $request->idEquipament;
+        $equipment_id  = $request->idEquipment;
 
-        $equipament = $this->equipament->getEquipament($equipament_id, $company_id);
+        $equipment = $this->equipment->getEquipment($equipment_id, $company_id);
 
-        return response()->json($equipament->stock);
+        return response()->json($equipment->stock);
     }
 
-    public function getPriceEquipament(Request $request)
+    public function getPriceEquipment(Request $request)
     {
         $company_id     = $request->user()->company_id;
-        $equipament_id  = $request->idEquipament;
+        $equipment_id  = $request->idEquipment;
         $diff_days      = $request->diffDays;
 
-        $equipament = $this->equipament->getEquipament($equipament_id, $company_id);
+        $equipment = $this->equipment->getEquipment($equipment_id, $company_id);
 
         // não encontrou o equipamento, retorna zerioo
-        if (!$equipament) return 0;
+        if (!$equipment) return 0;
 
         //recebeu false porque a data de retirada não foi definida
-        if ($diff_days == false) $equipamentWallet = false;
-        else $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament_id, $diff_days);
+        if ($diff_days == false) $equipmentWallet = false;
+        else $equipmentWallet = $this->equipment_wallet->getValueWalletsEquipment($company_id, $equipment_id, $diff_days);
 
-        if (!$equipamentWallet) return response()->json($equipament->value);
+        if (!$equipmentWallet) return response()->json($equipment->value);
 
-        return response()->json($equipamentWallet->value);
+        return response()->json($equipmentWallet->value);
     }
 
-    public function getPriceStockEquipament(Request $request)
+    public function getPriceStockEquipment(Request $request)
     {
         $company_id     = $request->user()->company_id;
-        $equipament_id  = $request->idEquipament;
+        $equipment_id  = $request->idEquipment;
         $diff_days      = $request->diffDays;
 
-        $equipament = $this->equipament->getEquipament($equipament_id, $company_id);
+        $equipment = $this->equipment->getEquipment($equipment_id, $company_id);
 
         // não encontrou o equipamento, retorna zero para preço e estoque
-        if (!$equipament) return response()->json(['price' => 0, 'stock' => 0]);
+        if (!$equipment) return response()->json(['price' => 0, 'stock' => 0]);
 
         //recebeu false porque a data de retirada não foi definida
-        if ($diff_days === "false") $equipamentWallet = false;
-        else $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament_id, $diff_days);
+        if ($diff_days === "false") $equipmentWallet = false;
+        else $equipmentWallet = $this->equipment_wallet->getValueWalletsEquipment($company_id, $equipment_id, $diff_days);
 
-        if (!$equipamentWallet) return response()->json(['price' => $equipament->value, 'stock' => $equipament->stock, 'x'=>$diff_days]);
+        if (!$equipmentWallet) return response()->json(['price' => $equipment->value, 'stock' => $equipment->stock, 'x'=>$diff_days]);
 
-        return response()->json(['price' => $equipamentWallet->value, 'stock' => $equipament->stock, 'x'=>$diff_days]);
+        return response()->json(['price' => $equipmentWallet->value, 'stock' => $equipment->stock, 'x'=>$diff_days]);
     }
 
     public function getPricePerPeriod(Request $request)
     {
         $company_id     = $request->user()->company_id;
-        $equipament_id  = $request->idEquipament;
+        $equipment_id  = $request->idEquipment;
 
-        $equipamentWallet = $this->equipament_wallet->getWalletsEquipament($company_id, $equipament_id);
+        $equipmentWallet = $this->equipment_wallet->getWalletsEquipment($company_id, $equipment_id);
 
-        return response()->json($equipamentWallet);
+        return response()->json($equipmentWallet);
     }
 
-    public function getCheckPriceStockEquipament(Request $request)
+    public function getCheckPriceStockEquipment(Request $request)
     {
         //DB::enableQueryLog();
-        $rsEquipament   = [];
+        $rsEquipment   = [];
         $company_id     = $request->user()->company_id;
-        $equipamentsId  = $request->arrEquipaments;
+        $equipmentsId  = $request->arrEquipments;
         $diffsDays      = $request->arrDiffDays;
 
-        $equipaments = $this->equipament->getMultipleEquipaments($equipamentsId, $company_id);
+        $equipments = $this->equipment->getMultipleEquipments($equipmentsId, $company_id);
 
         // não encontrou todos od equipamentos, retorna zero para preço e estoque
-        if (count($equipaments) !== count($equipamentsId)) return response()->json([0 => ['price' => 0, 'stock' => 0]]);
+        if (count($equipments) !== count($equipmentsId)) return response()->json([0 => ['price' => 0, 'stock' => 0]]);
 
-        foreach ($equipaments as $equipament) {
+        foreach ($equipments as $equipment) {
             //recebeu false porque a data de retirada não foi definida
-            if ($diffsDays[$equipament['id']] === "false") $equipamentWallet = false;
-            else $equipamentWallet = $this->equipament_wallet->getValueWalletsEquipament($company_id, $equipament['id'], $diffsDays[$equipament['id']]);
+            if ($diffsDays[$equipment['id']] === "false") $equipmentWallet = false;
+            else $equipmentWallet = $this->equipment_wallet->getValueWalletsEquipment($company_id, $equipment['id'], $diffsDays[$equipment['id']]);
 
-            if (!$equipamentWallet) $price = $equipament->value;
-            else $price = $equipamentWallet->value;
+            if (!$equipmentWallet) $price = $equipment->value;
+            else $price = $equipmentWallet->value;
 
-            $rsEquipament[$equipament['id']] = [
+            $rsEquipment[$equipment['id']] = [
                 'price' => $price,
-                'stock' => $equipament->stock
+                'stock' => $equipment->stock
             ];
         }
         //DB::getQueryLog()
-        return response()->json($rsEquipament);
+        return response()->json($rsEquipment);
     }
 }

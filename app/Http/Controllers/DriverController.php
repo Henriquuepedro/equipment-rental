@@ -58,10 +58,6 @@ class DriverController extends Controller
             }
         }
 
-        if (!empty($searchUser)) $filtered = $this->driver->getCountDrivers($company_id, $searchUser);
-        else $filtered = 0;
-
-
         $data = $this->driver->getDrivers($company_id, $ini, $length, $searchUser, $orderBy);
 
         // get string query
@@ -70,9 +66,7 @@ class DriverController extends Controller
         $permissionUpdate = $this->hasPermission('DriverUpdatePost');
         $permissionDelete = $this->hasPermission('DriverDeletePost');
 
-        $i = 0;
         foreach ($data as $key => $value) {
-            $i++;
             $buttons = "<a href='".route('driver.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
             $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
             $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveDriver btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' driver-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
@@ -86,12 +80,10 @@ class DriverController extends Controller
             );
         }
 
-        if ($filtered == 0) $filtered = $i;
-
         $output = array(
             "draw" => $draw,
             "recordsTotal" => $this->driver->getCountDrivers($company_id),
-            "recordsFiltered" => $filtered,
+            "recordsFiltered" => $this->driver->getCountDrivers($company_id, $searchUser),
             "data" => $result
         );
 

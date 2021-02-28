@@ -2,12 +2,66 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/PrintController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/ResidueDeletePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/ResidueUpdatePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/Equipment.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/EquipmentWallet.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/RentalEquipment.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/js/views/residue/form.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/print/rental.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/residue/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/locacao.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/locacao.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/js/views/client/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/client/form.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/DriverController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/DriverController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EquipamentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EquipmentController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ResidueController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ResidueController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/VehicleController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/VehicleController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/ClientDeletePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/ClientDeletePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/DriverDeletePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/DriverDeletePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/EquipamentCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/EquipmentCreatePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/EquipamentDeletePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/EquipmentDeletePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/EquipamentUpdatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/EquipmentUpdatePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/RentalCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/RentalCreatePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/VehicleDeletePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/VehicleDeletePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Equipament.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/EquipamentWallet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/RentalEquipament.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/RentalPayment.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/RentalPayment.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Residue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Residue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/adminlte.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/adminlte.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/locacao-09-11-20.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_10_21_213742_create_equipaments_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_10_21_213742_create_equipments_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_10_21_223842_create_equipament_wallets_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_10_21_223842_create_equipment_wallets_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_11_14_000214_create_vehicles_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_11_14_000214_create_vehicles_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_02_14_233616_create_rental_equipaments_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_02_14_233616_create_rental_equipments_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/js/views/equipament/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/equipment/form.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/client/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/create.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/client/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/update.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/includes/client/modal-create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/client/modal-create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/client/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/client/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/driver/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/driver/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/equipament/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipment/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/equipament/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipment/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/equipament/update.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/equipment/update.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/address/form.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/address/form.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/address/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/client/form.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/client/form.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/client/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/client/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/driver/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/driver/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/equipament/modal-create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/equipment/modal-create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/equipament/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/equipment/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/includes/vehicle/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/vehicle/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rental/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rental/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/rental/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rental/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vehicle/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vehicle/index.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/master.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/master.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +95,6 @@
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
-      <path value="$PROJECT_DIR$/vendor/paragonie/random_compat" />
       <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
       <path value="$PROJECT_DIR$/vendor/graham-campbell/result-type" />
       <path value="$PROJECT_DIR$/vendor/fzaninotto/faker" />
@@ -73,7 +126,6 @@
       <path value="$PROJECT_DIR$/vendor/symfony/console" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
       <path value="$PROJECT_DIR$/vendor/symfony/http-kernel" />
-      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php70" />
       <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher-contracts" />
       <path value="$PROJECT_DIR$/vendor/symfony/process" />
       <path value="$PROJECT_DIR$/vendor/guzzlehttp/promises" />
@@ -94,7 +146,6 @@
       <path value="$PROJECT_DIR$/vendor/symfony/translation" />
       <path value="$PROJECT_DIR$/vendor/symfony/css-selector" />
       <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher" />
-      <path value="$PROJECT_DIR$/vendor/scrivo/highlight.php" />
       <path value="$PROJECT_DIR$/vendor/symfony/routing" />
       <path value="$PROJECT_DIR$/vendor/symfony/http-client-contracts" />
       <path value="$PROJECT_DIR$/vendor/symfony/http-foundation" />
@@ -153,6 +204,11 @@
       <path value="$PROJECT_DIR$/vendor/jeroennoten/laravel-adminlte" />
       <path value="$PROJECT_DIR$/vendor/laravel/ui" />
       <path value="$PROJECT_DIR$/vendor/intervention/image" />
+      <path value="$PROJECT_DIR$/vendor/dompdf/dompdf" />
+      <path value="$PROJECT_DIR$/vendor/sabberworm/php-css-parser" />
+      <path value="$PROJECT_DIR$/vendor/phenx/php-svg-lib" />
+      <path value="$PROJECT_DIR$/vendor/phenx/php-font-lib" />
+      <path value="$PROJECT_DIR$/vendor/barryvdh/laravel-dompdf" />
     </include_path>
   </component>
   <component name="ProjectId" id="1ifJRvi6Ie1ztD6P0LDtbsOpl2m" />
@@ -168,7 +224,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/includes" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/public/assets/js/views" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -181,11 +237,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Projetos\locacao\public\assets\js\views" />
+      <recent name="C:\Projetos\locacao\resources\views" />
       <recent name="C:\Projetos\locacao\resources\views\includes" />
       <recent name="C:\Projetos\locacao\app\Models" />
       <recent name="C:\Projetos\locacao\database\migrations" />
-      <recent name="C:\Projetos\locacao\resources\views\rental" />
-      <recent name="C:\Projetos\locacao\public\assets\js\views" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Projetos\locacao\resources\views\includes\driver" />
@@ -302,7 +358,10 @@
       <workItem from="1613167176614" duration="1385000" />
       <workItem from="1613170436000" duration="6701000" />
       <workItem from="1613235299613" duration="40341000" />
-      <workItem from="1613591304351" duration="11973000" />
+      <workItem from="1613591304351" duration="12115000" />
+      <workItem from="1613777326961" duration="9049000" />
+      <workItem from="1614201135702" duration="4975000" />
+      <workItem from="1614433491993" duration="17910000" />
     </task>
     <servers />
   </component>
