@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 
-class RentalCreatePost extends FormRequest
+class BudgetCreatePost extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +25,6 @@ class RentalCreatePost extends FormRequest
     public function rules()
     {
         return [
-            'type_rental' => 'required|boolean',
             'client' => 'required|numeric',
             'cep' => 'regex:/^[0-9]{2}.[0-9]{3}-[0-9]{3}$/|max:10|nullable',
             'address' => 'required',
@@ -86,7 +84,6 @@ class RentalCreatePost extends FormRequest
     public function messages()
     {
         return [
-            'type_rental.*'     => 'Tipo de locação mal inforada.',
             'client.*'          => 'Cliente mal informado.',
             'cep.*'             => 'CEP do cliente em um formato inválido.',
             'address.required'  => 'Endereço do cliente precisa ser informado.',

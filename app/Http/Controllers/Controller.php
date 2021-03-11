@@ -76,4 +76,18 @@ class Controller extends BaseController
 
         return preg_match($regex, $haystack) > 0;
     }
+
+    /**
+     * @param   string  $value          CPF ou CNPJ
+     * @param   string  $defaultEmpty   Valor padrão de retorno, caso cheguei em branco ou nulo
+     * @return  string                  Retorno da formatação
+     */
+    public function formatCPF_CNPJ($value, $defaultEmpty = "Não Informado"){
+        $format = '';
+        if(empty($value)) $format = $defaultEmpty;
+        elseif(strlen($value) != 11 && strlen($value) != 14 && strlen($value) != 0) return $value;
+        elseif(strlen($value) == 11) $format = $this->mask($value, '###.###.###-##');
+        elseif(strlen($value) == 14) $format = $this->mask($value, '##.###.###/####-##');
+        return $format;
+    }
 }
