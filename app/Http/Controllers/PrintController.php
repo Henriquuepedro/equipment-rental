@@ -46,19 +46,25 @@ class PrintController extends Controller
 //        dd($rental);
 
         $rental->address_zipcode = $rental->address_zipcode ? $this->mask($rental->address_zipcode, '##.###-###') : null;
-        $company->cpf_cnpj = strlen($company->cpf_cnpj) == 11 ? $this->mask($company->cpf_cnpj, '###.###.###-##') : $this->mask($company->cpf_cnpj, '##.###.###/####-##');
+        $company->cpf_cnpj = $this->formatCPF_CNPJ($company->cpf_cnpj);
         $company->cep = $company->cep ? $this->mask($company->cep, '##.###-###') : null;
+        $client->cpf_cnpj = $this->formatCPF_CNPJ($client->cpf_cnpj);
 
         $contentRecibo = [
-            'company' => $company,
-            'rental' => $rental,
-            'client' => $client,
+            'company'    => $company,
+            'rental'     => $rental,
+            'client'     => $client,
             'equipments' => $equipments,
-            'payments' => $payments
+            'payments'   => $payments
         ];
 
         $pdf = $this->pdf->loadView('print.rental', $contentRecibo);
         //return $pdf->download('rental.pdf');
         return $pdf->stream();
+    }
+
+    public function budget(int $budget)
+    {
+        return 'Em construção...';
     }
 }

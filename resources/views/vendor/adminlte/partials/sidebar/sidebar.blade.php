@@ -14,7 +14,8 @@
         strstr($route->getName(),'residue')     !== false
     ) $registerActive = 'active';
     elseif (
-        strstr($route->getName(),'rental') !== false
+        strstr($route->getName(),'rental') !== false ||
+        strstr($route->getName(),'budget') !== false
     ) $controlActive = 'active';
 @endphp
 
@@ -28,7 +29,13 @@
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
-        @if(in_array('ClientView', $permissions) || in_array('EquipmentView', $permissions) || in_array('DriverView', $permissions) || in_array('VehicleView', $permissions))
+        @if(
+            in_array('ClientView', $permissions) ||
+            in_array('EquipmentView', $permissions) ||
+            in_array('DriverView', $permissions) ||
+            in_array('VehicleView', $permissions) ||
+            in_array('ResidueView', $permissions)
+        )
         <li class="nav-item {{ $registerActive }}">
             <a class="nav-link" data-toggle="collapse" href="#register-dropdown" aria-expanded="false" aria-controls="register-dropdown">
                 <i class="menu-icon typcn typcn-plus-outline"></i>
@@ -66,7 +73,10 @@
             </div>
         </li>
         @endif
-        @if(in_array('RentalView', $permissions))
+        @if(
+            in_array('RentalView', $permissions) ||
+            in_array('BudgetView', $permissions)
+        )
             <li class="nav-item {{ $controlActive }}">
                 <a class="nav-link" data-toggle="collapse" href="#control-dropdown" aria-expanded="false" aria-controls="control-dropdown">
                     <i class="menu-icon typcn typcn-cog-outline"></i>
@@ -78,6 +88,11 @@
                         @if(in_array('RentalView', $permissions))
                             <li class="nav-item">
                                 <a class="nav-link" href=" {{ route('rental.index') }}">Locação</a>
+                            </li>
+                        @endif
+                        @if(in_array('BudgetView', $permissions))
+                            <li class="nav-item">
+                                <a class="nav-link" href=" {{ route('budget.index') }}">Orçamento</a>
                             </li>
                         @endif
                     </ul>

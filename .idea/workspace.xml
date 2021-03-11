@@ -2,21 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/app/Models/Config.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2021_02_28_181701_create_configs_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/js/views/config/form.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/BudgetController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Requests/BudgetCreatePost.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/Budget.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/BudgetEquipment.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/BudgetResidue.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2021_03_10_233652_create_budgets_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2021_03_10_235140_create_budget_equipments_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2021_03_10_235156_create_budget_residues_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/budget/create.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/budget/index.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CompanyController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ConfigController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ConfigController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EquipmentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EquipmentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/css/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/js/views/client/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/client/form.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PrintController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PrintController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/RentalCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/RentalCreatePost.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/config/index.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/config/index.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/includes/residue/modal-script.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/print/rental.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/print/rental.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/rental/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rental/create.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -181,11 +185,14 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/public/assets/js/views" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -194,8 +201,8 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Projetos\locacao\public\assets\js\views" />
       <recent name="C:\Projetos\locacao\resources\views" />
+      <recent name="C:\Projetos\locacao\public\assets\js\views" />
       <recent name="C:\Projetos\locacao\resources\views\includes" />
       <recent name="C:\Projetos\locacao\app\Models" />
       <recent name="C:\Projetos\locacao\database\migrations" />

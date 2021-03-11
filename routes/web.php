@@ -100,6 +100,7 @@ Route::group(['middleware' => 'auth'], function (){
     Route::group(['prefix' => '/impressao', 'as' => 'print.'], function () {
 
         Route::get('/locacao/{rental}', [App\Http\Controllers\PrintController::class, 'rental'])->name('rental');
+        Route::get('/orcamento/{budget}', [App\Http\Controllers\PrintController::class, 'budget'])->name('budget');
 
     });
 
@@ -107,6 +108,15 @@ Route::group(['middleware' => 'auth'], function (){
     Route::group(['prefix' => '/residuo', 'as' => 'residue.'], function () {
 
         Route::get('/', [App\Http\Controllers\ResidueController::class, 'index'])->name('index');
+
+    });
+
+    // Orçamento
+    Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
+
+        Route::get('/', [App\Http\Controllers\BudgetController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\BudgetController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\BudgetController::class, 'insert'])->name('insert');
 
     });
 
@@ -173,6 +183,11 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/nova-locacao', [App\Http\Controllers\RentalController::class, 'insert'])->name('new-rental');
             Route::post('/buscar', [App\Http\Controllers\RentalController::class, 'fetchRentals'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\RentalController::class, 'delete'])->name('delete');
+        });
+        Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
+            Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');
+            Route::post('/buscar', [App\Http\Controllers\BudgetController::class, 'fetchBudgets'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\BudgetController::class, 'delete'])->name('delete');
         });
     });
 });

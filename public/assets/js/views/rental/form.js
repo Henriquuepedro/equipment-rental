@@ -1,6 +1,7 @@
 (function ($) {
     'use strict';
     var form = $("#formCreateRental");
+    var budget = $('#budget').val() ? true : false;
     form.steps({
         headerTag: "h3",
         bodyTag: "div.stepRental",
@@ -127,7 +128,7 @@
                     if (isNaN(stockEquipment) || stockEquipment === 0)
                         arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) deve ser informado uma quantidade.`);
 
-                    else if (stockEquipment > stockMax)
+                    else if (stockEquipment > stockMax && !budget)
                         arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
 
                     notUseDateWithdrawal = $('.not_use_date_withdrawal', this).is(':checked');
@@ -323,7 +324,7 @@
                 if (pricesAndStocks) {
                     await Promise.all(dataEquipments.map(async equipment => {
                         dataEquipmentsPayCheck.push(equipment[0]);
-                        if (equipment[1] > pricesAndStocks[equipment[0]].stock) {
+                        if (equipment[1] > pricesAndStocks[equipment[0]].stock && !budget) {
                             $(`#collapseEquipment-${equipment[0]}`).find('input[name^="stock_equipment_"]').attr('max-stock', pricesAndStocks[equipment[0]].stock).val(pricesAndStocks[equipment[0]].stock);
                             $(`#collapseEquipment-${equipment[0]}`).find('.stock_available').text('Disponível: ' + pricesAndStocks[equipment[0]].stock);
                             arrErrors.push(`O equipamento ( <strong>${equipment[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipment[0]].stock} un</strong>`);
@@ -502,6 +503,7 @@
 })(jQuery);
 
 var searchEquipmentOld = '';
+var budget = $('#budget').val() ? true : false;
 
 $(function() {
     $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
@@ -616,18 +618,17 @@ $('#searchEquipment').on('blur keyup', function (e){
             let badgeStock = '';
             $.each(response, function (key, val) {
                 badgeStock = val.stock <= 0 ? 'danger' : 'primary';
-                $('table.list-equipment tbody').append(`
-                        <tr class="equipment" id-equipment="${val.id}">
+                let reg = `<tr class="equipment" id-equipment="${val.id}">
                             <td class="text-left"><h6 class="mb-1 text-left">${val.name}</h6></td>
-                            <td><div class="badge badge-pill badge-lg badge-info">${val.reference}</div></td>
-                            <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>
-                            <td class="text-right">
+                            <td><div class="badge badge-pill badge-lg badge-info">${val.reference}</div></td>`;
+                reg += budget ? '' : `<td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>`;
+                reg += `<td class="text-right">
                                 <button type="button" class="badge badge-lg badge-pill badge-success">
                                     <i class="fa fa-plus"></i>
                                 </button>
                             </td>
-                        </tr>
-                    `);
+                        </tr>`;
+                $('table.list-equipment tbody').append(reg);
             });
         }, error: e => {
             console.log(e);
@@ -658,7 +659,7 @@ $('table.list-equipment').on('click', '.equipment', function(){
         },
         type: 'POST',
         url: $('#routeGetEquipment').val(),
-        data: { idEquipment, validStock: true },
+        data: { idEquipment, validStock: budget ? false : true },
         success: response => {
 
             if (!response.success) {
@@ -906,7 +907,7 @@ $(document).on('blur change', '[name^="stock_equipment_"]', function (){
     const stock         = parseInt($(this).val());
     const idEquipment  = parseInt($(this).closest('.card').find('.card-header').attr('id-equipment'));
 
-    if (stock > maxStock) {
+    if (stock > maxStock && !budget) {
         Toast.fire({
             icon: 'error',
             title: `A quantidade não pode ser superior a ${maxStock} un.`

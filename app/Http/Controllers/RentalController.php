@@ -156,16 +156,16 @@ class RentalController extends Controller
             return redirect()->route('rental.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
+        $budget = false;
 
-        return view('rental.create');
+        return view('rental.create', compact('budget'));
     }
 
     public function insert(RentalCreatePost $request)
     {
-        if (!$this->hasPermission('RentalCreatePost')) {
-            return redirect()->route('rental.index')
-                ->with('warning', "Você não tem permissão para acessar essa página!");
-        }
+        if (!$this->hasPermission('RentalCreatePost'))
+            return response()->json(['success' => false, 'message' => "Você não tem permissão para criar locações."]);
+
         $company_id = $request->user()->company_id;
 
         $haveCharged = $request->type_rental ? false : true; // true = com cobrança
@@ -283,8 +283,9 @@ class RentalController extends Controller
 
     }
 
-    private function setEquipmentRental($request)
+    public function setEquipmentRental($request, bool $budget = false)
     {
+        $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         $response = new \StdClass();
         $response->arrEquipment = array();
         $response->grossValue = 0;
@@ -319,7 +320,7 @@ class RentalController extends Controller
             $dateDeliveryEquip = $dateDeliveryEquip ? \DateTime::createFromFormat('d/m/Y H:i', $dateDeliveryEquip) : null;
             $dateWithdrawalEquip = $dateWithdrawalEquip ? \DateTime::createFromFormat('d/m/Y H:i', $dateWithdrawalEquip) : null;
 
-            if ($stockRequest > $stockDb)
+            if ($stockRequest > $stockDb && !$budget)
                 return $response->error = "O equipamento ( <strong>{$reference}</strong> ) não tem estoque suficiente. <strong>Disponível: {$stockDb} un</strong>";
 
             if ($useDateDiff) { // será utilizada uma diferente que a data da locação
@@ -367,8 +368,8 @@ class RentalController extends Controller
 
             array_push($response->arrEquipment, array(
                 'company_id'                => $company_id,
-                'rental_id'                 => 0,
-                'equipment_id'             => $equipmentId->id,
+                $nameFieldID                => 0,
+                'equipment_id'              => $equipmentId->id,
                 'reference'                 => $equipmentId->reference,
                 'name'                      => $equipmentId->name,
                 'volume'                    => $equipmentId->volume,
@@ -388,8 +389,9 @@ class RentalController extends Controller
         return $response;
     }
 
-    private function setPaymentRental(object $request, $grossValue): \StdClass
+    public function setPaymentRental(object $request, $grossValue, bool $budget = false): \StdClass
     {
+        $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         $company_id = $request->user()->company_id;
         $response = new \StdClass();
         $response->arrPayment = array();
@@ -453,7 +455,7 @@ class RentalController extends Controller
 
                 array_push($response->arrPayment, array(
                     'company_id'    => $company_id,
-                    'rental_id'     => 0,
+                    $nameFieldID    => 0,
                     'parcel'        => $parcel + 1,
                     'due_day'       => $request->due_day[$parcel],
                     'due_date'      => $request->due_date[$parcel],
@@ -471,7 +473,7 @@ class RentalController extends Controller
             // 1x o pagamento, vencimento para hoje
             array_push($response->arrPayment, array(
                 'company_id'    => $company_id,
-                'rental_id'     => 0,
+                $nameFieldID    => 0,
                 'parcel'        => 1,
                 'due_day'       => 0,
                 'due_date'      => date('Y-m-d'),
@@ -488,8 +490,9 @@ class RentalController extends Controller
         return $response;
     }
 
-    private function setResidueRental(object $request): array
+    public function setResidueRental(object $request, bool $budget = false): array
     {
+        $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         if (empty($request->residues)) return [];
 
         $company_id = $request->user()->company_id;
@@ -503,7 +506,7 @@ class RentalController extends Controller
         foreach ($residues as $residue) {
             array_push($arrResidue, array(
                 'company_id'    => $company_id,
-                'rental_id'     => 0,
+                $nameFieldID    => 0,
                 'residue_id'    => $residue->id,
                 'name_residue'  => $residue->name,
                 'user_insert'   => $request->user()->id
@@ -513,10 +516,11 @@ class RentalController extends Controller
         return $arrResidue;
     }
 
-    private function addRentalIdArray(array $array, int $rentalId): array
+    public function addRentalIdArray(array $array, int $rentalId, bool $budget = false): array
     {
+        $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         foreach ($array as $key => $value)
-             if (isset($value['rental_id'])) $array[$key]['rental_id'] = $rentalId;
+             if (isset($value[$nameFieldID])) $array[$key][$nameFieldID] = $rentalId;
 
         return $array;
     }

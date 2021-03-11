@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', $budget ? 'Cadastro de Orçamento' : 'Cadastro de Locação')
+@section('title', 'Cadastro de Locação')
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Cadastro de  {{ $budget ? 'Orçamento' : 'Locação' }}</h1>
+    <h1 class="m-0 text-dark">Cadastro de Locação</h1>
 @stop
 
 @section('css')
@@ -171,19 +171,16 @@
 @section('js')
 <script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}" type="application/javascript"></script>
 <script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
+<script src="{{ asset('assets/js/views/client/form.js') }}" type="application/javascript"></script>
+<script src="{{ asset('assets/js/views/equipment/form.js') }}" type="application/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
 <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
-
 @include('includes.client.modal-script')
 @include('includes.address.modal-script')
 @include('includes.equipment.modal-script')
 @include('includes.driver.modal-script')
 @include('includes.vehicle.modal-script')
 @include('includes.residue.modal-script')
-
-    @if(in_array('ClientCreatePost', $permissions))    <script src="{{ asset('assets/js/views/client/form.js') }}" type="application/javascript"></script>    @endif
-    @if(in_array('EquipmentCreatePost', $permissions)) <script src="{{ asset('assets/js/views/equipment/form.js') }}" type="application/javascript"></script> @endif
-
 @stop
 
 @section('content')
@@ -204,22 +201,20 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route($budget ? 'ajax.budget.new-rental' : 'ajax.rental.new-rental') }}" method="POST" enctype="multipart/form-data" id="formCreateRental" class="pb-2">
-                                <h3>Tipo de {{ $budget ? 'Orçamento' : 'Locação' }}</h3>
+                            <form action="{{ route(('ajax.rental.new-rental')) }}" method="POST" enctype="multipart/form-data" id="formCreateRental" class="pb-2">
+                                <h3>Tipo de Locação</h3>
                                 <div class="stepRental">
-                                    <h6>Tipo de {!! $budget ? 'Orçamento' : 'Locação <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
+                                    <h6>Tipo de Locação <i class="fa fa-info-circle" data-toggle="tooltip" title="Defina se haverá ou não cobrança para essa locação."></i></h6>
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
                                             <div class="">
-                                                <input type="radio" name="type_rental" id="have-payment" value="0" @if($budget) checked @endif>
-                                                <label for="have-payment">{{ $budget ? 'Orçamento' : 'Com Cobrança' }}</label>
+                                                <input type="radio" name="type_rental" id="have-payment" value="0" @if(old('type_person') === '0') checked @endif>
+                                                <label for="have-payment">Com Cobrança</label>
                                             </div>
-                                            @if(!$budget)
                                             <div class="">
-                                                <input type="radio" name="type_rental" id="no-have-payment" value="1">
+                                                <input type="radio" name="type_rental" id="no-have-payment" value="1" @if(old('type_person') === '1') checked @endif>
                                                 <label for="no-have-payment">Sem Cobrança</label>
                                             </div>
-                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -287,7 +282,7 @@
                                             <div class="input-group label-animate">
                                                 <select class="select2 form-control" multiple="multiple" name="residues[]"></select>
                                                 <div class="input-group-addon input-group-append">
-                                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo" @if(!in_array('ResidueCreatePost', $permissions)) disabled @endif><i class="fas fa-plus-circle"></i></button>
+                                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo"><i class="fas fa-plus-circle"></i></button>
                                                 </div>
                                             </div>
                                         </div>
@@ -305,7 +300,7 @@
                                                 <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipment">
                                                     <i class="fa fa-times input-group-text text-white"></i>
                                                 </div>
-                                                <div class="input-group-addon input-group-append btn-success" @if(in_array('EquipmentCreatePost', $permissions))id="newEquipment" data-toggle="modal" data-target="#newEquipmentModal"@else disabled @endif>
+                                                <div class="input-group-addon input-group-append btn-success" id="newEquipment" data-toggle="modal" data-target="#newEquipmentModal">
                                                     <i class="fa fa-plus input-group-text text-white"></i>
                                                 </div>
                                             </div>
@@ -313,7 +308,7 @@
                                         <div class="form-group col-md-12 mt-2 table-responsive content-equipment">
                                             <table class="table list-equipment d-table">
                                                 <tbody>
-                                                    <tr>
+                                                    <tr class="equipment">
                                                         <td class="text-left"><h6 class="text-center"><i class="fas fa-search"></i> Pesquise por um equipamento</h6></td>
                                                     </tr>
                                                 </tbody>
@@ -380,9 +375,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <hr class="separator-dashed payment-hidden {{ $budget ? 'display-none' : '' }}">
+                                            <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 d-flex justify-content-between payment-hidden">
-                                                <div class="form-group {{ $budget ? 'display-none' : '' }}">
+                                                <div class="form-group">
                                                     <div class="switch">
                                                         <input type="checkbox" class="check-style check-xs" name="is_parceled" id="is_parceled">
                                                         <label for="is_parceled" class="check-style check-xs"></label> Gerar Parcelamento
@@ -410,7 +405,7 @@
                                     <h6>Finalizar</h6>
                                     <div class="row">
                                         <div class="form-group col-md-12 mt-3">
-                                            <h5>Observação {{ $budget ? 'do Orçamento' : 'da Locação' }}</h5>
+                                            <h5>Observação da Locação</h5>
                                             <div id="observationDiv" class="quill-container"></div>
                                             <textarea type="hidden" class="d-none" name="observation" id="observation"></textarea>
                                         </div>
@@ -437,11 +432,11 @@
             </div>
         </div>
     </div>
-    @if(in_array('ClientCreatePost', $permissions))    @include('includes.client.modal-create')    @endif
-    @if(in_array('EquipmentCreatePost', $permissions)) @include('includes.equipment.modal-create') @endif
-    @if(in_array('VehicleCreatePost', $permissions))   @include('includes.vehicle.modal-create')   @endif
-    @if(in_array('DriverCreatePost', $permissions))    @include('includes.driver.modal-create')    @endif
-    @if(in_array('ResidueCreatePost', $permissions))   @include('includes.residue.modal-create')   @endif
+    @include('includes.client.modal-create')
+    @include('includes.equipment.modal-create')
+    @include('includes.vehicle.modal-create')
+    @include('includes.driver.modal-create')
+    @include('includes.residue.modal-create')
     <div class="modal fade" tabindex="-1" role="dialog" id="confirmAddressRental">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -469,11 +464,18 @@
             </div>
         </div>
     </div>
+    <input type="hidden" id="routeGetStockEquipment" value="{{ route('ajax.equipment.get-stock') }}">
+    <input type="hidden" id="routeGetPriceEquipment" value="{{ route('ajax.equipment.get-price') }}">
+    <input type="hidden" id="routeGetEquipment" value="{{ route('ajax.equipment.get-equipment') }}">
+    <input type="hidden" id="routeGetPriceStockEquipments" value="{{ route('ajax.equipment.get-price-stock-check') }}">
+    <input type="hidden" id="routeGetEquipments" value="{{ route('ajax.equipment.get-equipments') }}">
+    <input type="hidden" id="routeGetPriceStockPeriodEquipment" value="{{ route('ajax.equipment.get-price-per-period') }}">
+    <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
     <div class="modal fade" tabindex="-1" role="dialog" id="createRental">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{ $budget ? 'Orçamento criado' : 'Locação criada' }} com sucesso</h5>
+                    <h5 class="modal-title">Locação criada com sucesso</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -481,7 +483,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="text-center code_rental">{{ $budget ? 'Orçamento' : 'Locação' }} código <strong></strong> criada com sucesso!</h3>
+                            <h3 class="text-center code_rental">Locação código <strong></strong> criada com sucesso!</h3>
                         </div>
                     </div>
                     <div class="row">
@@ -491,21 +493,13 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12 d-flex justify-content-around flex-wrap mt-5">
-                            <a href="{{ route($budget ? 'budget.index' : 'rental.index') }}" class="btn btn-primary col-md-4">Listagem de {{ $budget ? 'Orçamentos' : 'Locações' }}</a>
-                            <a href="{{ route($budget ? 'budget.create' : 'rental.create') }}" class="btn btn-secondary col-md-4">Realizar {{ $budget ? 'novo Orçamento' : 'nova Locação' }}</a>
+                            <a href="{{ route('rental.index') }}" class="btn btn-primary col-md-4">Listagem de Locações</a>
+                            <a href="{{ route('rental.create') }}" class="btn btn-secondary col-md-4">Realizar nova Locação</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <input type="hidden" id="routeGetStockEquipment" value="{{ route('ajax.equipment.get-stock') }}">
-    <input type="hidden" id="routeGetPriceEquipment" value="{{ route('ajax.equipment.get-price') }}">
-    <input type="hidden" id="routeGetEquipment" value="{{ route('ajax.equipment.get-equipment') }}">
-    <input type="hidden" id="routeGetPriceStockEquipments" value="{{ route('ajax.equipment.get-price-stock-check') }}">
-    <input type="hidden" id="routeGetEquipments" value="{{ route('ajax.equipment.get-equipments') }}">
-    <input type="hidden" id="routeGetPriceStockPeriodEquipment" value="{{ route('ajax.equipment.get-price-per-period') }}">
-    <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
-    <input type="hidden" id="budget" value="{{ $budget }}">
 
 @stop

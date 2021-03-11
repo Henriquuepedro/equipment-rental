@@ -126,12 +126,12 @@
                     <strong>{{ $company->cpf_cnpj }}</strong>
                 </td>
                 <td class='info title' style='width: 30%'>
-                    <h5 class='title'>INFORMAÇÕES</h5>
+                    <h5 class='title'>RECIBO DE LOCAÇÃO</h5>
                 </td>
             </tr>
             <tr>
                 <td class='info'>
-                    <span>Código Locação</span>
+                    <span>Número Locação</span>
                     <p>{{ str_pad($rental->code, 5, 0, STR_PAD_LEFT) }}</p>
                 </td>
             </tr>
@@ -143,7 +143,7 @@
             </tr>
             <tr>
                 <td class='info'>
-                    <span>Valor da Locação</span>
+                    <span>Valor Total</span>
                     <p>R$ {{ number_format($rental->net_value, 2, ',', '.') }}</p>
                 </td>
             </tr>
@@ -151,17 +151,17 @@
         <table class='table'>
             <tr>
                 <td class='info title text-left' colspan='3' style='width: 100%'>
-                    <h5 class='title'>DADOS DE COBRANÇA</h5>
+                    <h5 class='title'>DADOS DO CLIENTE</h5>
                 </td>
             </tr>
             <tr>
                 <td class='info' colspan='2' style='width: 70%'>
                     <span>Cliente</span>
-                    <p class='dadosLocacao'>{{ $client->name }}</p>
+                    <p class='dadosLocacao'>{{ $client->name }} @if($client->cpf_cnpj)( {{ $client->cpf_cnpj }} )@endif</p>
                 </td>
                 <td class='info' style='width: 30%'>
                     <span>Telefone</span>
-                    <p class='dadosLocacao'>{{ $client->phone_1 }}</p>
+                    <p class='dadosLocacao'>{!! $client->phone_1 ?? '&nbsp;' !!}</p>
                 </td>
             </tr>
             <tr>
@@ -192,7 +192,7 @@
         <table class='table'>
             <tr>
                 <td class='info title text-left' style='width: 100%' colspan='6'>
-                    <h5 class='title'>EQUIPAMENTO</h5>
+                    <h5 class='title'>DADOS DO EQUIPAMENTO</h5>
                 </td>
             </tr>
             @foreach($equipments as $equipment)
@@ -224,56 +224,10 @@
                 </tr>
             @endforeach
         </table>
-        @if (count($payments))
         <table class='table'>
             <tr>
                 <td class='info title text-left' colspan='4' style='width: 100%'>
-                    <h5 class='title'>PAGAMENTO</h5>
-                </td>
-            </tr>
-            @foreach($payments as $payment)
-            <tr>
-                <td class='info' style='width: 25%'>
-                    <strong>{{ $payment->parcel }}º Parcela</strong>
-                </td>
-                <td class='info' style='width: 25%'>
-                    <span>Vencimento</span>
-                    <p class='dadosLocacao'>{{ date('d/m/Y', strtotime($payment->due_date)) }}</p>
-                </td>
-                <td class='info' style='width: 25%'>
-                    <span>Valor</span>
-                    <p class='dadosLocacao'>R$ {{ number_format($payment->due_value, 2, ',', '.') }}</p>
-                </td>
-                <td class='info' style='width: 25%'>
-                    <span>Situação</span>
-                    <p class='dadosLocacao'>{{ $payment->payday ? 'Pago' : 'Em aberto' }}</p>
-                </td>
-            </tr>
-            @endforeach
-            <tr>
-                <td class='info' style='width: 25%'>
-                    <span>Total Bruto</span>
-                    <p class='dadosLocacao'>R$ {{ number_format($rental->gross_value, 2, ',', '.') }}</p>
-                </td>
-                <td class='info' style='width: 25%'>
-                    <span>Desconto</span>
-                    <p class='dadosLocacao'>R$ {{ number_format($rental->discount_value, 2, ',', '.') }}</p>
-                </td>
-                <td class='info' style='width: 25%'>
-                    <span>Acréscimo</span>
-                    <p class='dadosLocacao'>R$ {{ number_format($rental->extra_value, 2, ',', '.') }}</p>
-                </td>
-                <td class='info' style='width: 25%'>
-                    <span>Total Líquido</span>
-                    <p class='dadosLocacao'>R$ {{ number_format($rental->net_value, 2, ',', '.') }}</p>
-                </td>
-            </tr>
-        </table>
-        @endif
-        <table class='table'>
-            <tr>
-                <td class='info title text-left' colspan='4' style='width: 100%'>
-                    <h5 class='title'>DADOS ENTREGA</h5>
+                    <h5 class='title'>DADOS DA ENTREGA</h5>
                 </td>
             </tr>
             <tr>
@@ -301,6 +255,52 @@
                 </td>
             </tr>
         </table>
+        @if (count($payments))
+            <table class='table'>
+                <tr>
+                    <td class='info title text-left' colspan='4' style='width: 100%'>
+                        <h5 class='title'>DADOS DE PAGAMENTO</h5>
+                    </td>
+                </tr>
+                @foreach($payments as $payment)
+                    <tr>
+                        <td class='info' style='width: 25%'>
+                            <strong>{{ $payment->parcel }}º Parcela</strong>
+                        </td>
+                        <td class='info' style='width: 25%'>
+                            <span>Vencimento</span>
+                            <p class='dadosLocacao'>{{ date('d/m/Y', strtotime($payment->due_date)) }}</p>
+                        </td>
+                        <td class='info' style='width: 25%'>
+                            <span>Valor</span>
+                            <p class='dadosLocacao'>R$ {{ number_format($payment->due_value, 2, ',', '.') }}</p>
+                        </td>
+                        <td class='info' style='width: 25%'>
+                            <span>Situação</span>
+                            <p class='dadosLocacao'>{{ $payment->payday ? 'Pago' : 'Em aberto' }}</p>
+                        </td>
+                    </tr>
+                @endforeach
+                <tr>
+                    <td class='info' style='width: 25%'>
+                        <span>Total Bruto</span>
+                        <p class='dadosLocacao'>R$ {{ number_format($rental->gross_value, 2, ',', '.') }}</p>
+                    </td>
+                    <td class='info' style='width: 25%'>
+                        <span>Desconto</span>
+                        <p class='dadosLocacao'>R$ {{ number_format($rental->discount_value, 2, ',', '.') }}</p>
+                    </td>
+                    <td class='info' style='width: 25%'>
+                        <span>Acréscimo</span>
+                        <p class='dadosLocacao'>R$ {{ number_format($rental->extra_value, 2, ',', '.') }}</p>
+                    </td>
+                    <td class='info' style='width: 25%'>
+                        <span>Total Líquido</span>
+                        <p class='dadosLocacao'>R$ {{ number_format($rental->net_value, 2, ',', '.') }}</p>
+                    </td>
+                </tr>
+            </table>
+        @endif
         <table class='table'>
             <tr>
                 <td class='info title text-left' style='width: 100%'>
