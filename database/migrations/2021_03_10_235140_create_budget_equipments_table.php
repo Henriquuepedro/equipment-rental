@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBudgetEquipmentTable extends Migration
+class CreateBudgetEquipmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -27,11 +27,11 @@ class CreateBudgetEquipmentTable extends Migration
             $table->decimal('total_value', 12,2)->nullable();
             $table->bigInteger('vehicle_suggestion')->unsigned()->nullable();
             $table->bigInteger('driver_suggestion')->unsigned()->nullable();
-            $table->tinyInteger('use_date_diff_equip');
+//            $table->tinyInteger('use_date_diff_equip');
 
-            $table->dateTime('expected_delivery_date');
-            $table->dateTime('expected_withdrawal_date')->nullable();
-            $table->tinyInteger('not_use_date_withdrawal');
+//            $table->dateTime('expected_delivery_date');
+//            $table->dateTime('expected_withdrawal_date')->nullable();
+//            $table->tinyInteger('not_use_date_withdrawal');
 
             $table->bigInteger('user_insert')->unsigned();
             $table->bigInteger('user_update')->unsigned()->nullable();

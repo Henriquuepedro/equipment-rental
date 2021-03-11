@@ -2,26 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b217fd17-cc27-48bd-a414-92e227571952" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/BudgetController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Requests/BudgetCreatePost.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Models/Budget.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Models/BudgetEquipment.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Models/BudgetResidue.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2021_03_10_233652_create_budgets_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2021_03_10_235140_create_budget_equipments_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/migrations/2021_03_10_235156_create_budget_residues_table.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/budget/create.blade.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/budget/index.blade.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/BudgetPayment.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2021_03_11_221406_create_budget_payments_table.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PrintController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PrintController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/BudgetController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/BudgetController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/RentalController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/RentalCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/RentalCreatePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Requests/BudgetCreatePost.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/BudgetCreatePost.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_03_10_233652_create_budgets_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_03_10_233652_create_budgets_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_03_10_235140_create_budget_equipments_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_03_10_235140_create_budget_equipments_table.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/js/views/rental/form.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/print/rental.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/print/rental.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/rental/create.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/rental/create.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/vendor/adminlte/partials/sidebar/sidebar.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -327,6 +317,7 @@
       <workItem from="1614201135702" duration="4975000" />
       <workItem from="1614433491993" duration="19974000" />
       <workItem from="1614530465139" duration="11213000" />
+      <workItem from="1615500714352" duration="4748000" />
     </task>
     <servers />
   </component>
