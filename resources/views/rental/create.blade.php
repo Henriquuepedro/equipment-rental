@@ -211,15 +211,13 @@
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
                                             <div class="">
-                                                <input type="radio" name="type_rental" id="have-payment" value="0" @if($budget) checked @endif>
-                                                <label for="have-payment">{{ $budget ? 'Orçamento' : 'Com Cobrança' }}</label>
+                                                <input type="radio" name="type_rental" id="have-payment" value="0">
+                                                <label for="have-payment">Com Cobrança</label>
                                             </div>
-                                            @if(!$budget)
                                             <div class="">
                                                 <input type="radio" name="type_rental" id="no-have-payment" value="1">
                                                 <label for="no-have-payment">Sem Cobrança</label>
                                             </div>
-                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -238,6 +236,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @if (!$budget)
                                 <h3>Datas</h3>
                                 <div class="stepRental">
                                     <h6>Datas</h6>
@@ -278,6 +277,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                                 <h3>Equipamentos</h3>
                                 <div class="stepRental">
                                     <h6>Equipamentos</h6>
@@ -380,9 +380,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <hr class="separator-dashed payment-hidden {{ $budget ? 'display-none' : '' }}">
+                                            <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 d-flex justify-content-between payment-hidden">
-                                                <div class="form-group {{ $budget ? 'display-none' : '' }}">
+                                                <div class="form-group">
                                                     <div class="switch">
                                                         <input type="checkbox" class="check-style check-xs" name="is_parceled" id="is_parceled">
                                                         <label for="is_parceled" class="check-style check-xs"></label> Gerar Parcelamento

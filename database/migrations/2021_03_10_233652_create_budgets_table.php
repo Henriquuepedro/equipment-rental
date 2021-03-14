@@ -17,6 +17,7 @@ class CreateBudgetsTable extends Migration
             $table->id();
             $table->bigInteger('code');
             $table->bigInteger('company_id')->unsigned();
+            $table->tinyInteger('type_rental')->default(0);
 
             $table->bigInteger('client_id')->unsigned();
 
@@ -31,9 +32,9 @@ class CreateBudgetsTable extends Migration
             $table->string('address_lat', 64);
             $table->string('address_lng', 64);
 
-            $table->dateTime('expected_delivery_date');
-            $table->dateTime('expected_withdrawal_date')->nullable();
-            $table->tinyInteger('not_use_date_withdrawal');
+//            $table->dateTime('expected_delivery_date');
+//            $table->dateTime('expected_withdrawal_date')->nullable();
+//            $table->tinyInteger('not_use_date_withdrawal');
 
             $table->decimal('gross_value', 12,2)->nullable();
             $table->decimal('extra_value', 12,2)->nullable();
@@ -41,6 +42,8 @@ class CreateBudgetsTable extends Migration
             $table->decimal('net_value', 12,2)->nullable();
 
             $table->tinyInteger('calculate_net_amount_automatic')->nullable();
+            $table->tinyInteger('use_parceled')->nullable();
+            $table->tinyInteger('automatic_parcel_distribution')->nullable();
 
             $table->longText('observation')->nullable();
 

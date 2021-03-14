@@ -304,18 +304,18 @@ class RentalController extends Controller
 
         foreach ($equipments as $equipmentId) {
 
-            $stockRequest = (int)$request->{"stock_equipment_{$equipmentId->id}"};
-            $stockDb = (int)$equipmentId->stock;
-            $reference = $request->{"reference_equipment_{$equipmentId->id}"};
-            $useDateDiff = $request->{"use_date_diff_equip_{$equipmentId->id}"} ? true : false;
-            $notUseDateWithdrawalEquip = $request->{"not_use_date_withdrawal_equip_{$equipmentId->id}"} ? true : false;
-            $dateDeliveryEquip = $request->{"date_delivery_equipment_{$equipmentId->id}"};
-            $dateWithdrawalEquip = $request->{"date_withdrawal_equipment_{$equipmentId->id}"};
-            $driverEquip = (int)$request->{"driver_{$equipmentId->id}"};
-            $vehicleEquip = (int)$request->{"vehicle_{$equipmentId->id}"};
-            $priceTotalEquip = $haveCharged ? $this->transformMoneyBr_En($request->{"priceTotalEquipment_{$equipmentId->id}"}) : 0;
-            $unitaryValue = $haveCharged ? $equipmentId->value : 0;
-            $response->grossValue += $priceTotalEquip;
+            $stockRequest               = (int)$request->{"stock_equipment_{$equipmentId->id}"};
+            $stockDb                    = (int)$equipmentId->stock;
+            $reference                  = $request->{"reference_equipment_{$equipmentId->id}"};
+            $useDateDiff                = !$budget && $request->{"use_date_diff_equip_{$equipmentId->id}"};
+            $notUseDateWithdrawalEquip  = !$budget && $request->{"not_use_date_withdrawal_equip_{$equipmentId->id}"};
+            $dateDeliveryEquip          = $request->{"date_delivery_equipment_{$equipmentId->id}"};
+            $dateWithdrawalEquip        = $request->{"date_withdrawal_equipment_{$equipmentId->id}"};
+            $driverEquip                = (int)$request->{"driver_{$equipmentId->id}"};
+            $vehicleEquip               = (int)$request->{"vehicle_{$equipmentId->id}"};
+            $priceTotalEquip            = $haveCharged ? $this->transformMoneyBr_En($request->{"priceTotalEquipment_{$equipmentId->id}"}) : 0;
+            $unitaryValue               = $haveCharged ? $equipmentId->value : 0;
+            $response->grossValue       += $priceTotalEquip;
 
             $dateDeliveryEquip = $dateDeliveryEquip ? \DateTime::createFromFormat('d/m/Y H:i', $dateDeliveryEquip) : null;
             $dateWithdrawalEquip = $dateWithdrawalEquip ? \DateTime::createFromFormat('d/m/Y H:i', $dateWithdrawalEquip) : null;
@@ -323,7 +323,7 @@ class RentalController extends Controller
             if ($stockRequest > $stockDb && !$budget)
                 return $response->error = "O equipamento ( <strong>{$reference}</strong> ) não tem estoque suficiente. <strong>Disponível: {$stockDb} un</strong>";
 
-            if ($useDateDiff) { // será utilizada uma diferente que a data da locação
+            if ($useDateDiff && !$budget) { // será utilizada uma diferente que a data da locação
 
                 if (!$dateDeliveryEquip)
                     return $response->error = "Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm, no equipamento ( <strong>{$reference}</strong> ).";
@@ -346,7 +346,7 @@ class RentalController extends Controller
                 $dateDeliveryEquip = $dateDelivery;
                 $dateWithdrawalEquip = $dateWithdrawal;
 
-                if (!$notUseDateWithdrawal) {
+                if (!$notUseDateWithdrawal && !$budget) {
                     // diferença entre as datas
                     $dateDiff = $dateDeliveryEquip->diff($dateWithdrawalEquip);
                     // recupera valores configurados para valor unitário
@@ -366,7 +366,7 @@ class RentalController extends Controller
                 if (!$this->vehicle->getVehicle($vehicleEquip, $company_id))
                     return $response->error = "Veículo não foi encontrado no equipamento ( <strong>{$reference}</strong> ).";
 
-            array_push($response->arrEquipment, array(
+            $arrEquipment = array(
                 'company_id'                => $company_id,
                 $nameFieldID                => 0,
                 'equipment_id'              => $equipmentId->id,
@@ -378,12 +378,17 @@ class RentalController extends Controller
                 'total_value'               => $priceTotalEquip,
                 'vehicle_suggestion'        => empty($vehicleEquip) ? null : $vehicleEquip,
                 'driver_suggestion'         => empty($driverEquip) ? null : $driverEquip,
-                'use_date_diff_equip'       => $useDateDiff,
-                'expected_delivery_date'    => $dateDeliveryEquip->format('Y-m-d H:i:s'),
-                'expected_withdrawal_date'  => $dateWithdrawalEquip ? $dateWithdrawalEquip->format('Y-m-d H:i:s') : null,
-                'not_use_date_withdrawal'   => $notUseDateWithdrawalEquip,
                 'user_insert'               => $request->user()->id
-            ));
+            );
+            if (!$budget)
+                $arrEquipment = array_merge($arrEquipment, array(
+                    'use_date_diff_equip'       => $useDateDiff,
+                    'expected_delivery_date'    => $dateDeliveryEquip->format('Y-m-d H:i:s'),
+                    'expected_withdrawal_date'  => $dateWithdrawalEquip ? $dateWithdrawalEquip->format('Y-m-d H:i:s') : null,
+                    'not_use_date_withdrawal'   => $notUseDateWithdrawalEquip
+                ));
+
+            array_push($response->arrEquipment, $arrEquipment);
         }
 
         return $response;

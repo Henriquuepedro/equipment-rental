@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BudgetCreatePost;
 use App\Models\Budget;
 use App\Models\BudgetEquipment;
+use App\Models\BudgetPayment;
 use App\Models\BudgetResidue;
 use App\Models\Client;
 use Illuminate\Http\Request;
@@ -18,14 +19,16 @@ class BudgetController extends Controller
     private $client;
     private $budget_equipment;
     private $budget_residue;
+    private $budget_payment;
 
-    public function __construct(Budget $budget, RentalController $rentalController, Client $client, BudgetEquipment $budget_equipment, BudgetResidue $budget_residue)
+    public function __construct(Budget $budget, RentalController $rentalController, Client $client, BudgetEquipment $budget_equipment, BudgetResidue $budget_residue, BudgetPayment $budget_payment)
     {
         $this->budget = $budget;
         $this->rentalController = $rentalController;
         $this->client = $client;
         $this->budget_equipment = $budget_equipment;
         $this->budget_residue = $budget_residue;
+        $this->budget_payment = $budget_payment;
     }
 
     public function index()
@@ -116,6 +119,8 @@ class BudgetController extends Controller
 
         $company_id = $request->user()->company_id;
 
+        $haveCharged = $request->type_rental ? false : true; // true = com cobrança
+
         $clientId   = (int)$request->client;
         $zipcode    = $request->cep ? filter_var(preg_replace('/[^0-9]/', '', $request->cep), FILTER_SANITIZE_NUMBER_INT) : null;
         $address    = $request->address ? filter_var($request->address, FILTER_SANITIZE_STRING) : null;
@@ -138,32 +143,21 @@ class BudgetController extends Controller
         if ($state == '') return response()->json(['success' => false, 'message' => 'Informe um estado. Revise a aba de Cliente e Endereço.']);
         if ($lat == '' || $lng == '') return response()->json(['success' => false, 'message' => 'Confirme o endereço no mapa. Revise a aba de Cliente e Endereço.']);
 
-        // datas do orçamento
-        $dateDelivery = $request->date_delivery ? \DateTime::createFromFormat('d/m/Y H:i', $request->date_delivery) : null;
-        $dateWithdrawal = $request->date_withdrawal ? \DateTime::createFromFormat('d/m/Y H:i', $request->date_withdrawal) : null;
-        $notUseDateWithdrawal = $request->not_use_date_withdrawal ? true : false;
-
-        if (!$dateDelivery) // não reconheceu a data de entrega
-            return response()->json(['success' => false, 'message' => "Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
-
-        if (!$notUseDateWithdrawal) { // usará data de retirada
-
-            if (!$dateWithdrawal) // não reconheceu a data de retirada
-                return response()->json(['success' => false, 'message' => "Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
-
-            if ($dateDelivery->getTimestamp() >= $dateWithdrawal->getTimestamp()) // data de entrega é maior ou igual a data de retirada
-                return response()->json(['success' => false, 'message' => "Data prevista de entrega não pode ser maior ou igual que a data prevista de retirada."]);
-        }
-
         // Equipamentos
         $responseEquipment = $this->rentalController->setEquipmentRental($request, true);
         if (isset($responseEquipment->error))
             return response()->json(['success' => false, 'message' => $responseEquipment->error]);
         $arrEquipment = $responseEquipment->arrEquipment;
 
-        $responsePayment = $this->rentalController->setPaymentRental($request, $responseEquipment->grossValue, true);
-        if (isset($responsePayment->error))
-            return response()->json(['success' => false, 'message' => $responsePayment->error]);
+        // Pagamento
+        $arrPayment = array();
+        if ($haveCharged) {
+            $responsePayment = $this->rentalController->setPaymentRental($request, $responseEquipment->grossValue, true);
+            if (isset($responsePayment->error))
+                return response()->json(['success' => false, 'message' => $responsePayment->error]);
+
+            $arrPayment = $responsePayment->arrPayment;
+        }
 
         // Resíduo
         $arrResidue = $this->rentalController->setResidueRental($request, true);
@@ -174,6 +168,7 @@ class BudgetController extends Controller
         $arrBudget = array(
             'code' => $this->budget->getNextCode($company_id), // get last code
             'company_id' => $company_id,
+            'type_rental' => $haveCharged,
             'client_id' => $clientId,
             'address_zipcode' => $zipcode,
             'address_name' => $address,
@@ -185,14 +180,13 @@ class BudgetController extends Controller
             'address_state' => $state,
             'address_lat' => $lat,
             'address_lng' => $lng,
-            'expected_delivery_date' => $dateDelivery->format('Y-m-d H:i:s'),
-            'expected_withdrawal_date' => $dateWithdrawal ? $dateWithdrawal->format('Y-m-d H:i:s') : null,
-            'not_use_date_withdrawal' => $notUseDateWithdrawal,
-            'gross_value' => $responseEquipment->grossValue,
-            'extra_value'   => $responsePayment->extraValue,
-            'discount_value' => $responsePayment->discountValue,
-            'net_value' => $responsePayment->netValue,
+            'gross_value' => $haveCharged ? $responseEquipment->grossValue : null,
+            'extra_value'   => $haveCharged ? $responsePayment->extraValue : null,
+            'discount_value' => $haveCharged ? $responsePayment->discountValue : null,
+            'net_value' => $haveCharged ? $responsePayment->netValue : null,
             'calculate_net_amount_automatic' => $request->calculate_net_amount_automatic ? true : false,
+            'use_parceled' => $request->is_parceled ? true : false,
+            'automatic_parcel_distribution' => $request->automatic_parcel_distribution ? true : false,
             'observation' => strip_tags($request->observation, $this->allowableTags),
             'user_insert' => $request->user()->id
         );
@@ -203,9 +197,11 @@ class BudgetController extends Controller
 
         $arrEquipment = $this->rentalController->addRentalIdArray($arrEquipment, $insertBudget->id, true);
         $arrResidue = $this->rentalController->addRentalIdArray($arrResidue, $insertBudget->id, true);
+        $arrPayment = $this->rentalController->addRentalIdArray($arrPayment, $insertBudget->id, true);
 
         $this->budget_equipment->inserts($arrEquipment);
         $this->budget_residue->inserts($arrResidue);
+        if (count($arrPayment)) $this->budget_payment->inserts($arrPayment);
 
         if ($insertBudget) {
             DB::commit();

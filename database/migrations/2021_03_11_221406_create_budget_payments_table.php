@@ -1,0 +1,47 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateBudgetPaymentsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('budget_payments', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id')->unsigned();
+            $table->bigInteger('budget_id')->unsigned();
+            $table->integer('parcel');
+            $table->integer('due_day');
+            $table->date('due_date');
+            $table->decimal('due_value', 12, 2);
+            $table->integer('payment_id')->nullable();
+            $table->string('payment_name', 256)->nullable();
+            $table->dateTime('payday')->nullable();
+            $table->bigInteger('user_insert')->unsigned();
+            $table->bigInteger('user_update')->unsigned()->nullable();
+            $table->timestamps();
+
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->foreign('budget_id')->references('id')->on('budgets');
+            $table->foreign('user_insert')->references('id')->on('users');
+            $table->foreign('user_update')->references('id')->on('users');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('budget_payments');
+    }
+}
