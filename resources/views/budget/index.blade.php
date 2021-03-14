@@ -109,7 +109,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="header-card-body justify-content-between flex-wrap">
-                        <h4 class="card-title no-border">Orçamentos Realizadas</h4>
+                        <h4 class="card-title no-border">Orçamentos Realizados</h4>
                         @if(in_array('BudgetCreatePost', $permissions))
                         <a href="{{ route('budget.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Orçamento</a>
                         @endif

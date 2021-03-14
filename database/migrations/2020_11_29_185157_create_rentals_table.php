@@ -34,6 +34,8 @@ class CreateRentalsTable extends Migration
 
             $table->dateTime('expected_delivery_date');
             $table->dateTime('expected_withdrawal_date')->nullable();
+            $table->dateTime('actual_delivery_date')->nullable();
+            $table->dateTime('actual_withdrawal_date')->nullable();
             $table->tinyInteger('not_use_date_withdrawal');
 
             $table->decimal('gross_value', 12,2)->nullable();

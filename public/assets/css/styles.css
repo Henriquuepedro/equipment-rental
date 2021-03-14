@@ -667,9 +667,10 @@ div.dataTables_wrapper div.dataTables_processing{
         transform:rotate(360deg);
     }
 }
-.dataTable tbody tr td:last-child {
-    display: flex;
-    justify-content: center;
+.dataTable tbody tr td:last-child a,
+.dataTable tbody tr td:last-child button{
+    float: left;
+    padding: 0.5rem 0.81rem !important;
 }
 #map,
 #mapRental {

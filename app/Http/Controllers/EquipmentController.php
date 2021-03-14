@@ -143,9 +143,19 @@ class EquipmentController extends Controller
         if (!$equipment)
             return redirect()->route('equipment.index');
 
-        $equipment_wallet = $this->equipment_wallet->getWalletsEquipment($company_id, $id);
+        $equipment->value = number_format($equipment->value, 2, ',', '.');
 
-        return view('equipment.update', compact('equipment', 'equipment_wallet'));
+        $equipment_wallet = $this->equipment_wallet->getWalletsEquipment($company_id, $id);
+        $dataEquipmentWallet = [];
+        foreach ($equipment_wallet as $wallet) {
+            array_push($dataEquipmentWallet, [
+                'day_start' => $wallet->day_start,
+                'day_end'   => $wallet->day_end,
+                'value'     => number_format($wallet->value, 2, ',', '.')
+            ]);
+        }
+
+        return view('equipment.update', compact('equipment', 'dataEquipmentWallet'));
     }
 
     public function update(EquipmentUpdatePost $request)
@@ -360,7 +370,8 @@ class EquipmentController extends Controller
                 'id'        => $equipment->id,
                 'name'      => $equipment->name ?? "Caçamba {$equipment->volume}m³",
                 'reference' => $equipment->reference,
-                'stock'     => $equipment->stock
+                'stock'     => $equipment->stock,
+                'value'     => number_format($equipment->value, 2, ',', '.')
             ]);
 
         return response()->json($equipmentData);

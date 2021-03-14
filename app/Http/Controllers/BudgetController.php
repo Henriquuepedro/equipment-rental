@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BudgetCreatePost;
+use App\Http\Requests\BudgetDeletePost;
 use App\Models\Budget;
 use App\Models\BudgetEquipment;
 use App\Models\BudgetPayment;
 use App\Models\BudgetResidue;
 use App\Models\Client;
+use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -17,15 +19,25 @@ class BudgetController extends Controller
     private $budget;
     private $rentalController;
     private $client;
+    private $address;
     private $budget_equipment;
     private $budget_residue;
     private $budget_payment;
 
-    public function __construct(Budget $budget, RentalController $rentalController, Client $client, BudgetEquipment $budget_equipment, BudgetResidue $budget_residue, BudgetPayment $budget_payment)
+    public function __construct(
+        Budget $budget,
+        RentalController $rentalController,
+        Client $client,
+        Address $address,
+        BudgetEquipment $budget_equipment,
+        BudgetResidue $budget_residue,
+        BudgetPayment $budget_payment
+    )
     {
         $this->budget = $budget;
         $this->rentalController = $rentalController;
         $this->client = $client;
+        $this->address = $address;
         $this->budget_equipment = $budget_equipment;
         $this->budget_residue = $budget_residue;
         $this->budget_payment = $budget_payment;
@@ -193,6 +205,8 @@ class BudgetController extends Controller
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
+        $this->rentalController->updateLatLngAddressSelected($request);
+
         $insertBudget = $this->budget->insert($arrBudget);
 
         $arrEquipment = $this->rentalController->addRentalIdArray($arrEquipment, $insertBudget->id, true);
@@ -212,5 +226,29 @@ class BudgetController extends Controller
 
         return response()->json(['success' => false, 'message' => 'Não foi possível gravar o orçamento, recarregue a página e tente novamente.']);
 
+    }
+
+    public function delete(BudgetDeletePost $request): JsonResponse
+    {
+        $company_id = $request->user()->company_id;
+        $budget_id  = $request->budget_id;
+
+        if (!$this->budget->getBudget($budget_id, $company_id))
+            return response()->json(['success' => false, 'message' => 'Não foi possível localizar o orçamento!']);
+
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
+
+        $delPayment     = $this->budget_payment->remove($budget_id, $company_id);
+        $delResidue     = $this->budget_residue->remove($budget_id, $company_id);
+        $delEquipment   = $this->budget_equipment->remove($budget_id, $company_id);
+        $delRental      = $this->budget->remove($budget_id, $company_id);
+
+        if ($delEquipment && $delRental) {
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Orçamento excluída com sucesso!']);
+        }
+
+        DB::rollBack();
+        return response()->json(['success' => false, 'message' => 'Não foi possível excluir o orçamento!']);
     }
 }

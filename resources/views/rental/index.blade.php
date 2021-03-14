@@ -7,6 +7,11 @@
 @stop
 
 @section('css')
+    <style>
+        #tableRentals .badge.badge-lg {
+            padding: 0.2rem 0.3rem;
+        }
+    </style>
 @stop
 
 @section('js')

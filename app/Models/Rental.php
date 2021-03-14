@@ -31,6 +31,8 @@ class Rental extends Model
         'address_lng',
         'expected_delivery_date',
         'expected_withdrawal_date',
+        'actual_delivery_date',
+        'actual_withdrawal_date',
         'not_use_date_withdrawal',
         'gross_value',
         'extra_value',

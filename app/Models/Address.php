@@ -51,4 +51,13 @@ class Address extends Model
     {
         return $this->where('client_id', $client_id)->delete();
     }
+
+    public function updateLanLngAddressClient($company_id, $client_id, $adrress_id, $dataUpdate)
+    {
+        return $this->where([
+            'id'            => $adrress_id,
+            'company_id'    => $company_id,
+            'client_id'     => $client_id
+        ])->update($dataUpdate);
+    }
 }

@@ -157,8 +157,8 @@
                                     <h4 class="card-title">Valores</h4>
                                     <p class="card-description"> Preencha o formulário abaixo com as informações de valores, defindo por intervalos</p>
                                 </div>
-                                @if (count($equipment_wallet) && !old('day_start'))
-                                    @foreach($equipment_wallet as $countPeriod => $period)
+                                @if (count($dataEquipmentWallet) && !old('day_start'))
+                                    @foreach($dataEquipmentWallet as $countPeriod => $period)
                                         @php
                                             $numberNewPeriod = $countPeriod + 1;
                                         @endphp
@@ -169,15 +169,15 @@
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Dia Inicial</label>
-                                                    <input {{ $disabled }} type="text" class="form-control" name="day_start[]" autocomplete="nope" value="{{ $period->day_start }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="day_start[]" autocomplete="nope" value="{{ $period['day_start'] }}">
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Dia Final</label>
-                                                    <input {{ $disabled }} type="text" class="form-control" name="day_end[]" autocomplete="nope" value="{{ $period->day_end }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="day_end[]" autocomplete="nope" value="{{ $period['day_end'] }}">
                                                 </div>
                                                 <div class="form-group col-md-3">
                                                     <label>Valor</label>
-                                                    <input {{ $disabled }} type="text" class="form-control" name="value_period[]" autocomplete="nope" value="{{ $period->value }}">
+                                                    <input {{ $disabled }} type="text" class="form-control" name="value_period[]" autocomplete="nope" value="{{ $period['value'] }}">
                                                 </div>
                                                 <div class="col-md-1">
                                                     <label>&nbsp;</label>

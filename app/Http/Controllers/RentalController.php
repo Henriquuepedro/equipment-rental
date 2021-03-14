@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RentalCreatePost;
 use App\Http\Requests\RentalDeletePost;
+use App\Models\Address;
 use App\Models\Driver;
 use App\Models\Equipment;
 use App\Models\EquipmentWallet;
@@ -22,6 +23,7 @@ use Illuminate\Http\JsonResponse;
 class RentalController extends Controller
 {
     private $client;
+    private $address;
     private $equipment;
     private $driver;
     private $vehicle;
@@ -34,6 +36,7 @@ class RentalController extends Controller
 
     public function __construct(
         Client $client,
+        Address $address,
         Equipment $equipment,
         Driver $driver,
         Vehicle $vehicle,
@@ -47,6 +50,7 @@ class RentalController extends Controller
     {
         $this->rental = $rental;
         $this->client = $client;
+        $this->address = $address;
         $this->equipment = $equipment;
         $this->driver = $driver;
         $this->vehicle = $vehicle;
@@ -108,9 +112,68 @@ class RentalController extends Controller
             $buttons = $permissionDelete ? "<button class='btn btn-danger btnRemoveRental btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' rental-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
             $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='btn btn-primary btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Imprimir'><i class='fas fa-print'></i></a>";
 
+            $expectedDeliveryDate = null;
+            $expectedWithdrawalDate = null;
+
+            $actualDeliveryDate = null;
+            $actualWithdrawalDate = null;
+
+            $allDelivered = true;
+            $allWithdrawn = true;
+
+            $dataEquipment = $this->rental_equipment->getEquipments($company_id, $value->id);
+            foreach ($dataEquipment as $equipment) {
+                // tenta definir as variaveis iniciais, se existir dados
+                if ($expectedDeliveryDate   === null)   $expectedDeliveryDate   = $equipment->actual_delivery_date   === null ? $equipment->expected_delivery_date   : null;
+                if ($expectedWithdrawalDate === null)   $expectedWithdrawalDate = $equipment->actual_withdrawal_date === null ? $equipment->expected_withdrawal_date : null;
+
+                if ($actualDeliveryDate     === null)   $actualDeliveryDate     = $equipment->actual_delivery_date ?? null;
+                if ($actualWithdrawalDate   === null)   $actualWithdrawalDate   = $equipment->actual_withdrawal_date ?? null;
+
+                // encontrou um equipamento que não foi entregue, a locação não ficará com data de entrega realizada
+                if ($allDelivered && $equipment->actual_delivery_date   === null) $allDelivered = false;
+                // encontrou um equipamento que não foi retirado, a locação não ficará com data de retirada realizada
+                if ($allWithdrawn && $equipment->actual_withdrawal_date === null) $allWithdrawn = false;
+
+                // data prevista
+                // se não foi entregue e existe data de entrega prevista, faz a comparação da data para pegar sempre a data mais antiga
+                if ($equipment->actual_delivery_date === null && $expectedDeliveryDate !== null && strtotime($expectedDeliveryDate) > strtotime($equipment->expected_delivery_date))
+                    $expectedDeliveryDate = $equipment->expected_delivery_date;
+                // se não foi retirado e existe data de retirada prevista, faz a comparação da data para pegar sempre a data mais antiga
+                if ($equipment->actual_withdrawal_date === null && $expectedWithdrawalDate !== null && $equipment->expected_withdrawal_date !== null && strtotime($expectedWithdrawalDate) > strtotime($equipment->expected_withdrawal_date))
+                    $expectedWithdrawalDate = $equipment->expected_withdrawal_date;
+
+                // data real
+                // se ainda não encontrou um equipamento que não foi entregue e existe data de entrega, faz a comparação para pegar sempre a data mais recente
+                if ($allDelivered && $actualDeliveryDate !== null && $equipment->actual_delivery_date !== null && strtotime($actualDeliveryDate) < strtotime($equipment->actual_delivery_date))
+                    $actualDeliveryDate = $equipment->actual_delivery_date;
+                // se ainda não encontrou um equipamento que não foi retirado e existe data de retirada, faz a comparação para pegar sempre a data mais recente
+                if ($allWithdrawn && $actualWithdrawalDate !== null && $equipment->actual_withdrawal_date !== null && strtotime($actualWithdrawalDate) > strtotime($equipment->actual_withdrawal_date))
+                    $actualWithdrawalDate = $equipment->actual_withdrawal_date;
+            }
+
+            $colorBadgeDeliveryDate     = $allDelivered ? 'success' : (strtotime($expectedDeliveryDate) < time() ? 'danger' : 'warning');
+            $colorBadgeWithdrawalDate   = $allWithdrawn ? 'success' : ($expectedWithdrawalDate !== null && strtotime($expectedWithdrawalDate) < time() ? 'danger' : 'warning');
+
+            $labelBadgeDeliveryDate     = $allDelivered ? 'Data de Entrega' : 'Data Prevista de Entrega';
+            $labelBadgeWithdrawalDate   = $allWithdrawn ? 'Data de Retirada' : 'Data Prevista de Retirada';
+
+            $strDateDelivery            = date('d/m/Y H:i', strtotime($allDelivered ? $actualDeliveryDate : $expectedDeliveryDate));
+            $strDateWithdraw            = $expectedWithdrawalDate === null && !$allWithdrawn ? 'Não informado' : date('d/m/Y H:i', strtotime($allWithdrawn ? $actualWithdrawalDate : $expectedWithdrawalDate));
+
+            $strDeliveryDate = "<div class='badge badge-pill badge-lg badge-{$colorBadgeDeliveryDate}'>{$labelBadgeDeliveryDate}: {$strDateDelivery}</div>";
+            $strWithdrawalDate = "<div class='badge badge-pill badge-lg badge-{$colorBadgeWithdrawalDate}'>{$labelBadgeWithdrawalDate}: {$strDateWithdraw}</div>";
+
             $result[$key] = array(
                 str_pad($value['code'], 5, 0, STR_PAD_LEFT),
-                "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>{$value['client_name']}</span><span class='mt-1 w-100'>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}</span></div>",
+                "<div class='d-flex flex-wrap'>
+                    <div class='w-100 mb-2'>
+                        {$strDeliveryDate}
+                        {$strWithdrawalDate}
+                    </div>
+                    <span class='font-weight-bold w-100'>{$value['client_name']}</span>
+                    <span class='mt-1 w-100'>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}</span>
+                </div>",
                 date('d/m/Y H:i', strtotime($value['created_at'])),
                 $buttons
             );
@@ -261,6 +324,8 @@ class RentalController extends Controller
         );
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
+
+        $this->updateLatLngAddressSelected($request);
 
         $insertRental = $this->rental->insert($arrRental);
 
@@ -528,5 +593,20 @@ class RentalController extends Controller
              if (isset($value[$nameFieldID])) $array[$key][$nameFieldID] = $rentalId;
 
         return $array;
+    }
+
+    public function updateLatLngAddressSelected($request): bool
+    {
+        if ((int)$request->name_address == 0) return false;
+
+        $company_id = $request->user()->company_id;
+
+        $dataUpdate = [
+            'lat' => $request->lat,
+            'lng' => $request->lng
+        ];
+
+        return $this->address->updateLanLngAddressClient($company_id, $request->client, $request->name_address, $dataUpdate) ? true : false;
+
     }
 }
