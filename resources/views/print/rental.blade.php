@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Recibo Locação {{ $rental->code }}</title>
+        <title>Recibo {{ $budget ? 'Orçamento' : 'Locação' }} {{ $rental->code }}</title>
         <style>
             body{
                 font-family: 'Microsoft YaHei','Source Sans Pro', sans-serif;
@@ -126,12 +126,12 @@
                     <strong>{{ $company->cpf_cnpj }}</strong>
                 </td>
                 <td class='info title' style='width: 30%'>
-                    <h5 class='title'>RECIBO DE LOCAÇÃO</h5>
+                    <h5 class='title'>RECIBO DE {{ $budget ? 'ORÇAMENTO' : 'LOCAÇÃO' }}</h5>
                 </td>
             </tr>
             <tr>
                 <td class='info'>
-                    <span>Número Locação</span>
+                    <span>Número {{ $budget ? 'Orçamento' : 'Locação' }}</span>
                     <p>{{ str_pad($rental->code, 5, 0, STR_PAD_LEFT) }}</p>
                 </td>
             </tr>
@@ -155,9 +155,13 @@
                 </td>
             </tr>
             <tr>
-                <td class='info' colspan='2' style='width: 70%'>
+                <td class='info' style='width: 70%'>
                     <span>Cliente</span>
-                    <p class='dadosLocacao'>{{ $client->name }} @if($client->cpf_cnpj)( {{ $client->cpf_cnpj }} )@endif</p>
+                    <p class='dadosLocacao'>{{ $client->name }}</p>
+                </td>
+                <td class='info' style='width: 70%'>
+                    <span>CPF/CNPJ</span>
+                    <p class='dadosLocacao'>{{ $client->cpf_cnpj }}</p>
                 </td>
                 <td class='info' style='width: 30%'>
                     <span>Telefone</span>
@@ -191,24 +195,25 @@
         </table>
         <table class='table'>
             <tr>
-                <td class='info title text-left' style='width: 100%' colspan='6'>
+                <td class='info title text-left' style='width: 100%' colspan='{{ $budget ? 4 : 6 }}'>
                     <h5 class='title'>DADOS DO EQUIPAMENTO</h5>
                 </td>
             </tr>
             @foreach($equipments as $equipment)
                 <tr>
-                    <td class='info' style='width: 35%'>
+                    <td class='info' style='width: {{ $budget ? 69 : 35 }}%'>
                         <span>Equipamento</span>
                         <p class='dadosLocacao'>{{ $equipment->name ?? 'Caçamba '.$equipment->volume.'m³' }} - {{ $equipment->reference }}</p>
-                    </td>
-                    <td class='info' style='width: 11%'>
-                        <span>Valor Total</span>
-                        <p class='dadosLocacao'>R$ {{ number_format($equipment->total_value, 2, ',', '.') }}</p>
                     </td>
                     <td class='info' style='width: 10%'>
                         <span>Quantidade</span>
                         <p class='dadosLocacao'>{{ $equipment->quantity }}</p>
                     </td>
+                    <td class='info' style='width: 11%'>
+                        <span>Valor Total</span>
+                        <p class='dadosLocacao'>R$ {{ number_format($equipment->total_value, 2, ',', '.') }}</p>
+                    </td>
+                    @if(!$budget)
                     <td class='info' style='width: 17%'>
                         <span>Data Entrega</span>
                         <p class='dadosLocacao'>{{ date('d/m/Y H:i', strtotime($equipment->expected_delivery_date)) }}</p>
@@ -217,6 +222,7 @@
                         <span>Data Retirada</span>
                         <p class='dadosLocacao'>{!! $equipment->expected_withdrawal_date ? date('d/m/Y H:i', strtotime($equipment->expected_withdrawal_date)) : '&nbsp;' !!}</p>
                     </td>
+                    @endif
                     <td class='info' style='width: 10%'>
                         <span>Situação</span>
                         <p class='dadosLocacao'>Criado</p>

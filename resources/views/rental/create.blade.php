@@ -61,6 +61,16 @@
         .list-equipment .equipment {
             cursor: pointer;
         }
+        .list-equipment .equipment td{
+            padding: 5px 2px;
+        }
+        .list-equipment .equipment td:nth-child(1){
+            align-items: center;
+            display: flex;
+        }
+        .list-equipment .equipment td:nth-child(1) p{
+            margin: 0;
+        }
         .list-equipment .equipment:hover {
             background: #f5f5f5;
         }
@@ -232,7 +242,7 @@
                                     @include('includes.address.form')
                                     <div class="row">
                                         <div class="form-group col-md-12 mt-2">
-                                            <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa no cadastro do cliente, isso pode acarretar uma má precisão da localização.</div>
+                                            <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa no cadastro do cliente, isso pode acarretar uma má precisão da localização. <br>Após a confirmação a geolocalização será atualizada no endereço do cliente.</div>
                                         </div>
                                     </div>
                                 </div>

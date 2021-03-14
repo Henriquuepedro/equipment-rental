@@ -13,7 +13,7 @@ class BudgetDeletePost extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return $this->hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
 
     /**

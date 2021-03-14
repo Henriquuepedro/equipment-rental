@@ -1,6 +1,4 @@
 $(() => {
-    $('#formEquipment [name="cep"]').mask('00.000-000');
-    $('#formEquipment [name="phone_1"],#formEquipment [name="phone_2"]').mask('(00) 000000000');
     $('#formEquipment [name="stock"]').mask('0#');
     $('#formEquipment [name="value"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
     $('#formEquipment [name="day_start[]"], #formEquipment [name="day_end[]"]').mask('0#');

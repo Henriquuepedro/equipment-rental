@@ -643,19 +643,25 @@ $('#searchEquipment').on('blur keyup', function (e){
             }
 
             let badgeStock = '';
+            let dataEquipment = '';
             $.each(response, function (key, val) {
                 badgeStock = val.stock <= 0 && !budget ? 'danger' : 'primary';
-                $('table.list-equipment tbody').append(`
+
+                dataEquipment = `
                         <tr class="equipment" id-equipment="${val.id}">
-                            <td class="text-left"><h6 class="mb-1 text-left">${val.name}</h6></td>
+                            <td class="text-left"><p class="text-left">${val.name}</p></td>
                             <td><div class="badge badge-pill badge-lg badge-info">${val.reference}</div></td>\`;
-                            <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>
+                            <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>`;
+                dataEquipment += budget ? '' : `<td><div class="badge badge-pill badge-lg badge-warning">R$ ${val.value}</div></td>`;
+                dataEquipment += `
                             <td class="text-right">
                                 <button type="button" class="badge badge-lg badge-pill badge-success">
                                     <i class="fa fa-plus"></i>
                                 </button>
                             </td>
-                        </tr>`);
+                        </tr>`;
+
+                $('table.list-equipment tbody').append(dataEquipment);
             });
         }, error: e => {
             console.log(e);

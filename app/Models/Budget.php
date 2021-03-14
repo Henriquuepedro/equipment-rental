@@ -115,4 +115,14 @@ class Budget extends Model
 
         return $budget->count();
     }
+
+    public function getBudget($budget_id, $company_id)
+    {
+        return $this->where(['id' => $budget_id, 'company_id' => $company_id])->first();
+    }
+
+    public function remove($budget_id, $company_id)
+    {
+        return $this->where(['id' => $budget_id, 'company_id' => $company_id])->delete();
+    }
 }
