@@ -17,6 +17,7 @@ use App\Models\Vehicle;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Models\Client;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 
@@ -68,7 +69,11 @@ class RentalController extends Controller
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        return view('rental.index');
+        $company_id = Auth::user()->company_id;
+
+        $clients = $this->client->getClients($company_id);
+
+        return view('rental.index', compact('clients'));
     }
 
     public function fetchRentals(Request $request): JsonResponse
@@ -80,10 +85,25 @@ class RentalController extends Controller
         $result     = array();
         $searchUser = null;
 
-        $ini        = $request->start;
-        $draw       = $request->draw;
-        $length     = $request->length;
-        $company_id = $request->user()->company_id;
+        $filters        = [];
+        $ini            = $request->start;
+        $draw           = $request->draw;
+        $length         = $request->length;
+        $company_id     = $request->user()->company_id;
+        $typeRental     = $request->type;
+        // Filtro datas
+        $intervalDate   = $request->intervalDate;
+        $intervalDate   = explode('-', $intervalDate);
+        $filters['dateStart']   = date('Y-m-d', strtotime("-2 months", time()));
+        $filters['dateFinish']  = date('Y-m-d');
+        if (count($intervalDate) == 2) {
+            $filters['dateStart']  = \DateTime::createFromFormat('d/m/Y', trim($intervalDate[0]))->format('Y-m-d');
+            $filters['dateFinish'] = \DateTime::createFromFormat('d/m/Y', trim($intervalDate[1]))->format('Y-m-d');
+        }
+        // Filtro cliente
+        $client = $request->client ?? (int)$request->client;
+        if (empty($client)) $client = null;
+        $filters['client'] = $client;
 
         $search = $request->search;
         if ($search['value']) $searchUser = $search['value'];
@@ -92,7 +112,7 @@ class RentalController extends Controller
             if ($request->order[0]['dir'] == "asc") $direction = "asc";
             else $direction = "desc";
 
-            $fieldsOrder = array('rentals.code','clients.name','rentals.address_name','rentals.created_at', '');
+            $fieldsOrder = array('rentals.code','clients.name','rentals.created_at', '');
             $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
@@ -100,7 +120,7 @@ class RentalController extends Controller
             }
         }
 
-        $data = $this->rental->getRentals($company_id, $ini, $length, $searchUser, $orderBy);
+        $data = $this->rental->getRentals($company_id, $filters, $ini, $length, $searchUser, $orderBy, $typeRental);
 
         // get string query
         // DB::getQueryLog();
@@ -109,8 +129,16 @@ class RentalController extends Controller
         $permissionDelete = $this->hasPermission('RentalDeletePost');
 
         foreach ($data as $key => $value) {
-            $buttons = $permissionDelete ? "<button class='btn btn-danger btnRemoveRental btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' rental-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
-            $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='btn btn-primary btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Imprimir'><i class='fas fa-print'></i></a>";
+            $buttons = $permissionDelete ? "<button class='dropdown-item btnRemoveRental' rental-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir</button>" : '';
+            $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir</a>";
+
+            $buttons = "<div class='row'><div class='col-12'><div class='dropdown dropleft'>
+                            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsRental-{$value['id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                              <i class='fa fa-cog'></i>
+                            </button>
+                            <div class='dropdown-menu' aria-labelledby='dropActionsRental-{$value['id']}'>
+                              {$buttons}
+                            </div</div></div>";
 
             $expectedDeliveryDate = null;
             $expectedWithdrawalDate = null;
@@ -155,8 +183,8 @@ class RentalController extends Controller
             $colorBadgeDeliveryDate     = $allDelivered ? 'success' : (strtotime($expectedDeliveryDate) < time() ? 'danger' : 'warning');
             $colorBadgeWithdrawalDate   = $allWithdrawn ? 'success' : ($expectedWithdrawalDate !== null && strtotime($expectedWithdrawalDate) < time() ? 'danger' : 'warning');
 
-            $labelBadgeDeliveryDate     = $allDelivered ? 'Data de Entrega' : 'Data Prevista de Entrega';
-            $labelBadgeWithdrawalDate   = $allWithdrawn ? 'Data de Retirada' : 'Data Prevista de Retirada';
+            $labelBadgeDeliveryDate     = $allDelivered ? 'Entregue em' : 'Previsão de Entrega';
+            $labelBadgeWithdrawalDate   = $allWithdrawn ? 'Retirada em' : 'Previsão de Retirada';
 
             $strDateDelivery            = date('d/m/Y H:i', strtotime($allDelivered ? $actualDeliveryDate : $expectedDeliveryDate));
             $strDateWithdraw            = $expectedWithdrawalDate === null && !$allWithdrawn ? 'Não informado' : date('d/m/Y H:i', strtotime($allWithdrawn ? $actualWithdrawalDate : $expectedWithdrawalDate));
@@ -166,6 +194,7 @@ class RentalController extends Controller
 
             $result[$key] = array(
                 str_pad($value['code'], 5, 0, STR_PAD_LEFT),
+//                json_encode([$dateStart, $dateFinish]),
                 "<div class='d-flex flex-wrap'>
                     <div class='w-100 mb-2'>
                         {$strDeliveryDate}
@@ -181,8 +210,8 @@ class RentalController extends Controller
 
         $output = array(
             "draw" => $draw,
-            "recordsTotal" => $this->rental->getCountRentals($company_id),
-            "recordsFiltered" => $this->rental->getCountRentals($company_id, $searchUser),
+            "recordsTotal" => $this->rental->getCountRentals($company_id, $filters, null, $typeRental),
+            "recordsFiltered" => $this->rental->getCountRentals($company_id, $filters, $searchUser, $typeRental),
             "data" => $result
         );
 
@@ -608,5 +637,20 @@ class RentalController extends Controller
 
         return $this->address->updateLanLngAddressClient($company_id, $request->client, $request->name_address, $dataUpdate) ? true : false;
 
+    }
+
+    public function getQtyTypeRentals(Request $request)
+    {
+        $company_id = $request->user()->company_id;
+
+        $typesQuery = $this->rental->getCountTypeRentals($company_id);
+
+        $arrTypes = array(
+            'deliver' => $typesQuery[0]->qty_rental,
+            'withdraw' => $typesQuery[1]->qty_rental,
+            'finished' => $typesQuery[2]->qty_rental
+        );
+
+        return response()->json($arrTypes);
     }
 }

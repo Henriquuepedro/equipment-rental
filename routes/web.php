@@ -183,6 +183,7 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/nova-locacao', [App\Http\Controllers\RentalController::class, 'insert'])->name('new-rental');
             Route::post('/buscar', [App\Http\Controllers\RentalController::class, 'fetchRentals'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\RentalController::class, 'delete'])->name('delete');
+            Route::post('/quantidade-tipo-locacoes', [App\Http\Controllers\RentalController::class, 'getQtyTypeRentals'])->name('get-qty-type-rentals');
         });
         Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Rental extends Model
 {
@@ -78,7 +79,7 @@ class Rental extends Model
         return 1;
     }
 
-    public function getRentals($company_id, $init = null, $length = null, $searchDriver = null, $orderBy = array())
+    public function getRentals($company_id, $filters, $init = null, $length = null, $searchDriver = null, $orderBy = array(), $typeRental = null)
     {
         $rental = $this ->select(
                             'rentals.id',
@@ -94,7 +95,8 @@ class Rental extends Model
                             'rentals.created_at'
                         )
                         ->join('clients','clients.id','=','rentals.client_id')
-                        ->where('rentals.company_id', $company_id);
+                        ->where('rentals.company_id', $company_id)
+                        ->whereBetween('rentals.created_at', ["{$filters['dateStart']} 00:00:00", "{$filters['dateFinish']} 23:59:59"]);
         if ($searchDriver)
             $rental->where(function($query) use ($searchDriver) {
                 $query->where('rentals.code', 'like', "%{$searchDriver}%")
@@ -102,6 +104,29 @@ class Rental extends Model
                     ->orWhere('rentals.address_name', 'like', "%{$searchDriver}%")
                     ->orWhere('rentals.created_at', 'like', "%{$searchDriver}%");
             });
+
+        if ($typeRental) {
+            switch ($typeRental) {
+                case 'deliver':
+                    $rental->where('rentals.actual_delivery_date', null);
+                    break;
+                case 'withdraw':
+                    $rental->where([
+                        ['rentals.actual_delivery_date', '<>', null],
+                        ['rentals.actual_withdrawal_date', '=', null]
+                    ]);
+                    break;
+                case 'finished':
+                    $rental->where([
+                        ['rentals.actual_delivery_date', '<>', null],
+                        ['rentals.actual_withdrawal_date', '<>', null]
+                    ]);
+                    break;
+            }
+        }
+
+        if ($filters['client'] !== null)
+            $rental->where('rentals.client_id', $filters['client']);
 
         if (count($orderBy) !== 0) $rental->orderBy($orderBy['field'], $orderBy['order']);
         else $rental->orderBy('rentals.code', 'asc');
@@ -111,10 +136,11 @@ class Rental extends Model
         return $rental->get();
     }
 
-    public function getCountRentals($company_id, $searchDriver = null)
+    public function getCountRentals($company_id, $filters, $searchDriver = null, $typeRental = null)
     {
         $rental = $this ->join('clients','clients.id','=','rentals.client_id')
-            ->where('rentals.company_id', $company_id);
+            ->where('rentals.company_id', $company_id)
+            ->whereBetween('rentals.created_at', ["{$filters['dateStart']} 00:00:00", "{$filters['dateFinish']} 23:59:59"]);
         if ($searchDriver)
             $rental->where(function($query) use ($searchDriver) {
                 $query->where('rentals.code', 'like', "%{$searchDriver}%")
@@ -122,6 +148,29 @@ class Rental extends Model
                     ->orWhere('rentals.address_name', 'like', "%{$searchDriver}%")
                     ->orWhere('rentals.created_at', 'like', "%{$searchDriver}%");
             });
+
+        if ($typeRental) {
+            switch ($typeRental) {
+                case 'deliver':
+                    $rental->where('rentals.actual_delivery_date', null);
+                    break;
+                case 'withdraw':
+                    $rental->where([
+                        ['rentals.actual_delivery_date', '<>', null],
+                        ['rentals.actual_withdrawal_date' => null]
+                    ]);
+                    break;
+                case 'finished':
+                    $rental->where([
+                        ['rentals.actual_delivery_date', '<>', null],
+                        ['rentals.actual_withdrawal_date', '<>', null]
+                    ]);
+                    break;
+            }
+        }
+
+        if ($filters['client'] !== null)
+            $rental->where('rentals.client_id', $filters['client']);
 
         return $rental->count();
     }
@@ -134,5 +183,33 @@ class Rental extends Model
     public function remove($rental_id, $company_id)
     {
         return $this->where(['id' => $rental_id, 'company_id' => $company_id])->delete();
+    }
+
+    public function getCountTypeRentals($company_id)
+    {
+        return DB::select("
+            SELECT * FROM(
+                SELECT COUNT(*) AS qty_rental
+                FROM rentals
+                WHERE actual_delivery_date IS NULL
+                AND company_id = {$company_id}
+
+                UNION ALL
+
+                SELECT COUNT(*) AS qty_rental
+                FROM rentals
+                WHERE actual_delivery_date IS NOT NULL
+                AND actual_withdrawal_date IS NULL
+                AND company_id = {$company_id}
+
+                UNION ALL
+
+                SELECT COUNT(*) AS qty_rental
+                FROM rentals
+                WHERE actual_delivery_date IS NOT NULL
+                AND actual_withdrawal_date IS NOT NULL
+                AND company_id = {$company_id}
+            ) AS qty_rentals
+        ");
     }
 }

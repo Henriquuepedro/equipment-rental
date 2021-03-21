@@ -74,7 +74,7 @@ class BudgetController extends Controller
             if ($request->order[0]['dir'] == "asc") $direction = "asc";
             else $direction = "desc";
 
-            $fieldsOrder = array('budgets.code','clients.name','budgets.address_name','budgets.created_at', '');
+            $fieldsOrder = array('budgets.code','clients.name','budgets.created_at', '');
             $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
