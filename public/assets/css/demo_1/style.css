@@ -1242,3 +1242,7 @@
           padding: 0 7px; }
 
 /*# sourceMappingURL=style.css.map */
+
+.navbar.default-layout .navbar-brand-wrapper .navbar-brand img {
+    height: 60px;
+}

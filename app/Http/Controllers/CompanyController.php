@@ -9,6 +9,7 @@ use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class CompanyController extends Controller
 {
@@ -27,7 +28,7 @@ class CompanyController extends Controller
 
     public function index()
     {
-        if (!$this->hasAdmin())
+        if (!hasAdmin())
             return redirect()->route('dashboard');
 
         $company_id = Auth::user()->company_id;
@@ -82,9 +83,12 @@ class CompanyController extends Controller
         ];
 
         foreach ($configCompanyColumn as $configIndex) {
-            if (in_array($configIndex, ['id', 'company_id', 'user_update', 'created_at', 'updated_at'])) continue;
+            if (in_array($configIndex, ['id', 'company_id', 'user_update', 'created_at', 'updated_at'])) {
+                continue;
+            }
+
             $configCompany->$configIndex = [
-                'status'        => $configCompanyValue->$configIndex ? true : false,
+                'status'        => $configCompanyValue && $configCompanyValue->$configIndex,
                 'name'          => $configIndex,
                 'description'   => $fromToNameConfig[$configIndex]
             ];
@@ -159,7 +163,7 @@ class CompanyController extends Controller
 
     private function uploadLogoCompany($company_id, $file)
     {
-        $uploadPath = "assets/images/company/{$company_id}";
+        $uploadPath = "assets/images/company/$company_id";
         $extension = $file->getClientOriginalExtension(); // Recupera extensão da imagem
         $nameOriginal = $file->getClientOriginalName(); // Recupera nome da imagem
         $imageName = base64_encode($nameOriginal); // Gera um novo nome para a imagem.

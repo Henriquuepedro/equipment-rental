@@ -15,7 +15,7 @@ class VehicleCreatePost extends FormRequest
      */
     public function authorize()
     {
-        return $this->hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
+        return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
 
     /**
@@ -77,7 +77,7 @@ class VehicleCreatePost extends FormRequest
      */
     public function response(array $errors)
     {
-        if ($this->isAjax()) return response()->json(['errors' => $errors]);
+        if (isAjax()) return response()->json(['errors' => $errors]);
 
         return $this->redirector->to($this->getRedirectUrl())
             ->withInput($this->except($this->dontFlash))

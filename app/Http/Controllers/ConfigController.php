@@ -16,7 +16,7 @@ class ConfigController extends Controller
 
     public function updateConfig(Request $request)
     {
-        if (!$this->hasAdmin())
+        if (!hasAdmin())
             return redirect()->route('dashboard');
 
         $company_id = $request->user()->company_id;

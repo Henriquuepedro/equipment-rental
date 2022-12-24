@@ -259,8 +259,9 @@ const transformDateForEn = date => {
     return moment(date, "DD/MM/YYYY").format("YYYY-MM-DD");
 }
 
-const getTodayDateBr = (returnTime = true) => {
-    if (returnTime) return moment().format("DD/MM/YYYY HH:mm:ss");
+const getTodayDateBr = (returnTime = true, seconds = true) => {
+    if (returnTime && seconds) return moment().format("DD/MM/YYYY HH:mm:ss");
+    else if (returnTime && !seconds) return moment().format("DD/MM/YYYY HH:mm");
     return moment().format("DD/MM/YYYY");
 }
 

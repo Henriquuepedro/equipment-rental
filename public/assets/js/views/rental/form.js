@@ -1140,6 +1140,7 @@ $(document).on('change', '[name^="vehicle_"]', function (){
     if (vehicle_id == '0') return false;
 
     const el = $(this).closest('.card-body');
+    const driver_actual = parseInt(el.find('[name^="driver_"]').val());
 
     $.ajax({
         headers: {
@@ -1150,9 +1151,9 @@ $(document).on('change', '[name^="vehicle_"]', function (){
         url: $('#routeGetVehicle').val(),
         async: true,
         success: response => {
-            if (response.driver_id && el.find('[name^="driver_"]').val() === '0')
+            if (response.driver_id && el.find('[name^="driver_"]').val() === '0') {
                 el.find('[name^="driver_"]').val(response.driver_id)
-            else if(response.driver_id)
+            } else if(response.driver_id && driver_actual !== parseInt(response.driver_id)) {
                 Swal.fire({
                     title: 'Alteração de Motorista',
                     html: `O veículo selecionado contém relacionado o motorista <b>${response.driver_name}</b>. <br>Deseja atualizar?`,
@@ -1164,10 +1165,11 @@ $(document).on('change', '[name^="vehicle_"]', function (){
                     cancelButtonText: 'Não atualizar',
                     reverseButtons: true
                 }).then((result) => {
-                    if (result.isConfirmed)
+                    if (result.isConfirmed) {
                         el.find('[name^="driver_"]').val(response.driver_id)
+                    }
                 })
-
+            }
         }
     });
 });

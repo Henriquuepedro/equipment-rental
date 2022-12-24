@@ -77,4 +77,19 @@ class RentalEquipment extends Model
     {
         return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->get();
     }
+
+    public function getEquipmentsForDeliver($company_id, $rental_id)
+    {
+        return $this->where([
+            'rental_id' => $rental_id,
+            'company_id' => $company_id,
+            'actual_delivery_date' => null,
+            'actual_withdrawal_date' => null
+        ])->get();
+    }
+
+    public function updateByRentalAndRentalEquipmentId(int $rental_id, int $rental_equipment_id, array $data): bool
+    {
+        return (bool)$this->where(array('id' => $rental_equipment_id, 'rental_id' => $rental_id))->update($data);
+    }
 }

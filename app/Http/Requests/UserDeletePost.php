@@ -13,7 +13,7 @@ class UserDeletePost extends FormRequest
      */
     public function authorize()
     {
-        return $this->hasAdmin();
+        return hasAdmin();
     }
 
     /**

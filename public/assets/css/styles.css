@@ -913,6 +913,13 @@ div[disabled].btn-danger {
 div[disabled].btn-primary {
     background: #0c7cd5 !important;;
 }
+.justify-content-evenly {
+    justify-content: space-evenly !important;
+}
+a[disabled] {
+    pointer-events: none;
+    cursor: no-drop;
+}
 
 
 
