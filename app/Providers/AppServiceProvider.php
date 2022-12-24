@@ -47,6 +47,12 @@ class AppServiceProvider extends ServiceProvider
                 $settings['name_company'] = $dataCompany->name;
                 $settings['type_user'] = auth()->user()->type_user;
 
+                $months = 2;
+                $settings['intervalDates'] = [
+                    'start' => date('d/m/Y', strtotime("-{$months} months", time())),
+                    'finish' => date('d/m/Y')
+                ];
+
                 $view->with('settings', $settings);
 
                 // permissões

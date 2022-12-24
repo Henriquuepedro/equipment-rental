@@ -115,7 +115,7 @@
         <table class='table'>
             <tr>
                 <td class='header img' rowspan='4' style='width: 15%'>
-                    <img src=' {{ $company->logo ? "../../assets/images/company/{$company->id}/{$company->logo}" : "../../assets/images/company/company.png" }}'/>
+                    <img src='{{$company->logo}}'/>
                 </td>
                 <td class='header dadosEmpresa' rowspan='4' style='width: 55%'>
                     <p class='nomeEmpresa'>{{ mb_strimwidth($company->name, 0, 50) }}</p>

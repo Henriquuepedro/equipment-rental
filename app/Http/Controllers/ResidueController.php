@@ -20,7 +20,7 @@ class ResidueController extends Controller
 
     public function index()
     {
-        if (!$this->hasPermission('ResidueView')) {
+        if (!hasPermission('ResidueView')) {
             return redirect()->route('dashboard')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -30,7 +30,7 @@ class ResidueController extends Controller
 
     public function fetchResidues(Request $request): JsonResponse
     {
-        if (!$this->hasPermission('ResidueView'))
+        if (!hasPermission('ResidueView'))
             return response()->json([]);
 
         $orderBy    = array();
@@ -62,8 +62,8 @@ class ResidueController extends Controller
         // get string query
         // DB::getQueryLog();
 
-        $permissionUpdate = $this->hasPermission('ResidueUpdatePost');
-        $permissionDelete = $this->hasPermission('ResidueDeletePost');
+        $permissionUpdate = hasPermission('ResidueUpdatePost');
+        $permissionDelete = hasPermission('ResidueDeletePost');
 
         foreach ($data as $key => $value) {
             $buttons  = '';
@@ -91,7 +91,7 @@ class ResidueController extends Controller
     {
         // data residue
         $dataResidue = $this->formatDataResidue($request);
-        $isAjax = $this->isAjax();
+        $isAjax = isAjax();
 
         if (!$this->residue->getResidue($dataResidue->company_id, $dataResidue->residue_id)) {
 
@@ -159,7 +159,7 @@ class ResidueController extends Controller
     {
         // data residue
         $dataResidue = $this->formatDataResidue($request);
-        $isAjax = $this->isAjax();
+        $isAjax = isAjax();
 
         $createResidue = $this->residue->insert(array(
             'company_id'    => $dataResidue->company_id,

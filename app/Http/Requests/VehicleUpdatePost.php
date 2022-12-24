@@ -14,7 +14,7 @@ class VehicleUpdatePost extends FormRequest
      */
     public function authorize()
     {
-        return $this->hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
+        return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
 
     /**

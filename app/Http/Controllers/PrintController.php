@@ -13,6 +13,7 @@ use App\Models\RentalPayment;
 use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class PrintController extends Controller
 {
@@ -47,13 +48,19 @@ class PrintController extends Controller
         $this->budget = $budget;
         $this->budget_equipment = $budget_equipment;
         $this->budget_payment = $budget_payment;
+        $this->pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+
+        define("DOMPDF_ENABLE_REMOTE", false);
     }
 
     public function rental(int $rental)
     {
         $contentRecibo = $this->getDataFormatBudgetRental($rental, false);
-        if (!$contentRecibo)
+        if (!$contentRecibo) {
             return redirect()->route('rental.index');
+        }
+
+        $contentRecibo['company']->logo = $this->getImageCompanyBase64($contentRecibo['company']);
 
         $pdf = $this->pdf->loadView('print.rental', $contentRecibo);
         return $pdf->stream();
@@ -62,42 +69,63 @@ class PrintController extends Controller
     public function budget(int $budget)
     {
         $contentRecibo = $this->getDataFormatBudgetRental($budget, true);
-        if (!$contentRecibo)
+        if (!$contentRecibo) {
             return redirect()->route('budget.index');
+        }
+
+        $contentRecibo['company']->logo = $this->getImageCompanyBase64($contentRecibo['company']);
 
         $pdf = $this->pdf->loadView('print.rental', $contentRecibo);
         return $pdf->stream();
+    }
+
+    public function getImageCompanyBase64(object $company): string
+    {
+        if ($company->logo) {
+            $image = "assets/images/company/$company->id/$company->logo";
+        } else {
+            $image = "assets/images/company/company.png";
+        }
+
+        $extension = File::extension($image);
+
+        $img_to_base64 = base64_encode(File::get($image));
+        return "data:image/$extension;base64, $img_to_base64";
     }
 
     private function getDataFormatBudgetRental(int $code, bool $budget)
     {
         $company_id = Auth::user()->company_id;
 
-        if ($budget)
+        if ($budget) {
             $rentalBudget = $this->budget->getBudget($code, $company_id);
-        else
+        } else {
             $rentalBudget = $this->rental->getRental($code, $company_id);
+        }
 
-        if (!$rentalBudget)
+        if (!$rentalBudget) {
             return false;
+        }
 
-        if ($budget)
+        if ($budget) {
             $equipments = $this->budget_equipment->getEquipments($company_id, $rentalBudget->id);
-        else
+        } else {
             $equipments = $this->rental_equipment->getEquipments($company_id, $rentalBudget->id);
+        }
 
-        $client = $this->client->getClient($rentalBudget->client_id, $company_id);
-        $company = $this->company->getCompany($company_id);
+        $client     = $this->client->getClient($rentalBudget->client_id, $company_id);
+        $company    = $this->company->getCompany($company_id);
 
-        if ($budget)
+        if ($budget) {
             $payments = $this->budget_payment->getPayments($company_id, $rentalBudget->id);
-        else
+        } else {
             $payments = $this->rental_payment->getPayments($company_id, $rentalBudget->id);
+        }
 
-        $rentalBudget->address_zipcode = $rentalBudget->address_zipcode ? $this->mask($rentalBudget->address_zipcode, '##.###-###') : null;
-        $company->cpf_cnpj = $this->formatCPF_CNPJ($company->cpf_cnpj);
-        $company->cep = $company->cep ? $this->mask($company->cep, '##.###-###') : null;
-        $client->cpf_cnpj = $this->formatCPF_CNPJ($client->cpf_cnpj);
+        $rentalBudget->address_zipcode  = formatZipcode($rentalBudget->address_zipcode);
+        $company->cpf_cnpj              = formatCPF_CNPJ($company->cpf_cnpj);
+        $company->cep                   = formatZipcode($company->cep);
+        $client->cpf_cnpj               = formatCPF_CNPJ($client->cpf_cnpj);
 
         return [
             'company'    => $company,

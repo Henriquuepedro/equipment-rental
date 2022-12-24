@@ -24,7 +24,7 @@ class EquipmentController extends Controller
 
     public function index()
     {
-        if (!$this->hasPermission('EquipmentView')) {
+        if (!hasPermission('EquipmentView')) {
             return redirect()->route('dashboard')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -34,7 +34,7 @@ class EquipmentController extends Controller
 
     public function create()
     {
-        if (!$this->hasPermission('EquipmentCreatePost')) {
+        if (!hasPermission('EquipmentCreatePost')) {
             return redirect()->route('equipment.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -59,7 +59,7 @@ class EquipmentController extends Controller
             'volume'        => $dataEquipment->volume,
             'user_insert'   => $dataEquipment->user_id
         ));
-        $isAjax = $this->isAjax();
+        $isAjax = isAjax();
 
         $createPeriods = true;
         $equipmentId = $createEquipment->id;
@@ -87,10 +87,10 @@ class EquipmentController extends Controller
                 // dia informado já está dentro de um prazo
                 if (in_array($countPer, $arrDaysVerify)) {
                     if ($isAjax)
-                        return response()->json(['success' => false, 'message' => "Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros perído."]);
+                        return response()->json(['success' => false, 'message' => "Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros período."]);
 
                     return redirect()->back()
-                        ->withErrors(["Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros perído."])
+                        ->withErrors(["Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros período."])
                         ->withInput();
                 }
 
@@ -205,7 +205,7 @@ class EquipmentController extends Controller
                 // dia informado já está dentro de um prazo
                 if (in_array($countPer, $arrDaysVerify))
                     return redirect()->back()
-                        ->withErrors(["Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros perído."])
+                        ->withErrors(["Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros período."])
                         ->withInput();
 
                 array_push($arrDaysVerify, $countPer);
@@ -258,7 +258,7 @@ class EquipmentController extends Controller
     public function fetchEquipments(Request $request)
     {
 //        DB::enableQueryLog();
-        if (!$this->hasPermission('EquipmentView'))
+        if (!hasPermission('EquipmentView'))
             return response()->json([]);
 
         $orderBy    = array();
@@ -274,7 +274,7 @@ class EquipmentController extends Controller
         $search = $request->search;
         $search['value'] = str_replace('*','', filter_var($search['value'], FILTER_SANITIZE_STRING));
 
-        if ($this->likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$search['value'])).'%', 'cacamba'))
+        if (likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$search['value'])).'%', 'cacamba'))
             $getCacamba = true;
 
         if ($search['value']) $searchUser = $search['value'];
@@ -296,8 +296,8 @@ class EquipmentController extends Controller
         // get string query
 //         DB::getQueryLog();
 
-        $permissionUpdate = $this->hasPermission('EquipmentUpdatePost');
-        $permissionDelete = $this->hasPermission('EquipmentDeletePost');
+        $permissionUpdate = hasPermission('EquipmentUpdatePost');
+        $permissionDelete = hasPermission('EquipmentDeletePost');
 
         foreach ($data as $key => $value) {
             $buttons = "<a href='".route('equipment.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
@@ -333,7 +333,7 @@ class EquipmentController extends Controller
         $obj->volume        = $request->type_equipment === "others" ? null : filter_var($request->volume, FILTER_VALIDATE_INT);
         $obj->reference     = filter_var($request->reference, FILTER_SANITIZE_STRING);
         $obj->manufacturer  = $request->manufacturer ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
-        $obj->value         = $request->value ? $this->transformMoneyBr_En($request->value) : 0.00;
+        $obj->value         = $request->value ? transformMoneyBr_En($request->value) : 0.00;
         $obj->stock         = $request->stock ? filter_var($request->stock, FILTER_VALIDATE_INT) : 0;
         $obj->equipment_id = isset($request->equipment_id) ? (int)$request->equipment_id : null;
 
@@ -346,7 +346,7 @@ class EquipmentController extends Controller
 
         $obj->day_start      = filter_var((int)$request->day_start[$per], FILTER_VALIDATE_INT);
         $obj->day_end        = filter_var((int)$request->day_end[$per], FILTER_VALIDATE_INT);
-        $obj->value_period   = $this->transformMoneyBr_En($request->value_period[$per]);
+        $obj->value_period   = transformMoneyBr_En($request->value_period[$per]);
 
         return $obj;
     }
@@ -360,7 +360,7 @@ class EquipmentController extends Controller
         $getCacamba         = false;
         $equipmentInUse    = $request->equipmentInUse;
 
-        if ($this->likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$searchEquipment)).'%', 'cacamba'))
+        if (likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$searchEquipment)).'%', 'cacamba'))
             $getCacamba = true;
 
         $equipments = $this->equipment->getEquipmentRental($company_id, $searchEquipment, $getCacamba, $equipmentInUse);
@@ -401,8 +401,8 @@ class EquipmentController extends Controller
         ];
 
         $permissions = [
-            'vehicle' => $this->hasPermission('VehicleCreatePost'),
-            'driver' => $this->hasPermission('DriverCreatePost')
+            'vehicle' => hasPermission('VehicleCreatePost'),
+            'driver' => hasPermission('DriverCreatePost')
         ];
 
         return response()->json(['success' => true, 'data' => $equipmentData, 'permissions' => $permissions]);

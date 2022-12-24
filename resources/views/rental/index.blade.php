@@ -7,22 +7,138 @@
 @stop
 
 @section('css')
+    <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
     <style>
         #tableRentals .badge.badge-lg {
             padding: 0.2rem 0.3rem;
+        }
+        .tickets-tab-switch .nav-item .nav-link.active .badge {
+            background: #fff;
+            color: #2196f3;
+        }
+        .dropdown-menu .dropdown-item:hover {
+            background: rgba(33, 150, 243, 0.35);
+        }
+        .flatpickr a.input-button,
+        .flatpickr button.input-button{
+            height: calc(1.5em + 0.75rem + 3px);
+            width: 50%;
+            /*text-align: center;*/
+            /*padding-top: 13%;*/
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .flatpickr a.input-button:last-child,
+        .flatpickr button.input-button:last-child{
+            border-bottom-right-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+        .flatpickr-input {
+            border-bottom-right-radius: 0 !important;
+            border-top-right-radius: 0 !important;;
+        }
+        .equipmentsRentalTable tr.noSelected {
+            background-color: rgba(255,175,0,.1);
+        }
+        .equipmentsRentalTable tr.selected {
+            background-color: rgba(27,255,0,.1);
         }
     </style>
 @stop
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
+    <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
     <script>
-        var tableRental;
+        let tableRental;
+
         $(function () {
-            tableRental = getTable(false);
+            setTabRental();
+
+            moment.locale('pt-br');
+            $('input[name="intervalDates"]').daterangepicker({
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
         });
 
-        const getTable = (stateSave = true) => {
-            return $("#tableRentals").DataTable({
+        const setTabRental = () => {
+            const url = window.location.href;
+            const splitUrl = url.split('#');
+            let tab = 'deliver';
+
+            if (splitUrl.length === 2)
+                tab = splitUrl[1];
+
+            $(`#${tab}-tab`).tab('show');
+            getTable(tab, false);
+        }
+
+        const loadCountsTabRental = () => {
+            $('.nav-tabs.tickets-tab-switch').each(function(){
+                $(this).find('li a .badge').html('<i class="fa fa-spin fa-spinner" style="margin-right: 0px"></i>');
+            })
+        }
+
+        const disabledLoadData = () => {
+            $('a[data-toggle="tab"], input[name="intervalDates"], select[name="clients"]').prop('disabled', true);
+        }
+
+        const enabledLoadData = () => {
+            $('a[data-toggle="tab"], input[name="intervalDates"], select[name="clients"]').prop('disabled', false);
+        }
+
+        const getCountsTabRentals = () => {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'POST',
+                url: "{{ route('ajax.rental.get-qty-type-rentals') }}",
+                dataType: 'json',
+                success: response => {
+
+                    $.each(response, function( index, value ) {
+                        $(`#${index}-tab .badge`).text(value)
+                    });
+
+                }, error: e => {
+                    console.log(e);
+                },
+                complete: function(xhr) {
+                    if (xhr.status === 403) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Você não tem permissão para fazer essa operação!'
+                        });
+                        $(`button[rental-id="${rental_id}"]`).trigger('blur');
+                    }
+                }
+            });
+        }
+
+        const getTable = (typeRentals, stateSave = true) => {
+
+            loadCountsTabRental();
+            disabledLoadData();
+
+            $('[data-toggle="tooltip"]').tooltip('dispose');
+
+            if (typeof tableRental !== 'undefined') {
+                tableRental.destroy();
+
+                $("#tableRentals tbody").empty();
+            }
+
+            getCountsTabRentals();
+
+            tableRental = $("#tableRentals").DataTable({
                 "responsive": true,
                 "processing": true,
                 "autoWidth": false,
@@ -36,17 +152,150 @@
                     url: '{{ route('ajax.rental.fetch') }}',
                     pages: 2,
                     type: 'POST',
-                    data: { "_token": $('meta[name="csrf-token"]').attr('content') },
+                    data: {
+                        "_token": $('meta[name="csrf-token"]').attr('content'),
+                        type: typeRentals,
+                        intervalDate: $('[name="intervalDates"]').val(),
+                        client: $('[name="clients"]').val()
+                    },
                     error: function(jqXHR, ajaxOptions, thrownError) {
                         console.log(jqXHR, ajaxOptions, thrownError);
+                    }, complete: () => {
+                        enabledLoadData();
                     }
                 },
                 "initComplete": function( settings, json ) {
-                    $('[data-toggle="tooltip"]').tooltip();
+                    enabledLoadData();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json"
                 }
+            });
+        }
+
+        const showModalDeliverEquipment = (rental_id) => {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'POST',
+                url: "{{ route('ajax.rental.get-equipments') }}",
+                data: { rental_id },
+                dataType: 'json',
+                success: response => {
+                    console.log(response);
+
+                    if (!response.success) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atenção',
+                            html: `<ol><li>${response.data}</li></ol>`
+                        });
+                        return false;
+                    }
+
+                    let equipments = '';
+
+                    $.each(response.data, function( index, value ) {
+                        equipments += `
+                        <tr id-rental-equipment="${value.id}" class="noSelected">
+                            <td>
+                                <div class="form-group">
+                                    <input type="checkbox" class="deliverEquipment" name="checked[]" value="${index}">
+                                    <input type="hidden" name="rental_equipment_id[]" value="${value.id}">
+                                    <input type="hidden" name="rental_id[]" value="${value.rental_id}">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <input type="text" class="form-control d-flex align-items-center" value="${value.name ?? 'Caçamba '+value.volume+'m³'} - ${value.reference}" disabled>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group flatpickr d-flex no-margin">
+                                    <input type="tel" class="form-control flatpickr-input" name="date_deliver[]" value="${getTodayDateBr(true, false)}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input readonly>
+                                    <div class="input-button-calendar col-md-3 no-padding">
+                                        <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                            <i class="fa fa-calendar text-white"></i>
+                                        </a>
+                                        <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                            <i class="fa fa-times text-white"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <small class="${value.expected_delivery_date === null ? 'd-none' : ''}">Entrega Prevista: ${transformDateForBr(value.expected_delivery_date)}</small>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <select class="form-control vehicles" name="vechicles[]" vehicle-suggestion="${value.vehicle_suggestion}" readonly></select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <select class="form-control drivers" name="drivers[]" driver-suggestion="${value.driver_suggestion}" readonly></select>
+                                </div>
+                            </td>
+                        </tr>`
+                    });
+
+                    $('#modalDeliver .equipmentsRentalTable tbody').empty().append(equipments);
+
+                    if ($('#modalDeliver').is(':not(:visible)')) {
+                        $('#modalDeliver').modal();
+                    }
+
+                    console.log(response.data);
+
+                    $.each(response.data, function( index, value ) {
+                        loadVehicles(value.vehicle_suggestion ?? 0, `#modalDeliver .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="vechicles[]"]`)
+                        loadDrivers(value.driver_suggestion ?? 0, `#modalDeliver .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="drivers[]"]`)
+                    });
+
+                    $('#modalDeliver [type="checkbox"]').iCheck({
+                        checkboxClass: 'icheckbox_square-blue',
+                        radioClass: 'iradio_square-blue',
+                        increaseArea: '20%' // optional
+                    });
+
+                    $('.flatpickr').flatpickr({
+                        enableTime: true,
+                        dateFormat: "d/m/Y H:i",
+                        time_24hr: true,
+                        wrap: true,
+                        clickOpens: false,
+                        allowInput: true,
+                        locale: "pt"
+                    });
+
+                    console.log(response);
+                }, error: e => {
+                    console.log(e);
+                },
+                complete: function(xhr) {
+                    if (xhr.status === 403) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Você não tem permissão para fazer essa operação!'
+                        });
+                        $(`button[rental-id="${rental_id}"]`).trigger('blur');
+                    }
+                }
+            });
+
+            $('#modalDeliver [type="checkbox"]').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+
+            $('.flatpickr').flatpickr({
+                enableTime: true,
+                dateFormat: "d/m/Y H:i",
+                time_24hr: true,
+                wrap: true,
+                clickOpens: false,
+                allowInput: true,
+                locale: "pt"
             });
         }
 
@@ -55,8 +304,8 @@
             const rental_name = $(this).closest('tr').find('td:eq(1)').html();
 
             Swal.fire({
-                title: 'Exclusão de Veículo',
-                html: "Você está prestes a excluir definitivamente o veículo <br><strong>"+rental_name+"</strong><br>Deseja continuar?",
+                title: 'Exclusão de Locação',
+                html: "<h4>Você está prestes a excluir definitivamente uma locação</h4> <br><strong>"+rental_name+"</strong><br>Deseja continuar?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -75,10 +324,7 @@
                         data: { rental_id },
                         dataType: 'json',
                         success: response => {
-                            $('[data-toggle="tooltip"]').tooltip('dispose')
-                            tableRental.destroy();
-                            $("#tableRentals tbody").empty();
-                            tableRental = getTable();
+                            getTable();
                             Toast.fire({
                                 icon: response.success ? 'success' : 'error',
                                 title: response.message
@@ -98,12 +344,181 @@
                     });
                 }
             })
-        })
+        });
+
+        $(document).on('click', '.btnDeliver', function(){
+
+            const rental_id = $(this).attr('rental-id');
+
+            showModalDeliverEquipment(rental_id);
+        });
+
+        $(document).on('ifChanged', '.deliverEquipment', function() {
+
+            const check = !$(this).is(':checked');
+
+            $(this).closest('tr').find('.flatpickr-input, select, .input-button-calendar a').attr('disabled', check);
+
+            $(this).closest('tr').toggleClass('noSelected selected');
+        });
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            getTable(e.target.id.replace('-tab',''), false);
+        });
+
+        $('[name="intervalDates"], [name="clients"]').change(function(){
+            getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false);
+        });
+
+        $('.modal .equipmentsRentalTable tbody').on('change', 'select[name="vechicles[]"]', function (){
+            const vehicle_id = $(this).val();
+            if (vehicle_id == '0') {
+                return false;
+            }
+
+            const el = $(this).closest('tr');
+            const driver_actual = parseInt(el.find('[name="drivers[]"]').val());
+
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'GET',
+                data: { vehicle_id },
+                url: "{{ route('ajax.vehicle.get-vehicle') }}",
+                async: true,
+                success: response => {
+                    console.log(response);
+                    if (response.driver_id && el.find('[name="drivers[]"]').val() === '0') {
+                        el.find('[name="drivers[]"]').val(response.driver_id)
+                    } else if (response.driver_id && driver_actual !== parseInt(response.driver_id)) {
+                        Swal.fire({
+                            title: 'Alteração de Motorista',
+                            html: `O veículo selecionado contém relacionado o motorista <b>${response.driver_name}</b>. <br>Deseja atualizar?`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#19d895',
+                            cancelButtonColor: '#bbb',
+                            confirmButtonText: 'Sim, atualizar',
+                            cancelButtonText: 'Não atualizar',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                el.find('[name="drivers[]"]').val(response.driver_id)
+                            }
+                        })
+                    }
+                }
+            });
+        });
+
+        $("#formUpdateDeliver").validate({
+            rules: {
+                date_deliver: {
+                    required: true
+                },
+                vechicles: {
+                    required: true
+                },
+                drivers: {
+                    required: true
+                }
+            },
+            messages: {
+                date_deliver: {
+                    required: 'Informe a data de entrega.'
+                },
+                vechicles: {
+                    required: 'Informe o veículo.'
+                },
+                drivers: {
+                    required: 'Informe o motorista.'
+                }
+            },
+            invalidHandler: function(event, validator) {
+                $('html, body').animate({scrollTop:0}, 400);
+                let arrErrors = [];
+                $.each(validator.errorMap, function (key, val) {
+                    arrErrors.push(val);
+                });
+                setTimeout(() => {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                    });
+                }, 500);
+            },
+            submitHandler: function(form) {
+                let getForm = $('#formUpdateDeliver');
+
+                getForm.find('button[type="submit"]').attr('disabled', true);
+
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: 'POST',
+                    url: getForm.attr('action'),
+                    data: getForm.serialize(),
+                    dataType: 'json',
+                    success: response => {
+                        console.log(response);
+
+                        getForm.find('button[type="submit"]').attr('disabled', false);
+
+                        if (!response.success) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atenção',
+                                html: '<ol><li>' + response.message + '</li></ol>'
+                            });
+                            return false;
+                        }
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: response.message
+                        });
+
+                        if (response.rental_updated) {
+                            $('#modalDeliver').modal('hide');
+                        } else {
+                            showModalDeliverEquipment($('[name="rental_id[]"]').val());
+                        }
+
+                        loadCountsTabRental();
+                        getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false);
+                    }, error: e => {
+                        console.log(e);
+                        getForm.find('button[type="submit"]').attr('disabled', false);
+                        let arrErrors = [];
+
+                        $.each(e.responseJSON.errors, function( index, value ) {
+                            arrErrors.push(value);
+                        });
+
+                        if (!arrErrors.length && e.responseJSON.message !== undefined) {
+                            arrErrors.push('Você não tem permissão para fazer essa operação!');
+                        }
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atenção',
+                            html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                        });
+                    }
+                });
+            }
+        });
     </script>
+
+    @include('includes.driver.modal-script')
+    @include('includes.vehicle.modal-script')
 @stop
 
 @section('content')
-    <div class="row">
+    <div class="row profile-page">
         <div class="col-md-12 grid-margin">
             @if(session('success'))
                 <div class="alert-animate alert-success"><i class="fa fa-check-circle"></i> {{session('success')}}</div>
@@ -119,26 +534,154 @@
                         <a href="{{ route('rental.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Nova Locação</a>
                         @endif
                     </div>
-                    <table id="tableRentals" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Cliente/Endereço</th>
-                                <th>Criado Em</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Código</th>
-                                <th>Cliente/Endereço</th>
-                                <th>Criado Em</th>
-                                <th>Ação</th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                    <div class="row">
+                        <div class="col-md-9 form-group">
+                            <label>Cliente</label>
+                            <select class="form-control" name="clients">
+                                <option value="0">Todos</option>
+                                @foreach($clients as $client)
+                                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label>Data de Criação</label>
+                            <input type="text" name="intervalDates" class="form-control" value="{{ $settings['intervalDates']['start'] . ' - ' . $settings['intervalDates']['finish'] }}" />
+                        </div>
+                    </div>
+                    <div class="nav-scroller mt-3">
+                        <ul class="nav nav-tabs tickets-tab-switch" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="deliver-tab" data-toggle="tab" href="#deliver" role="tab" aria-controls="deliver" aria-selected="true">Para Entregar<div class="badge">13</div></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="withdraw-tab" data-toggle="tab" href="#withdraw" role="tab" aria-controls="withdraw" aria-selected="false">Para Retirar<div class="badge">50 </div></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="finished-tab" data-toggle="tab" href="#finished" role="tab" aria-controls="finished" aria-selected="false">Finalizados<div class="badge">29 </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content tab-content-basic">
+                        <div class="tab-pane fade show active" id="deliver" role="tabpanel" aria-labelledby="deliver">
+
+                        </div>
+                        <div class="tab-pane fade" id="withdraw" role="tabpanel" aria-labelledby="withdraw">
+
+                        </div>
+                        <div class="tab-pane fade" id="finished" role="tabpanel" aria-labelledby="finished">
+
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <table id="tableRentals" class="table table-bordered mt-2">
+                                <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Cliente/Endereço</th>
+                                    <th>Criado Em</th>
+                                    <th>Ação</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tfoot>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Cliente/Endereço</th>
+                                    <th>Criado Em</th>
+                                    <th>Ação</th>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalDeliver" tabindex="-1" role="dialog" aria-labelledby="modalDeliver" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <form action="{{ route('rental.delivery_equipment') }}" method="POST" id="formUpdateDeliver">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar entrega do equipamento</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <table class="table col-md-12 equipmentsRentalTable">
+                                <thead>
+                                    <th style="width: 5%">Entregar</th>
+                                    <th style="width: 30%">Equipamento</th>
+                                    <th style="width: 20%">Data da Entrega</th>
+                                    <th style="width: 20%">Veículo</th>
+                                    <th style="width: 20%">Motorista</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <input type="checkbox" class="deliverEquipment">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control d-flex align-items-center" value="Equipamento de Teste - C-009" disabled>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group flatpickr d-flex">
+                                                <input type="tel" class="form-control flatpickr-input" name="date_deliver" value="{{ date('d/m/Y H:i') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                                <div class="input-button-calendar col-md-3 no-padding">
+                                                    <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                                        <i class="fa fa-calendar text-white"></i>
+                                                    </a>
+                                                    <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                                        <i class="fa fa-times text-white"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select class="form-control" disabled>
+                                                    <option>Veículo 1</option>
+                                                    <option>Veículo 2</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select class="form-control" disabled>
+                                                    <option>Motorista 1</option>
+                                                    <option>Motorista 2</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row mt-4 display-none">
+                            <div class="col-md-12">
+                                <h4 class="text-center">Data da entrega está divergente da data prevista de entrega, deseja realizar alteração na forma de pagamento da locação?</h4>
+                            </div>
+                            <div class="col-md-12 d-flex flex-wrap justify-content-evenly">
+                                <button type="button" class="col-md-2 btn btn-primary">SIM</button>
+                                <button type="button" class="col-md-2 btn btn-warning">NÃO</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-around">
+                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-check"></i> Confirmar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

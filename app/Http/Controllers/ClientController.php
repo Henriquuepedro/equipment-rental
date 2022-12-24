@@ -28,7 +28,7 @@ class ClientController extends Controller
 
     public function index()
     {
-        if (!$this->hasPermission('ClientView')) {
+        if (!hasPermission('ClientView')) {
             return redirect()->route('dashboard')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -38,7 +38,7 @@ class ClientController extends Controller
 
     public function create()
     {
-        if (!$this->hasPermission('ClientCreatePost')) {
+        if (!hasPermission('ClientCreatePost')) {
             return redirect()->route('client.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -61,7 +61,7 @@ class ClientController extends Controller
         $rg_ie      = $request->rg_ie           ? filter_var(preg_replace('/[^0-9]/', '', $request->rg_ie), FILTER_SANITIZE_NUMBER_INT) : null;
         $contact    = $request->contact         ? filter_var($request->contact, FILTER_SANITIZE_STRING) : null;
         $observation= $request->observation     ? filter_var($request->observation, FILTER_SANITIZE_STRING) : null;
-        $isAjax     = $this->isAjax();
+        $isAjax     = isAjax();
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
@@ -313,8 +313,8 @@ class ClientController extends Controller
         // get string query
         // DB::getQueryLog();
 
-        $permissionUpdate = $this->hasPermission('ClientUpdatePost');
-        $permissionDelete = $this->hasPermission('ClientDeletePost');
+        $permissionUpdate = hasPermission('ClientUpdatePost');
+        $permissionDelete = hasPermission('ClientDeletePost');
 
         foreach ($data as $key => $value) {
             $buttons = "<a href='".route('client.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";

@@ -24,7 +24,7 @@ class VehicleController extends Controller
 
     public function index()
     {
-        if (!$this->hasPermission('VehicleView')) {
+        if (!hasPermission('VehicleView')) {
             return redirect()->route('dashboard')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -34,7 +34,7 @@ class VehicleController extends Controller
 
     public function fetchVehicles(Request $request)
     {
-        if (!$this->hasPermission('VehicleView'))
+        if (!hasPermission('VehicleView'))
             return response()->json([]);
 
         $orderBy    = array();
@@ -67,8 +67,8 @@ class VehicleController extends Controller
         // get string query
         // DB::getQueryLog();
 
-        $permissionUpdate = $this->hasPermission('VehicleUpdatePost');
-        $permissionDelete = $this->hasPermission('VehicleDeletePost');
+        $permissionUpdate = hasPermission('VehicleUpdatePost');
+        $permissionDelete = hasPermission('VehicleDeletePost');
 
         foreach ($data as $key => $value) {
             $buttons = "<a href='".route('vehicle.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
@@ -111,7 +111,7 @@ class VehicleController extends Controller
 
     public function create()
     {
-        if (!$this->hasPermission('VehicleCreatePost')) {
+        if (!hasPermission('VehicleCreatePost')) {
             return redirect()->route('driver.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -126,7 +126,7 @@ class VehicleController extends Controller
     {
         // data driver
         $dataVehicle = $this->formatDataVehicle($request);
-        $isAjax = $this->isAjax();
+        $isAjax = isAjax();
 
         $updateVehicle = $this->vehicle->insert(
             array(

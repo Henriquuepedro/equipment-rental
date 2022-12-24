@@ -45,7 +45,7 @@ class BudgetController extends Controller
 
     public function index()
     {
-        if (!$this->hasPermission('BudgetView')) {
+        if (!hasPermission('BudgetView')) {
             return redirect()->route('dashboard')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -55,7 +55,7 @@ class BudgetController extends Controller
 
     public function fetchBudgets(Request $request): JsonResponse
     {
-        if (!$this->hasPermission('BudgetView'))
+        if (!hasPermission('BudgetView'))
             return response()->json([]);
 
         $orderBy    = array();
@@ -74,7 +74,7 @@ class BudgetController extends Controller
             if ($request->order[0]['dir'] == "asc") $direction = "asc";
             else $direction = "desc";
 
-            $fieldsOrder = array('budgets.code','clients.name','budgets.address_name','budgets.created_at', '');
+            $fieldsOrder = array('budgets.code','clients.name','budgets.created_at', '');
             $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
@@ -87,8 +87,8 @@ class BudgetController extends Controller
         // get string query
         // DB::getQueryLog();
 
-        $permissionUpdate = $this->hasPermission('BudgetUpdatePost');
-        $permissionDelete = $this->hasPermission('BudgetDeletePost');
+        $permissionUpdate = hasPermission('BudgetUpdatePost');
+        $permissionDelete = hasPermission('BudgetDeletePost');
 
         foreach ($data as $key => $value) {
             $buttons = $permissionDelete ? "<button class='btn btn-danger btnRemoveBudget btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' budget-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
@@ -114,7 +114,7 @@ class BudgetController extends Controller
 
     public function create()
     {
-        if (!$this->hasPermission('BudgetCreatePost')) {
+        if (!hasPermission('BudgetCreatePost')) {
             return redirect()->route('budget.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -126,7 +126,7 @@ class BudgetController extends Controller
 
     public function insert(BudgetCreatePost $request)
     {
-        if (!$this->hasPermission('BudgetCreatePost'))
+        if (!hasPermission('BudgetCreatePost'))
             return response()->json(['success' => false, 'message' => "Você não tem permissão para criar orçamentos."]);
 
         $company_id = $request->user()->company_id;

@@ -796,7 +796,7 @@ table .form-group {
 .form-control:read-only {
     background-color: #fff;
 }
-.btn-outline-primary, .wizard > .actions .disabled a{
+.wizard > .actions .disabled a{
     color: #fff;
     background: #2780c8;
     cursor: no-drop;
@@ -912,6 +912,13 @@ div[disabled].btn-danger {
 }
 div[disabled].btn-primary {
     background: #0c7cd5 !important;;
+}
+.justify-content-evenly {
+    justify-content: space-evenly !important;
+}
+a[disabled] {
+    pointer-events: none;
+    cursor: no-drop;
 }
 
 

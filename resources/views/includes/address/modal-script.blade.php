@@ -100,10 +100,12 @@
 
                 $('select[name="name_address"]').empty().append('<option value="0">Não selecionado</option>');
                 $.each(response.data, function( index, value ) {
-                    selected = value.id === client_id ? 'selected' : '';
+                    selected = value.id === client_id || response.data.length === 1 ? 'selected' : '';
                     nameAddress = value.name ?? 'Endereço #' + countNameAddr++;
                     $('select[name="name_address"]').append(`<option value='${value.id}' ${selected}>${nameAddress}</option>`);
                 });
+
+                $('select[name="name_address"]').trigger('change');
 
             }, error: e => {
                 enabledFieldAddress();

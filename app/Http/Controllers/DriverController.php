@@ -21,7 +21,7 @@ class DriverController extends Controller
 
     public function index()
     {
-        if (!$this->hasPermission('DriverView')) {
+        if (!hasPermission('DriverView')) {
             return redirect()->route('dashboard')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -31,7 +31,7 @@ class DriverController extends Controller
 
     public function fetchDrivers(Request $request)
     {
-        if (!$this->hasPermission('DriverView'))
+        if (!hasPermission('DriverView'))
             return response()->json([]);
 
         $orderBy    = array();
@@ -63,8 +63,8 @@ class DriverController extends Controller
         // get string query
         // DB::getQueryLog();
 
-        $permissionUpdate = $this->hasPermission('DriverUpdatePost');
-        $permissionDelete = $this->hasPermission('DriverDeletePost');
+        $permissionUpdate = hasPermission('DriverUpdatePost');
+        $permissionDelete = hasPermission('DriverDeletePost');
 
         foreach ($data as $key => $value) {
             $buttons = "<a href='".route('driver.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
@@ -74,8 +74,8 @@ class DriverController extends Controller
             $result[$key] = array(
                 $value['id'],
                 $value['name'],
-                $value['cpf'] ? $this->mask($value['cpf'], '###.###.###-##') : '',
-                $value['phone'] ? $this->mask($value['phone'], strlen($value['phone']) === 10 ? '(##) ####-####' : '(##) #####-####') : '',
+                $value['cpf'] ? mask($value['cpf'], '###.###.###-##') : '',
+                $value['phone'] ? mask($value['phone'], strlen($value['phone']) === 10 ? '(##) ####-####' : '(##) #####-####') : '',
                 $buttons
             );
         }
@@ -92,7 +92,7 @@ class DriverController extends Controller
 
     public function create()
     {
-        if (!$this->hasPermission('DriverCreatePost')) {
+        if (!hasPermission('DriverCreatePost')) {
             return redirect()->route('driver.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -104,7 +104,7 @@ class DriverController extends Controller
     {
         // data driver
         $dataDriver = $this->formatDataDriver($request);
-        $isAjax = $this->isAjax();
+        $isAjax = isAjax();
 
         $createDriver = $this->driver->insert(array(
             'company_id'    => $dataDriver->company_id,

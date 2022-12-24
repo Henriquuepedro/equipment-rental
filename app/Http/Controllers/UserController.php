@@ -37,14 +37,14 @@ class UserController extends Controller
     {
         $user_id        = $request->user()->id;
         $company_id     = $request->user()->company_id;
-        $isAjax         = $this->isAjax();
+        $isAjax         = isAjax();
 
         if ($isAjax) {
 
             $user_id_session = $user_id;
             $user_id = $request->user_id;
 
-            if (!$this->hasAdmin())
+            if (!hasAdmin())
                 return response()->json(['success' => false, 'data' => 'Você não tem permissão para fazer essa operação!']);
 
             if ($user_id == $user_id_session)
@@ -194,7 +194,7 @@ class UserController extends Controller
         $nameStatusError    = $dataUserInactive->active == 1 ? 'inativar' : 'ativar';
         $nameStatusSuccess  = $dataUserInactive->active == 1 ? 'inativado' : 'ativado';
 
-        if (!$this->hasAdmin())
+        if (!hasAdmin())
             return response()->json(['success' => false, 'message' => "Você não tem permissão para {$nameStatusError} um usuário"]);
 
         if (!$dataUserInactive)
@@ -223,7 +223,7 @@ class UserController extends Controller
 
     public function getUsers()
     {
-        if (!$this->hasAdmin())
+        if (!hasAdmin())
             return response()->json([]);
 
         $dataUsers = [];
@@ -253,7 +253,7 @@ class UserController extends Controller
 
     public function getPermissionsUsers(Request $request)
     {
-        if (!$this->hasAdmin())
+        if (!hasAdmin())
             return response()->json(['success' => false, 'data' => '<h4>Você não tem permissão para fazer essa operação!</h4>']);
 
         $user_id    = $request->user_id;
@@ -309,7 +309,7 @@ class UserController extends Controller
 
     public function updatePermissionsUsers(Request $request)
     {
-        if (!$this->hasAdmin())
+        if (!hasAdmin())
             return response()->json(['success' => false, 'message' => 'Você não tem permissão para fazer essa operação!']);
 
         $arrPermissions = [];
@@ -344,7 +344,7 @@ class UserController extends Controller
         $company_id = $request->user()->company_id;
         $user_id    = $request->user_id;
 
-        if (!$this->hasAdmin()) {
+        if (!hasAdmin()) {
             return response()->json(['success' => false, 'message' => 'Você não tem permissão para fazer essa operação!']);
         }
 
@@ -372,7 +372,7 @@ class UserController extends Controller
         $user_id_session= $request->user()->id;
         $user_id        = $request->user_id;
 
-        if (!$this->hasAdmin())
+        if (!hasAdmin())
             return response()->json(['success' => false, 'message' => 'Você não tem permissão para fazer essa operação!']);
 
         if ($user_id == $user_id_session)
@@ -401,7 +401,7 @@ class UserController extends Controller
         $user_id_session= $request->user()->id;
         $user_id        = $request->user_id;
 
-        if (!$this->hasAdmin())
+        if (!hasAdmin())
             return response()->json(['success' => false, 'data' => 'Você não tem permissão para fazer essa operação!']);
 
         if ($user_id == $user_id_session)

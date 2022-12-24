@@ -17,6 +17,7 @@ use App\Models\Vehicle;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Models\Client;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 
@@ -63,27 +64,47 @@ class RentalController extends Controller
 
     public function index()
     {
-        if (!$this->hasPermission('RentalView')) {
+        if (!hasPermission('RentalView')) {
             return redirect()->route('dashboard')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        return view('rental.index');
+        $company_id = Auth::user()->company_id;
+
+        $clients = $this->client->getClients($company_id);
+
+        return view('rental.index', compact('clients'));
     }
 
     public function fetchRentals(Request $request): JsonResponse
     {
-        if (!$this->hasPermission('RentalView'))
+        if (!hasPermission('RentalView')) {
             return response()->json([]);
+        }
 
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
 
-        $ini        = $request->start;
-        $draw       = $request->draw;
-        $length     = $request->length;
-        $company_id = $request->user()->company_id;
+        $filters        = [];
+        $ini            = $request->start;
+        $draw           = $request->draw;
+        $length         = $request->length;
+        $company_id     = $request->user()->company_id;
+        $typeRental     = $request->type;
+        // Filtro datas
+        $intervalDate   = $request->intervalDate;
+        $intervalDate   = explode('-', $intervalDate);
+        $filters['dateStart']   = date('Y-m-d', strtotime("-2 months", time()));
+        $filters['dateFinish']  = date('Y-m-d');
+        if (count($intervalDate) == 2) {
+            $filters['dateStart']  = \DateTime::createFromFormat('d/m/Y', trim($intervalDate[0]))->format('Y-m-d');
+            $filters['dateFinish'] = \DateTime::createFromFormat('d/m/Y', trim($intervalDate[1]))->format('Y-m-d');
+        }
+        // Filtro cliente
+        $client = $request->client ?? (int)$request->client;
+        if (empty($client)) $client = null;
+        $filters['client'] = $client;
 
         $search = $request->search;
         if ($search['value']) $searchUser = $search['value'];
@@ -92,7 +113,7 @@ class RentalController extends Controller
             if ($request->order[0]['dir'] == "asc") $direction = "asc";
             else $direction = "desc";
 
-            $fieldsOrder = array('rentals.code','clients.name','rentals.address_name','rentals.created_at', '');
+            $fieldsOrder = array('rentals.code','clients.name','rentals.created_at', '');
             $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
@@ -100,17 +121,23 @@ class RentalController extends Controller
             }
         }
 
-        $data = $this->rental->getRentals($company_id, $ini, $length, $searchUser, $orderBy);
+        $data = $this->rental->getRentals($company_id, $filters, $ini, $length, $searchUser, $orderBy, $typeRental);
 
-        // get string query
-        // DB::getQueryLog();
-
-        $permissionUpdate = $this->hasPermission('RentalUpdatePost');
-        $permissionDelete = $this->hasPermission('RentalDeletePost');
+        $permissionUpdate = hasPermission('RentalUpdatePost');
+        $permissionDelete = hasPermission('RentalDeletePost');
 
         foreach ($data as $key => $value) {
-            $buttons = $permissionDelete ? "<button class='btn btn-danger btnRemoveRental btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' rental-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
-            $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='btn btn-primary btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Imprimir'><i class='fas fa-print'></i></a>";
+            $buttons =  $permissionUpdate && $typeRental === 'deliver' ? "<button class='dropdown-item btnDeliver' rental-id='{$value['id']}'><i class='fas fa-check'></i> Confirmar Entrega</button>" : '';
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' rental-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
+            $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
+
+            $buttons = "<div class='row'><div class='col-12'><div class='dropdown dropleft'>
+                            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsRental-{$value['id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                              <i class='fa fa-cog'></i>
+                            </button>
+                            <div class='dropdown-menu' aria-labelledby='dropActionsRental-{$value['id']}'>
+                              {$buttons}
+                            </div</div></div>";
 
             $expectedDeliveryDate = null;
             $expectedWithdrawalDate = null;
@@ -124,39 +151,55 @@ class RentalController extends Controller
             $dataEquipment = $this->rental_equipment->getEquipments($company_id, $value->id);
             foreach ($dataEquipment as $equipment) {
                 // tenta definir as variaveis iniciais, se existir dados
-                if ($expectedDeliveryDate   === null)   $expectedDeliveryDate   = $equipment->actual_delivery_date   === null ? $equipment->expected_delivery_date   : null;
-                if ($expectedWithdrawalDate === null)   $expectedWithdrawalDate = $equipment->actual_withdrawal_date === null ? $equipment->expected_withdrawal_date : null;
+                if ($expectedDeliveryDate === null)   {
+                    $expectedDeliveryDate = $equipment->actual_delivery_date   === null ? $equipment->expected_delivery_date   : null;
+                }
+                if ($expectedWithdrawalDate === null)   {
+                    $expectedWithdrawalDate = $equipment->actual_withdrawal_date === null ? $equipment->expected_withdrawal_date : null;
+                }
 
-                if ($actualDeliveryDate     === null)   $actualDeliveryDate     = $equipment->actual_delivery_date ?? null;
-                if ($actualWithdrawalDate   === null)   $actualWithdrawalDate   = $equipment->actual_withdrawal_date ?? null;
+                if ($actualDeliveryDate === null)   {
+                    $actualDeliveryDate = $equipment->actual_delivery_date ?? null;
+                }
+                if ($actualWithdrawalDate === null)   {
+                    $actualWithdrawalDate = $equipment->actual_withdrawal_date ?? null;
+                }
 
                 // encontrou um equipamento que não foi entregue, a locação não ficará com data de entrega realizada
-                if ($allDelivered && $equipment->actual_delivery_date   === null) $allDelivered = false;
+                if ($allDelivered && $equipment->actual_delivery_date === null) {
+                    $allDelivered = false;
+                }
                 // encontrou um equipamento que não foi retirado, a locação não ficará com data de retirada realizada
-                if ($allWithdrawn && $equipment->actual_withdrawal_date === null) $allWithdrawn = false;
+                if ($allWithdrawn && $equipment->actual_withdrawal_date === null) {
+                    $allWithdrawn = false;
+                }
 
                 // data prevista
                 // se não foi entregue e existe data de entrega prevista, faz a comparação da data para pegar sempre a data mais antiga
-                if ($equipment->actual_delivery_date === null && $expectedDeliveryDate !== null && strtotime($expectedDeliveryDate) > strtotime($equipment->expected_delivery_date))
+                if ($equipment->actual_delivery_date === null && $expectedDeliveryDate !== null && strtotime($expectedDeliveryDate) > strtotime($equipment->expected_delivery_date)) {
                     $expectedDeliveryDate = $equipment->expected_delivery_date;
+                }
                 // se não foi retirado e existe data de retirada prevista, faz a comparação da data para pegar sempre a data mais antiga
-                if ($equipment->actual_withdrawal_date === null && $expectedWithdrawalDate !== null && $equipment->expected_withdrawal_date !== null && strtotime($expectedWithdrawalDate) > strtotime($equipment->expected_withdrawal_date))
+                if ($equipment->actual_withdrawal_date === null && $expectedWithdrawalDate !== null && $equipment->expected_withdrawal_date !== null && strtotime($expectedWithdrawalDate) > strtotime($equipment->expected_withdrawal_date)) {
                     $expectedWithdrawalDate = $equipment->expected_withdrawal_date;
+                }
 
                 // data real
                 // se ainda não encontrou um equipamento que não foi entregue e existe data de entrega, faz a comparação para pegar sempre a data mais recente
-                if ($allDelivered && $actualDeliveryDate !== null && $equipment->actual_delivery_date !== null && strtotime($actualDeliveryDate) < strtotime($equipment->actual_delivery_date))
+                if ($allDelivered && $actualDeliveryDate !== null && $equipment->actual_delivery_date !== null && strtotime($actualDeliveryDate) < strtotime($equipment->actual_delivery_date)) {
                     $actualDeliveryDate = $equipment->actual_delivery_date;
+                }
                 // se ainda não encontrou um equipamento que não foi retirado e existe data de retirada, faz a comparação para pegar sempre a data mais recente
-                if ($allWithdrawn && $actualWithdrawalDate !== null && $equipment->actual_withdrawal_date !== null && strtotime($actualWithdrawalDate) > strtotime($equipment->actual_withdrawal_date))
+                if ($allWithdrawn && $actualWithdrawalDate !== null && $equipment->actual_withdrawal_date !== null && strtotime($actualWithdrawalDate) > strtotime($equipment->actual_withdrawal_date)) {
                     $actualWithdrawalDate = $equipment->actual_withdrawal_date;
+                }
             }
 
             $colorBadgeDeliveryDate     = $allDelivered ? 'success' : (strtotime($expectedDeliveryDate) < time() ? 'danger' : 'warning');
             $colorBadgeWithdrawalDate   = $allWithdrawn ? 'success' : ($expectedWithdrawalDate !== null && strtotime($expectedWithdrawalDate) < time() ? 'danger' : 'warning');
 
-            $labelBadgeDeliveryDate     = $allDelivered ? 'Data de Entrega' : 'Data Prevista de Entrega';
-            $labelBadgeWithdrawalDate   = $allWithdrawn ? 'Data de Retirada' : 'Data Prevista de Retirada';
+            $labelBadgeDeliveryDate     = $allDelivered ? 'Entregue em' : 'Entrega prevista em';
+            $labelBadgeWithdrawalDate   = $allWithdrawn ? 'Retirada em' : 'Retirada prevista para';
 
             $strDateDelivery            = date('d/m/Y H:i', strtotime($allDelivered ? $actualDeliveryDate : $expectedDeliveryDate));
             $strDateWithdraw            = $expectedWithdrawalDate === null && !$allWithdrawn ? 'Não informado' : date('d/m/Y H:i', strtotime($allWithdrawn ? $actualWithdrawalDate : $expectedWithdrawalDate));
@@ -164,12 +207,22 @@ class RentalController extends Controller
             $strDeliveryDate = "<div class='badge badge-pill badge-lg badge-{$colorBadgeDeliveryDate}'>{$labelBadgeDeliveryDate}: {$strDateDelivery}</div>";
             $strWithdrawalDate = "<div class='badge badge-pill badge-lg badge-{$colorBadgeWithdrawalDate}'>{$labelBadgeWithdrawalDate}: {$strDateWithdraw}</div>";
 
+            // Se for para listar somente os para entregar, não precisa mostrar os dados de retirada.
+            if ($typeRental === 'deliver') {
+                $strWithdrawalDate = '';
+            }
+            // Se for para listar somente os para retirar, não precisa mostrar os dados de entrega.
+            if ($typeRental === 'withdraw') {
+                $strDeliveryDate = '';
+            }
+
             $result[$key] = array(
                 str_pad($value['code'], 5, 0, STR_PAD_LEFT),
+//                json_encode([$dateStart, $dateFinish]),
                 "<div class='d-flex flex-wrap'>
                     <div class='w-100 mb-2'>
-                        {$strDeliveryDate}
-                        {$strWithdrawalDate}
+                        $strDeliveryDate
+                        $strWithdrawalDate
                     </div>
                     <span class='font-weight-bold w-100'>{$value['client_name']}</span>
                     <span class='mt-1 w-100'>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}</span>
@@ -181,8 +234,8 @@ class RentalController extends Controller
 
         $output = array(
             "draw" => $draw,
-            "recordsTotal" => $this->rental->getCountRentals($company_id),
-            "recordsFiltered" => $this->rental->getCountRentals($company_id, $searchUser),
+            "recordsTotal" => $this->rental->getCountRentals($company_id, $filters, null, $typeRental),
+            "recordsFiltered" => $this->rental->getCountRentals($company_id, $filters, $searchUser, $typeRental),
             "data" => $result
         );
 
@@ -194,8 +247,9 @@ class RentalController extends Controller
         $company_id = $request->user()->company_id;
         $rental_id  = $request->rental_id;
 
-        if (!$this->rental->getRental($rental_id, $company_id))
+        if (!$this->rental->getRental($rental_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível localizar a locação!']);
+        }
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
@@ -215,7 +269,7 @@ class RentalController extends Controller
 
     public function create()
     {
-        if (!$this->hasPermission('RentalCreatePost')) {
+        if (!hasPermission('RentalCreatePost')) {
             return redirect()->route('rental.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
@@ -226,7 +280,7 @@ class RentalController extends Controller
 
     public function insert(RentalCreatePost $request)
     {
-        if (!$this->hasPermission('RentalCreatePost'))
+        if (!hasPermission('RentalCreatePost'))
             return response()->json(['success' => false, 'message' => "Você não tem permissão para criar locações."]);
 
         $company_id = $request->user()->company_id;
@@ -378,7 +432,7 @@ class RentalController extends Controller
             $dateWithdrawalEquip        = $request->{"date_withdrawal_equipment_{$equipmentId->id}"};
             $driverEquip                = (int)$request->{"driver_{$equipmentId->id}"};
             $vehicleEquip               = (int)$request->{"vehicle_{$equipmentId->id}"};
-            $priceTotalEquip            = $haveCharged ? $this->transformMoneyBr_En($request->{"priceTotalEquipment_{$equipmentId->id}"}) : 0;
+            $priceTotalEquip            = $haveCharged ? transformMoneyBr_En($request->{"priceTotalEquipment_{$equipmentId->id}"}) : 0;
             $unitaryValue               = $haveCharged ? $equipmentId->value : 0;
             $response->grossValue       += $priceTotalEquip;
 
@@ -470,11 +524,11 @@ class RentalController extends Controller
         $discountValue = 0;
         $calculateNetAmountAutomatic = $request->calculate_net_amount_automatic ? true : false;
         if ($calculateNetAmountAutomatic) { // valor liquido sera calculado automatico
-            $extraValue = $this->transformMoneyBr_En($request->extra_value);
-            $discountValue = $this->transformMoneyBr_En($request->discount_value);
+            $extraValue = transformMoneyBr_En($request->extra_value);
+            $discountValue = transformMoneyBr_En($request->discount_value);
             $netValue = $grossValue - $discountValue + $extraValue;
         } else { // valor liquido será definido pelo usuario
-            $netValue = $this->transformMoneyBr_En($request->net_value);
+            $netValue = transformMoneyBr_En($request->net_value);
             // devo comparar o valor liquido com o bruto para definir desconto e acrescimo
             if ($netValue > $grossValue) {
                 $extraValue = $netValue - $grossValue;
@@ -511,7 +565,7 @@ class RentalController extends Controller
                     if(($parcel + 1) === $qtyParcel) $valueParcel = (float)number_format($netValue - $valueSumParcel,2,'.','');
                     $valueSumParcel += $valueParcel;
 
-                } else $valueParcel = (float)$this->transformMoneyBr_En($request->value_parcel[$parcel]);
+                } else $valueParcel = (float)transformMoneyBr_En($request->value_parcel[$parcel]);
 
 
                 if ($daysTemp === null) $daysTemp = $request->due_day[$parcel];
@@ -608,5 +662,20 @@ class RentalController extends Controller
 
         return $this->address->updateLanLngAddressClient($company_id, $request->client, $request->name_address, $dataUpdate) ? true : false;
 
+    }
+
+    public function getQtyTypeRentals(Request $request)
+    {
+        $company_id = $request->user()->company_id;
+
+        $typesQuery = $this->rental->getCountTypeRentals($company_id);
+
+        $arrTypes = array(
+            'deliver'   => $typesQuery['deliver'],
+            'withdraw'  => $typesQuery['withdraw'],
+            'finished'  => $typesQuery['finished']
+        );
+
+        return response()->json($arrTypes);
     }
 }
