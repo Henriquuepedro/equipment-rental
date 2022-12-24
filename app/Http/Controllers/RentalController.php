@@ -127,7 +127,21 @@ class RentalController extends Controller
         $permissionDelete = hasPermission('RentalDeletePost');
 
         foreach ($data as $key => $value) {
-            $buttons =  $permissionUpdate && $typeRental === 'deliver' ? "<button class='dropdown-item btnDeliver' rental-id='{$value['id']}'><i class='fas fa-check'></i> Confirmar Entrega</button>" : '';
+            $buttons = '';
+
+            if ($permissionUpdate && in_array($typeRental, array('deliver', 'withdraw'))) {
+                $btn_class = $btn_text = '';
+                if ($typeRental === 'deliver') {
+                    $btn_class = 'btnDeliver';
+                    $btn_text = 'Entrega';
+                }
+                else if ($typeRental === 'withdraw') {
+                    $btn_class = 'btnWithdraw';
+                    $btn_text = 'Retirada'; // ou coleta?
+                }
+                $buttons .="<button class='dropdown-item $btn_class' rental-id='{$value['id']}'><i class='fas fa-check'></i> Confirmar $btn_text</button>";
+            }
+
             $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' rental-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
             $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
 
@@ -135,15 +149,14 @@ class RentalController extends Controller
                             <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsRental-{$value['id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                               <i class='fa fa-cog'></i>
                             </button>
-                            <div class='dropdown-menu' aria-labelledby='dropActionsRental-{$value['id']}'>
-                              {$buttons}
-                            </div</div></div>";
+                            <div class='dropdown-menu' aria-labelledby='dropActionsRental-{$value['id']}'>$buttons</div</div>
+                        </div>";
 
-            $expectedDeliveryDate = null;
+            $expectedDeliveryDate   = null;
             $expectedWithdrawalDate = null;
 
-            $actualDeliveryDate = null;
-            $actualWithdrawalDate = null;
+            $actualDeliveryDate     = null;
+            $actualWithdrawalDate   = null;
 
             $allDelivered = true;
             $allWithdrawn = true;
@@ -204,8 +217,8 @@ class RentalController extends Controller
             $strDateDelivery            = date('d/m/Y H:i', strtotime($allDelivered ? $actualDeliveryDate : $expectedDeliveryDate));
             $strDateWithdraw            = $expectedWithdrawalDate === null && !$allWithdrawn ? 'Não informado' : date('d/m/Y H:i', strtotime($allWithdrawn ? $actualWithdrawalDate : $expectedWithdrawalDate));
 
-            $strDeliveryDate = "<div class='badge badge-pill badge-lg badge-{$colorBadgeDeliveryDate}'>{$labelBadgeDeliveryDate}: {$strDateDelivery}</div>";
-            $strWithdrawalDate = "<div class='badge badge-pill badge-lg badge-{$colorBadgeWithdrawalDate}'>{$labelBadgeWithdrawalDate}: {$strDateWithdraw}</div>";
+            $strDeliveryDate    = "<div class='badge badge-pill badge-lg badge-$colorBadgeDeliveryDate'>$labelBadgeDeliveryDate: $strDateDelivery</div>";
+            $strWithdrawalDate  = "<div class='badge badge-pill badge-lg badge-$colorBadgeWithdrawalDate'>$labelBadgeWithdrawalDate: $strDateWithdraw</div>";
 
             // Se for para listar somente os para entregar, não precisa mostrar os dados de retirada.
             if ($typeRental === 'deliver') {
@@ -245,7 +258,7 @@ class RentalController extends Controller
     public function delete(RentalDeletePost $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
-        $rental_id  = $request->rental_id;
+        $rental_id  = $request->input('rental_id');
 
         if (!$this->rental->getRental($rental_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível localizar a locação!']);
@@ -255,7 +268,7 @@ class RentalController extends Controller
 
         $delPayment     = $this->rental_payment->remove($rental_id, $company_id);
         $delResidue     = $this->rental_residue->remove($rental_id, $company_id);
-        $delEquipment  = $this->rental_equipment->remove($rental_id, $company_id);
+        $delEquipment   = $this->rental_equipment->remove($rental_id, $company_id);
         $delRental      = $this->rental->remove($rental_id, $company_id);
 
         if ($delEquipment && $delRental) {
@@ -278,10 +291,11 @@ class RentalController extends Controller
         return view('rental.create', compact('budget'));
     }
 
-    public function insert(RentalCreatePost $request)
+    public function insert(RentalCreatePost $request): JsonResponse
     {
-        if (!hasPermission('RentalCreatePost'))
+        if (!hasPermission('RentalCreatePost')) {
             return response()->json(['success' => false, 'message' => "Você não tem permissão para criar locações."]);
+        }
 
         $company_id = $request->user()->company_id;
 
@@ -314,38 +328,44 @@ class RentalController extends Controller
         $dateWithdrawal = $request->date_withdrawal ? \DateTime::createFromFormat('d/m/Y H:i', $request->date_withdrawal) : null;
         $notUseDateWithdrawal = $request->not_use_date_withdrawal ? true : false;
 
-        if (!$dateDelivery) // não reconheceu a data de entrega
+        if (!$dateDelivery) { // não reconheceu a data de entrega
             return response()->json(['success' => false, 'message' => "Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
+        }
 
         if (!$notUseDateWithdrawal) { // usará data de retirada
 
-            if (!$dateWithdrawal) // não reconheceu a data de retirada
+            if (!$dateWithdrawal) { // não reconheceu a data de retirada
                 return response()->json(['success' => false, 'message' => "Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
+            }
 
-            if ($dateDelivery->getTimestamp() >= $dateWithdrawal->getTimestamp()) // data de entrega é maior ou igual a data de retirada
+            if ($dateDelivery->getTimestamp() >= $dateWithdrawal->getTimestamp()) { // data de entrega é maior ou igual a data de retirada
                 return response()->json(['success' => false, 'message' => "Data prevista de entrega não pode ser maior ou igual que a data prevista de retirada."]);
+            }
         }
 
         // Equipamentos
         $responseEquipment = $this->setEquipmentRental($request);
-        if (isset($responseEquipment->error))
+        if (isset($responseEquipment->error)) {
             return response()->json(['success' => false, 'message' => $responseEquipment->error]);
+        }
         $arrEquipment = $responseEquipment->arrEquipment;
 
         // Pagamento
         $arrPayment = array();
         if ($haveCharged) {
             $responsePayment = $this->setPaymentRental($request, $responseEquipment->grossValue);
-            if (isset($responsePayment->error))
+            if (isset($responsePayment->error)) {
                 return response()->json(['success' => false, 'message' => $responsePayment->error]);
+            }
 
             $arrPayment = $responsePayment->arrPayment;
         }
 
         // Resíduo
         $arrResidue = $this->setResidueRental($request);
-        if (isset($arrResidue['error']))
+        if (isset($arrResidue['error'])) {
             return response()->json(['success' => false, 'message' => $arrResidue['error']]);
+        }
 
         // Locacão
         $arrRental = array(
@@ -399,7 +419,6 @@ class RentalController extends Controller
         DB::rollBack();
 
         return response()->json(['success' => false, 'message' => 'Não foi possível gravar a locação, recarregue a página e tente novamente.']);
-
     }
 
     public function setEquipmentRental($request, bool $budget = false)
