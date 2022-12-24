@@ -235,7 +235,7 @@ class Rental extends Model
         return $data;
     }
 
-    public function checkAllEquipmentsDelivered(int $rental_id, int $company_id)
+    public function checkAllEquipmentsDelivered(int $rental_id, int $company_id): bool
     {
         $rental_dont_delivered = $this->select('rental_id', 'id')
             ->from('rental_equipments')
@@ -255,6 +255,33 @@ class Rental extends Model
                 ])->first();
 
             $this->updateByRentalAndCompany($rental_id, $company_id, array('actual_delivery_date' => $rental_delivered->actual_delivery_date));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function checkAllEquipmentsWithdrawal(int $rental_id, int $company_id): bool
+    {
+        $rental_dont_withdrawal = $this->select('rental_id', 'id')
+            ->from('rental_equipments')
+            ->where([
+                'rental_id'              => $rental_id,
+                'company_id'             => $company_id,
+                'actual_withdrawal_date' => null
+            ])->first();
+
+        if (!$rental_dont_withdrawal) {
+            $rental_withdrawal = $this->select(DB::raw('max(actual_withdrawal_date) as actual_withdrawal_date'))
+                ->from('rental_equipments')
+                ->where([
+                    ['rental_id',              '=', $rental_id],
+                    ['company_id',             '=', $company_id],
+                    ['actual_withdrawal_date', '!=', null]
+                ])->first();
+
+            $this->updateByRentalAndCompany($rental_id, $company_id, array('actual_withdrawal_date' => $rental_withdrawal->actual_withdrawal_date));
 
             return true;
         }

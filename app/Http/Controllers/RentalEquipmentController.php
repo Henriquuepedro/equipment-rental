@@ -20,16 +20,30 @@ class RentalEquipmentController extends Controller
         $this->rental = new Rental();
     }
 
-    public function getEquipmentsRental(Request $request)
+    public function getEquipmentsRentalToDeliver(Request $request)
     {
         $company_id = $request->user()->company_id;
-        $rental_id  = $request->rental_id;
+        $rental_id  = $request->input('rental_id');
 
         $equipments = $this->rental_equipment->getEquipmentsForDeliver($company_id, $rental_id);
 
-        if (count($equipments) === 0)
+        if (count($equipments) === 0) {
             return response()->json(['success' => false, 'data' => 'Não foi possível localizar os equipamentos para entrega.']);
+        }
 
+        return response()->json(['success' => true, 'data' => $equipments]);
+    }
+
+    public function getEquipmentsRentalToWithdraw(Request $request)
+    {
+        $company_id = $request->user()->company_id;
+        $rental_id  = $request->input('rental_id');
+
+        $equipments = $this->rental_equipment->getEquipmentsForWithdraw($company_id, $rental_id);
+
+        if (count($equipments) === 0) {
+            return response()->json(['success' => false, 'data' => 'Não foi possível localizar os equipamentos para entrega.']);
+        }
 
         return response()->json(['success' => true, 'data' => $equipments]);
     }
@@ -64,10 +78,10 @@ class RentalEquipmentController extends Controller
                 continue;
             }
 
-            $date_deliver_quipment = DateTime::createFromFormat('d/m/Y H:i', $date_deliver[$count]);
+            $date_deliver_equipment = DateTime::createFromFormat('d/m/Y H:i', $date_deliver[$count]);
 
             $datas_update[] = array(
-                'actual_delivery_date'      => $date_deliver_quipment,
+                'actual_delivery_date'      => $date_deliver_equipment,
                 'actual_driver_delivery'    => $drivers[$count],
                 'actual_vehicle_delivery'   => $vechicles[$count],
                 'rental_equipment_id'       => $rental_equipments_id[$count]
@@ -88,8 +102,6 @@ class RentalEquipmentController extends Controller
             $rental_equipment_id = $data_update['rental_equipment_id'];
             unset($data_update['rental_equipment_id']);
 
-//            var_dump([$rental_id, $rental_equipment_id, $data_update]);die;
-
             if (!$this->rental_equipment->updateByRentalAndRentalEquipmentId($rental_id, $rental_equipment_id, $data_update)) {
                 DB::rollBack();
                 return response()->json(array(
@@ -100,6 +112,80 @@ class RentalEquipmentController extends Controller
         }
 
         $rental_updated = $this->rental->checkAllEquipmentsDelivered($rental_id, $company_id);
+
+        DB::commit();
+
+        return response()->json(array(
+            'success'        => true,
+            'message'        => "Equipamento atualizado.",
+            'rental_updated' => $rental_updated
+        ));
+    }
+
+    public function withdrawEquipment(Request $request): JsonResponse
+    {
+        $company_id             = $request->user()->company_id;
+        $checked                = $request->input('checked');
+        $date_withdraw          = $request->input('date');
+        $drivers                = $request->input('drivers');
+        $vechicles              = $request->input('vechicles');
+        $rental_equipments_id   = $request->input('rental_equipment_id');
+        $rental_id              = $request->input('rental_id')[0] ?? 0;
+
+        if (!$this->rental->getRental($rental_id, $company_id)) {
+            return response()->json(array(
+                'success' => false,
+                'message' => "Não foi possível localizar a locação."
+            ));
+        }
+
+        if (count($date_withdraw) !== count($drivers) || count($date_withdraw) !== count($vechicles)) {
+            return response()->json(array(
+                'success' => false,
+                'message' => "Não foi possível realizar a leitura."
+            ));
+        }
+
+        $datas_update = array();
+        for ($count = 0; $count < count($date_withdraw); $count++) {
+            if (!in_array((string)$count, $checked)) {
+                continue;
+            }
+
+            $date_withdraw_equipment = DateTime::createFromFormat('d/m/Y H:i', $date_withdraw[$count]);
+
+            $datas_update[] = array(
+                'actual_withdrawal_date'    => $date_withdraw_equipment,
+                'actual_driver_withdrawal'  => $drivers[$count],
+                'actual_vehicle_withdrawal' => $vechicles[$count],
+                'rental_equipment_id'       => $rental_equipments_id[$count]
+            );
+        }
+
+        if (!count($datas_update)) {
+            return response()->json(array(
+                'success' => false,
+                'message' => "Não foi selecionado nenhum equipamento."
+            ));
+        }
+
+        DB::beginTransaction();
+
+        foreach ($datas_update as $data_update) {
+
+            $rental_equipment_id = $data_update['rental_equipment_id'];
+            unset($data_update['rental_equipment_id']);
+
+            if (!$this->rental_equipment->updateByRentalAndRentalEquipmentId($rental_id, $rental_equipment_id, $data_update)) {
+                DB::rollBack();
+                return response()->json(array(
+                    'success' => false,
+                    'message' => "Não foi atualizar o equipamento $rental_equipment_id."
+                ));
+            }
+        }
+
+        $rental_updated = $this->rental->checkAllEquipmentsWithdrawal($rental_id, $company_id);
 
         DB::commit();
 
