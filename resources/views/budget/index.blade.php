@@ -51,7 +51,7 @@
 
             Swal.fire({
                 title: 'Exclusão de Veículo',
-                html: "Você está prestes a excluir definitivamente o veículo <br><strong>"+budget_name+"</strong><br>Deseja continuar?",
+                html: "Você está prestes a excluir definitivamente o orçamento <br><strong>"+budget_name+"</strong><br>Deseja continuar?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -78,6 +78,70 @@
                                 icon: response.success ? 'success' : 'error',
                                 title: response.message
                             })
+                        }, error: e => {
+                            console.log(e);
+                        },
+                        complete: function(xhr) {
+                            if (xhr.status === 403) {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: 'Você não tem permissão para fazer essa operação!'
+                                });
+                                $(`button[budget-id="${budget_id}"]`).trigger('blur');
+                            }
+                        }
+                    });
+                }
+            })
+        });
+
+        $(document).on('click', '.btnApproveBudget', function (){
+            $('#confirmBudget').modal();
+        });
+
+        $(document).on('click', '.btnApproveBudget', function (){
+            const budget_id = $(this).attr('budget-id');
+            const budget_name = $(this).closest('tr').find('td:eq(1)').html();
+
+            Swal.fire({
+                title: 'Aprovar orçamento',
+                html: "Você está prestes a confirmar o orçamento <br><strong>"+budget_name+"</strong><br>Deseja continuar?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#2196f3',
+                cancelButtonColor: '#bbb',
+                confirmButtonText: 'Sim, aprovar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: 'POST',
+                        url: "{{ route('ajax.budget.confirm') }}",
+                        data: { budget_id },
+                        dataType: 'json',
+                        success: response => {
+                            $('[data-toggle="tooltip"]').tooltip('dispose')
+                            tableBudget.destroy();
+                            $("#tableBudgets tbody").empty();
+                            tableBudget = getTable();
+
+                            if (!response.success) {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: response.message
+                                })
+                            } else {
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                    html: `<a href="${$('[name="rental_url"]').val()}" class="btn btn-primary col-md-12"> Abrir listagem de locações</a>`
+                                });
+                            }
                         }, error: e => {
                             console.log(e);
                         },
@@ -137,4 +201,5 @@
             </div>
         </div>
     </div>
+    <input type="hidden" name="rental_url" value="{{ route('rental.index') }}">
 @stop

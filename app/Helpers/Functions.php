@@ -169,3 +169,20 @@ if (! function_exists('formatZipcode')) {
         return mask($value, '##.###-###');
     }
 }
+
+if (! function_exists('onlyNumbers')) {
+    /**
+     * Limpa o texto e mantém somente números.
+     *
+     * @param   string|null $text
+     * @return  string|null
+     */
+    function onlyNumbers(?string $text): ?string
+    {
+        if (is_null($text)) {
+            return null;
+        }
+
+        return preg_replace('/\D/', '', $text);
+    }
+}

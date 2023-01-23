@@ -61,7 +61,7 @@
                     $('#newResidueModal').modal('hide');
                     cleanFormResidueModal();
                     checkLabelAnimate();
-                    @if(\Request::route()->getName() == 'rental.create')
+                    @if(in_array(\Request::route()->getName(), ['rental.create', 'budget.create']))
                         loadResidues(response.residue_id, '.container-residues select[name="residues[]"]');
                     @elseif(\Request::route()->getName() == 'residue.index')
                         reloadTable();
