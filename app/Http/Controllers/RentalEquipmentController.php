@@ -52,7 +52,7 @@ class RentalEquipmentController extends Controller
     {
         $company_id             = $request->user()->company_id;
         $checked                = $request->input('checked');
-        $date_deliver           = $request->input('date_deliver');
+        $date_deliver           = $request->input('date');
         $drivers                = $request->input('drivers');
         $vechicles              = $request->input('vechicles');
         $rental_equipments_id   = $request->input('rental_equipment_id');
