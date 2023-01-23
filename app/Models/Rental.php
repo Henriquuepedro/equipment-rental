@@ -76,15 +76,17 @@ class Rental extends Model
         return $this->where('company_id', $company_id)->max('code');
     }
 
-    public function getNextCode(int $company_id)
+    public function getNextCode(int $company_id): int
     {
-        $maxCode = $this->where('company_id', $company_id)->max('code');
-        if ($maxCode) return ++$maxCode;
+        $max_code = $this->where(array('company_id' => $company_id, 'deleted' => false))->max('code');
+        if ($max_code) {
+            return ++$max_code;
+        }
 
         return 1;
     }
 
-    public function getRentals(int $company_id, array $filters, int $init = null, int $length = null, string $searchDriver = null, array $orderBy = array(), string $typeRental = null)
+    public function getRentals(int $company_id, array $filters, int $init = null, int $length = null, string $search_driver = null, array $order_by = array(), string $type_rental = null)
     {
         $rental = $this ->select(
                             'rentals.id',
@@ -103,16 +105,16 @@ class Rental extends Model
                         ->join('rental_equipments','rental_equipments.rental_id','=','rentals.id')
                         ->where('rentals.company_id', $company_id)
                         ->whereBetween('rentals.created_at', ["{$filters['dateStart']} 00:00:00", "{$filters['dateFinish']} 23:59:59"]);
-        if ($searchDriver)
-            $rental->where(function($query) use ($searchDriver) {
-                $query->where('rentals.code', 'like', "%{$searchDriver}%")
-                    ->orWhere('clients.name', 'like', "%{$searchDriver}%")
-                    ->orWhere('rentals.address_name', 'like', "%{$searchDriver}%")
-                    ->orWhere('rentals.created_at', 'like', "%{$searchDriver}%");
+        if ($search_driver)
+            $rental->where(function($query) use ($search_driver) {
+                $query->where('rentals.code', 'like', "%$search_driver%")
+                    ->orWhere('clients.name', 'like', "%$search_driver%")
+                    ->orWhere('rentals.address_name', 'like', "%$search_driver%")
+                    ->orWhere('rentals.created_at', 'like', "%$search_driver%");
             });
 
-        if ($typeRental) {
-            switch ($typeRental) {
+        if ($type_rental) {
+            switch ($type_rental) {
                 case 'deliver':
                     $rental->where('rental_equipments.actual_delivery_date', null);
                     break;
@@ -135,13 +137,13 @@ class Rental extends Model
             $rental->where('rentals.client_id', $filters['client']);
         }
 
-        if (count($orderBy) !== 0) {
-            $rental->orderBy($orderBy['field'], $orderBy['order']);
+        if (count($order_by) !== 0) {
+            $rental->orderBy($order_by['field'], $order_by['order']);
         } else {
             $rental->orderBy('rentals.code', 'asc');
         }
 
-        $rental->groupBy($typeRental === 'finished' ? 'rentals.id' : 'rental_equipments.rental_id');
+        $rental->groupBy($type_rental === 'finished' ? 'rentals.id' : 'rental_equipments.rental_id');
 
         if ($init !== null && $length !== null) {
             $rental->offset($init)->limit($length);
@@ -150,24 +152,24 @@ class Rental extends Model
         return $rental->get();
     }
 
-    public function getCountRentals(int $company_id, array $filters, string $searchDriver = null, string $typeRental = null)
+    public function getCountRentals(int $company_id, array $filters, string $search_driver = null, string $type_rental = null)
     {
         $rental = $this ->join('clients','clients.id','=','rentals.client_id')
             ->join('rental_equipments','rental_equipments.rental_id','=','rentals.id')
             ->where('rentals.company_id', $company_id)
             ->whereBetween('rentals.created_at', ["{$filters['dateStart']} 00:00:00", "{$filters['dateFinish']} 23:59:59"]);
 
-        if ($searchDriver) {
-            $rental->where(function ($query) use ($searchDriver) {
-                $query->where('rentals.code', 'like', "%{$searchDriver}%")
-                    ->orWhere('clients.name', 'like', "%{$searchDriver}%")
-                    ->orWhere('rentals.address_name', 'like', "%{$searchDriver}%")
-                    ->orWhere('rentals.created_at', 'like', "%{$searchDriver}%");
+        if ($search_driver) {
+            $rental->where(function ($query) use ($search_driver) {
+                $query->where('rentals.code', 'like', "%$search_driver%")
+                    ->orWhere('clients.name', 'like', "%$search_driver%")
+                    ->orWhere('rentals.address_name', 'like', "%$search_driver%")
+                    ->orWhere('rentals.created_at', 'like', "%$search_driver%");
             });
         }
 
-        if ($typeRental) {
-            switch ($typeRental) {
+        if ($type_rental) {
+            switch ($type_rental) {
                 case 'deliver':
                     $rental->where('rental_equipments.actual_delivery_date', null);
                     break;
@@ -190,7 +192,7 @@ class Rental extends Model
             $rental->where('rentals.client_id', $filters['client']);
         }
 
-        $rental->groupBy($typeRental === 'finished' ? 'rentals.id' : 'rental_equipments.rental_id');
+        $rental->groupBy($type_rental === 'finished' ? 'rentals.id' : 'rental_equipments.rental_id');
 
         return $rental->get()->count();
     }
@@ -205,9 +207,8 @@ class Rental extends Model
         return $this->where(['id' => $rental_id, 'company_id' => $company_id])->delete();
     }
 
-    public function getCountTypeRentals(int $company_id)
+    public function getCountTypeRentals(int $company_id): array
     {
-        DB::enableQueryLog();
         $data = array();
 
         foreach (array(

@@ -242,7 +242,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                @if (!$budget)
                                 <h3>Datas</h3>
                                 <div class="stepRental">
                                     <h6>Datas</h6>
@@ -283,7 +282,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                @endif
                                 <h3>Equipamentos</h3>
                                 <div class="stepRental">
                                     <h6>Equipamentos</h6>

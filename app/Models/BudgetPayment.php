@@ -49,15 +49,16 @@ class BudgetPayment extends Model
 
     public function inserts(array $datas)
     {
-        foreach ($datas as $data)
+        foreach ($datas as $data) {
             if (!$this->create($data)) return false;
+        }
 
         return true;
     }
 
     public function remove($budget_id, $company_id)
     {
-        return $this->where(['budget_id' => $budget_id, 'company_id' => $company_id])->delete();
+        return $this->where(['budget_id' => $budget_id, 'company_id' => $company_id])->update(array('deleted' => true));
     }
 
     public function getPayments($company_id, $budget_id)

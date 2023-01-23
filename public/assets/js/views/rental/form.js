@@ -58,7 +58,7 @@
                     return false;
                 }
             }
-            if (!budget && currentIndex <= getIndexStep(2) && newIndex > getIndexStep(2)) { // datas
+            if (currentIndex <= getIndexStep(2) && newIndex > getIndexStep(2)) { // datas
                 if (debug) {
                     changeStepPosAbsolute();
                     fixEquipmentDates();
@@ -125,19 +125,22 @@
                     nameEquipment      = $('.card-header a:eq(0)', this).text();
                     stockMax            = parseInt($('[name^="stock_equipment_"]', this).attr('max-stock'));
 
-                    if (isNaN(stockEquipment) || stockEquipment === 0)
+                    if (isNaN(stockEquipment) || stockEquipment === 0) {
                         arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) deve ser informado uma quantidade.`);
-
-                    else if (stockEquipment > stockMax && !budget)
+                    } else if (stockEquipment > stockMax && !budget) {
                         arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
+                    }
 
                     notUseDateWithdrawal = $('.not_use_date_withdrawal', this).is(':checked');
 
-                    dateDeliveryTime = !budget ? new Date(transformDateForEn($('input[name^="date_delivery_equipment_"]', this).val())).getTime() : false;
-                    dateWithdrawalTime = !budget ? new Date(transformDateForEn($('input[name^="date_withdrawal_equipment_"]', this).val())).getTime() : false;
+                    dateDeliveryTime = new Date(transformDateForEn($('input[name^="date_delivery_equipment_"]', this).val())).getTime();
+                    dateWithdrawalTime = new Date(transformDateForEn($('input[name^="date_withdrawal_equipment_"]', this).val())).getTime();
 
-                    if (!budget && (dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0))) arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento ( <strong>${nameEquipment}</strong> ) deve ser informada corretamente.`);
-                    else if (!budget && !notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) arrErrors.push(`A data prevista de entrega do equipamento ( <strong>${nameEquipment}</strong> ) não pode ser maior ou igual que a data prevista de retirada.`);
+                    if ((dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0))) {
+                        arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento ( <strong>${nameEquipment}</strong> ) deve ser informada corretamente.`);
+                    } else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) {
+                        arrErrors.push(`A data prevista de entrega do equipamento ( <strong>${nameEquipment}</strong> ) não pode ser maior ou igual que a data prevista de retirada.`);
+                    }
                 });
 
                 if (arrErrors.length) {
@@ -276,9 +279,9 @@
 
             if (priorIndex === getIndexStep(0)) { // tipo de cobrança
 
-                const rental_p = budget ? 'formCreateRental-p-3' : 'formCreateRental-p-4';
-                const rental_t = budget ? 'formCreateRental-t-3' : 'formCreateRental-t-4';
-                const numberIndex = budget ? 4 : 5;
+                const rental_p = 'formCreateRental-p-4';
+                const rental_t = 'formCreateRental-t-4';
+                const numberIndex = 5;
                 const payment  = $(`#${rental_p} #payment`);
 
                 typeLocation === 0 ? payment.removeClass('payment-no').addClass('payment-yes') : payment.removeClass('payment-yes').addClass('payment-no');
@@ -520,20 +523,20 @@ const getIndexStep = step => {
         case 1:
             return 1;
         case 2:
-            return budget ? 0 : 2;
+            return 2;
         case 3:
-            return budget ? 2 : 3;
+            return 3;
         case 4:
-            return budget ? 3 : 4;
+            return 4;
         case 5:
-            return budget ? 4 : 5;
+            return 5;
     }
 }
 
 $(function() {
     $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
     // $('[name="date_withdrawal"], [name="date_delivery"]').mask('00/00/0000 00:00');
-    if (!budget) {
+    // if (!budget) {
         $('[name="date_withdrawal"], [name="date_delivery"]').inputmask();
         $('.flatpickr').flatpickr({
             enableTime: true,
@@ -547,7 +550,7 @@ $(function() {
                 checkLabelAnimate();
             }
         });
-    }
+    // }
     $('#discount_value, #extra_value, #net_value').maskMoney({thousands: '.', decimal: ',', allowZero: true});
     loadDrivers(0, '#newVehicleModal [name="driver"]');
     loadResidues(0, '.container-residues select[name="residues[]"]');
@@ -651,8 +654,8 @@ $('#searchEquipment').on('blur keyup', function (e){
                         <tr class="equipment" id-equipment="${val.id}">
                             <td class="text-left"><p class="text-left">${val.name}</p></td>
                             <td><div class="badge badge-pill badge-lg badge-info">${val.reference}</div></td>\`;
-                            <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>`;
-                dataEquipment += budget ? '' : `<td><div class="badge badge-pill badge-lg badge-warning">R$ ${val.value}</div></td>`;
+                            <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>
+                            <td><div class="badge badge-pill badge-lg badge-warning">R$ ${val.value}</div></td>`;
                 dataEquipment += `
                             <td class="text-right">
                                 <button type="button" class="badge badge-lg badge-pill badge-success">
@@ -692,7 +695,7 @@ $('table.list-equipment').on('click', '.equipment', function(){
         },
         type: 'POST',
         url: $('#routeGetEquipment').val(),
-        data: { idEquipment, validStock: budget ? false : true },
+        data: { idEquipment, validStock: !budget },
         success: response => {
 
             if (!response.success) {
@@ -770,8 +773,7 @@ $('table.list-equipment').on('click', '.equipment', function(){
                                             </div>
                                         </div>
                                     </div>
-                                </div>`;
-                                regEquipment += budget ? '' : `
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="switch pt-3">
@@ -839,7 +841,7 @@ $('table.list-equipment').on('click', '.equipment', function(){
                 checkLabelAnimate();
                 $(`#collapseEquipment-${idEquipment}`).collapse('show');
                 $(`#collapseEquipment-${idEquipment} input[name^="stock_equipment_"]`).mask('0#');
-                if (!budget) {
+                // if (!budget) {
                     $(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).inputmask();
                     $(`#collapseEquipment-${idEquipment} input[name^="date_delivery_equipment_"]`).inputmask();
                     $(`#collapseEquipment-${idEquipment} .flatpickr:not(.stock-group)`).flatpickr({
@@ -858,7 +860,7 @@ $('table.list-equipment').on('click', '.equipment', function(){
                         $(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).val('');
                         $(`#collapseEquipment-${idEquipment} .not_use_date_withdrawal`).prop('checked', true);
                     }
-                }
+                // }
                 $(`#collapseEquipment-${idEquipment} .btn-view-price-period-equipment`).tooltip();
 
                 if (response.cacamba) {
@@ -1255,10 +1257,10 @@ const showSeparatorEquipmentSelected = () => {
 }
 
 const fixEquipmentDates = () => {
-    if (budget) {
+    /*if (budget) {
         checkLabelAnimate();
         return false;
-    }
+    }*/
 
     let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
     let dateDelivery = $('input[name="date_delivery"]').val();
@@ -1301,10 +1303,10 @@ const getStockEquipment = async idEquipment => {
 }
 
 const getPriceEquipment = async idEquipment => {
-    const check_not_use_date_withdrawal = !budget && $(`#collapseEquipment-${idEquipment} input[name="not_use_date_withdrawal"]`).is(':checked');
+    const check_not_use_date_withdrawal = $(`#collapseEquipment-${idEquipment} input[name="not_use_date_withdrawal"]`).is(':checked');
     let diffDays = false;
 
-    if (!budget && !check_not_use_date_withdrawal) {
+    if (!check_not_use_date_withdrawal) {
         let dateDelivery = new Date(transformDateForEn($(`#collapseEquipment-${idEquipment} input[name^="date_delivery_equipment_"]`).val().split(' ')[0]).replace(/-/g, '/'));
         let dateWithdrawal = new Date(transformDateForEn($(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).val().split(' ')[0]).replace(/-/g, '/'));
 
@@ -1441,7 +1443,7 @@ const getPriceStockEquipments = async idEquipment => {
         idEquipment             = parseInt($('.card-header', this).attr('id-equipment'));
         diffDays                = false;
 
-        if (!budget && !not_use_date_withdrawal) {
+        if (!not_use_date_withdrawal) {
             dateDelivery = new Date(transformDateForEn($('input[name^="date_delivery_equipment_"]', this).val().split(' ')[0]).replace(/-/g, '/'));
             dateWithdrawal = new Date(transformDateForEn($('input[name^="date_withdrawal_equipment_"]', this).val().split(' ')[0]).replace(/-/g, '/'));
 

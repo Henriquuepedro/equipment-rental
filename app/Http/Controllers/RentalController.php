@@ -297,36 +297,48 @@ class RentalController extends Controller
             return response()->json(['success' => false, 'message' => "Você não tem permissão para criar locações."]);
         }
 
-        $company_id = $request->user()->company_id;
+        $company_id  = $request->user()->company_id;
+        $haveCharged = !$request->input('type_rental'); // true = com cobrança
 
-        $haveCharged = $request->type_rental ? false : true; // true = com cobrança
+        $clientId   = (int)$request->input('client');
+        $zipcode    = onlyNumbers($request->input('cep'));
+        $address    = filter_var($request->input('address'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $number     = filter_var($request->input('number'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $complement = filter_var($request->input('complement'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $reference  = filter_var($request->input('reference'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $neigh      = filter_var($request->input('neigh'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $city       = filter_var($request->input('city'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $state      = filter_var($request->input('state'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $lat        = filter_var($request->input('lat'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $lng        = filter_var($request->input('lng'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
 
-        $clientId   = (int)$request->client;
-        $zipcode    = $request->cep ? filter_var(preg_replace('/[^0-9]/', '', $request->cep), FILTER_SANITIZE_NUMBER_INT) : null;
-        $address    = $request->address ? filter_var($request->address, FILTER_SANITIZE_STRING) : null;
-        $number     = $request->number ? filter_var($request->number, FILTER_SANITIZE_STRING) : null;
-        $complement = $request->complement ? filter_var($request->complement, FILTER_SANITIZE_STRING) : null;
-        $reference  = $request->reference ? filter_var($request->reference, FILTER_SANITIZE_STRING) : null;
-        $neigh      = $request->neigh ? filter_var($request->neigh, FILTER_SANITIZE_STRING) : null;
-        $city       = $request->city ? filter_var($request->city, FILTER_SANITIZE_STRING) : null;
-        $state      = $request->state ? filter_var($request->state, FILTER_SANITIZE_STRING) : null;
-        $lat        = $request->lat ? filter_var($request->lat, FILTER_SANITIZE_STRING) : null;
-        $lng        = $request->lng ? filter_var($request->lng, FILTER_SANITIZE_STRING) : null;
-
-        if (empty($clientId) || !$this->client->getClient($clientId, $company_id))
+        if (empty($clientId) || !$this->client->getClient($clientId, $company_id)) {
             return response()->json(['success' => false, 'message' => "Cliente não foi encontrado. Revise a aba de Cliente e Endereço."]);
+        }
 
-        if ($address == '') return response()->json(['success' => false, 'message' => 'Informe um endereço. Revise a aba de Cliente e Endereço.']);
-        if ($number == '') return response()->json(['success' => false, 'message' => 'Informe um número para o endereço. Revise a aba de Cliente e Endereço.']);
-        if ($neigh == '') return response()->json(['success' => false, 'message' => 'Informe um bairro. Revise a aba de Cliente e Endereço.']);
-        if ($city == '') return response()->json(['success' => false, 'message' => 'Informe uma cidade. Revise a aba de Cliente e Endereço.']);
-        if ($state == '') return response()->json(['success' => false, 'message' => 'Informe um estado. Revise a aba de Cliente e Endereço.']);
-        if ($lat == '' || $lng == '') return response()->json(['success' => false, 'message' => 'Confirme o endereço no mapa. Revise a aba de Cliente e Endereço.']);
+        if ($address == '') {
+            return response()->json(['success' => false, 'message' => 'Informe um endereço. Revise a aba de Cliente e Endereço.']);
+        }
+        if ($number == '') {
+            return response()->json(['success' => false, 'message' => 'Informe um número para o endereço. Revise a aba de Cliente e Endereço.']);
+        }
+        if ($neigh == '') {
+            return response()->json(['success' => false, 'message' => 'Informe um bairro. Revise a aba de Cliente e Endereço.']);
+        }
+        if ($city == '') {
+            return response()->json(['success' => false, 'message' => 'Informe uma cidade. Revise a aba de Cliente e Endereço.']);
+        }
+        if ($state == '') {
+            return response()->json(['success' => false, 'message' => 'Informe um estado. Revise a aba de Cliente e Endereço.']);
+        }
+        if ($lat == '' || $lng == '') {
+            return response()->json(['success' => false, 'message' => 'Confirme o endereço no mapa. Revise a aba de Cliente e Endereço.']);
+        }
 
         // datas da locação
-        $dateDelivery = $request->date_delivery ? \DateTime::createFromFormat('d/m/Y H:i', $request->date_delivery) : null;
-        $dateWithdrawal = $request->date_withdrawal ? \DateTime::createFromFormat('d/m/Y H:i', $request->date_withdrawal) : null;
-        $notUseDateWithdrawal = $request->not_use_date_withdrawal ? true : false;
+        $dateDelivery = $request->input('date_delivery') ? \DateTime::createFromFormat('d/m/Y H:i', $request->input('date_delivery')) : null;
+        $dateWithdrawal = $request->input('date_withdrawal') ? \DateTime::createFromFormat('d/m/Y H:i', $request->input('date_withdrawal')) : null;
+        $notUseDateWithdrawal = (bool)$request->input('not_use_date_withdrawal');
 
         if (!$dateDelivery) { // não reconheceu a data de entrega
             return response()->json(['success' => false, 'message' => "Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
@@ -369,47 +381,49 @@ class RentalController extends Controller
 
         // Locacão
         $arrRental = array(
-            'code' => $this->rental->getNextCode($company_id), // get last code
-            'company_id' => $company_id,
-            'type_rental' => $haveCharged,
-            'client_id' => $clientId,
-            'address_zipcode' => $zipcode,
-            'address_name' => $address,
-            'address_number' => $number,
-            'address_complement' => $complement,
-            'address_reference' => $reference,
-            'address_neigh' => $neigh,
-            'address_city' => $city,
-            'address_state' => $state,
-            'address_lat' => $lat,
-            'address_lng' => $lng,
-            'expected_delivery_date' => $dateDelivery->format('Y-m-d H:i:s'),
-            'expected_withdrawal_date' => $dateWithdrawal ? $dateWithdrawal->format('Y-m-d H:i:s') : null,
-            'not_use_date_withdrawal' => $notUseDateWithdrawal,
-            'gross_value' => $haveCharged ? $responseEquipment->grossValue : null,
-            'extra_value'   => $haveCharged ? $responsePayment->extraValue : null,
-            'discount_value' => $haveCharged ? $responsePayment->discountValue : null,
-            'net_value' => $haveCharged ? $responsePayment->netValue : null,
-            'calculate_net_amount_automatic' => $request->calculate_net_amount_automatic ? true : false,
-            'use_parceled' => $request->is_parceled ? true : false,
-            'automatic_parcel_distribution' => $request->automatic_parcel_distribution ? true : false,
-            'observation' => strip_tags($request->observation, $this->allowableTags),
-            'user_insert' => $request->user()->id
+            'code'                          => $this->rental->getNextCode($company_id), // get last code
+            'company_id'                    => $company_id,
+            'type_rental'                   => $haveCharged,
+            'client_id'                     => $clientId,
+            'address_zipcode'               => $zipcode,
+            'address_name'                  => $address,
+            'address_number'                => $number,
+            'address_complement'            => $complement,
+            'address_reference'             => $reference,
+            'address_neigh'                 => $neigh,
+            'address_city'                  => $city,
+            'address_state'                 => $state,
+            'address_lat'                   => $lat,
+            'address_lng'                   => $lng,
+            'expected_delivery_date'        => $dateDelivery->format('Y-m-d H:i:s'),
+            'expected_withdrawal_date'      => $dateWithdrawal ? $dateWithdrawal->format('Y-m-d H:i:s') : null,
+            'not_use_date_withdrawal'       => $notUseDateWithdrawal,
+            'gross_value'                   => $haveCharged ? $responseEquipment->grossValue : null,
+            'extra_value'                   => $haveCharged ? $responsePayment->extraValue : null,
+            'discount_value'                => $haveCharged ? $responsePayment->discountValue : null,
+            'net_value'                     => $haveCharged ? $responsePayment->netValue : null,
+            'calculate_net_amount_automatic'=> (bool)$request->input('calculate_net_amount_automatic'),
+            'use_parceled'                  => (bool)$request->input('is_parceled'),
+            'automatic_parcel_distribution' => (bool)$request->input('automatic_parcel_distribution'),
+            'observation'                   => strip_tags($request->input('observation'), $this->allowableTags),
+            'user_insert'                   => $request->user()->id
         );
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
         $this->updateLatLngAddressSelected($request);
 
-        $insertRental = $this->rental->insert($arrRental);
+        $insertRental   = $this->rental->insert($arrRental);
 
-        $arrEquipment = $this->addRentalIdArray($arrEquipment, $insertRental->id);
-        $arrResidue = $this->addRentalIdArray($arrResidue, $insertRental->id);
-        $arrPayment = $this->addRentalIdArray($arrPayment, $insertRental->id);
+        $arrEquipment   = $this->addRentalIdArray($arrEquipment, $insertRental->id);
+        $arrResidue     = $this->addRentalIdArray($arrResidue, $insertRental->id);
+        $arrPayment     = $this->addRentalIdArray($arrPayment, $insertRental->id);
 
         $this->rental_equipment->inserts($arrEquipment);
         $this->rental_residue->inserts($arrResidue);
-        if (count($arrPayment)) $this->rental_payment->inserts($arrPayment);
+        if (count($arrPayment)) {
+            $this->rental_payment->inserts($arrPayment);
+        }
 
         if ($insertRental) {
             DB::commit();
@@ -518,7 +532,7 @@ class RentalController extends Controller
                 'driver_suggestion'         => empty($driverEquip) ? null : $driverEquip,
                 'user_insert'               => $request->user()->id
             );
-            if (!$budget)
+//            if (!$budget)
                 $arrEquipment = array_merge($arrEquipment, array(
                     'use_date_diff_equip'       => $useDateDiff,
                     'expected_delivery_date'    => $dateDeliveryEquip->format('Y-m-d H:i:s'),

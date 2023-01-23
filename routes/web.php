@@ -193,6 +193,7 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');
             Route::post('/buscar', [App\Http\Controllers\BudgetController::class, 'fetchBudgets'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\BudgetController::class, 'delete'])->name('delete');
+            Route::post('/confirmar', [App\Http\Controllers\BudgetController::class, 'confirm'])->name('confirm');
         });
     });
 });
