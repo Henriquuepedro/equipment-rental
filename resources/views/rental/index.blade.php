@@ -693,7 +693,7 @@
                         <div class="row">
                             <table class="table col-md-12 equipmentsRentalTable">
                                 <thead>
-                                <th style="width: 5%">Entregar</th>
+                                <th style="width: 5%">Retirar</th>
                                 <th style="width: 30%">Equipamento</th>
                                 <th style="width: 20%">Data da Retirada</th>
                                 <th style="width: 20%">Veículo</th>
