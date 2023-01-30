@@ -49,19 +49,30 @@ class ClientController extends Controller
     public function insert(ClientCreatePost $request)
     {
         // data client
-        $company_id = $request->user()->company_id;
-        $user_id    = $request->user()->id;
-        $name       = $request->name_client     ? filter_var($request->name_client, FILTER_SANITIZE_STRING) : null;
-        $type       = $request->type_person     ? filter_var($request->type_person, FILTER_SANITIZE_STRING) : 'pf';
-        $fantasy    = $request->fantasy_client  ? filter_var($request->fantasy_client, FILTER_SANITIZE_STRING) : null;
-        $email      = $request->email           ? filter_var($request->email, FILTER_VALIDATE_EMAIL) : null;
-        $phone_1    = $request->phone_1         ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_1), FILTER_SANITIZE_NUMBER_INT) : null;
-        $phone_2    = $request->phone_2         ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_2), FILTER_SANITIZE_NUMBER_INT) : null;
-        $cpf_cnpj   = $request->cpf_cnpj        ? filter_var(preg_replace('/[^0-9]/', '', $request->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT) : null;
-        $rg_ie      = $request->rg_ie           ? filter_var(preg_replace('/[^0-9]/', '', $request->rg_ie), FILTER_SANITIZE_NUMBER_INT) : null;
-        $contact    = $request->contact         ? filter_var($request->contact, FILTER_SANITIZE_STRING) : null;
-        $observation= $request->observation     ? filter_var($request->observation, FILTER_SANITIZE_STRING) : null;
-        $isAjax     = isAjax();
+        $company_id     = $request->user()->company_id;
+        $user_id        = $request->user()->id;
+        $name           = filter_var($request->input('name_client'), FILTER_SANITIZE_STRING);
+        $type           = filter_var($request->input('type_person'), FILTER_SANITIZE_STRING);
+        $fantasy        = filter_var($request->input('fantasy_client'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $email          = filter_var($request->input('email'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $contact        = filter_var($request->input('contact'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $sex            = filter_var($request->input('sex'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $birth_date     = filter_var($request->input('birth_date'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $nationality    = filter_var($request->input('nationality'), FILTER_SANITIZE_STRING);
+        $marital_status = filter_var($request->input('marital_status'), FILTER_SANITIZE_STRING);
+        $observation    = filter_var($request->input('observation'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $isAjax         = isAjax();
+
+        if (empty($nationality)) {
+            $nationality = null;
+        }
+        if (empty($marital_status)) {
+            $marital_status = null;
+        }
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
@@ -76,6 +87,10 @@ class ClientController extends Controller
             'cpf_cnpj'      => $cpf_cnpj,
             'rg_ie'         => $rg_ie,
             'contact'       => $contact,
+            'sex'           => $sex,
+            'birth_date'    => $birth_date,
+            'nationality'   => $nationality,
+            'marital_status'=> $marital_status,
             'observation'   => $observation,
             'user_insert'   => $user_id
         ));

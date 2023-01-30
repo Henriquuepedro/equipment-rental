@@ -14,6 +14,9 @@ $(() => {
     }
     showHideTableAddress();
     getLocation();
+
+    getOptionsForm('nationality', $('#formUpdateClient [name="nationality"], #formCreateClient [name="nationality"], #formCreateClientModal [name="nationality"]'), $('[name="nationality_id"]').val() ?? null);
+    getOptionsForm('marital_status', $('#formUpdateClient [name="marital_status"], #formCreateClient [name="marital_status"], #formCreateClientModal [name="marital_status"]'), $('[name="marital_status_id"]').val() ?? null);
 });
 // Where you want to render the map.
 element = document.getElementById('map');
@@ -149,6 +152,7 @@ $('[name="type_person"]').on('change', function(){
         form.find('label[for="rg_ie"]').text('RG');
         form.find('#fantasy_client').val('').closest('.form-group').addClass('d-none');
         form.find('[name="cpf_cnpj"]').mask('000.000.000-00');
+        form.find('.personal_data').slideDown('slow');
     }
     else if (type === 'pj') {
         form.find('label[for="name_client"]').html('Razão Social <sup>*</sup>');
@@ -157,6 +161,7 @@ $('[name="type_person"]').on('change', function(){
         form.find('label[for="rg_ie"]').text('IE');
         form.find('#fantasy_client').closest('.form-group').removeClass('d-none');
         form.find('[name="cpf_cnpj"]').mask('00.000.000/0000-00');
+        form.find('.personal_data').slideUp('slow');
     }
 
     form.find(".card").each(function() {
