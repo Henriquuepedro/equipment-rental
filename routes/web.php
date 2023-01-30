@@ -195,5 +195,11 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/delete', [App\Http\Controllers\BudgetController::class, 'delete'])->name('delete');
             Route::post('/confirmar', [App\Http\Controllers\BudgetController::class, 'confirm'])->name('confirm');
         });
+        Route::group(['prefix' => '/nacionalidade', 'as' => 'nationality.'], function () {
+            Route::get('', [App\Http\Controllers\NationalityController::class, 'getNationalities'])->name('get-nationalities');
+        });
+        Route::group(['prefix' => '/estado-civil', 'as' => 'marital_status.'], function () {
+            Route::get('', [App\Http\Controllers\MaritalStatusController::class, 'getMaritalStatus'])->name('get-marital-status');
+        });
     });
 });

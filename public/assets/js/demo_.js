@@ -300,3 +300,48 @@ const calculateDays = (date1, date2) => {
 const sumMonthsDateNow = months => {
     return moment().add(months, 'M').format("YYYY-MM-DD");
 }
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.substr(1);
+}
+
+const getOptionsForm = async (type, el, selected = null) => {
+
+    const base_uri = $('[name="base_url"]').val();
+    let options = '<option value="0">Selecione ...</option>';
+    let endpoint = '';
+    let field_id;
+    let field_text;
+
+    switch (type) {
+        case 'nationality':
+            endpoint = `${base_uri}/ajax/nacionalidade`;
+            field_id = 'id';
+            field_text = 'gentile';
+            break;
+        case 'marital_status':
+            endpoint = `${base_uri}/ajax/estado-civil`;
+            field_id = 'id';
+            field_text = 'name';
+            break;
+        default:
+            return el.empty().append(options);
+    }
+
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+        return el.empty().append(options);
+    }
+    const results = await response.json();
+
+    let prop_text = '';
+    await $(results).each(await function (key, value) {
+        prop_text = '';
+        if (selected && parseInt(selected) === parseInt(value[field_id])) {
+            prop_text = 'selected';
+        }
+        options += `<option value="${value[field_id]}" ${prop_text}>${value[field_text].capitalize()}</option>`;
+    });
+
+    return el.empty().append(options);
+}
