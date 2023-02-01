@@ -11,7 +11,8 @@
         strstr($route->getName(),'equipment')   !== false ||
         strstr($route->getName(),'driver')      !== false ||
         strstr($route->getName(),'vehicle')     !== false ||
-        strstr($route->getName(),'residue')     !== false
+        strstr($route->getName(),'residue')     !== false ||
+        strstr($route->getName(),'provider')     !== false
     ) $registerActive = 'active';
     elseif (
         strstr($route->getName(),'rental') !== false ||
@@ -67,6 +68,11 @@
                     @if(in_array('ResidueView', $permissions))
                         <li class="nav-item">
                             <a class="nav-link" href=" {{ route('residue.index') }}">Resíduo</a>
+                        </li>
+                    @endif
+                    @if(in_array('ProviderView', $permissions))
+                        <li class="nav-item">
+                            <a class="nav-link" href=" {{ route('provider.index') }}">Fornecedor</a>
                         </li>
                     @endif
                 </ul>

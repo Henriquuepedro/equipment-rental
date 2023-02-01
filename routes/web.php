@@ -120,6 +120,18 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
 
+    // Fornecedores
+    Route::group(['prefix' => '/fornecedor', 'as' => 'provider.'], function () {
+
+        Route::get('/', [App\Http\Controllers\ProviderController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\ProviderController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\ProviderController::class, 'insert'])->name('insert');
+
+        Route::get('/{id}', [App\Http\Controllers\ProviderController::class, 'edit'])->name('edit');
+        Route::post('/atualizar', [App\Http\Controllers\ProviderController::class, 'update'])->name('update');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -200,6 +212,13 @@ Route::group(['middleware' => 'auth'], function (){
         });
         Route::group(['prefix' => '/estado-civil', 'as' => 'marital_status.'], function () {
             Route::get('', [App\Http\Controllers\MaritalStatusController::class, 'getMaritalStatus'])->name('get-marital-status');
+        });
+        Route::group(['prefix' => '/fornecedor', 'as' => 'provider.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\ProviderController::class, 'fetchProviders'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\ProviderController::class, 'delete'])->name('delete');
+            Route::get('/visualizar-fornecedores', [App\Http\Controllers\ProviderController::class, 'getProviders'])->name('get-providers');
+            Route::get('/visualizar-fornecedor', [App\Http\Controllers\ProviderController::class, 'getProvider'])->name('get-provider');
+            Route::post('/novo-fornecedor', [App\Http\Controllers\ProviderController::class, 'insert'])->name('new-provider');
         });
     });
 });

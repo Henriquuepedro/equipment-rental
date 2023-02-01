@@ -4,8 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
-class ClientCreatePost extends FormRequest
+class ProviderCreatePost extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,14 +27,14 @@ class ClientCreatePost extends FormRequest
     {
         return [
             'type_person'   => 'size:2',
-            'name_client'   => [
+            'name'   => [
                 'required',
                 function ($attribute, $value, $fail) {
                     $type = $this->type_person;
 
-                    $exists = DB::table('clients')->where(['name' => $this->name_client, 'company_id' => $this->user()->company_id])->count();
+                    $exists = DB::table('providers')->where(['name' => $this->name, 'company_id' => $this->user()->company_id])->count();
                     if ($exists) {
-                        $fail($type == 'pf' ? 'Nome do cliente já está em uso' : 'Razão Social do cliente já está em uso');
+                        $fail($type == 'pf' ? 'Nome do fornecedor já está em uso' : 'Razão Social do fornecedor já está em uso');
                     }
                 }
             ],
@@ -45,9 +46,9 @@ class ClientCreatePost extends FormRequest
                     $cpf_cnpj = filter_var(onlyNumbers($this->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT);
                     $type = $this->type_person;
 
-                    $exists = DB::table('clients')->where(['cpf_cnpj' => $cpf_cnpj, 'company_id' => $this->user()->company_id])->count();
+                    $exists = DB::table('providers')->where(['cpf_cnpj' => $cpf_cnpj, 'company_id' => $this->user()->company_id])->count();
                     if ($exists && !empty($cpf_cnpj)) {
-                        $fail($type == 'pf' ? 'CPF do cliente já está em uso' : 'CNPJ do cliente já está em uso');
+                        $fail($type == 'pf' ? 'CPF do fornecedor já está em uso' : 'CNPJ do fornecedor já está em uso');
                     }
                 }
             ],
@@ -64,13 +65,13 @@ class ClientCreatePost extends FormRequest
         $type = $this->type_person;
 
         return [
-            'type_person.size'      => 'Tipo de pessoa mal informado, selecione entre Pessoa Física ou Pesso Jurídica',
-            'name_client.required'  => $type == 'pf' ? 'O Nome é obrigatório' : 'A Razão Social é obrigatório',
-            'phone_1.min'           => 'O telefone principal deve conter o DDD e o número telefônico',
-            'phone_1.max'           => 'O telefone principal deve conter o DDD e o número telefônico',
-            'phone_2.min'           => 'O telefone secundário deve conter o DDD e o número telefônico',
-            'phone_2.max'           => 'O telefone secundário deve conter o DDD e o número telefônico',
-            'email.email'           => 'O endereço de e-mail deve ser um e-mail válido'
+            'type_person.size'  => 'Tipo de pessoa mal informado, selecione entre Pessoa Física ou Pesso Jurídica',
+            'name.required'     => $type == 'pf' ? 'O Nome é obrigatório' : 'A Razão Social é obrigatório',
+            'phone_1.min'       => 'O telefone principal deve conter o DDD e o número telefônico',
+            'phone_1.max'       => 'O telefone principal deve conter o DDD e o número telefônico',
+            'phone_2.min'       => 'O telefone secundário deve conter o DDD e o número telefônico',
+            'phone_2.max'       => 'O telefone secundário deve conter o DDD e o número telefônico',
+            'email.email'       => 'O endereço de e-mail deve ser um e-mail válido'
         ];
     }
 
@@ -78,7 +79,7 @@ class ClientCreatePost extends FormRequest
      * Get the proper failed validation response for the request.
      *
      * @param  array  $errors
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function response(array $errors)
     {
