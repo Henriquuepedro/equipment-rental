@@ -12,11 +12,12 @@
         strstr($route->getName(),'driver')      !== false ||
         strstr($route->getName(),'vehicle')     !== false ||
         strstr($route->getName(),'residue')     !== false ||
-        strstr($route->getName(),'provider')     !== false
+        strstr($route->getName(),'provider')    !== false
     ) $registerActive = 'active';
     elseif (
         strstr($route->getName(),'rental') !== false ||
-        strstr($route->getName(),'budget') !== false
+        strstr($route->getName(),'budget') !== false ||
+        strstr($route->getName(),'bills_to_receive') !== false
     ) $controlActive = 'active';
 @endphp
 
@@ -99,6 +100,11 @@
                         @if(in_array('BudgetView', $permissions))
                             <li class="nav-item">
                                 <a class="nav-link" href=" {{ route('budget.index') }}">Orçamento</a>
+                            </li>
+                        @endif
+                        @if(in_array('BillsToReceiveView', $permissions))
+                            <li class="nav-item">
+                                <a class="nav-link" href=" {{ route('bills_to_receive.index') }}">Contas a Receber</a>
                             </li>
                         @endif
                     </ul>

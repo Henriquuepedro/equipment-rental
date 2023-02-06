@@ -295,6 +295,12 @@ const getOptionsForm = async (type, el, selected = null) => {
             field_id = 'id';
             field_text = 'name';
             break;
+        case 'form-of-payment':
+            endpoint = `${base_uri}/ajax/forma-de-pagamento`;
+            field_id = 'id';
+            field_text = 'name';
+            options = '<option value="">Selecione ...</option>';
+            break;
         default:
             return el.empty().append(options);
     }

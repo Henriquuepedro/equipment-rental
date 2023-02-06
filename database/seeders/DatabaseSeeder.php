@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             UserSeeder::class,
             NationalitySeeder::class,
-            MaritalStatusSeeder::class
+            MaritalStatusSeeder::class,
+            FormPaymentSeeder::class
         ]);
     }
 }

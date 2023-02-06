@@ -45,7 +45,11 @@ class PermissionSeeder extends Seeder
             ['id' => 28, 'name' => 'ProviderView', 'text' => 'Visualizar', 'group_name' => 'provider', 'group_text' => 'Controle de Fornecedor', 'auto_check' => '[]', 'active' => '1'],
             ['id' => 29, 'name' => 'ProviderCreatePost', 'text' => 'Cadastrar', 'group_name' => 'provider', 'group_text' => 'Controle de Fornecedor', 'auto_check' => '[28]', 'active' => '1'],
             ['id' => 30, 'name' => 'ProviderUpdatePost', 'text' => 'Atualizar', 'group_name' => 'provider', 'group_text' => 'Controle de Fornecedor', 'auto_check' => '[28]', 'active' => '1'],
-            ['id' => 31, 'name' => 'ProviderDeletePost', 'text' => 'Excluir', 'group_name' => 'provider', 'group_text' => 'Cadastro de Fornecedor', 'auto_check' => '[28]', 'active' => '1']
+            ['id' => 31, 'name' => 'ProviderDeletePost', 'text' => 'Excluir', 'group_name' => 'provider', 'group_text' => 'Cadastro de Fornecedor', 'auto_check' => '[28]', 'active' => '1'],
+            ['id' => 32, 'name' => 'BillsToReceiveView', 'text' => 'Visualizar', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[]', 'active' => '1'],
+            ['id' => 33, 'name' => 'BillsToReceiveCreatePost', 'text' => 'Cadastrar', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[32]', 'active' => '1'],
+            ['id' => 34, 'name' => 'BillsToReceiveUpdatePost', 'text' => 'Atualizar', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[32]', 'active' => '1'],
+            ['id' => 35, 'name' => 'BillsToReceiveDeletePost', 'text' => 'Excluir', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[32]', 'active' => '1']
         ];
 
         foreach ($permissions as $permission) {
