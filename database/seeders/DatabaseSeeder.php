@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             CompanySeeder::class,
             PermissionSeeder::class,
             UserSeeder::class,
+            ConfigSeeder::class,
             NationalitySeeder::class,
             MaritalStatusSeeder::class,
             FormPaymentSeeder::class

@@ -132,10 +132,19 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
 
-    // Contas a pagar
+    // Contas a receber
     Route::group(['prefix' => '/contas-a-receber', 'as' => 'bills_to_receive.'], function () {
 
         Route::get('/', [App\Http\Controllers\BillsToReceiveController::class, 'index'])->name('index');
+
+    });
+
+    // Contas a pagar
+    Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
+
+        Route::get('/', [App\Http\Controllers\BillsToPayController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\BillsToPayController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('insert');
 
     });
 
@@ -235,6 +244,13 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/delete', [App\Http\Controllers\BillsToReceiveController::class, 'delete'])->name('delete');
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToReceiveController::class, 'getQtyTypeRentals'])->name('get-qty-type-rentals');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'confirmPayment'])->name('confirm_payment');
+        });
+        Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
+            Route::post('/nova-locacao', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');
+            Route::post('/buscar', [App\Http\Controllers\BillsToPayController::class, 'fetchBills'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
+            Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToPayController::class, 'getQtyTypeBills'])->name('get-qty-type-bills');
+            Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToPayController::class, 'confirmPayment'])->name('confirm_payment');
         });
     });
 });

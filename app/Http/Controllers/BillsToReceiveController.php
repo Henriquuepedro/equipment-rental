@@ -92,7 +92,7 @@ class BillsToReceiveController extends Controller
 
         foreach ($data as $key => $value) {
             $rental_code = str_pad($value['code'], 5, 0, STR_PAD_LEFT);
-            $data_prop_button = "data-rental-payment-id='{$value['rental_payment_id']}' data-rental-code='$rental_code' data-name-client='{$value['client_name']}' data-date-rental='" . date('d/m/Y H:i', strtotime($value['created_at'])) . "' data-due-date='" . date('d/m/Y', strtotime($value['due_date'])) . "' data-payment-id='{$value['payment_id']}' data-payday='" . date('d/m/Y', strtotime($value['payday'])) . "'";
+            $data_prop_button = "data-rental-payment-id='{$value['rental_payment_id']}' data-rental-code='$rental_code' data-name-client='{$value['client_name']}' data-date-rental='" . date('d/m/Y H:i', strtotime($value['created_at'])) . "' data-due-date='" . date('d/m/Y', strtotime($value['due_date'])) . "' data-payment-id='{$value['payment_id']}' data-payday='" . date('d/m/Y', strtotime($value['payday'])) . "' data-due-value='" . number_format($value['due_value'], 2, ',', '.') . "'";
 
             $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> Visualizar Pagamento</button>";
 
@@ -113,6 +113,7 @@ class BillsToReceiveController extends Controller
                     <span class='font-weight-bold w-100'>{$value['client_name']}</span>
                     <span class='mt-1 w-100'>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}</span>
                 </div>",
+                'R$ ' . number_format($value['due_value'], 2, ',', '.'),
                 date('d/m/Y', strtotime($value['due_date'])),
                 $buttons
             );

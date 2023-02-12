@@ -49,7 +49,11 @@ class PermissionSeeder extends Seeder
             ['id' => 32, 'name' => 'BillsToReceiveView', 'text' => 'Visualizar', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[]', 'active' => '1'],
             ['id' => 33, 'name' => 'BillsToReceiveCreatePost', 'text' => 'Cadastrar', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[32]', 'active' => '1'],
             ['id' => 34, 'name' => 'BillsToReceiveUpdatePost', 'text' => 'Atualizar', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[32]', 'active' => '1'],
-            ['id' => 35, 'name' => 'BillsToReceiveDeletePost', 'text' => 'Excluir', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[32]', 'active' => '1']
+            ['id' => 35, 'name' => 'BillsToReceiveDeletePost', 'text' => 'Excluir', 'group_name' => 'bills_to_receive', 'group_text' => 'Contas a Receber', 'auto_check' => '[32]', 'active' => '1'],
+            ['id' => 36, 'name' => 'BillsToPayView', 'text' => 'Visualizar', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[]', 'active' => '1'],
+            ['id' => 37, 'name' => 'BillsToPayCreatePost', 'text' => 'Cadastrar', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1'],
+            ['id' => 38, 'name' => 'BillsToPayUpdatePost', 'text' => 'Atualizar', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1'],
+            ['id' => 39, 'name' => 'BillsToPayDeletePost', 'text' => 'Excluir', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1']
         ];
 
         foreach ($permissions as $permission) {

@@ -278,28 +278,36 @@ String.prototype.capitalize = function() {
 
 const getOptionsForm = async (type, el, selected = null) => {
 
-    const base_uri = $('[name="base_url"]').val();
+    const base_uri = $('[name="base_url"]').val() + '/ajax';
     let options = '<option value="0">Selecione ...</option>';
     let endpoint = '';
     let field_id;
     let field_text;
+    let data_search = null;
 
     switch (type) {
         case 'nationality':
-            endpoint = `${base_uri}/ajax/nacionalidade`;
+            endpoint = `${base_uri}/nacionalidade`;
             field_id = 'id';
             field_text = 'gentile';
             break;
         case 'marital_status':
-            endpoint = `${base_uri}/ajax/estado-civil`;
+            endpoint = `${base_uri}/estado-civil`;
             field_id = 'id';
             field_text = 'name';
             break;
         case 'form-of-payment':
-            endpoint = `${base_uri}/ajax/forma-de-pagamento`;
+            endpoint = `${base_uri}/forma-de-pagamento`;
             field_id = 'id';
             field_text = 'name';
             options = '<option value="">Selecione ...</option>';
+            break;
+        case 'providers':
+            endpoint = `${base_uri}/fornecedor/visualizar-fornecedores`;
+            field_id = 'id';
+            field_text = 'name';
+            options = '<option value="">Selecione ...</option>';
+            data_search = 'data';
             break;
         default:
             return el.empty().append(options);
@@ -309,7 +317,12 @@ const getOptionsForm = async (type, el, selected = null) => {
     if (!response.ok) {
         return el.empty().append(options);
     }
-    const results = await response.json();
+    let results = await response.json();
+
+    // Os dados estão dentro de um vetor.
+    if (data_search !== null) {
+        results = results[data_search];
+    }
 
     let prop_text = '';
     await $(results).each(await function (key, value) {

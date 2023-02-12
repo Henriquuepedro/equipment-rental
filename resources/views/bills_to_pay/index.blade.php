@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Listagem de Contas a Receber')
+@section('title', 'Listagem de Contas a Pagar')
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Listagem de Contas a Receber</h1>
+    <h1 class="m-0 text-dark">Listagem de Contas a Pagar</h1>
 @stop
 
 @section('css')
@@ -25,11 +25,11 @@
         let tableBillsToReceive;
 
         $(function () {
-            setTabRental();
+            setTabBill();
             getOptionsForm('form-of-payment', $('#modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
         });
 
-        const setTabRental = () => {
+        const setTabBill = () => {
             const url = window.location.href;
             const splitUrl = url.split('#');
             let tab = 'late';
@@ -42,30 +42,30 @@
             getTable(tab, false);
         }
 
-        const loadCountsTabRental = () => {
+        const loadCountsTabBill = () => {
             $('.nav-tabs.tickets-tab-switch').each(function(){
                 $(this).find('li a .badge').html('<i class="fa fa-spin fa-spinner" style="margin-right: 0px"></i>');
             })
         }
 
         const disabledLoadData = () => {
-            $('a[data-toggle="tab"], select[name="clients"]').prop('disabled', true);
+            $('a[data-toggle="tab"], select[name="providers"]').prop('disabled', true);
         }
 
         const enabledLoadData = () => {
-            $('a[data-toggle="tab"], select[name="clients"]').prop('disabled', false);
+            $('a[data-toggle="tab"], select[name="providers"]').prop('disabled', false);
         }
 
-        const getCountsTabRentals = () => {
+        const getCountsTabBills = () => {
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: 'POST',
                 data: {
-                    client: $('[name="clients"]').val()
+                    provider: $('[name="providers"]').val()
                 },
-                url: "{{ route('ajax.bills_to_receive.get-qty-type-rentals') }}",
+                url: "{{ route('ajax.bills_to_pay.get-qty-type-bills') }}",
                 dataType: 'json',
                 success: response => {
 
@@ -82,15 +82,15 @@
                             icon: 'error',
                             title: 'Você não tem permissão para fazer essa operação!'
                         });
-                        $(`button[rental-id="${rental_id}"]`).trigger('blur');
+                        $(`button[bill-id="${bill_id}"]`).trigger('blur');
                     }
                 }
             });
         }
 
-        const getTable = (typeRentals, stateSave = true) => {
+        const getTable = (typeBills, stateSave = true) => {
 
-            loadCountsTabRental();
+            loadCountsTabBill();
             disabledLoadData();
 
             $('[data-toggle="tooltip"]').tooltip('dispose');
@@ -101,7 +101,7 @@
                 $("#tableBillsToReceive tbody").empty();
             }
 
-            getCountsTabRentals();
+            getCountsTabBills();
 
             tableBillsToReceive = $("#tableBillsToReceive").DataTable({
                 "responsive": true,
@@ -114,13 +114,13 @@
                 "serverMethod": "post",
                 "order": [[ 0, 'desc' ]],
                 "ajax": {
-                    url: '{{ route('ajax.bills_to_receive.fetch') }}',
+                    url: '{{ route('ajax.bills_to_pay.fetch') }}',
                     pages: 2,
                     type: 'POST',
                     data: {
                         "_token": $('meta[name="csrf-token"]').attr('content'),
-                        type: typeRentals,
-                        client: $('[name="clients"]').val()
+                        type: typeBills,
+                        provider: $('[name="providers"]').val()
                     },
                     error: function(jqXHR, ajaxOptions, thrownError) {
                         console.log(jqXHR, ajaxOptions, thrownError);
@@ -137,23 +137,14 @@
             });
         }
 
-        $(document).on('ifChanged', '#modalConfirmPayment .equipment, #modalWithdraw .equipment', function() {
-
-            const check = !$(this).is(':checked');
-
-            $(this).closest('tr').find('.flatpickr-input, select, .input-button-calendar a').attr('disabled', check);
-
-            $(this).closest('tr').toggleClass('noSelected selected');
-        });
-
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             getTable(e.target.id.replace('-tab',''), false);
         });
 
         $(document).on('click', '.btnViewPayment', function() {
-            const rental_code   = $(this).data('rental-code');
-            const name_client   = $(this).data('name-client');
-            const date_rental   = $(this).data('date-rental');
+            const bill_code     = $(this).data('bill-code');
+            const name_provider = $(this).data('name-provider');
+            const date_bill     = $(this).data('date-bill');
             const due_date      = $(this).data('due-date');
             const due_value     = 'R$ ' + $(this).data('due-value');
             const payment_id    = $(this).data('payment-id');
@@ -170,9 +161,9 @@
                 $('#modalViewPayment').find('[name="form_payment"]').closest('.form-group').hide();
             }
 
-            $('#modalViewPayment').find('[name="rental_code"]').val(rental_code);
-            $('#modalViewPayment').find('[name="client"]').val(name_client);
-            $('#modalViewPayment').find('[name="date_rental"]').val(date_rental);
+            $('#modalViewPayment').find('[name="bill_code"]').val(bill_code);
+            $('#modalViewPayment').find('[name="provider"]').val(name_provider);
+            $('#modalViewPayment').find('[name="date_bill"]').val(date_bill);
             $('#modalViewPayment').find('[name="due_date"]').val(due_date);
             $('#modalViewPayment').find('[name="due_value"]').val(due_value);
             checkLabelAnimate();
@@ -180,17 +171,17 @@
         });
 
         $(document).on('click', '.btnConfirmPayment', function() {
-            const payment_id    = $(this).data('rental-payment-id');
-            const rental_code   = $(this).data('rental-code');
-            const name_client   = $(this).data('name-client');
-            const date_rental   = $(this).data('date-rental');
+            const payment_id    = $(this).data('bill-payment-id');
+            const bill_code     = $(this).data('bill-code');
+            const name_provider = $(this).data('name-provider');
+            const date_bill     = $(this).data('date-bill');
             const due_date      = $(this).data('due-date');
             const due_value     = 'R$ ' + $(this).data('due-value');
 
-            $('#modalConfirmPayment').find('[name="rental_code"]').val(rental_code);
-            $('#modalConfirmPayment').find('[name="client"]').val(name_client);
-            $('#modalConfirmPayment').find('[name="date_rental"]').val(date_rental);
-            $('#modalConfirmPayment').find('[name="due_date"]').val(due_date)
+            $('#modalConfirmPayment').find('[name="bill_code"]').val(bill_code);
+            $('#modalConfirmPayment').find('[name="provider"]').val(name_provider);
+            $('#modalConfirmPayment').find('[name="date_bill"]').val(date_bill);
+            $('#modalConfirmPayment').find('[name="due_date"]').val(due_date);
             $('#modalConfirmPayment').find('[name="due_value"]').val(due_value);
             $('#modalConfirmPayment').find('[name="payment_id"]').val(payment_id);
             $('#modalConfirmPayment').find('[name="date_payment"]').val((new Date()).toJSON().slice(0, 10));
@@ -266,7 +257,7 @@
 
         });
 
-        $('[name="clients"]').on('change', function(){
+        $('[name="providers"]').on('change', function(){
             getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false);
         });
     </script>
@@ -287,15 +278,18 @@
             <div class="card">
                 <div class="card-body">
                     <div class="header-card-body justify-content-between flex-wrap">
-                        <h4 class="card-title no-border">Contas a Receber</h4>
+                        <h4 class="card-title no-border">Contas a Pagar</h4>
+                        @if(in_array('BillsToPayCreatePost', $permissions))
+                            <a href="{{ route('bills_to_pay.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Pagamento</a>
+                        @endif
                     </div>
                     <div class="row">
                         <div class="col-md-12 form-group">
-                            <label>Cliente</label>
-                            <select class="form-control" name="clients">
+                            <label>Fornecedor</label>
+                            <select class="form-control" name="providers">
                                 <option value="0">Todos</option>
-                                @foreach($clients as $client)
-                                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                @foreach($providers as $provider)
+                                    <option value="{{ $provider->id }}">{{ $provider->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -336,7 +330,7 @@
                                 <thead>
                                 <tr>
                                     <th>Locação</th>
-                                    <th>Cliente/Endereço</th>
+                                    <th>Fornecedor</th>
                                     <th>Valor</th>
                                     <th>Vencimento</th>
                                     <th>Ação</th>
@@ -346,7 +340,7 @@
                                 <tfoot>
                                 <tr>
                                     <th>Locação</th>
-                                    <th>Cliente/Endereço</th>
+                                    <th>Fornecedor</th>
                                     <th>Valor</th>
                                     <th>Vencimento</th>
                                     <th>Ação</th>
@@ -362,7 +356,7 @@
     <div class="modal fade" id="modalConfirmPayment" tabindex="-1" role="dialog" aria-labelledby="modalConfirmPayment" aria-hidden="true">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
-                <form action="{{ route('ajax.bills_to_receive.confirm_payment') }}" method="POST" id="formConfirmPayment">
+                <form action="{{ route('ajax.bills_to_pay.confirm_payment') }}" method="POST" id="formConfirmPayment">
                     <div class="modal-header">
                         <h5 class="modal-title">Confirmar pagamento</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -373,15 +367,15 @@
                         <div class="row">
                             <div class="form-group col-md-3">
                                 <label>Locação</label>
-                                <input type="text" class="form-control" name="rental_code" value="" disabled>
+                                <input type="text" class="form-control" name="bill_code" value="" disabled>
                             </div>
                             <div class="form-group col-md-6">
-                                <label>Cliente</label>
-                                <input type="text" class="form-control" name="client" value="" disabled>
+                                <label>Fornecedor</label>
+                                <input type="text" class="form-control" name="provider" value="" disabled>
                             </div>
                             <div class="form-group col-md-3">
                                 <label>Data da Locação</label>
-                                <input type="text" class="form-control" name="date_rental" value="" disabled>
+                                <input type="text" class="form-control" name="date_bill" value="" disabled>
                             </div>
                         </div>
                         <div class="row">
@@ -426,15 +420,15 @@
                     <div class="row">
                         <div class="form-group col-md-3">
                             <label>Locação</label>
-                            <input type="text" class="form-control" name="rental_code" value="" disabled>
+                            <input type="text" class="form-control" name="bill_code" value="" disabled>
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Cliente</label>
-                            <input type="text" class="form-control" name="client" value="" disabled>
+                            <label>Fornecedor</label>
+                            <input type="text" class="form-control" name="provider" value="" disabled>
                         </div>
                         <div class="form-group col-md-3">
                             <label>Data da Locação</label>
-                            <input type="text" class="form-control" name="date_rental" value="" disabled>
+                            <input type="text" class="form-control" name="date_bill" value="" disabled>
                         </div>
                     </div>
                     <div class="row">

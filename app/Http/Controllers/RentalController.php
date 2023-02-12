@@ -546,7 +546,7 @@ class RentalController extends Controller
         return $response;
     }
 
-    public function setPaymentRental(object $request, $grossValue, bool $budget = false): \StdClass
+    public function setPaymentRental(RentalCreatePost $request, $grossValue, bool $budget = false): \StdClass
     {
         $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         $company_id = $request->user()->company_id;
@@ -555,19 +555,17 @@ class RentalController extends Controller
 
         $extraValue = 0;
         $discountValue = 0;
-        $calculateNetAmountAutomatic = $request->calculate_net_amount_automatic ? true : false;
+        $calculateNetAmountAutomatic = (bool)$request->input('calculate_net_amount_automatic');
         if ($calculateNetAmountAutomatic) { // valor liquido sera calculado automatico
-            $extraValue = transformMoneyBr_En($request->extra_value);
-            $discountValue = transformMoneyBr_En($request->discount_value);
+            $extraValue = transformMoneyBr_En($request->input('extra_value'));
+            $discountValue = transformMoneyBr_En($request->input('discount_value'));
             $netValue = $grossValue - $discountValue + $extraValue;
         } else { // valor liquido será definido pelo usuario
-            $netValue = transformMoneyBr_En($request->net_value);
+            $netValue = transformMoneyBr_En($request->input('net_value'));
             // devo comparar o valor liquido com o bruto para definir desconto e acrescimo
             if ($netValue > $grossValue) {
                 $extraValue = $netValue - $grossValue;
-                $discountValue = 0;
             } elseif ($netValue < $grossValue) {
-                $extraValue = 0;
                 $discountValue = $grossValue - $netValue;
             }
         }
@@ -578,47 +576,50 @@ class RentalController extends Controller
             return $response;
         }
 
-        $is_parceled = $request->is_parceled ? true : false;
-        $automaticParcelDistribution = $request->automatic_parcel_distribution ? true : false;
+        $is_parceled = (bool)$request->input('is_parceled');
+        $automaticParcelDistribution = (bool)$request->input('automatic_parcel_distribution');
 
         // existe parcelamento
         if ($is_parceled) {
-
             $daysTemp = null;
             $priceTemp = 0;
 
             $valueSumParcel = 0;
-            $qtyParcel = count($request->due_date);
-            $valueParcel = (float)number_format($netValue / $qtyParcel, 2,'.','.');
+            $qtyParcel = count($request->input('due_date'));
+            $valueParcel = (float)number_format($netValue / $qtyParcel, 2,'.','');
 
-            foreach ($request->due_date as $parcel => $_) {
-
+            foreach ($request->input('due_date') as $parcel => $_) {
                 if ($automaticParcelDistribution) {
-
-                    if(($parcel + 1) === $qtyParcel) $valueParcel = (float)number_format($netValue - $valueSumParcel,2,'.','');
+                    if (($parcel + 1) === $qtyParcel) {
+                        $valueParcel = (float)number_format($netValue - $valueSumParcel,2,'.','');
+                    }
                     $valueSumParcel += $valueParcel;
 
-                } else $valueParcel = (float)transformMoneyBr_En($request->value_parcel[$parcel]);
+                } else {
+                    $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
+                }
 
 
-                if ($daysTemp === null) $daysTemp = $request->due_day[$parcel];
-                elseif ($daysTemp >= $request->due_day[$parcel]) {
+                if ($daysTemp === null) {
+                    $daysTemp = $request->input('due_day')[$parcel];
+                } elseif ($daysTemp >= $request->input('due_day')[$parcel]) {
                     $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
                     return $response;
+                } else {
+                    $daysTemp = $request->input('due_day')[$parcel];
                 }
-                else $daysTemp = $request->due_day[$parcel];
 
                 $priceTemp += $valueParcel;
 
-                array_push($response->arrPayment, array(
+                $response->arrPayment[] = array(
                     'company_id'    => $company_id,
                     $nameFieldID    => 0,
                     'parcel'        => $parcel + 1,
-                    'due_day'       => $request->due_day[$parcel],
-                    'due_date'      => $request->due_date[$parcel],
+                    'due_day'       => $request->input('due_day')[$parcel],
+                    'due_date'      => $request->input('due_date')[$parcel],
                     'due_value'     => $valueParcel,
                     'user_insert'   => $request->user()->id
-                ));
+                );
             }
 
             if (number_format($priceTemp,2, '.','') != number_format($netValue,2, '.','')) { // os valores das parcelas não corresponde ao valor líquido
@@ -628,17 +629,15 @@ class RentalController extends Controller
 
         } else {
             // 1x o pagamento, vencimento para hoje
-            array_push($response->arrPayment, array(
+            $response->arrPayment[] = array(
                 'company_id'    => $company_id,
                 $nameFieldID    => 0,
                 'parcel'        => 1,
                 'due_day'       => 0,
                 'due_date'      => date('Y-m-d'),
                 'due_value'     => $netValue,
-                'payment_id'    => 0,
-                'payment_name'  => '',
                 'user_insert'   => $request->user()->id
-            ));
+            );
         }
         $response->netValue      = $netValue;
         $response->discountValue = $discountValue;
@@ -676,8 +675,11 @@ class RentalController extends Controller
     public function addRentalIdArray(array $array, int $rentalId, bool $budget = false): array
     {
         $nameFieldID = $budget ? 'budget_id' : 'rental_id';
-        foreach ($array as $key => $value)
-             if (isset($value[$nameFieldID])) $array[$key][$nameFieldID] = $rentalId;
+        foreach ($array as $key => $value) {
+            if (isset($value[$nameFieldID])) {
+                $array[$key][$nameFieldID] = $rentalId;
+            }
+        }
 
         return $array;
     }

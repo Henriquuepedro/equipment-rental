@@ -72,7 +72,7 @@ class RentalPayment extends Model
 
     public function getPayment($company_id, $payment_id)
     {
-        return $this->where(['id' => $payment_id, 'company_id' => $company_id])->get();
+        return $this->where(['id' => $payment_id, 'company_id' => $company_id])->first();
     }
 
     public function getCountTypePayments(int $company_id, int $client = null): array
@@ -119,6 +119,7 @@ class RentalPayment extends Model
             'rentals.address_state',
             'rentals.created_at',
             'rental_payments.due_date',
+            'rental_payments.due_value',
             'rental_payments.id as rental_payment_id',
             'rental_payments.payment_id',
             'rental_payments.payday',

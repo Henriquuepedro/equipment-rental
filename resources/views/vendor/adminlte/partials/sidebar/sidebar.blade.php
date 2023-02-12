@@ -17,7 +17,8 @@
     elseif (
         strstr($route->getName(),'rental') !== false ||
         strstr($route->getName(),'budget') !== false ||
-        strstr($route->getName(),'bills_to_receive') !== false
+        strstr($route->getName(),'bills_to_receive') !== false ||
+        strstr($route->getName(),'bills_to_pay') !== false
     ) $controlActive = 'active';
 @endphp
 
@@ -105,6 +106,11 @@
                         @if(in_array('BillsToReceiveView', $permissions))
                             <li class="nav-item">
                                 <a class="nav-link" href=" {{ route('bills_to_receive.index') }}">Contas a Receber</a>
+                            </li>
+                        @endif
+                        @if(in_array('BillsToPayView', $permissions))
+                            <li class="nav-item">
+                                <a class="nav-link" href=" {{ route('bills_to_pay.index') }}">Contas a Pagar</a>
                             </li>
                         @endif
                     </ul>

@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
             }, Permission::all()->toArray());
 
             User::create([
+                'id'            => 1,
                 'name'          => 'Administrador',
                 'username'      => 'admin',
                 'email'         => 'admin@admin.com',
