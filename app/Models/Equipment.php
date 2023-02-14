@@ -133,8 +133,11 @@ class Equipment extends Model
 
     public function getAllStockEquipment(int $company_id, int $ignore_id = null): int
     {
-        $company = new Company();
-        $quantity_equipment = $company->getPlanCompany($company_id)->quantity_equipment;
+        $quantity_equipment = 0;
+        $company = (new Company())->getPlanCompany($company_id);
+        if ($company) {
+            $quantity_equipment = $company->quantity_equipment;
+        }
 
         $total_stock = $this->select(DB::raw('SUM(stock) as total'))->where(['company_id' => $company_id]);
 
