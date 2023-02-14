@@ -28,7 +28,7 @@ class CreateBillToPaysTable extends Migration
             $table->tinyInteger('use_parceled')->nullable();
             $table->tinyInteger('automatic_parcel_distribution')->nullable();
 
-            $table->longText('form_payment')->nullable();
+            $table->unsignedBigInteger('form_payment')->nullable();
             $table->longText('observation')->nullable();
 
             $table->unsignedBigInteger('user_insert');
