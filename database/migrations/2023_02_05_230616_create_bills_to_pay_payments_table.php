@@ -29,7 +29,7 @@ class CreateBillsToPayPaymentsTable extends Migration
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->foreign('bills_to_pay_id')->references('id')->on('bill_to_pays');
+            $table->foreign('bill_to_pay_id')->references('id')->on('bill_to_pays');
             $table->foreign('user_insert')->references('id')->on('users');
             $table->foreign('user_update')->references('id')->on('users');
         });
