@@ -6,6 +6,7 @@ $(() => {
     if ($('#formEquipment [name="type_equipment"]:checked').length) {
         $('#formEquipment [name="type_equipment"]:checked').trigger('change');
     }
+    availableStock($('.available_stock'), $('[name="equipment_id"]').val() ?? null)
 });
 
 $('#formEquipment [name="type_equipment"]').on('change', function(){
@@ -25,6 +26,7 @@ $('#formEquipment [name="type_equipment"]').on('change', function(){
         $(this).slideDown('slow');
     });
 });
+
 jQuery.validator.addMethod("name_valid", function(value, element) {
     value = jQuery.trim(value);
     return value !== "";

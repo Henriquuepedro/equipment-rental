@@ -60,6 +60,7 @@
 
     @yield('body')
 
+    <input type="hidden" name="base_url" value="{{ url('/') }}">
     <!-- plugins:js -->
     <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
     {{-- Libs --}}

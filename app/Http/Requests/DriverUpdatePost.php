@@ -41,7 +41,7 @@ class DriverUpdatePost extends FormRequest
             'phone'     => 'min:13|max:14|nullable',
             'cpf'       => [
                 function ($attribute, $value, $fail) {
-                    $cpf = filter_var(preg_replace('~[\\\\/.-]~', '', $this->cpf), FILTER_SANITIZE_NUMBER_INT);
+                    $cpf = filter_var(onlyNumbers($this->cpf), FILTER_SANITIZE_NUMBER_INT);
                     $exists = DB::table('drivers')
                         ->where(['cpf' => $cpf, 'company_id' => $this->user()->company_id])
                         ->whereNotIn('id', [$this->driver_id])

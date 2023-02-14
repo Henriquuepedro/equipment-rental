@@ -102,4 +102,20 @@ class RentalEquipment extends Model
     {
         return (bool)$this->where(array('id' => $rental_equipment_id, 'rental_id' => $rental_id))->update($data);
     }
+
+    public function getEquipmentsInUse(int $company_id, int $equipment_id)
+    {
+        $equipment = $this->where([
+            ['equipment_id', '=', $equipment_id],
+            ['company_id', '=', $company_id]
+        ]);
+
+        $equipment->where(function($query) {
+            $query->where('actual_delivery_date', '=', null)
+                ->orWhere('actual_withdrawal_date', '=', null);
+        });
+
+
+        return $equipment->get()->count();
+    }
 }

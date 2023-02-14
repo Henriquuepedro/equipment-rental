@@ -120,6 +120,34 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
 
+    // Fornecedores
+    Route::group(['prefix' => '/fornecedor', 'as' => 'provider.'], function () {
+
+        Route::get('/', [App\Http\Controllers\ProviderController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\ProviderController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\ProviderController::class, 'insert'])->name('insert');
+
+        Route::get('/{id}', [App\Http\Controllers\ProviderController::class, 'edit'])->name('edit');
+        Route::post('/atualizar', [App\Http\Controllers\ProviderController::class, 'update'])->name('update');
+
+    });
+
+    // Contas a receber
+    Route::group(['prefix' => '/contas-a-receber', 'as' => 'bills_to_receive.'], function () {
+
+        Route::get('/', [App\Http\Controllers\BillsToReceiveController::class, 'index'])->name('index');
+
+    });
+
+    // Contas a pagar
+    Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
+
+        Route::get('/', [App\Http\Controllers\BillsToPayController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\BillsToPayController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('insert');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -144,6 +172,7 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/visualizar-preco-estoque', [App\Http\Controllers\EquipmentController::class, 'getPriceStockEquipment'])->name('get-price-stock');
             Route::post('/visualizar-preco-por-periodo', [App\Http\Controllers\EquipmentController::class, 'getPricePerPeriod'])->name('get-price-per-period');
             Route::post('/visualizar-preco-estoque', [App\Http\Controllers\EquipmentController::class, 'getCheckPriceStockEquipment'])->name('get-price-stock-check');
+            Route::get('/estoque-disponivel/{id?}', [App\Http\Controllers\EquipmentController::class, 'availableStock'])->name('available_stock');
         });
         Route::group(['prefix' => '/meu-perfil', 'as' => 'profile.'], function () {
             Route::post('/atualizar-imagem', [App\Http\Controllers\UserController::class, 'updateImage'])->name('update.image');
@@ -194,6 +223,35 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/buscar', [App\Http\Controllers\BudgetController::class, 'fetchBudgets'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\BudgetController::class, 'delete'])->name('delete');
             Route::post('/confirmar', [App\Http\Controllers\BudgetController::class, 'confirm'])->name('confirm');
+        });
+        Route::group(['prefix' => '/nacionalidade', 'as' => 'nationality.'], function () {
+            Route::get('', [App\Http\Controllers\NationalityController::class, 'getNationalities'])->name('get-nationalities');
+        });
+        Route::group(['prefix' => '/estado-civil', 'as' => 'marital_status.'], function () {
+            Route::get('', [App\Http\Controllers\MaritalStatusController::class, 'getMaritalStatus'])->name('get-marital-status');
+        });
+        Route::group(['prefix' => '/forma-de-pagamento', 'as' => 'form_payment.'], function () {
+            Route::get('', [App\Http\Controllers\FormPaymentController::class, 'getFormPayments'])->name('get-form-payments');
+        });
+        Route::group(['prefix' => '/fornecedor', 'as' => 'provider.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\ProviderController::class, 'fetchProviders'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\ProviderController::class, 'delete'])->name('delete');
+            Route::get('/visualizar-fornecedores', [App\Http\Controllers\ProviderController::class, 'getProviders'])->name('get-providers');
+            Route::get('/visualizar-fornecedor', [App\Http\Controllers\ProviderController::class, 'getProvider'])->name('get-provider');
+            Route::post('/novo-fornecedor', [App\Http\Controllers\ProviderController::class, 'insert'])->name('new-provider');
+        });
+        Route::group(['prefix' => '/contas-a-receber', 'as' => 'bills_to_receive.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\BillsToReceiveController::class, 'fetchRentals'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\BillsToReceiveController::class, 'delete'])->name('delete');
+            Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToReceiveController::class, 'getQtyTypeRentals'])->name('get-qty-type-rentals');
+            Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'confirmPayment'])->name('confirm_payment');
+        });
+        Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
+            Route::post('/nova-locacao', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');
+            Route::post('/buscar', [App\Http\Controllers\BillsToPayController::class, 'fetchBills'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
+            Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToPayController::class, 'getQtyTypeBills'])->name('get-qty-type-bills');
+            Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToPayController::class, 'confirmPayment'])->name('confirm_payment');
         });
     });
 });

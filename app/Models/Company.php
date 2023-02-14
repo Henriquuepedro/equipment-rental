@@ -32,6 +32,7 @@ class Company extends Model
         'neigh',
         'city',
         'state',
+        'plan_id',
         'user_update'
     ];
 
@@ -57,5 +58,10 @@ class Company extends Model
     public function edit($data, $id)
     {
         return $this->where('id', $id)->update($data);
+    }
+
+    public function getPlanCompany(int $id)
+    {
+        return $this->select('plans.*')->join('plans', 'plans.id', '=', 'companies.plan_id')->where('companies.id', $id)->first();
     }
 }

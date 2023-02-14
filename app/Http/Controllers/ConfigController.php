@@ -16,8 +16,9 @@ class ConfigController extends Controller
 
     public function updateConfig(Request $request)
     {
-        if (!hasAdmin())
+        if (!hasAdmin()) {
             return redirect()->route('dashboard');
+        }
 
         $company_id = $request->user()->company_id;
 
@@ -26,14 +27,16 @@ class ConfigController extends Controller
         $arrUpdate = [];
 
         foreach ($configCompanyColumn as $configIndex) {
-            if (in_array($configIndex, ['id', 'company_id', 'user_update', 'created_at', 'updated_at'])) continue;
+            if (in_array($configIndex, ['id', 'company_id', 'user_update', 'created_at', 'updated_at'])) {
+                continue;
+            }
 
-            $arrUpdate[$configIndex] = $request->$configIndex ? true : false;
+            $arrUpdate[$configIndex] = (bool)$request->input($configIndex);
         }
 
         $updateConfig = $this->config->edit($arrUpdate, $company_id);
 
-        if($updateConfig) {
+        if ($updateConfig) {
             return redirect()->route('config.index')
                 ->with('success', "Configurações de empresa atualizada com sucesso!");
         }

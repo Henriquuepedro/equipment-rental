@@ -115,53 +115,24 @@ const checkLabelAnimate = () => {
 }
 
 const validCNPJ = cnpj => {
+    var b = [ 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 ]
+    var c = String(cnpj).replace(/[^\d]/g, '')
 
-    cnpj = cnpj.replace(/[^\d]+/g,'');
+    if(c.length !== 14)
+        return false
 
-    if(cnpj === '') return false;
+    if(/0{14}/.test(c))
+        return false
 
-    if (cnpj.length !== 14)
-        return false;
+    for (var i = 0, n = 0; i < 12; n += c[i] * b[++i]);
+    if(c[12] != (((n %= 11) < 2) ? 0 : 11 - n))
+        return false
 
-    // Elimina CNPJs invalidos conhecidos
-    if (cnpj === "00000000000000" ||
-        cnpj === "11111111111111" ||
-        cnpj === "22222222222222" ||
-        cnpj === "33333333333333" ||
-        cnpj === "44444444444444" ||
-        cnpj === "55555555555555" ||
-        cnpj === "66666666666666" ||
-        cnpj === "77777777777777" ||
-        cnpj === "88888888888888" ||
-        cnpj === "99999999999999")
-        return false;
+    for (var i = 0, n = 0; i <= 12; n += c[i] * b[i++]);
+    if(c[13] != (((n %= 11) < 2) ? 0 : 11 - n))
+        return false
 
-    // Valida DVs
-    tamanho = cnpj.length - 2
-    numeros = cnpj.substring(0,tamanho);
-    digitos = cnpj.substring(tamanho);
-    soma = 0;
-    pos = tamanho - 7;
-    for (i = tamanho; i >= 1; i--) {
-        soma += numeros.charAt(tamanho - i) * pos--;
-        if (pos < 2)
-            pos = 9;
-    }
-    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-    if (resultado !== digitos.charAt(0))
-        return false;
-
-    tamanho = tamanho + 1;
-    numeros = cnpj.substring(0,tamanho);
-    soma = 0;
-    pos = tamanho - 7;
-    for (i = tamanho; i >= 1; i--) {
-        soma += numeros.charAt(tamanho - i) * pos--;
-        if (pos < 2)
-            pos = 9;
-    }
-    resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-    return resultado === digitos.charAt(1);
+    return true
 }
 const validCPF = cpf => {
     cpf = cpf.replace(/[^\d]+/g,'');
@@ -299,4 +270,89 @@ const calculateDays = (date1, date2) => {
 
 const sumMonthsDateNow = months => {
     return moment().add(months, 'M').format("YYYY-MM-DD");
+}
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.substr(1);
+}
+
+const getOptionsForm = async (type, el, selected = null) => {
+
+    const base_uri = $('[name="base_url"]').val() + '/ajax';
+    let options = '<option value="0">Selecione ...</option>';
+    let endpoint = '';
+    let field_id;
+    let field_text;
+    let data_search = null;
+
+    switch (type) {
+        case 'nationality':
+            endpoint = `${base_uri}/nacionalidade`;
+            field_id = 'id';
+            field_text = 'gentile';
+            break;
+        case 'marital_status':
+            endpoint = `${base_uri}/estado-civil`;
+            field_id = 'id';
+            field_text = 'name';
+            break;
+        case 'form-of-payment':
+            endpoint = `${base_uri}/forma-de-pagamento`;
+            field_id = 'id';
+            field_text = 'name';
+            options = '<option value="">Selecione ...</option>';
+            break;
+        case 'providers':
+            endpoint = `${base_uri}/fornecedor/visualizar-fornecedores`;
+            field_id = 'id';
+            field_text = 'name';
+            options = '<option value="">Selecione ...</option>';
+            data_search = 'data';
+            break;
+        default:
+            return el.empty().append(options);
+    }
+
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+        return el.empty().append(options);
+    }
+    let results = await response.json();
+
+    // Os dados estão dentro de um vetor.
+    if (data_search !== null) {
+        results = results[data_search];
+    }
+
+    let prop_text = '';
+    await $(results).each(await function (key, value) {
+        prop_text = '';
+        if (selected && parseInt(selected) === parseInt(value[field_id])) {
+            prop_text = 'selected';
+        }
+        options += `<option value="${value[field_id]}" ${prop_text}>${value[field_text].capitalize()}</option>`;
+    });
+
+    return el.empty().append(options);
+}
+
+const availableStock = (el, id = null) => {
+    let url = $('[name="base_url"]').val() + `/ajax/equipamento/estoque-disponivel`;
+    if (id !== null) {
+        url += `/${id}`;
+    }
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'GET',
+        url,
+        success: response => {
+            el.text(response.total_equipment);
+        }, error: e => {
+            console.log(e);
+            el.text(0);
+        }
+    });
 }

@@ -42,7 +42,7 @@ class ClientCreatePost extends FormRequest
             'email'         => 'email:rfc,dns|nullable',
             'cpf_cnpj'      => [
                 function ($attribute, $value, $fail) {
-                    $cpf_cnpj = filter_var(preg_replace('~[\\\\/.-]~', '', $this->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT);
+                    $cpf_cnpj = filter_var(onlyNumbers($this->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT);
                     $type = $this->type_person;
 
                     $exists = DB::table('clients')->where(['cpf_cnpj' => $cpf_cnpj, 'company_id' => $this->user()->company_id])->count();

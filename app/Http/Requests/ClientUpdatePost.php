@@ -45,7 +45,7 @@ class ClientUpdatePost extends FormRequest
             'email'         => 'email:rfc,dns|nullable',
             'cpf_cnpj'      => [
                 function ($attribute, $value, $fail) {
-                    $cpf_cnpj = filter_var(preg_replace('~[\\\\/.-]~', '', $this->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT);
+                    $cpf_cnpj = filter_var(onlyNumbers($this->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT);
                     $type = $this->type_person;
 
                     $exists = DB::table('clients')

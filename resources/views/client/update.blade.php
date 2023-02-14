@@ -148,6 +148,26 @@
                                         <input {{ $disabled }} type="email" class="form-control" id="email" name="email" autocomplete="nope" value="{{ old('email') ?? $client->email }}">
                                     </div>
                                 </div>
+                                <div class="row personal_data">
+                                    <div class="form-group col-md-4">
+                                        <label for="sex" style="top: 15px; left: 0;">Sexo</label><br>
+                                        <input {{ $disabled }} type="radio" id="sex_1" name="sex" value="1" style="position: relative; top: 15px;" {{ old('sex') ?? $client->sex == '1' ? 'checked' : '' }}> <label for="sex_1" style="top: 17px; left: 0; pointer-events: none;">Masculino</label>
+                                        <input {{ $disabled }} type="radio" id="sex_2" name="sex" value="2" style="position: relative; top: 15px;" {{ old('sex') ?? $client->sex == '2' ? 'checked' : '' }}> <label for="sex_2" style="top: 17px; left: 0; pointer-events: none;">Feminino</label>
+                                        <input {{ $disabled }} type="radio" id="sex_3" name="sex" value="3" style="position: relative; top: 15px;" {{ old('sex') ?? $client->sex == '3' ? 'checked' : '' }}> <label for="sex_3" style="top: 17px; left: 0; pointer-events: none;">Outro</label>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label for="birth_date">Data de Nascimento</label>
+                                        <input {{ $disabled }} type="date" class="form-control" id="birth_date" name="birth_date" autocomplete="nope" value="{{ old('birth_date') ?? $client->birth_date }}">
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label for="nationality">Nacionalidade</label>
+                                        <select {{ $disabled }} class="form-control" id="nationality" name="nationality"></select>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label for="marital_status">Estado Civíl</label>
+                                        <select {{ $disabled }} class="form-control" id="marital_status" name="marital_status"></select>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="form-group col-md-12">
                                         <label for="observation">Observação</label>
@@ -336,6 +356,8 @@
                         </div>
                         @if($btns)
                         <input type="hidden" name="client_id" value="{{ $client->id }}">
+                        <input type="hidden" name="nationality_id" value="{{ $client->nationality }}">
+                        <input type="hidden" name="marital_status_id" value="{{ $client->marital_status }}">
                         {{ csrf_field() }}
                         @endif
                     </form>

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EquipmentCreatePost;
 use App\Http\Requests\EquipmentDeletePost;
 use App\Http\Requests\EquipmentUpdatePost;
+use App\Models\RentalEquipment;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +18,13 @@ class EquipmentController extends Controller
 {
     public $equipment;
     public $equipment_wallet;
+    public $rental_equipment;
 
     public function __construct(Equipment $equipment, EquipmentWallet $equipment_wallet)
     {
         $this->equipment = $equipment;
         $this->equipment_wallet = $equipment_wallet;
+        $this->rental_equipment = new RentalEquipment();
     }
 
     public function index()
@@ -47,6 +52,20 @@ class EquipmentController extends Controller
         // data equipment
         $dataEquipment = $this->formatDataEquipment($request);
 
+        $isAjax = isAjax();
+
+        // valida se tem estoque disponivel na conta.
+        $available_stock = $this->equipment->getAllStockEquipment($dataEquipment->company_id);
+        if ($dataEquipment->stock > $available_stock) {
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => "Você tem disponível somente $available_stock unidades para cadastro."]);
+            }
+
+            return redirect()->back()
+                ->withErrors(["Você tem disponível somente $available_stock unidades para cadastro."])
+                ->withInput();
+        }
+
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
         $createEquipment = $this->equipment->insert(array(
@@ -59,7 +78,6 @@ class EquipmentController extends Controller
             'volume'        => $dataEquipment->volume,
             'user_insert'   => $dataEquipment->user_id
         ));
-        $isAjax = isAjax();
 
         $createPeriods = true;
         $equipmentId = $createEquipment->id;
@@ -148,25 +166,42 @@ class EquipmentController extends Controller
         $equipment_wallet = $this->equipment_wallet->getWalletsEquipment($company_id, $id);
         $dataEquipmentWallet = [];
         foreach ($equipment_wallet as $wallet) {
-            array_push($dataEquipmentWallet, [
+            $dataEquipmentWallet[] = [
                 'day_start' => $wallet->day_start,
                 'day_end'   => $wallet->day_end,
                 'value'     => number_format($wallet->value, 2, ',', '.')
-            ]);
+            ];
         }
 
         return view('equipment.update', compact('equipment', 'dataEquipmentWallet'));
     }
 
-    public function update(EquipmentUpdatePost $request)
+    public function update(EquipmentUpdatePost $request): RedirectResponse
     {
         // data equipment
         $dataEquipment = $this->formatDataEquipment($request);
 
-        if (!$this->equipment->getEquipment($dataEquipment->equipment_id, $dataEquipment->company_id))
+        // valida se tem estoque disponivel na conta.
+        $available_stock = $this->equipment->getAllStockEquipment($dataEquipment->company_id, $dataEquipment->equipment_id);
+        if ($dataEquipment->stock > $available_stock) {
+            return redirect()->back()
+                ->withErrors(["Você tem disponível somente $available_stock unidades para cadastro."])
+                ->withInput();
+        }
+
+        // valida se o estoque será menor que o que está em uso.
+        $stock_in_use = $this->rental_equipment->getEquipmentsInUse($dataEquipment->company_id, $dataEquipment->equipment_id);
+        if ($dataEquipment->stock < $stock_in_use) {
+            return redirect()->back()
+                ->withErrors(["Você tem $stock_in_use unidade em uso em locações, após a conclusão da locação, será possível reduzir o estoque."])
+                ->withInput();
+        }
+
+        if (!$this->equipment->getEquipment($dataEquipment->equipment_id, $dataEquipment->company_id)) {
             return redirect()->back()
                 ->withErrors(['Não foi possível localizar o equipamento para atualizar!'])
                 ->withInput();
+        }
 
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
@@ -203,19 +238,21 @@ class EquipmentController extends Controller
             // adiciona valor em array para validação
             for ($countPer = $dataPeriod->day_start; $countPer <= $dataPeriod->day_end; $countPer++) {
                 // dia informado já está dentro de um prazo
-                if (in_array($countPer, $arrDaysVerify))
+                if (in_array($countPer, $arrDaysVerify)) {
                     return redirect()->back()
                         ->withErrors(["Existem erros no período. O {$periodUser}º período está inválido, já existe algum dia em outros período."])
                         ->withInput();
+                }
 
-                array_push($arrDaysVerify, $countPer);
+                $arrDaysVerify[] = $countPer;
             }
 
             // valor zerados ou negativo
-            if ($dataPeriod->day_start < 0 || $dataPeriod->day_end <= 0 || $dataPeriod->value_period <= 0)
+            if ($dataPeriod->day_start < 0 || $dataPeriod->day_end <= 0 || $dataPeriod->value_period <= 0) {
                 return redirect()->back()
                     ->withErrors(['Existem erros no período. Dia inicial não pode ser negativo. Dia final e valor deve ser maior que zero.'])
                     ->withInput();
+            }
 
             $queryPeriods = $this->equipment_wallet->insert(array(
                 'company_id'    => $dataEquipment->company_id,
@@ -226,7 +263,9 @@ class EquipmentController extends Controller
                 'user_insert'   => $dataEquipment->user_id
             ));
 
-            if (!$queryPeriods) $updatePeriods = false;
+            if (!$queryPeriods) {
+                $updatePeriods = false;
+            }
         }
 
         if($updateEquipment && $updatePeriods) {
@@ -244,13 +283,15 @@ class EquipmentController extends Controller
     public function delete(EquipmentDeletePost $request)
     {
         $company_id = $request->user()->company_id;
-        $equipment_id = $request->equipment_id;
+        $equipment_id = $request->input('equipment_id');
 
-        if (!$this->equipment->getEquipment($equipment_id, $company_id))
+        if (!$this->equipment->getEquipment($equipment_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível localizar o equipamento!']);
+        }
 
-        if (!$this->equipment->remove($equipment_id, $company_id))
+        if (!$this->equipment->remove($equipment_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível excluir o equipamento!']);
+        }
 
         return response()->json(['success' => true, 'message' => 'Equipamento excluído com sucesso!']);
     }
@@ -258,8 +299,9 @@ class EquipmentController extends Controller
     public function fetchEquipments(Request $request)
     {
 //        DB::enableQueryLog();
-        if (!hasPermission('EquipmentView'))
+        if (!hasPermission('EquipmentView')) {
             return response()->json([]);
+        }
 
         $orderBy    = array();
         $result     = array();
@@ -274,14 +316,20 @@ class EquipmentController extends Controller
         $search = $request->search;
         $search['value'] = str_replace('*','', filter_var($search['value'], FILTER_SANITIZE_STRING));
 
-        if (likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$search['value'])).'%', 'cacamba'))
+        if (likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$search['value'])).'%', 'cacamba')) {
             $getCacamba = true;
+        }
 
-        if ($search['value']) $searchUser = $search['value'];
+        if ($search['value']) {
+            $searchUser = $search['value'];
+        }
 
         if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+            if ($request->order[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('id','name','reference','stock', '');
             $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
@@ -496,5 +544,19 @@ class EquipmentController extends Controller
         }
         //DB::getQueryLog()
         return response()->json($rsEquipment);
+    }
+
+    public function availableStock(int $id = null)
+    {
+        $is_ajax = isAjax();
+        $company_id = Auth::user()->company_id;
+
+        $available_stock = $this->equipment->getAllStockEquipment($company_id, $id);
+
+        if ($is_ajax) {
+            return response()->json(array('total_equipment' => $available_stock));
+        }
+
+        return $available_stock;
     }
 }
