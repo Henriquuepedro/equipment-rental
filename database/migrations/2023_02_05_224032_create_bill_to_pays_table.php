@@ -37,7 +37,7 @@ class CreateBillToPaysTable extends Migration
 
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreign('provider_id')->references('id')->on('providers');
-            $table->foreign('provider_id')->references('id')->on('form_payments');
+            $table->foreign('form_payment')->references('id')->on('form_payments');
             $table->foreign('user_insert')->references('id')->on('users');
             $table->foreign('user_update')->references('id')->on('users');
         });
