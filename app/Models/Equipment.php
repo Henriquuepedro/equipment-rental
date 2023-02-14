@@ -130,4 +130,30 @@ class Equipment extends Model
                     ->whereIn('id', $equipments_id)
                     ->get();
     }
+
+    public function getAllStockEquipment(int $company_id, int $ignore_id = null): int
+    {
+        $company = new Company();
+        $quantity_equipment = $company->getPlanCompany($company_id)->quantity_equipment;
+
+        $total_stock = $this->select(DB::raw('SUM(stock) as total'))->where(['company_id' => $company_id]);
+
+        if (!is_null($ignore_id)) {
+            $total_stock->where('id', '!=', $ignore_id);
+        }
+
+        $total_stock = $total_stock->first();
+
+        if (empty($total_stock)) {
+            return 0;
+        }
+
+        $stock_available = $quantity_equipment - (int)$total_stock->total;
+
+        if ($stock_available < 0) {
+            return 0;
+        }
+
+        return $stock_available;
+    }
 }

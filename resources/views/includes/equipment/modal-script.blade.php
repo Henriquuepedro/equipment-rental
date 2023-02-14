@@ -86,6 +86,7 @@
                     $('#newEquipmentModal').modal('hide');
                     $('#searchEquipment').val(getForm.find('input[name="reference"]').val()).trigger('blur');
                     cleanFormEquipmentModal();
+                    availableStock($('.available_stock'));
                 }, error: e => {
                     getForm.find('button[type="submit"]').attr('disabled', false);
                     let arrErrors = [];

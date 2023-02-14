@@ -335,3 +335,24 @@ const getOptionsForm = async (type, el, selected = null) => {
 
     return el.empty().append(options);
 }
+
+const availableStock = (el, id = null) => {
+    let url = $('[name="base_url"]').val() + `/ajax/equipamento/estoque-disponivel`;
+    if (id !== null) {
+        url += `/${id}`;
+    }
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'GET',
+        url,
+        success: response => {
+            el.text(response.total_equipment);
+        }, error: e => {
+            console.log(e);
+            el.text(0);
+        }
+    });
+}

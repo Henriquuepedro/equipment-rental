@@ -172,6 +172,7 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/visualizar-preco-estoque', [App\Http\Controllers\EquipmentController::class, 'getPriceStockEquipment'])->name('get-price-stock');
             Route::post('/visualizar-preco-por-periodo', [App\Http\Controllers\EquipmentController::class, 'getPricePerPeriod'])->name('get-price-per-period');
             Route::post('/visualizar-preco-estoque', [App\Http\Controllers\EquipmentController::class, 'getCheckPriceStockEquipment'])->name('get-price-stock-check');
+            Route::get('/estoque-disponivel/{id?}', [App\Http\Controllers\EquipmentController::class, 'availableStock'])->name('available_stock');
         });
         Route::group(['prefix' => '/meu-perfil', 'as' => 'profile.'], function () {
             Route::post('/atualizar-imagem', [App\Http\Controllers\UserController::class, 'updateImage'])->name('update.image');

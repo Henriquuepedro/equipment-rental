@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
             ConfigSeeder::class,
             NationalitySeeder::class,
             MaritalStatusSeeder::class,
-            FormPaymentSeeder::class
+            FormPaymentSeeder::class,
+            PlanSeeder::class
         ]);
     }
 }
