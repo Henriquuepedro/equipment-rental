@@ -33,8 +33,11 @@ class BillsToReceiveController extends Controller
     public function getQtyTypeRentals(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
+        $client = $request->input('client');
+        $start_date = $request->input('start_date');
+        $end_date   = $request->input('end_date');
 
-        $typesQuery = $this->rental_payment->getCountTypePayments($company_id, $request->input('client'));
+        $typesQuery = $this->rental_payment->getCountTypePayments($company_id, $client, $start_date, $end_date);
 
         $arrTypes = array(
             'late'          => $typesQuery['late'],
@@ -55,18 +58,24 @@ class BillsToReceiveController extends Controller
         $result     = array();
         $searchUser = null;
 
-        $filters        = [];
-        $ini            = $request->input('start');
-        $draw           = $request->input('draw');
-        $length         = $request->input('length');
-        $company_id     = $request->user()->company_id;
-        $typeRental     = $request->input('type');
+        $filters    = [];
+        $ini        = $request->input('start');
+        $draw       = $request->input('draw');
+        $length     = $request->input('length');
+        $company_id = $request->user()->company_id;
+        $typeRental = $request->input('type');
+        $start_date = $request->input('start_date');
+        $end_date   = $request->input('end_date');
+
         // Filtro cliente
         $client = $request->input('client') ?? (int)$request->input('client');
         if (empty($client)) {
             $client = null;
         }
-        $filters['client'] = $client;
+
+        $filters['client']      = $client;
+        $filters['start_date']  = $start_date;
+        $filters['end_date']    = $end_date;
 
         $search = $request->input('search');
         if ($search['value']) {
@@ -77,7 +86,7 @@ class BillsToReceiveController extends Controller
             if ($request->input('order')[0]['dir'] == "asc") $direction = "asc";
             else $direction = "desc";
 
-            $fieldsOrder = array('rentals.code','clients.name','rentals.created_at', '');
+            $fieldsOrder = array('rentals.code','clients.name','rental_payments.due_value', 'rental_payments.due_date', '');
             $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
@@ -94,7 +103,8 @@ class BillsToReceiveController extends Controller
             $rental_code = str_pad($value['code'], 5, 0, STR_PAD_LEFT);
             $data_prop_button = "data-rental-payment-id='{$value['rental_payment_id']}' data-rental-code='$rental_code' data-name-client='{$value['client_name']}' data-date-rental='" . date('d/m/Y H:i', strtotime($value['created_at'])) . "' data-due-date='" . date('d/m/Y', strtotime($value['due_date'])) . "' data-payment-id='{$value['payment_id']}' data-payday='" . date('d/m/Y', strtotime($value['payday'])) . "' data-due-value='" . number_format($value['due_value'], 2, ',', '.') . "'";
 
-            $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> Visualizar Pagamento</button>";
+            $txt_btn_paid = $typeRental == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
+            $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";
 
             if ($permissionUpdate && in_array($typeRental, array('late', 'without_pay'))) {
                 $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";

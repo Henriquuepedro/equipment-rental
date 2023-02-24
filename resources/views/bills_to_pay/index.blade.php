@@ -25,6 +25,7 @@
         let tableBillsToReceive;
 
         $(function () {
+            loadDaterangePickerInput($('input[name="intervalDates"]'), function () { getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false); });
             setTabBill();
             getOptionsForm('form-of-payment', $('#modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
         });
@@ -57,13 +58,18 @@
         }
 
         const getCountsTabBills = () => {
+            const start_date = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+            const end_date   = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: 'POST',
                 data: {
-                    provider: $('[name="providers"]').val()
+                    provider: $('[name="providers"]').val(),
+                    start_date,
+                    end_date
                 },
                 url: "{{ route('ajax.bills_to_pay.get-qty-type-bills') }}",
                 dataType: 'json',
@@ -103,6 +109,9 @@
 
             getCountsTabBills();
 
+            const start_date = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+            const end_date   = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+
             tableBillsToReceive = $("#tableBillsToReceive").DataTable({
                 "responsive": true,
                 "processing": true,
@@ -112,7 +121,7 @@
                 "searching": true,
                 "stateSave": stateSave,
                 "serverMethod": "post",
-                "order": [[ 0, 'desc' ]],
+                "order": [[ 3, 'asc' ]],
                 "ajax": {
                     url: '{{ route('ajax.bills_to_pay.fetch') }}',
                     pages: 2,
@@ -120,7 +129,9 @@
                     data: {
                         "_token": $('meta[name="csrf-token"]').attr('content'),
                         type: typeBills,
-                        provider: $('[name="providers"]').val()
+                        provider: $('[name="providers"]').val(),
+                        start_date,
+                        end_date
                     },
                     error: function(jqXHR, ajaxOptions, thrownError) {
                         console.log(jqXHR, ajaxOptions, thrownError);
@@ -284,7 +295,7 @@
                         @endif
                     </div>
                     <div class="row">
-                        <div class="col-md-12 form-group">
+                        <div class="col-md-9 form-group">
                             <label>Fornecedor</label>
                             <select class="form-control" name="providers">
                                 <option value="0">Todos</option>
@@ -293,10 +304,10 @@
                                 @endforeach
                             </select>
                         </div>
-                        {{--<div class="col-md-3 form-group">
-                                <label>Data do Vencimento</label>
-                                <input type="text" name="intervalDates" class="form-control" value="{{ $settings['intervalDates']['start'] . ' - ' . $settings['intervalDates']['finish'] }}" />
-                            </div>--}}
+                        <div class="col-md-3 form-group">
+                            <label>Data do Vencimento</label>
+                            <input type="text" name="intervalDates" class="form-control" value="{{ $settings['intervalDates']['start'] . ' - ' . $settings['intervalDates']['finish'] }}" />
+                        </div>
                     </div>
                     <div class="nav-scroller mt-3">
                         <ul class="nav nav-tabs tickets-tab-switch" role="tablist">

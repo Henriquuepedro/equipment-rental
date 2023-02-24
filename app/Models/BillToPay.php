@@ -65,7 +65,7 @@ class BillToPay extends Model
         return $this->create($data);
     }
 
-    public function getCountTypePayments(int $company_id, int $provider = null): array
+    public function getCountTypePayments(int $company_id, int $provider, string $start_date, string $end_date): array
     {
         $data = array();
 
@@ -88,7 +88,12 @@ class BillToPay extends Model
                 $where = array_merge(array(['bill_to_pays.provider_id', '=', $provider]), $where);
             }
 
-            $data[$type] = $this->join('bill_to_pay_payments','bill_to_pay_payments.bill_to_pay_id','=','bill_to_pays.id')->where($where)->get()->count();
+            $data[$type] = $this
+                ->join('bill_to_pay_payments','bill_to_pay_payments.bill_to_pay_id','=','bill_to_pays.id')
+                ->whereBetween('bill_to_pay_payments.due_date', [$start_date, $end_date])
+                ->where($where)
+                ->get()
+                ->count();
         }
 
         return $data;
@@ -143,6 +148,10 @@ class BillToPay extends Model
 
         if ($filters['provider'] !== null) {
             $bill->where('bill_to_pays.provider_id', $filters['provider']);
+        }
+
+        if ($filters['end_date'] !== null && $filters['start_date'] !== null) {
+            $bill->whereBetween('bill_to_pay_payments.due_date', [$filters['start_date'], $filters['end_date']]);
         }
 
         if (count($order_by) !== 0) {
