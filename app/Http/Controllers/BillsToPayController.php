@@ -38,8 +38,11 @@ class BillsToPayController extends Controller
     public function getQtyTypeBills(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
+        $provider   = $request->input('provider');
+        $start_date = $request->input('start_date');
+        $end_date   = $request->input('end_date');
 
-        $typesQuery = $this->bill_to_pay->getCountTypePayments($company_id, $request->input('provider'));
+        $typesQuery = $this->bill_to_pay->getCountTypePayments($company_id, $provider, $start_date, $end_date);
 
         $arrTypes = array(
             'late'          => $typesQuery['late'],
@@ -66,13 +69,17 @@ class BillsToPayController extends Controller
         $length     = $request->input('length');
         $company_id = $request->user()->company_id;
         $typeBill   = $request->input('type');
+        $start_date = $request->input('start_date');
+        $end_date   = $request->input('end_date');
 
         // Filtro fornecedor
         $provider = $request->input('provider') ?? (int)$request->input('provider');
         if (empty($provider)) {
             $provider = null;
         }
-        $filters['provider'] = $provider;
+        $filters['provider']    = $provider;
+        $filters['start_date']  = $start_date;
+        $filters['end_date']    = $end_date;
 
         $search = $request->input('search');
         if ($search['value']) {
@@ -83,7 +90,7 @@ class BillsToPayController extends Controller
             if ($request->input('order')[0]['dir'] == "asc") $direction = "asc";
             else $direction = "desc";
 
-            $fieldsOrder = array('bill_to_pays.code','providers.name','bill_to_pays.created_at', '');
+            $fieldsOrder = array('bill_to_pays.code','providers.name','bill_to_pay_payments.due_value','bill_to_pay_payments.due_date', '');
             $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
@@ -100,7 +107,8 @@ class BillsToPayController extends Controller
             $bill_code = str_pad($value['code'], 5, 0, STR_PAD_LEFT);
             $data_prop_button = "data-bill-payment-id='{$value['bill_payment_id']}' data-bill-code='$bill_code' data-name-provider='{$value['provider_name']}' data-date-bill='" . date('d/m/Y H:i', strtotime($value['created_at'])) . "' data-due-date='" . date('d/m/Y', strtotime($value['due_date'])) . "' data-payment-id='{$value['payment_id']}' data-payday='" . date('d/m/Y', strtotime($value['payday'])) . "' data-due-value='" . number_format($value['due_value'], 2, ',', '.') . "'";
 
-            $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> Visualizar Pagamento</button>";
+            $txt_btn_paid = $typeBill == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
+            $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";
 
             if ($permissionUpdate && in_array($typeBill, array('late', 'without_pay'))) {
                 $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";

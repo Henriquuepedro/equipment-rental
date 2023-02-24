@@ -75,7 +75,7 @@ class RentalPayment extends Model
         return $this->where(['id' => $payment_id, 'company_id' => $company_id])->first();
     }
 
-    public function getCountTypePayments(int $company_id, int $client = null): array
+    public function getCountTypePayments(int $company_id, int $client, string $start_date, string $end_date): array
     {
         $data = array();
 
@@ -98,7 +98,12 @@ class RentalPayment extends Model
                 $where = array_merge(array(['rentals.client_id', '=', $client]), $where);
             }
 
-            $data[$type] = $this->join('rentals','rental_payments.rental_id','=','rentals.id')->where($where)->get()->count();
+            $data[$type] = $this
+                ->join('rentals','rental_payments.rental_id','=','rentals.id')
+                ->whereBetween('rental_payments.due_date', [$start_date, $end_date])
+                ->where($where)
+                ->get()
+                ->count();
         }
 
         return $data;
@@ -160,6 +165,10 @@ class RentalPayment extends Model
 
         if ($filters['client'] !== null) {
             $rental->where('rentals.client_id', $filters['client']);
+        }
+
+        if ($filters['end_date'] !== null && $filters['start_date'] !== null) {
+            $rental->whereBetween('rental_payments.due_date', [$filters['start_date'], $filters['end_date']]);
         }
 
         if (count($order_by) !== 0) {
