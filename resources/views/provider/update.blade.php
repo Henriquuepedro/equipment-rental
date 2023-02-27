@@ -54,16 +54,17 @@
             }, 500);
         },
         submitHandler: function(form) {
+            $('#formUpdateProvider [type="submit"]').attr('disabled', true);
             let verifyAddress = verifyAddressComplet();
             if (!verifyAddress[0]) {
                 Toast.fire({
                     icon: 'warning',
                     title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para alterar o cadastro.`
                 });
+                $('#formUpdateProvider [type="submit"]').attr('disabled', false);
                 return false;
             }
 
-            $('#formUpdateProvider [type="submit"]').attr('disabled', true);
             form.submit();
         }
     });

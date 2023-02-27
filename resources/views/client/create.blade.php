@@ -54,16 +54,18 @@
             }, 500);
         },
         submitHandler: function(form) {
+            $('#formCreateClient [type="submit"]').attr('disabled', true);
+
             let verifyAddress = verifyAddressComplet();
             if (!verifyAddress[0]) {
                 Toast.fire({
                     icon: 'warning',
                     title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para finalizar o cadastro.`
                 });
+                $('#formCreateClient [type="submit"]').attr('disabled', false);
                 return false;
             }
 
-            $('#formCreateClient [type="submit"]').attr('disabled', true);
             form.submit();
         }
     });
