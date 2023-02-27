@@ -54,6 +54,7 @@
             }, 500);
         },
         submitHandler: function(form) {
+            $('#formCreateProvider [type="submit"]').attr('disabled', true);
             let verifyAddress = verifyAddressComplet();
             if (!verifyAddress[0]) {
                 Toast.fire({
@@ -62,8 +63,8 @@
                 });
                 return false;
             }
+            $('#formCreateProvider [type="submit"]').attr('disabled', false);
 
-            $('#formCreateProvider [type="submit"]').attr('disabled', true);
             form.submit();
         }
     });
