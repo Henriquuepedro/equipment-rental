@@ -245,13 +245,13 @@
                                                             <label>Bairro</label>
                                                             <input {{ $disabled }} type="text" class="form-control" name="neigh[]" autocomplete="nope" value="{{ $address->neigh }}">
                                                         </div>
-                                                        <div class="form-group col-md-4">
-                                                            <label>Cidade</label>
-                                                            <input {{ $disabled }} type="text" class="form-control" name="city[]" autocomplete="nope" value="{{ $address->city }}">
-                                                        </div>
-                                                        <div class="form-group col-md-4">
+                                                        <div  {{ $disabled }} class="form-group col-md-4">
                                                             <label>Estado</label>
-                                                            <input {{ $disabled }} type="text" class="form-control" name="state[]" autocomplete="nope" value="{{ $address->state }}">
+                                                            <select class="form-control" name="state[]" data-value-state="{{ $address->state }}"></select>
+                                                        </div>
+                                                        <div  {{ $disabled }} class="form-group col-md-4">
+                                                            <label>Cidade</label>
+                                                            <select class="form-control" name="city[]" data-value-city="{{ $address->city }}"></select>
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -317,12 +317,12 @@
                                                             <input {{ $disabled }} type="text" class="form-control" name="neigh[]" autocomplete="nope" value="{{ old('neigh')[$addr] }}">
                                                         </div>
                                                         <div class="form-group col-md-4">
-                                                            <label>Cidade</label>
-                                                            <input {{ $disabled }} type="text" class="form-control" name="city[]" autocomplete="nope" value="{{ old('city')[$addr] }}">
+                                                            <label>Estado</label>
+                                                            <select {{ $disabled }} class="form-control" name="state[]" data-value-state="{{ old('state')[$addr] }}"></select>
                                                         </div>
                                                         <div class="form-group col-md-4">
-                                                            <label>Estado</label>
-                                                            <input {{ $disabled }} type="text" class="form-control" name="state[]" autocomplete="nope" value="{{ old('state')[$addr] }}">
+                                                            <label>Cidade</label>
+                                                            <select {{ $disabled }} class="form-control" name="city[]" data-value-city="{{ old('city')[$addr] }}"></select>
                                                         </div>
                                                     </div>
                                                     <div class="row">

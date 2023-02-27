@@ -147,14 +147,19 @@
                 $('.show-address input[name="complement"]').val(response.complement ?? '');
                 $('.show-address input[name="reference"]').val(response.reference ?? '');
                 $('.show-address input[name="neigh"]').val(response.neigh ?? '');
-                $('.show-address input[name="city"]').val(response.city ?? '');
-                $('.show-address input[name="state"]').val(response.state ?? '');
+                //$('.show-address select[name="city"]').val(response.city ?? '');
+                //$('.show-address select[name="state"]').val(response.state ?? '');
                 $('input[name="lat"]').val(response.lat ?? '');
                 $('input[name="lng"]').val(response.lng ?? '');
                 checkLabelAnimate();
                 $('[name="cep"]').unmask().mask('00.000-000');
 
-                if (response.address != null && response.lat == null) $('.alert-mark-map').slideDown('slow');
+                if (response.address != null && response.lat == null) {
+                    $('.alert-mark-map').slideDown('slow');
+                }
+
+                loadStates($('.show-address select[name="state"]'), response.state ?? '');
+                loadCities($('.show-address select[name="city"]'), response.state ?? '', response.city ?? '');
 
                 //setTimeout( () => { $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500) }, 750);
 
@@ -195,8 +200,8 @@
         $('.show-address input[name="complement"]').attr('disabled', false).parent().find('label').text('Complemento');
         $('.show-address input[name="reference"]').attr('disabled', false).parent().find('label').text('Referência');
         $('.show-address input[name="neigh"]').attr('disabled', false).parent().find('label').html('Bairro <sup>*</sup>');
-        $('.show-address input[name="city"]').attr('disabled', false).parent().find('label').html('Cidade <sup>*</sup>');
-        $('.show-address input[name="state"]').attr('disabled', false).parent().find('label').html('Estado <sup>*</sup>');
+        $('.show-address select[name="city"]').attr('disabled', false).parent().find('label').html('Cidade <sup>*</sup>');
+        $('.show-address select[name="state"]').attr('disabled', false).parent().find('label').html('Estado <sup>*</sup>');
     }
 
     // VERIFICAR SE HAVERÁ ALGUM ERRO
@@ -284,11 +289,11 @@
             $(`[name="neigh"]`).css('border', '1px solid red');
             existError = true;
         }
-        if (!$(`[name="city"]`).val().length) {
+        if (!$(`[name="city"]`).val()) {
             $(`[name="city"]`).css('border', '1px solid red');
             existError = true;
         }
-        if (!$(`[name="state"]`).val().length) {
+        if (!$(`[name="state"]`).val()) {
             $(`[name="state"]`).css('border', '1px solid red');
             existError = true;
         }
@@ -341,5 +346,10 @@
         mapRental.setView(newLatLng, 15);
         mapRental.invalidateSize();
     }
+
+
+    $(document).on('change', 'select[name="state"]', function(){
+        loadCities($('select[name="city"]'), $(this).val());
+    });
 
 </script>

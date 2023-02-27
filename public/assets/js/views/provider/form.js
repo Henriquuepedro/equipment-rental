@@ -5,7 +5,9 @@ $(() => {
     if ($('[name="type_person"]:checked').length) {
         $('[name="type_person"]:checked').trigger('change');
     }
+    $('[name="state"], [name="city"]').select2();
 
+    loadStates($('[name="state"]'));
     getOptionsForm('nationality', $('#formUpdateProvider [name="nationality"], #formCreateProvider [name="nationality"], #formCreateProviderModal [name="nationality"]'), $('[name="nationality_id"]').val() ?? null);
     getOptionsForm('marital_status', $('#formUpdateProvider [name="marital_status"], #formCreateProvider [name="marital_status"], #formCreateProviderModal [name="marital_status"]'), $('[name="marital_status_id"]').val() ?? null);
 });
@@ -42,6 +44,10 @@ $('[name="type_person"]').on('change', function(){
     form.find(".card").each(function() {
         $(this).slideDown('slow');
     });
+
+    setTimeout(() => {
+        $('[name="state"], [name="city"]').select2()
+    }, 500)
 });
 
 $(document).on('blur', '[name="cep[]"], [name="cep"], #cep_new', function (){
@@ -63,10 +69,18 @@ $(document).on('blur', '[name="cep[]"], [name="cep"], #cep_new', function (){
     $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/", function(dados) {
 
         if (!("erro" in dados)) {
-            if(dados.logradouro !== '') el.find('[name^="address"], #address_new').val(dados.logradouro).parent().addClass("label-animate");
-            if(dados.bairro !== '')     el.find('[name^="neigh"], #neigh_new').val(dados.bairro).parent().addClass("label-animate");
-            if(dados.localidade !== '') el.find('[name^="city"], #city_new').val(dados.localidade).parent().addClass("label-animate");
-            if(dados.uf !== '')         el.find('[name^="state"], #state_new').val(dados.uf).parent().addClass("label-animate");
+            if(dados.logradouro !== '') {
+                el.find('[name^="address"], #address_new').val(dados.logradouro).parent().addClass("label-animate");
+            }
+            if(dados.bairro !== '') {
+                el.find('[name^="neigh"], #neigh_new').val(dados.bairro).parent().addClass("label-animate");
+            }
+            if(dados.uf !== '') {
+                loadStates($('[name="state"]'), dados.uf);
+            }
+            if(dados.localidade !== '' && dados.uf !== '') {
+                loadCities($('[name="city"]'), dados.uf, dados.localidade);
+            }
         } //end if.
         else {
             Toast.fire({
@@ -85,3 +99,7 @@ jQuery.validator.addMethod("cpf_cnpj", function(value, element) {
     return this.optional(element) || retorno;
 
 }, 'Informe um CPF/CNPJ válido');
+
+$('[name="state"]').on('change', function(){
+    loadCities($('[name="city"]'), $(this).val());
+});

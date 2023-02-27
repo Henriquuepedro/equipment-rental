@@ -127,12 +127,12 @@
                                     <input type="text" class="form-control" name="neigh" autocomplete="nope">
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label>Cidade</label>
-                                    <input type="text" class="form-control" name="city" autocomplete="nope">
+                                    <label>Estado</label>
+                                    <select class="form-control" name="state"></select>
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label>Estado</label>
-                                    <input type="text" class="form-control" name="state" autocomplete="nope">
+                                    <label>Cidade</label>
+                                    <select class="form-control" name="city"></select>
                                 </div>
                             </div>
                         </div>

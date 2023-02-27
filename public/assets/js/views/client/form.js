@@ -9,14 +9,26 @@ $(() => {
     $('[name="cep[]"], [name="cep"]').mask('00.000-000');
     $('[name="phone_1"],[name="phone_2"]').mask('(00) 000000000');
     $('[name="rg_ie"]').mask('0#');
+    $('[name="state"], [name="city"], [name="state[]"], [name="city[]"]').select2();
     if ($('[name="type_person"]:checked').length) {
         $('[name="type_person"]:checked').trigger('change');
     }
+
     showHideTableAddress();
     getLocation();
 
+    loadStates($('[name="state"]'))
     getOptionsForm('nationality', $('#formUpdateClient [name="nationality"], #formCreateClient [name="nationality"], #formCreateClientModal [name="nationality"]'), $('[name="nationality_id"]').val() ?? null);
     getOptionsForm('marital_status', $('#formUpdateClient [name="marital_status"], #formCreateClient [name="marital_status"], #formCreateClientModal [name="marital_status"]'), $('[name="marital_status_id"]').val() ?? null);
+
+    $('#tableAddressClient tbody td').find('[data-value-state]').each(function() {
+        const state = $(this).closest('td').find('[data-value-state]').data('value-state');
+        const city = $(this).closest('td').find('[data-value-city]').data('value-city');
+        if (typeof state !== "undefined" && typeof city !== "undefined") {
+            loadStates($(this).closest('td').find('[name="state[]"]'), state);
+            loadCities($(this).closest('td').find('[name="city[]"]'), state, city);
+        }
+    });
 });
 // Where you want to render the map.
 element = document.getElementById('map');
@@ -167,6 +179,10 @@ $('[name="type_person"]').on('change', function(){
     form.find(".card").each(function() {
         $(this).slideDown('slow');
     });
+
+    setTimeout(() => {
+        $('[name="state"], [name="city"]').select2()
+    }, 500)
 });
 
 $(document).on('blur', '[name="cep[]"], [name="cep"], #cep_new', function (){
@@ -188,10 +204,18 @@ $(document).on('blur', '[name="cep[]"], [name="cep"], #cep_new', function (){
     $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/", function(dados) {
 
         if (!("erro" in dados)) {
-            if(dados.logradouro !== '') el.find('[name^="address"], #address_new').val(dados.logradouro).parent().addClass("label-animate");
-            if(dados.bairro !== '')     el.find('[name^="neigh"], #neigh_new').val(dados.bairro).parent().addClass("label-animate");
-            if(dados.localidade !== '') el.find('[name^="city"], #city_new').val(dados.localidade).parent().addClass("label-animate");
-            if(dados.uf !== '')         el.find('[name^="state"], #state_new').val(dados.uf).parent().addClass("label-animate");
+            if(dados.logradouro !== '') {
+                el.find('[name^="address"], #address_new').val(dados.logradouro).parent().addClass("label-animate");
+            }
+            if(dados.bairro !== '') {
+                el.find('[name^="neigh"], #neigh_new').val(dados.bairro).parent().addClass("label-animate");
+            }
+            if(dados.uf !== '') {
+                loadStates(el.find('[name^="state"], #state_new'), dados.uf);
+            }
+            if(dados.localidade !== '' && dados.uf !== '') {
+                loadCities(el.find('[name^="city"], #city_new'), dados.uf, dados.localidade);
+            }
         } //end if.
         else {
             Toast.fire({
@@ -273,12 +297,12 @@ $('#add-new-address').on('click', function () {
                         <input type="text" class="form-control" id="neigh_new" autocomplete="nope">
                     </div>
                     <div class="form-group col-md-4">
-                        <label>Cidade</label>
-                        <input type="text" class="form-control" id="city_new" autocomplete="nope">
+                        <label>Estado</label>
+                        <select class="form-control" id="state_new" name="state"></select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label>Estado</label>
-                        <input type="text" class="form-control" id="state_new" autocomplete="nope">
+                        <label>Cidade</label>
+                        <select class="form-control" id="city_new" name="city"></select>
                     </div>
                 </div>
                 <div class="row">
@@ -293,12 +317,16 @@ $('#add-new-address').on('click', function () {
         </div>
     `).find('.box').slideDown('slow');
 
+    $('#state_new, #city_new').select2();
+    loadStates($('#state_new'));
     $('[id="cep_new"]').mask('00.000-000');
 });
 
 $(document).on('click', '.edit-address', function(){
 
-    if (!verifyAddressComplet()[0]) return false;
+    if (!verifyAddressComplet()[0]) {
+        return false;
+    }
 
     if ($(this).closest('tr').next().is(':not(:visible)')) {
         if ($('#tableAddressClient tr td[colspan="5"]:visible').length) {
@@ -311,6 +339,10 @@ $(document).on('click', '.edit-address', function(){
     }
 
     $(this).closest('tr').next().toggle('slow').find('.address').slideToggle('slow');
+
+    setTimeout(() => {
+        $('[name="state[]"], [name="city[]"]').select2()
+    }, 100);
 })
 $(document).on('click', '.save-address', function(){
     if (!verifyAddressComplet()[0]) return false;
@@ -323,8 +355,11 @@ $(document).on('click', '.save-address, .edit-address', function(event){
     let el;
 
     // linha com o formulario
-    if (!$(event.target).is('.save-address')) el = $(this).closest('tr').next();
-    else el = $(this).closest('tr');
+    if (!$(event.target).is('.save-address')) {
+        el = $(this).closest('tr').next();
+    } else {
+        el = $(this).closest('tr');
+    }
 
     let verifyAddress = verifyAddressComplet();
     if (!verifyAddress[0]) {
@@ -444,11 +479,11 @@ const verifyAddressComplet = () => {
         $('#neigh_new').css('border', '1px solid red');
         existError = true;
     }
-    if ($('#city_new').val() !== undefined && !$('#city_new').val().length) {
+    if ($('#city_new').val() !== undefined && !$('#city_new').val()) {
         $('#city_new').css('border', '1px solid red');
         existError = true;
     }
-    if ($('#state_new').val() !== undefined && !$('#state_new').val().length) {
+    if ($('#state_new').val() !== undefined && !$('#state_new').val()) {
         $('#state_new').css('border', '1px solid red');
         existError = true;
     }
@@ -472,15 +507,17 @@ const verifyAddressComplet = () => {
             $(`[name="neigh[]"]:eq(${countAddr})`).css('border', '1px solid red');
             existError = true;
         }
-        if (!$(`[name="city[]"]:eq(${countAddr})`).val().length) {
+        if (!$(`[name="city[]"]:eq(${countAddr})`).val()) {
             $(`[name="city[]"]:eq(${countAddr})`).css('border', '1px solid red');
             existError = true;
         }
-        if (!$(`[name="state[]"]:eq(${countAddr})`).val().length) {
+        if (!$(`[name="state[]"]:eq(${countAddr})`).val()) {
             $(`[name="state[]"]:eq(${countAddr})`).css('border', '1px solid red');
             existError = true;
         }
-        if (existError) return [false, (countAddr + 1)];
+        if (existError) {
+            return [false, (countAddr + 1)];
+        }
     }
     return [true];
 }
@@ -545,12 +582,12 @@ const createNewAddress = (name_address, cep, address, number, complement, refere
                         <input type="text" class="form-control" name="neigh[]" autocomplete="nope" value="${neigh}">
                     </div>
                     <div class="form-group col-md-4">
-                        <label>Cidade</label>
-                        <input type="text" class="form-control" name="city[]" autocomplete="nope" value="${city}">
+                        <label>Estado</label>
+                        <select class="form-control" name="state[]"></select>
                     </div>
                     <div class="form-group col-md-4">
-                        <label>Estado</label>
-                        <input type="text" class="form-control" name="state[]" autocomplete="nope" value="${state}">
+                        <label>Cidade</label>
+                        <select class="form-control" name="city[]"></select>
                     </div>
                 </div>
                 <div class="row">
@@ -565,9 +602,20 @@ const createNewAddress = (name_address, cep, address, number, complement, refere
         </td>
     </tr>
     `);
+
+    $('#tableAddressClient td:last').find('[name="state[]"], [name="city[]"]').select2();
+    loadStates($('#tableAddressClient td:last').find('[name="state[]"]'), state);
+    loadCities($('#tableAddressClient td:last').find('[name="city[]"]'), state, city);
 }
 
 const showHideTableAddress = () => {
-    if ($('#tableAddressClient tbody tr').length) $('#tableAddressClient').slideDown('slow');
-    else  $('#tableAddressClient').slideUp('slow');
+    if ($('#tableAddressClient tbody tr').length) {
+        $('#tableAddressClient').slideDown('slow');
+    } else {
+        $('#tableAddressClient').slideUp('slow');
+    }
 }
+
+$(document).on('change','[name="state"], #state_new', function(){
+    loadCities($(this).closest('.box-body').find('[name="city"], #city_new'), $(this).val());
+});
