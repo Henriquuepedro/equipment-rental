@@ -31,7 +31,7 @@ class ProviderDeletePost extends FormRequest
                 'required',
                 'numeric',
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('bills_to_pay')
+                    $exists = DB::table('bill_to_pays')
                         ->where(['provider_id' => $value, 'company_id' => $this->user()->company_id])
                         ->count();
                     if ($exists == 1) {

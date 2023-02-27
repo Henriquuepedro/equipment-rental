@@ -340,7 +340,7 @@
                             <table id="tableBillsToReceive" class="table table-bordered mt-2">
                                 <thead>
                                 <tr>
-                                    <th>Locação</th>
+                                    <th>#</th>
                                     <th>Fornecedor</th>
                                     <th>Valor</th>
                                     <th>Vencimento</th>
@@ -350,7 +350,7 @@
                                 <tbody></tbody>
                                 <tfoot>
                                 <tr>
-                                    <th>Locação</th>
+                                    <th>#</th>
                                     <th>Fornecedor</th>
                                     <th>Valor</th>
                                     <th>Vencimento</th>

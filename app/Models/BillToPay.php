@@ -117,10 +117,24 @@ class BillToPay extends Model
 
         if ($search_provider) {
             $bill->where(function ($query) use ($search_provider) {
+
+                $search_format_value = transformMoneyBr_En($search_provider);
+                $search_format_date = transformDateBr_En($search_provider);
+
                 $query->where('bill_to_pays.code', 'like', "%".(int)onlyNumbers($search_provider)."%")
                     ->orWhere('providers.name', 'like', "%$search_provider%")
-                    ->orWhere('bill_to_pays.address_name', 'like', "%$search_provider%")
+                    ->orWhere('bill_to_pay_payments.due_value', 'like', "%$search_provider%")
                     ->orWhere('bill_to_pay_payments.due_date', 'like', "%$search_provider%");
+
+                // É um valor numerico
+                if (!empty($search_format_value)) {
+                    $query->orWhere('bill_to_pay_payments.due_value', 'like', "%$search_format_value%");
+                }
+
+                // É uma data
+                if ($search_format_date) {
+                    $query->orWhere('bill_to_pay_payments.due_date', 'like', "%$search_format_date%");
+                }
             });
         }
 

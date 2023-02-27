@@ -186,3 +186,32 @@ if (! function_exists('onlyNumbers')) {
         return preg_replace('/\D/', '', $text);
     }
 }
+
+if (! function_exists('transformDateBr_En')) {
+    /**
+     * Retorna a data formatada.
+     *
+     * @param   string|null $date
+     * @return  string|null
+     */
+    function transformDateBr_En(?string $date): ?string
+    {
+        if (is_null($date)) {
+            return null;
+        }
+
+        if (strlen($date) !== 10 && strlen($date) !== 19) {
+            return null;
+        }
+
+        $new_date = strlen($date) === 10 ?
+            implode('-', array_reverse(explode('/', $date))) :
+            implode('-', array_reverse(explode('/', explode(' ', explode('T', $date)[0])[0]))) . ' ' . (explode(' ', $date)[1] ?? explode('T', $date)[1]);
+
+        if (!strtotime($new_date)) {
+            return null;
+        }
+
+        return $new_date;
+    }
+}
