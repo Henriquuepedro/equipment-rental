@@ -54,7 +54,7 @@ var Toast = Swal.mixin({
                 });
             }
         });
-        $(document).on('click, focus', ".form-control", function() {
+        $(document).on('click, focus change', ".form-control", function() {
             $(".form-control").each(function() {
                 if ($(this).val() === '') {
                     $(this).parent().removeClass("label-animate");
@@ -394,3 +394,48 @@ const loadDaterangePickerInput = (el, event) => {
         }
     }, event);
 }
+
+const loadStates = async (el, id = null) => {
+    $.ajax({
+        type: 'GET',
+        url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome',
+        success: async response => {
+
+            let options = '<option value="0">Selecione ...</option>';
+            let selected = '';
+
+            await $(response).each(await function (key, value) {
+                selected = id === value.sigla ? 'selected' : '';
+                options += '<option data-id="' + value.id + '" value="' + value.sigla + '" '+selected+'>' + value.nome + '</option>';
+            })
+
+            el.select2('destroy').empty().html(options).select2();
+            checkLabelAnimate();
+        }, error: e => {
+            console.log(e);
+        }
+    });
+}
+
+const loadCities = async (el, state, id = null) => {
+    $.ajax({
+        type: 'GET',
+        url: `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios?orderBy=nome`,
+        success: async response => {
+
+            let options = '<option value="0">Selecione ...</option>';
+            let selected = '';
+
+            await $(response).each(await function (key, value) {
+                selected = id === value.nome ? 'selected' : '';
+                options += '<option data-id="' + value.id + '" value="' + value.nome + '" '+selected+'>' + value.nome + '</option>';
+            })
+
+            el.select2('destroy').empty().html(options).select2();
+            checkLabelAnimate();
+        }, error: e => {
+            console.log(e);
+        }
+    });
+}
+

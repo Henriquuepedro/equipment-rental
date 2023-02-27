@@ -38,12 +38,12 @@
 </div>
 <div class="row show-address">
     <div class="form-group col-md-6">
-        <label>Cidade <sup>*</sup></label>
-        <input type="text" name="city" class="form-control">
+        <label>Estado <sup>*</sup></label>
+        <select class="form-control" name="state"></select>
     </div>
     <div class="form-group col-md-6">
-        <label>Estado <sup>*</sup></label>
-        <input type="text" name="state" class="form-control">
+        <label>Cidade <sup>*</sup></label>
+        <select class="form-control" name="city"></select>
     </div>
 </div>
 <div class="row show-address mt-2">

@@ -239,12 +239,12 @@
                                                             <input type="text" class="form-control" name="neigh[]" autocomplete="nope" value="{{ old('neigh')[$addr] }}">
                                                         </div>
                                                         <div class="form-group col-md-4">
-                                                            <label>Cidade</label>
-                                                            <input type="text" class="form-control" name="city[]" autocomplete="nope" value="{{ old('city')[$addr] }}">
+                                                            <label>Estado</label>
+                                                            <select class="form-control" name="state[]" data-value-state="{{ old('state')[$addr] }}"></select>
                                                         </div>
                                                         <div class="form-group col-md-4">
-                                                            <label>Estado</label>
-                                                            <input type="text" class="form-control" name="state[]" autocomplete="nope" value="{{ old('state')[$addr] }}">
+                                                            <label>Cidade</label>
+                                                            <select class="form-control" name="city[]" data-value-city="{{ old('city')[$addr] }}"></select>
                                                         </div>
                                                     </div>
                                                     <div class="row">

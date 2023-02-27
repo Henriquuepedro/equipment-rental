@@ -27,20 +27,25 @@
                     });
                     return false;
                 }
+                setTimeout(() => {
+                    $('[name="client"]').select2();
+                }, 200)
             }
             if (currentIndex <= getIndexStep(1) && newIndex > getIndexStep(1)) { // cliente e endereo
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
                 }
-                if ($('select[name="client"]').val() === '0') arrErrors.push('Selecione um cliente.');
+                if ($('select[name="client"]').val() === '0') {
+                    arrErrors.push('Selecione um cliente.');
+                }
 
                 if (arrErrors.length === 0) {
                     if ($('input[name="address"]').val() === '') arrErrors.push('Informe um endereço.');
                     if ($('input[name="number"]').val() === '') arrErrors.push('Informe um número para o endereço.');
                     if ($('input[name="neigh"]').val() === '') arrErrors.push('Informe um bairro.');
-                    if ($('input[name="city"]').val() === '') arrErrors.push('Informe uma cidade.');
-                    if ($('input[name="state"]').val() === '') arrErrors.push('Informe um estado.');
+                    if ($('select[name="city"]').val() === '') arrErrors.push('Informe uma cidade.');
+                    if ($('select[name="state"]').val() === '') arrErrors.push('Informe um estado.');
                     if ($('input[name="lat"]').val() === '' || $('input[name="lng"]').val() === '') arrErrors.push('Confirme o endereço no mapa.');
                 }
 

@@ -203,12 +203,12 @@
                                         <input type="text" class="form-control" name="neigh" autocomplete="nope" value="{{ old('neigh') }}">
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label>Cidade</label>
-                                        <input type="text" class="form-control" name="city" autocomplete="nope" value="{{ old('city') }}">
+                                        <label>Estado</label>
+                                        <select class="form-control" name="state"></select>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label>Estado</label>
-                                        <input type="text" class="form-control" name="state" autocomplete="nope" value="{{ old('state') }}">
+                                        <label>Cidade</label>
+                                        <select class="form-control" name="city"></select>
                                     </div>
                                 </div>
                             </div>
