@@ -176,9 +176,11 @@
             if ($('#paid-tab.active').length) {
                 $('#modalViewPayment').find('[name="date_payment"]').val(payday);
                 $('#modalViewPayment').find('[name="form_payment"]').val(payment_id);
+                $('#modalViewPayment').find('.modal-title').text('Detalhes do Pagamento');
             } else {
                 $('#modalViewPayment').find('[name="date_payment"]').closest('.form-group').hide();
                 $('#modalViewPayment').find('[name="form_payment"]').closest('.form-group').hide();
+                $('#modalViewPayment').find('.modal-title').text('Detalhes do Lançamento');
             }
 
             $('#modalViewPayment').find('[name="rental_code"]').val(rental_code);
@@ -428,7 +430,7 @@
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Visualizar pagamento</h5>
+                    <h5 class="modal-title"></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
