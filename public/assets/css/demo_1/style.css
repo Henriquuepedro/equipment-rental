@@ -1246,9 +1246,6 @@
 .form-control {
     color: #000;
 }
-.navbar.default-layout .navbar-brand-wrapper .navbar-brand img {
-    height: 60px;
-}
 .sidebar > .nav .nav-item:not(.hover-open) .collapse .sub-menu .nav-item .nav-link.active:before {
     background-color: #fff;
 }
