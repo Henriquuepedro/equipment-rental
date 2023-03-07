@@ -15,10 +15,6 @@
             display: flex;
             justify-content: space-between;
         }
-        .wizard > .content {
-            background: #FFF;
-            border: 1px solid #eee;
-        }
         .wizard > .content > .body {
             height: unset;
         }
@@ -71,9 +67,6 @@
         .list-equipment .equipment td:nth-child(1) p{
             margin: 0;
         }
-        .list-equipment .equipment:hover {
-            background: #f5f5f5;
-        }
         .wizard > .content > .body {
             position: unset;
         }
@@ -100,11 +93,9 @@
         .content-equipment::-webkit-scrollbar-track {
             -webkit-box-shadow: inset 0 0 6px #2196f3;
             border-radius: 10px;
-            background-color: #F5F5F5;
         }
         .content-equipment::-webkit-scrollbar {
             width: 12px;
-            background-color: #F5F5F5;
         }
         .content-equipment::-webkit-scrollbar-thumb {
             border-radius: 10px;
@@ -129,13 +120,6 @@
         }
         .btn-view-price-period-equipment i {
             font-size: 18px !important;
-            color: #fff;
-        }
-        #payment input:disabled {
-            background-color: #eee;
-        }
-        #payment .input-group-text {
-            background-color: #eee;
         }
         #payment.payment-no .payment-hidden {
             display: none !important;

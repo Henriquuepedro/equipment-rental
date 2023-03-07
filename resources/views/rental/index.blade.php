@@ -58,14 +58,14 @@
         let tableRental;
 
         $(function () {
-            setTabRental();
-
             moment.locale('pt-br');
             $('input[name="intervalDates"]').daterangepicker({
                 locale: {
                     format: 'DD/MM/YYYY'
                 }
             });
+
+            setTabRental();
         });
 
         const setTabRental = () => {
@@ -95,12 +95,20 @@
         }
 
         const getCountsTabRentals = () => {
+            const start_date = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+            const end_date   = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: 'POST',
                 url: "{{ route('ajax.rental.get-qty-type-rentals') }}",
+                data: {
+                    client: $('[name="clients"]').val(),
+                    start_date,
+                    end_date
+                },
                 dataType: 'json',
                 success: response => {
 
@@ -138,6 +146,9 @@
 
             getCountsTabRentals();
 
+            const start_date = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+            const end_date   = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+
             tableRental = $("#tableRentals").DataTable({
                 "responsive": true,
                 "processing": true,
@@ -155,7 +166,8 @@
                     data: {
                         "_token": $('meta[name="csrf-token"]').attr('content'),
                         type: typeRentals,
-                        intervalDate: $('[name="intervalDates"]').val(),
+                        start_date,
+                        end_date,
                         client: $('[name="clients"]').val()
                     },
                     error: function(jqXHR, ajaxOptions, thrownError) {

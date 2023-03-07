@@ -207,28 +207,39 @@ class Rental extends Model
         return $this->where(['id' => $rental_id, 'company_id' => $company_id])->delete();
     }
 
-    public function getCountTypeRentals(int $company_id): array
+    public function getCountTypeRentals(int $company_id, int $client, string $start_date, string $end_date): array
     {
         $data = array();
 
         foreach (array(
              'deliver' => array(
-                 ['actual_delivery_date', '=', NULL]
+                 ['rental_equipments.actual_delivery_date', '=', NULL]
              ),
              'withdraw' => array(
-                 ['actual_delivery_date', '<>', NULL],
-                 ['actual_withdrawal_date', '=', NULL]
+                 ['rental_equipments.actual_delivery_date', '<>', NULL],
+                 ['rental_equipments.actual_withdrawal_date', '=', NULL]
              ),
              'finished' => array(
-                 ['actual_delivery_date', '<>', NULL],
-                 ['actual_withdrawal_date', '<>', NULL]
+                 ['rentals.actual_delivery_date', '<>', NULL],
+                 ['rentals.actual_withdrawal_date', '<>', NULL]
              )
         ) as $type => $where) {
-            $where = array_merge(array(['company_id', '=', $company_id]), $where);
+            $where = array_merge(array(['rentals.company_id', '=', $company_id]), $where);
 
-            $data[$type] = $this->from($type === 'finished' ? 'rentals' : 'rental_equipments')
+            if ($client) {
+                $where = array_merge(array(['rentals.client_id', '=', $client]), $where);
+            }
+
+            $query = $this->from($type === 'finished' ? 'rentals' : 'rental_equipments')
                 ->where($where)
-                ->groupBy($type === 'finished' ? 'id' : 'rental_id')
+                ->whereBetween('rentals.created_at', [$start_date, $end_date]);
+
+            if ($type !== 'finished') {
+                $query->join('rentals', 'rental_equipments.rental_id', '=', 'rentals.id');
+            }
+
+            $data[$type] = $query
+                ->groupBy($type === 'finished' ? 'rentals.id' : 'rental_equipments.rental_id')
                 ->get()
                 ->count();
         }
