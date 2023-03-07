@@ -27,6 +27,9 @@ class AlterTablePlanCompaniesTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('companies', function (Blueprint $table) {
+            $table->dropForeign('companies_plan_id_foreign');
+            $table->dropColumn('plan_id');
+        });
     }
 }

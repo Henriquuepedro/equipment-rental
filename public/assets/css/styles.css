@@ -1,11 +1,6 @@
 .no-border{
     border: 0 !important;
 }
-/* small-box com cores do text em branco */
-.small-box.bg-warning .inner,
-.small-box.bg-warning .small-box-footer{
-    color: #fff !important;
-}
 
 .display-none{
     display: none;
@@ -16,12 +11,10 @@
     top: 35px;
     left: 10px;
     position: relative;
-    background-color: white;
     padding: 0 5px 0 5px;
     font-size: 0.95em;
     transition: 0.2s;
     pointer-events:none;
-    color: #aaa;
     z-index: 1;
 }
 
@@ -29,7 +22,6 @@
     top: 18px;
     left: 5px;
     font-size: 0.75em;
-    color: #555;
     z-index: 4;
 }
 
@@ -43,15 +35,6 @@ table td .form-group.label-animate label {
     top: -5px;
     left: 20px;
     font-size: 0.9em;
-}
-.form-group.label-animate .form-control {
-    border-color: #dee2e6;
-}
-.form-group.label-animate .form-control:focus {
-    border-color: #1a73e8;
-}
-.form-group.label-animate .label-focus {
-    color: #1a73e8;
 }
 .form-group input,
 .form-group textarea,
@@ -176,7 +159,6 @@ table td .form-group.label-animate label {
 .dataTable thead tr th,
 .dataTable tfoot tr th {
     padding: 8px;
-    background: #eee;
 }
 .dataTable tbody tr td {
     padding: 8px;
@@ -236,20 +218,15 @@ table.dataTable tr td:last-child{
 .table.table-bordered td{
     border-color: transparent;
 }
-.table.table-bordered tbody tr:not(:last-child) td{
-    border-bottom: 1px solid #ddd !important;
-}
 .card .card-body .header-card-body{
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
     margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
 }
 .card .card-body .header-card-body h4{
     font-size: 25px;
     padding-right: 20px;
-    border-right: 1px solid #ddd;
     font-weight: inherit;
 }
 .card .card-body .header-card-body p{
@@ -260,7 +237,6 @@ table.dataTable tr td:last-child{
     top: 0;
     left: 0;
     height: 100%;
-    background: #fff;
     width: 100%;
     z-index: 10;
     display: flex;
@@ -307,8 +283,6 @@ label sup{
 .box {
     position: relative;
     border-radius: 3px;
-    background: #ffffff;
-    border-top: 3px solid #d2d6de;
     margin-bottom: 20px;
     width: 100%;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
@@ -328,15 +302,11 @@ label sup{
 .box.box-success {
     border-top-color: #00a65a;
 }
-.box.box-default {
-    border-top-color: #d2d6de;
-}
 .box.collapsed-box .box-body,
 .box.collapsed-box .box-footer {
     display: none;
 }
 .box .nav-stacked > li {
-    border-bottom: 1px solid #f4f4f4;
     margin: 0;
 }
 .box .nav-stacked > li:last-of-type {
@@ -346,21 +316,11 @@ label sup{
     max-height: 300px;
     overflow: auto;
 }
-.box .border-right {
-    border-right: 1px solid #f4f4f4;
-}
-.box .border-left {
-    border-left: 1px solid #f4f4f4;
-}
 .box.box-solid {
     border-top: 0;
 }
 .box.box-solid > .box-header .btn.btn-default {
     background: transparent;
-}
-.box.box-solid > .box-header .btn:hover,
-.box.box-solid > .box-header a:hover {
-    background: rgba(0, 0, 0, 0.1);
 }
 .box.box-solid.box-default {
     border: 1px solid #d2d6de;
@@ -464,7 +424,6 @@ label sup{
 .box .overlay,
 .overlay-wrapper .overlay {
     z-index: 50;
-    background: rgba(255, 255, 255, 0.7);
     border-radius: 3px;
 }
 .box .overlay > .fa,
@@ -500,9 +459,6 @@ label sup{
     display: block;
     padding: 10px;
     position: relative;
-}
-.box-header.with-border {
-    border-bottom: 1px solid #f4f4f4;
 }
 .collapsed-box .box-header.with-border {
     border-bottom: none;
@@ -589,9 +545,7 @@ label sup{
     border-top-right-radius: 0;
     border-bottom-right-radius: 3px;
     border-bottom-left-radius: 3px;
-    border-top: 1px solid #f4f4f4;
     padding: 10px;
-    background-color: #ffffff;
 }
 .chart-legend {
     margin: 10px 0;
@@ -602,12 +556,8 @@ label sup{
         margin-right: 10px;
     }
 }
-.box-comments {
-    background: #f7f7f7;
-}
 .box-comments .box-comment {
     padding: 8px 0;
-    border-bottom: 1px solid #eee;
 }
 .box-comments .box-comment:before,
 .box-comments .box-comment:after {
@@ -657,7 +607,6 @@ div.dataTables_wrapper div.dataTables_processing::after{
 div.dataTables_wrapper div.dataTables_processing{
     left: 45%;
     width: 300px;
-    background-color: rgba(255,255,255,.9);
 }
 @keyframes spin {
     from {
@@ -684,7 +633,6 @@ div.dataTables_wrapper div.dataTables_processing{
     color: #aaa;
 }
 .form-control {
-    color: #000;
     font-weight: 400;
 }
 select.form-control {
@@ -790,33 +738,16 @@ table .form-group {
     margin-right: 0;
 }
 .form-control:disabled {
-    background-color: #fff;
     cursor: not-allowed;
-}
-.form-control:read-only {
-    background-color: #fff;
 }
 .wizard > .actions .disabled a{
     color: #fff;
     background: #2780c8;
     cursor: no-drop;
 }
-#new-addressses table tr:nth-last-child(0) {
-    border-bottom: 1px solid #ccc;
-}
-#new-addressses table tr:nth-last-child(1) {
-    border-bottom: 1px solid #ccc;
-}
-#new-addressses table tr:last-of-type {
-    border-bottom: 1px solid #ccc;
-}
-#new-addressses table tr:last-child {
-    border-bottom: 1px solid #ccc;
-}
 .separator-dashed {
     border-style: dashed;
     border-width: 1px;
-    border-color: #ddd;
 }
 .no-border-radius {
     border-radius: 0 !important;
@@ -843,7 +774,6 @@ label.check-style:after {
     left: 1px;
     width: 25px;
     height: 25px;
-    background: #fff;
     border-radius: 90px;
     transition: 0.3s;
 }
@@ -920,11 +850,6 @@ a[disabled] {
     pointer-events: none;
     cursor: no-drop;
 }
-
-
-
-
-
 @media (min-width: 576px) {
     .modal-md {
         max-width: 100%;
