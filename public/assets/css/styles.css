@@ -871,3 +871,6 @@ a[disabled] {
 .navbar.default-layout .navbar-brand-wrapper .navbar-brand img {
     height: 60px !important;
 }
+.navbar.default-layout .navbar-brand-wrapper .navbar-brand {
+    padding: 1px 0 0 0;
+}
