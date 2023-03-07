@@ -867,3 +867,7 @@ a[disabled] {
         max-width: 65%;
     }
 }
+
+.navbar.default-layout .navbar-brand-wrapper .navbar-brand img {
+    height: 60px !important;
+}
