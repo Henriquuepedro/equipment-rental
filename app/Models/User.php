@@ -30,7 +30,8 @@ class User extends Authenticatable
         'last_login_ip',
         'last_access_at',
         'logout',
-        'type_user'
+        'type_user',
+        'style_template'
     ];
 
     /**

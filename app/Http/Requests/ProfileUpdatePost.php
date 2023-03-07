@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ProfileUpdatePost extends FormRequest
 {
@@ -32,15 +33,15 @@ class ProfileUpdatePost extends FormRequest
                 'nullable',
                 function ($attribute, $value, $fail) {
                     $exists = DB::table('users')
-                        ->where('email', $this->email)
-                        ->whereNotIn('id', [$this->user_id])
+                        ->where('email', $value)
+                        ->whereNotIn('id', [$this->input('user_id')])
                         ->count();
                     if ($exists) {
-                        echo json_encode(['success' => false, 'data' => 'Endereço de e-mail já está em uso.']);
-                        die;
+                        $fail('Endereço de e-mail já está em uso.');
                     }
                 }
-            ]
+            ],
+            'style_template'    => [Rule::in([1,3])]
         ];
     }
     /**

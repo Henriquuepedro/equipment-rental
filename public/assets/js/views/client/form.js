@@ -619,3 +619,6 @@ const showHideTableAddress = () => {
 $(document).on('change','[name="state"], #state_new', function(){
     loadCities($(this).closest('.box-body').find('[name="city"], #city_new'), $(this).val());
 });
+$(document).on('change','[name="state[]"]', function(){
+    loadCities($(this).closest('td').find('[name="city[]"]'), $(this).val());
+});

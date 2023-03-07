@@ -75,8 +75,9 @@ class UserController extends Controller
         }
 
         $dataUserUpdate = [
-            'name'  => $request->name ? filter_var($request->name, FILTER_SANITIZE_STRING) : null,
-            'phone' => $request->phone ? filter_var(preg_replace('/[^0-9]/', '', $request->phone), FILTER_SANITIZE_NUMBER_INT) : null
+            'name'  => filter_var($request->input('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL),
+            'phone' => filter_var(onlyNumbers($request->input('phone')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL),
+            'style_template'  => $request->input('style_template')
         ];
 
         if($request->password)

@@ -48,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
                 $settings['name_company'] = $dataCompany->name;
                 $settings['type_user'] = auth()->user()->type_user;
                 $settings['name_plan'] = $dataPlan ? $dataPlan->description : 'Sem plano';
+                $settings['style_template'] = auth()->user()->style_template;
 
                 $months = 2;
                 $settings['intervalDates'] = [

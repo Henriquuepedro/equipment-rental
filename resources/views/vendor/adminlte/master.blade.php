@@ -25,12 +25,12 @@
     <link rel="stylesheet" href="{{ asset('assets/css/shared/style.css') }}">
     <!-- endinject -->
     <!-- Layout styles -->
-    <link rel="stylesheet" href="{{ asset('assets/css/demo_1/style.css') }}">
+    <link rel="stylesheet" href="{{ asset("assets/css/demo_$settings[style_template]/style.css") }}">
     <!-- End Layout styles -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}"/>
     <!-- endinject -->
     <!-- Layout styles -->
-    <link rel="stylesheet" href="{{ asset('assets/css/demo_1/style.css') }}">
+    <link rel="stylesheet" href="{{ asset("assets/css/demo_$settings[style_template]/style.css") }}">
 
     {{-- Custom Meta Tags --}}
     @yield('meta_tags')

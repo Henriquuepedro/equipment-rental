@@ -220,6 +220,9 @@
                             <li class="nav-item">
                                 <a class="nav-link active" id="user-profile-info-tab" data-toggle="pill" href="#user-profile-info" role="tab" aria-controls="user-profile-info" aria-selected="true">Perfil</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="user-config-info-tab" data-toggle="pill" href="#user-config" role="tab" aria-controls="user-config" aria-selected="true">Configurações</a>
+                            </li>
                         </ul>
                         <form action="{{ route('profile.update') }}" method="POST" class="row" id="formUpdateProfile">
                             <div class="col-md-12">
@@ -266,6 +269,17 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="user-config" role="tabpanel" aria-labelledby="user-config-tab">
+                                        <div class="row pb-4">
+                                            <div class="form-group col-md-4">
+                                                <label>Tema</label>
+                                                <select class="form-control" name="style_template">
+                                                    <option value="1" {{ (old('style_template') ?? $user->style_template) == 1 ? 'selected' : '' }}>Claro (Light)</option>
+                                                    <option value="3" {{ (old('style_template') ?? $user->style_template) == 3 ? 'selected' : '' }}>Escuro (Dark)</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>

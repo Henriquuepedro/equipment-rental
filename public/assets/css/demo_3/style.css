@@ -2971,7 +2971,7 @@ input[type="button"].btn-block {
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center; }
-  
+
   .btn-group-vertical > .btn,
   .ajax-upload-dragdrop .btn-group-vertical > .ajax-file-upload,
   .swal2-modal .swal2-buttonswrapper .btn-group-vertical > .swal2-styled,
@@ -3275,7 +3275,7 @@ input[type="button"].btn-block {
   .asColorPicker-wrap > .custom-select:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0; }
-  
+
   .input-group > .custom-file,
   .asColorPicker-wrap > .custom-file {
     display: -webkit-box;
@@ -8699,7 +8699,7 @@ a.text-dark:hover, a.text-dark:focus {
     border: 1px solid #000; }
   .table, .jsgrid .jsgrid-table {
     border-collapse: collapse !important; }
-    
+
     .table td,
     .jsgrid .jsgrid-table td, .table th, .jsgrid .jsgrid-table th {
       background-color: #ffffff !important; }
@@ -13163,7 +13163,7 @@ ul {
       border-radius: 100%;
       width: 12px;
       height: 12px;
-      left: -28px;
+      left: -25px;
       top: 6px;
       border: 3px solid #2196f3;
       margin-right: 15px;
@@ -14558,7 +14558,7 @@ ul {
       margin-left: 0.325rem; }
   .table tbody td, .jsgrid .jsgrid-table tbody td {
     border-top-color: #383e5d; }
-  
+
   .table td,
   .jsgrid .jsgrid-table td, .table th, .jsgrid .jsgrid-table th {
     vertical-align: middle;
@@ -14590,7 +14590,7 @@ ul {
     .jsgrid .jsgrid-table th .form-radio {
       margin-top: 0;
       margin-bottom: -0px; }
-  
+
   .table td,
   .jsgrid .jsgrid-table td {
     color: #fff; }
@@ -19733,3 +19733,198 @@ body.invoice-page.invoice-2 table {
           padding: 0 7px; }
 
 /*# sourceMappingURL=style.css.map */
+
+.form-control {
+    color: #8e919f;
+}
+.dataTable thead tr th,
+.dataTable tfoot tr th {
+    background: #383e5d;
+}
+.table.table-bordered tbody tr:not(:last-child) td{
+    border-bottom: 1px solid #383e5d !important;
+}
+.card .card-body .header-card-body{
+    border-bottom: 1px solid #383e5d;
+}
+.card .card-body .header-card-body h4{
+    border-right: 1px solid #383e5d;
+}
+.block-screen-load{
+    background: #252C46;
+}
+.box {
+    background: #222437;
+    border: 1px solid #383e5d;
+}
+.box .box-header{
+    color: #fff
+}
+.box.box-default {
+    border-top-color: #383e5d;
+}
+.box .nav-stacked > li {
+    border-bottom: 1px solid #383e5d;
+}
+.box .border-right {
+    border-right: 1px solid #383e5d;
+}
+.box .border-left {
+    border-left: 1px solid #383e5d;
+}
+.box.box-solid > .box-header .btn:hover,
+.box.box-solid > .box-header a:hover {
+    background: rgba(37, 44, 70, 0.1);
+}
+.box.box-solid.box-default {
+    border: 1px solid #383e5d;
+}
+.overlay-wrapper .overlay {
+    background: #2a2c44;
+}
+.box-header.with-border {
+    border-bottom: 1px solid #383e5d;
+}
+.box-footer {
+    border-top: 1px solid #383e5d;
+    background-color: #2a2c44;
+}
+.box-comments {
+    background: #2a2c44;
+}
+.box-comments .box-comment {
+    border-bottom: 1px solid #383e5d;
+}
+div.dataTables_wrapper div.dataTables_processing{
+    background-color: #2a2c44;
+}
+#new-addressses table tr:nth-last-child(0) {
+    border-bottom: 1px solid #383e5d;
+}
+#new-addressses table tr:nth-last-child(1) {
+    border-bottom: 1px solid #383e5d;
+}
+#new-addressses table tr:last-of-type {
+    border-bottom: 1px solid #383e5d;
+}
+#new-addressses table tr:last-child {
+    border-bottom: 1px solid #383e5d;
+}
+.separator-dashed {
+    border-color: #383e5d;
+}
+label.check-style:after {
+    background: #2a2c44;
+}
+.form-group>label {
+    background-color: #222437;
+    color: #8e919f;
+}
+.form-group .form-control {
+    background-color: #222437;
+}
+.form-group.label-animate label {
+    color: #fff;
+}
+.form-group.label-animate .form-control:focus {
+    color: #fff !important;
+    border-color: #8e919f;
+}
+.form-control:disabled,
+.form-control:read-only:not(select){
+    background-color: #2a2c44;
+    color: #8e919f;
+}
+#users-registred .card {
+    border: 1px solid #383e5d;
+}
+.profile-page .profile-body .tab-switch .nav-item .nav-link{
+    color: #fff;
+    border-bottom: 3px solid #8e919f;
+}
+.profile-page .profile-body .tab-switch .nav-item .nav-link.active {
+    color: #fff;
+    border-bottom: 3px solid #fff;
+}
+.table-bordered th, .table-bordered td,
+.table-bordered {
+    border: 1px solid #383e5d
+}
+div.dataTables_wrapper div.dataTables_filter input {
+    background-color: #222437;
+}
+.swal2-popup {
+    background-color: #222437 !important;
+}
+.swal2-container.swal2-backdrop-show {
+    background: rgba(0,0,0,0.6) !important;
+}
+.select2-container--default .select2-results>.select2-results__options {
+    background: #383e5d;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background: #222437 !important;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background: #8e919f
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #8e919f
+}
+.select2-container--default .select2-selection--single,
+.select2-container {
+    background: #222437 !important;
+}
+.sidebar > .nav .nav-item .collapse .sub-menu .nav-item .nav-link.active:before {
+    background: #fff;
+}
+.daterangepicker,
+.daterangepicker .calendar-table{
+    background-color: #222437 !important;
+}
+.daterangepicker .calendar-table{
+    border: unset !important;
+}
+.daterangepicker td.off, .daterangepicker td.off.in-range, .daterangepicker td.off.start-date, .daterangepicker td.off.end-date {
+    background: #8e919f !important;
+    color: #bbb !important;
+}
+.daterangepicker td.available.active {
+    background: #131725 !important;
+}
+.daterangepicker td.in-range {
+    background: #252C46 !important;
+}
+.daterangepicker .calendar-table span {
+    border-color: #fff !important;
+}
+.select2-container--default .select2-selection--multiple {
+    background: #222437 !important;;
+}
+
+.list-equipment .equipment:hover {
+    background: #222437 !important;
+}
+.wizard > .content {
+    background: #222437 !important;;
+    border: 1px solid #eee;
+}
+.content-equipment::-webkit-scrollbar-track {
+    background-color: #F5F5F5;
+}
+.content-equipment::-webkit-scrollbar {
+    background-color: #F5F5F5;
+}
+.btn-view-price-period-equipment i {
+    color: #fff;
+}
+#payment input:disabled {
+    background-color: #eee;
+}
+#payment .input-group-text {
+    background-color: #eee;
+}
+.wizard > .steps .disabled a {
+    background: #131725 !important;
+    color: #fff !important;
+}
