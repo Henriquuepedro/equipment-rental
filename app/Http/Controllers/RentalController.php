@@ -93,28 +93,22 @@ class RentalController extends Controller
         $company_id     = $request->user()->company_id;
         $typeRental     = $request->type;
         // Filtro datas
-        $intervalDate   = $request->intervalDate;
-        $intervalDate   = explode('-', $intervalDate);
-        $filters['dateStart']   = date('Y-m-d', strtotime("-2 months", time()));
-        $filters['dateFinish']  = date('Y-m-d');
-        if (count($intervalDate) == 2) {
-            $filters['dateStart']  = \DateTime::createFromFormat('d/m/Y', trim($intervalDate[0]))->format('Y-m-d');
-            $filters['dateFinish'] = \DateTime::createFromFormat('d/m/Y', trim($intervalDate[1]))->format('Y-m-d');
-        }
+        $filters['dateStart']   = $request->input('start_date');
+        $filters['dateFinish']  = $request->input('end_date');
         // Filtro cliente
-        $client = $request->client ?? (int)$request->client;
+        $client = $request->input('client');
         if (empty($client)) $client = null;
         $filters['client'] = $client;
 
-        $search = $request->search;
+        $search = $request->input('search');
         if ($search['value']) $searchUser = $search['value'];
 
-        if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") $direction = "asc";
+        if ($request->input('order')) {
+            if ($request->input('order')[0]['dir'] == "asc") $direction = "asc";
             else $direction = "desc";
 
             $fieldsOrder = array('rentals.code','clients.name','rentals.created_at', '');
-            $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
+            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
                 $orderBy['order'] = $direction;
@@ -695,15 +689,18 @@ class RentalController extends Controller
             'lng' => $request->lng
         ];
 
-        return $this->address->updateLanLngAddressClient($company_id, $request->client, $request->name_address, $dataUpdate) ? true : false;
+        return (bool)$this->address->updateLanLngAddressClient($company_id, $request->client, $request->name_address, $dataUpdate);
 
     }
 
     public function getQtyTypeRentals(Request $request)
     {
         $company_id = $request->user()->company_id;
+        $client     = $request->input('client');
+        $start_date = $request->input('start_date');
+        $end_date   = $request->input('end_date');
 
-        $typesQuery = $this->rental->getCountTypeRentals($company_id);
+        $typesQuery = $this->rental->getCountTypeRentals($company_id, $client, $start_date, $end_date);
 
         $arrTypes = array(
             'deliver'   => $typesQuery['deliver'],
