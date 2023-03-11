@@ -2,6 +2,14 @@
 
 use App\Models\Permission;
 
+const DATETIME_INTERNATIONAL = 'Y-m-d H:i:s';
+const DATE_INTERNATIONAL = 'Y-m-d';
+const DATETIME_BRAZIL = 'd/m/Y H:i:s';
+const DATETIME_BRAZIL_NO_SECONDS = 'd/m/Y H:i';
+const DATE_BRAZIL = 'd/m/Y';
+const DATETIME_INTERNATIONAL_TIMEZONE = 'Y-m-d H:i:sP';
+const TIMEZONE_DEFAULT = 'America/Fortaleza';
+
 if (! function_exists('hasPermission')) {
     function hasPermission(string $permission): bool
     {
@@ -187,14 +195,14 @@ if (! function_exists('onlyNumbers')) {
     }
 }
 
-if (! function_exists('transformDateBr_En')) {
+if (! function_exists('dateBrazilToDateInternational')) {
     /**
      * Retorna a data formatada.
      *
      * @param   string|null $date
      * @return  string|null
      */
-    function transformDateBr_En(?string $date): ?string
+    function dateBrazilToDateInternational(?string $date): ?string
     {
         if (is_null($date)) {
             return null;
@@ -204,14 +212,83 @@ if (! function_exists('transformDateBr_En')) {
             return null;
         }
 
-        $new_date = strlen($date) === 10 ?
-            implode('-', array_reverse(explode('/', $date))) :
-            implode('-', array_reverse(explode('/', explode(' ', explode('T', $date)[0])[0]))) . ' ' . (explode(' ', $date)[1] ?? explode('T', $date)[1]);
+        $format_in  = DATE_BRAZIL;
+        $format_out = DATE_INTERNATIONAL;
 
-        if (!strtotime($new_date)) {
+        if (strlen($date) === 19) {
+            $format_in  .= ' H:i:s';
+            $format_out .= ' H:i:s';
+        }
+
+        try {
+            return DateTime::createFromFormat($format_in, $date)->format($format_out);
+        } catch (Exception | Throwable $e) {
+            return $date;
+        }
+    }
+}
+
+if (! function_exists('formdatDateBrazil')) {
+    /**
+     * Formata a data.
+     *
+     * @param   string|null $date
+     * @return  string|null
+     */
+    function formdatDateBrazil(?string $date, string $format = null): ?string
+    {
+        if (is_null($date)) {
             return null;
         }
 
-        return $new_date;
+        if (strlen($date) !== 10 && strlen($date) !== 19) {
+            return null;
+        }
+
+        $format_out = DATE_BRAZIL;
+        $format_in  = DATE_INTERNATIONAL;
+
+        if (strlen($date) === 19) {
+            $format_in  .= ' H:i:s';
+            $format_out .= ' H:i:s';
+        }
+
+        try {
+            return DateTime::createFromFormat($format_in, $date)->format($format ?? $format_out);
+        } catch (Exception | Throwable $e) {
+            return $date;
+        }
+    }
+}
+
+if (! function_exists('formatMoney')) {
+    function formatMoney(string $value = null, int $decimals = 2, string $prefix = ''): string
+    {
+        if (empty($value)) {
+            return 0.00;
+        }
+
+        return $prefix . number_format($value, $decimals, ',', '.');
+    }
+}
+
+if (! function_exists('formatCodeRental')) {
+    function formatCodeRental(string $code): string
+    {
+        return str_pad($code, 5, 0, STR_PAD_LEFT);
+    }
+}
+
+if (!function_exists('dateNowInternational')) {
+    function dateNowInternational($timezone = null, string $format = null): string
+    {
+        if ($timezone) {
+            $dateTimeNow = new DateTimeZone($timezone);
+        } else {
+            $dateTimeNow = new DateTimeZone(TIMEZONE_DEFAULT);
+        }
+
+        return (new DateTime())->setTimezone($dateTimeNow)->format($format ?? DATETIME_INTERNATIONAL);
+
     }
 }

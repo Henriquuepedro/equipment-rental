@@ -104,7 +104,7 @@ class BillsToPayController extends Controller
         $permissionDelete = hasPermission('BillsToPayDeletePost');
 
         foreach ($data as $key => $value) {
-            $bill_code = str_pad($value['code'], 5, 0, STR_PAD_LEFT);
+            $bill_code = formatCodeRental($value['code']);
             $data_prop_button = "data-bill-payment-id='{$value['bill_payment_id']}' data-bill-code='$bill_code' data-name-provider='{$value['provider_name']}' data-date-bill='" . date('d/m/Y H:i', strtotime($value['created_at'])) . "' data-due-date='" . date('d/m/Y', strtotime($value['due_date'])) . "' data-payment-id='{$value['payment_id']}' data-payday='" . date('d/m/Y', strtotime($value['payday'])) . "' data-due-value='" . number_format($value['due_value'], 2, ',', '.') . "'";
 
             $txt_btn_paid = $typeBill == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
@@ -328,7 +328,7 @@ class BillsToPayController extends Controller
                 'bill_to_pay_id'=> 0,
                 'parcel'        => 1,
                 'due_day'       => 0,
-                'due_date'      => date('Y-m-d'),
+                'due_date'      => date(DATE_INTERNATIONAL),
                 'due_value'     => $value,
                 'user_insert'   => $request->user()->id
             );

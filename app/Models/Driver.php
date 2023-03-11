@@ -50,17 +50,23 @@ class Driver extends Model
     public function getDrivers($company_id, $init = null, $length = null, $searchDriver = null, $orderBy = array())
     {
         $driver = $this->where('company_id', $company_id);
-        if ($searchDriver)
-            $driver->where(function($query) use ($searchDriver) {
+        if ($searchDriver) {
+            $driver->where(function ($query) use ($searchDriver) {
                 $query->where('name', 'like', "%{$searchDriver}%")
                     ->orWhere('cpf', 'like', "%{$searchDriver}%")
                     ->orWhere('phone', 'like', "%{$searchDriver}%");
             });
+        }
 
-        if (count($orderBy) !== 0) $driver->orderBy($orderBy['field'], $orderBy['order']);
-        else $driver->orderBy('name', 'asc');
+        if (count($orderBy) !== 0) {
+            $driver->orderBy($orderBy['field'], $orderBy['order']);
+        } else {
+            $driver->orderBy('name', 'asc');
+        }
 
-        if ($init !== null && $length !== null) $driver->offset($init)->limit($length);
+        if ($init !== null && $length !== null) {
+            $driver->offset($init)->limit($length);
+        }
 
         return $driver->get();
     }
@@ -68,12 +74,13 @@ class Driver extends Model
     public function getCountDrivers($company_id, $searchDriver = null)
     {
         $driver = $this->where('company_id', $company_id);
-        if ($searchDriver)
-            $driver->where(function($query) use ($searchDriver) {
+        if ($searchDriver) {
+            $driver->where(function ($query) use ($searchDriver) {
                 $query->where('name', 'like', "%{$searchDriver}%")
                     ->orWhere('cpf', 'like', "%{$searchDriver}%")
                     ->orWhere('phone', 'like', "%{$searchDriver}%");
             });
+        }
 
         return $driver->count();
     }

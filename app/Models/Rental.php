@@ -300,4 +300,85 @@ class Rental extends Model
 
         return false;
     }
+
+    public function getRentalsWithFilters(int $company_id, array $filters, bool $simplified = true)
+    {
+        $rental = $this ->select(
+            $simplified ? DB::raw('DISTINCT rentals.id') : 'rentals.id',
+            'rentals.code',
+            'clients.name as client_name',
+            'rentals.net_value',
+            'rentals.address_name',
+            'rentals.address_number',
+            'rentals.address_zipcode',
+            'rentals.address_complement',
+            'rentals.address_neigh',
+            'rentals.address_city',
+            'rentals.address_state',
+            'rentals.created_at',
+            'rental_equipments.actual_delivery_date',
+            'rental_equipments.actual_withdrawal_date'
+        )
+        ->join('clients','clients.id','=','rentals.client_id')
+        ->join('rental_equipments','rental_equipments.rental_id','=','rentals.id')
+        ->where(['rentals.company_id' => $company_id, 'rentals.deleted' => false]);
+
+        // Filtrar registros por data.
+        switch ($filters['_date_filter']) {
+            case 'created':
+                $date_filter = 'rentals.created_at';
+                break;
+            case 'delivered':
+                $date_filter = 'rental_equipments.actual_delivery_date';
+                break;
+            case 'withdrawn':
+                $date_filter = 'rental_equipments.actual_withdrawal_date';
+                break;
+            default:
+                $date_filter = 'rentals.created_at';
+        }
+
+        $rental->whereBetween($date_filter, ["{$filters['_date_start']} 00:00:00", "{$filters['_date_end']} 23:59:59"]);
+
+        // Faz os filtros conforme o que foi informado.
+        foreach ($filters as $filter_key => $filter_value) {
+            // chave que comecem com "_", devem se ignoradas.
+            if (substr($filter_key, 0, 1) === '_') {
+                continue;
+            }
+
+            $rental->where($filter_key, $filter_value);
+        }
+
+        // Filtrar registro por situação, caso foi informado.
+        if (!empty($filters['_status'])) {
+            switch ($filters['_status']) {
+                case 'deliver':
+                    $rental->where('rental_equipments.actual_delivery_date', null);
+                    break;
+                case 'withdraw':
+                    $rental->where([
+                        ['rental_equipments.actual_delivery_date', '<>', null],
+                        ['rental_equipments.actual_withdrawal_date', '=', null]
+                    ]);
+                    break;
+                case 'finished':
+                    $rental->where([
+                        ['rentals.actual_delivery_date', '<>', null],
+                        ['rentals.actual_withdrawal_date', '<>', null]
+                    ]);
+                    break;
+            }
+        }
+
+        // Ordena os registros.
+        $rental->orderBy('rentals.code', 'DESC');
+
+        // Agrupa os registros por locação.
+        /*if ($simplified) {
+            $rental->groupBy('rentals.id');
+        }*/
+
+        return $rental->get();
+    }
 }
