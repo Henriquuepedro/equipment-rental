@@ -7,12 +7,14 @@ use App\Models\BudgetEquipment;
 use App\Models\BudgetPayment;
 use App\Models\Client;
 use App\Models\Company;
+use App\Models\Driver;
 use App\Models\Rental;
 use App\Models\RentalEquipment;
 use App\Models\RentalPayment;
 use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class PrintController extends Controller
@@ -26,28 +28,20 @@ class PrintController extends Controller
     private $budget;
     private $budget_equipment;
     private $budget_payment;
+    private $driver;
 
-    public function __construct(
-        PDF $pdf,
-        Client $client,
-        Company $company,
-        Rental $rental,
-        RentalEquipment $rental_equipment,
-        RentalPayment $rental_payment,
-        Budget $budget,
-        BudgetEquipment $budget_equipment,
-        BudgetPayment $budget_payment
-    )
+    public function __construct(PDF $pdf)
     {
         $this->pdf = $pdf;
-        $this->rental_equipment = $rental_equipment;
-        $this->rental = $rental;
-        $this->client = $client;
-        $this->company = $company;
-        $this->rental_payment = $rental_payment;
-        $this->budget = $budget;
-        $this->budget_equipment = $budget_equipment;
-        $this->budget_payment = $budget_payment;
+        $this->rental_equipment = new RentalEquipment();
+        $this->rental = new Rental();
+        $this->client = new Client();
+        $this->company = new Company();
+        $this->rental_payment = new RentalPayment();
+        $this->budget = new Budget();
+        $this->budget_equipment = new BudgetEquipment();
+        $this->budget_payment = new BudgetPayment();
+        $this->driver = new Driver();
         $this->pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 
         define("DOMPDF_ENABLE_REMOTE", false);
@@ -135,5 +129,99 @@ class PrintController extends Controller
             'payments'   => $payments,
             'budget'     => $budget
         ];
+    }
+
+    public function reportRental(Request $request)
+    {
+        $company_id             = $request->user()->company_id;
+        $type_person            = $request->input('type_person');
+        $client                 = $request->input('client');
+        $driver                 = $request->input('driver');
+        $status                 = $request->input('status');
+        $state                  = $request->input('state');
+        $city                   = $request->input('city');
+        $date_filter            = $request->input('date_filter');
+        $interval_dates         = explode(' - ', $request->input('intervalDates'));
+        $data_filter_view_pdf   = array();
+
+        $date_start     = dateBrazilToDateInternational($interval_dates[0]);
+        $date_end       = dateBrazilToDateInternational($interval_dates[1]);
+
+        $filters = array(
+            '_date_start'    => $date_start,
+            '_date_end'      => $date_end,
+            '_date_filter'   => $date_filter
+        );
+
+        switch ($date_filter) {
+            case 'created':
+                $date_filter_str = 'Lançamento';
+                break;
+            case 'delivered':
+                $date_filter_str = 'Entregue';
+                break;
+            case 'withdrawn':
+                $date_filter_str = 'Retirado';
+                break;
+            default:
+                $date_filter_str = '';
+        }
+
+        $data_filter_view_pdf["Data de $date_filter_str"] = "de $interval_dates[0] até $interval_dates[1]";
+
+        if (!empty($client)) {
+            $client_data = $this->client->getClient($client, $company_id);
+            $filters['rentals.client_id'] = $client;
+            $data_filter_view_pdf['Cliente'] = $client_data->name;
+        }
+        if (!empty($driver)) {
+            $driver_data = $this->driver->getDriver($driver, $company_id);
+            $filters['rental_equipments.actual_driver_delivery'] = $driver;
+            $data_filter_view_pdf['Motorista'] = $driver_data->name;
+        }
+        if (!empty($status)) {
+            $filters['_status'] = $status;
+            switch ($status) {
+                case 'deliver':
+                    $status_str = 'Para Entregar';
+                    break;
+                case 'withdraw':
+                    $status_str = 'Para Retirar';
+                    break;
+                case 'finished':
+                    $status_str = 'Finalizada';
+                    break;
+                default:
+                    $status_str = '';
+            }
+            $data_filter_view_pdf['Situação'] = $status_str;
+        }
+        if (!empty($state)) {
+            $filters['rentals.address_state'] = $state;
+            $data_filter_view_pdf['Estado'] = $state;
+        }
+        if (!empty($city)) {
+            $filters['rentals.address_city'] = $city;
+            $data_filter_view_pdf['Cidade'] = $city;
+        }
+
+        DB::enableQueryLog();
+        $rentals = $this->rental->getRentalsWithFilters($company_id, $filters);
+        dd(DB::getQueryLog());
+        if (!$rentals) {
+            return redirect()->route('report.rental')
+                ->with('warning', "Nenhum registro encontrado para o filtro aplicado!");
+        }
+
+        $company_data = $this->company->getCompany($company_id);
+        $contentPrint = [
+            'company'               => $company_data,
+            'logo_company'          => $this->getImageCompanyBase64($company_data),
+            'rentals'               => $rentals,
+            'data_filter_view_pdf'  => $data_filter_view_pdf
+        ];
+
+        $pdf = $this->pdf->loadView('print.report.rental', $contentPrint);
+        return $pdf->stream();
     }
 }

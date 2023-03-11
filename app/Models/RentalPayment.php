@@ -81,11 +81,11 @@ class RentalPayment extends Model
 
         foreach (array(
              'late' => array(
-                 ['due_date', '<', date('Y-m-d')],
+                 ['due_date', '<', date(DATE_INTERNATIONAL)],
                  ['payday', '=', NULL]
              ),
              'without_pay' => array(
-                 ['due_date', '>=', date('Y-m-d')],
+                 ['due_date', '>=', date(DATE_INTERNATIONAL)],
                  ['payday', '=', NULL]
              ),
              'paid' => array(
@@ -145,13 +145,13 @@ class RentalPayment extends Model
             switch ($type_rental) {
                  case 'late':
                     $rental->where(array(
-                        ['rental_payments.due_date', '<', date('Y-m-d')],
+                        ['rental_payments.due_date', '<', date(DATE_INTERNATIONAL)],
                         ['rental_payments.payday', '=', NULL]
                     ));
                     break;
                  case 'without_pay':
                      $rental->where(array(
-                        ['rental_payments.due_date', '>=', date('Y-m-d')],
+                        ['rental_payments.due_date', '>=', date(DATE_INTERNATIONAL)],
                         ['rental_payments.payday', '=', NULL]
                     ));
                     break;

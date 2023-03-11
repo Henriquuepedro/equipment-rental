@@ -53,7 +53,8 @@ class PermissionSeeder extends Seeder
             ['id' => 36, 'name' => 'BillsToPayView', 'text' => 'Visualizar', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[]', 'active' => '1'],
             ['id' => 37, 'name' => 'BillsToPayCreatePost', 'text' => 'Cadastrar', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1'],
             ['id' => 38, 'name' => 'BillsToPayUpdatePost', 'text' => 'Atualizar', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1'],
-            ['id' => 39, 'name' => 'BillsToPayDeletePost', 'text' => 'Excluir', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1']
+            ['id' => 39, 'name' => 'BillsToPayDeletePost', 'text' => 'Excluir', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1'],
+            ['id' => 40, 'name' => 'ReportView', 'text' => 'Visualizar', 'group_name' => 'report', 'group_text' => 'Relatório', 'auto_check' => '[]', 'active' => '1']
         ];
 
         foreach ($permissions as $permission) {

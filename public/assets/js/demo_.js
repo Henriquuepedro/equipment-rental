@@ -395,13 +395,13 @@ const loadDaterangePickerInput = (el, event) => {
     }, event);
 }
 
-const loadStates = async (el, id = null) => {
+const loadStates = async (el, id = null, name_value_default = 'Selecione ...') => {
     $.ajax({
         type: 'GET',
         url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome',
         success: async response => {
 
-            let options = '<option value="0">Selecione ...</option>';
+            let options = `<option value="0">${name_value_default}</option>`;
             let selected = '';
 
             await $(response).each(await function (key, value) {
@@ -417,13 +417,13 @@ const loadStates = async (el, id = null) => {
     });
 }
 
-const loadCities = async (el, state, id = null) => {
+const loadCities = async (el, state, id = null, name_value_default = 'Selecione ...') => {
     $.ajax({
         type: 'GET',
         url: `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios?orderBy=nome`,
         success: async response => {
 
-            let options = '<option value="0">Selecione ...</option>';
+            let options = `<option value="0">${name_value_default}</option>`;
             let selected = '';
 
             await $(response).each(await function (key, value) {

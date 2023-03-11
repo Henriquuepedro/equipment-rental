@@ -3,23 +3,32 @@
 
     $registerActive = '';
     $controlActive = '';
+    $reportActive = '';
     $dashboardActive = '';
 
-    if ($route->getName() == 'dashboard') $dashboardActive = 'active';
-    elseif (
-        strstr($route->getName(),'client')      !== false ||
-        strstr($route->getName(),'equipment')   !== false ||
-        strstr($route->getName(),'driver')      !== false ||
-        strstr($route->getName(),'vehicle')     !== false ||
-        strstr($route->getName(),'residue')     !== false ||
-        strstr($route->getName(),'provider')    !== false
-    ) $registerActive = 'active';
-    elseif (
-        strstr($route->getName(),'rental') !== false ||
-        strstr($route->getName(),'budget') !== false ||
-        strstr($route->getName(),'bills_to_receive') !== false ||
-        strstr($route->getName(),'bills_to_pay') !== false
-    ) $controlActive = 'active';
+    if ($route->getName() == 'dashboard') {
+        $dashboardActive = 'active';
+    } elseif (
+        strstr($route->getName(),'client.')      !== false ||
+        strstr($route->getName(),'equipment.')   !== false ||
+        strstr($route->getName(),'driver.')      !== false ||
+        strstr($route->getName(),'vehicle.')     !== false ||
+        strstr($route->getName(),'residue.')     !== false ||
+        strstr($route->getName(),'provider.')    !== false
+    ) {
+        $registerActive = 'active';
+    } elseif (
+        strstr($route->getName(),'rental\.') !== false ||
+        strstr($route->getName(),'budget.') !== false ||
+        strstr($route->getName(),'bills_to_receive.') !== false ||
+        strstr($route->getName(),'bills_to_pay.') !== false
+    ) {
+        $controlActive = 'active';
+    } elseif (
+        strstr($route->getName(),'report.')
+    ) {
+        $reportActive = 'active';
+    }
 @endphp
 
 <!-- partial -->
@@ -49,32 +58,32 @@
                 <ul class="nav flex-column sub-menu">
                     @if(in_array('ClientView', $permissions))
                     <li class="nav-item">
-                        <a class="nav-link" href=" {{ route('client.index') }}">Cliente</a>
+                        <a class="nav-link" href="{{ route('client.index') }}">Cliente</a>
                     </li>
                     @endif
                     @if(in_array('EquipmentView', $permissions))
                         <li class="nav-item">
-                            <a class="nav-link" href=" {{ route('equipment.index') }}">Equipamento</a>
+                            <a class="nav-link" href="{{ route('equipment.index') }}">Equipamento</a>
                         </li>
                     @endif
                     @if(in_array('DriverView', $permissions))
                         <li class="nav-item">
-                            <a class="nav-link" href=" {{ route('driver.index') }}">Motorista</a>
+                            <a class="nav-link" href="{{ route('driver.index') }}">Motorista</a>
                         </li>
                     @endif
                     @if(in_array('VehicleView', $permissions))
                         <li class="nav-item">
-                            <a class="nav-link" href=" {{ route('vehicle.index') }}">Veículo</a>
+                            <a class="nav-link" href="{{ route('vehicle.index') }}">Veículo</a>
                         </li>
                     @endif
                     @if(in_array('ResidueView', $permissions))
                         <li class="nav-item">
-                            <a class="nav-link" href=" {{ route('residue.index') }}">Resíduo</a>
+                            <a class="nav-link" href="{{ route('residue.index') }}">Resíduo</a>
                         </li>
                     @endif
                     @if(in_array('ProviderView', $permissions))
                         <li class="nav-item">
-                            <a class="nav-link" href=" {{ route('provider.index') }}">Fornecedor</a>
+                            <a class="nav-link" href="{{ route('provider.index') }}">Fornecedor</a>
                         </li>
                     @endif
                 </ul>
@@ -95,22 +104,42 @@
                     <ul class="nav flex-column sub-menu">
                         @if(in_array('RentalView', $permissions))
                             <li class="nav-item">
-                                <a class="nav-link" href=" {{ route('rental.index') }}">Locação</a>
+                                <a class="nav-link" href="{{ route('rental.index') }}">Locação</a>
                             </li>
                         @endif
                         @if(in_array('BudgetView', $permissions))
                             <li class="nav-item">
-                                <a class="nav-link" href=" {{ route('budget.index') }}">Orçamento</a>
+                                <a class="nav-link" href="{{ route('budget.index') }}">Orçamento</a>
                             </li>
                         @endif
                         @if(in_array('BillsToReceiveView', $permissions))
                             <li class="nav-item">
-                                <a class="nav-link" href=" {{ route('bills_to_receive.index') }}">Contas a Receber</a>
+                                <a class="nav-link" href="{{ route('bills_to_receive.index') }}">Contas a Receber</a>
                             </li>
                         @endif
                         @if(in_array('BillsToPayView', $permissions))
                             <li class="nav-item">
-                                <a class="nav-link" href=" {{ route('bills_to_pay.index') }}">Contas a Pagar</a>
+                                <a class="nav-link" href="{{ route('bills_to_pay.index') }}">Contas a Pagar</a>
+                            </li>
+                        @endif
+                    </ul>
+                </div>
+            </li>
+        @endif
+        @if(
+            in_array('ReportView', $permissions)
+        )
+            <li class="nav-item {{ $reportActive }}">
+                <a class="nav-link" data-toggle="collapse" href="#report-dropdown" aria-expanded="false" aria-controls="report-dropdown">
+                    <i class="menu-icon typcn typcn-cog-outline"></i>
+                    <span class="menu-title">Relatório</span>
+                    <i class="menu-arrow"></i>
+                </a>
+                <div class="collapse" id="report-dropdown">
+                    <ul class="nav flex-column sub-menu">
+                        @if(in_array('ReportView', $permissions))
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('report.rental') }}">Locação</a>
                             </li>
                         @endif
                     </ul>

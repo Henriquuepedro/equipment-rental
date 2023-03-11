@@ -101,6 +101,7 @@ Route::group(['middleware' => 'auth'], function (){
 
         Route::get('/locacao/{rental}', [App\Http\Controllers\PrintController::class, 'rental'])->name('rental');
         Route::get('/orcamento/{budget}', [App\Http\Controllers\PrintController::class, 'budget'])->name('budget');
+        Route::post('/relatorio/locacao', [App\Http\Controllers\PrintController::class, 'reportRental'])->name('report_rental');
 
     });
 
@@ -145,6 +146,13 @@ Route::group(['middleware' => 'auth'], function (){
         Route::get('/', [App\Http\Controllers\BillsToPayController::class, 'index'])->name('index');
         Route::get('/novo', [App\Http\Controllers\BillsToPayController::class, 'create'])->name('create');
         Route::post('/cadastro', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('insert');
+
+    });
+
+    // Relatório
+    Route::group(['prefix' => '/relatorio', 'as' => 'report.'], function () {
+
+        Route::get('/locacao', [App\Http\Controllers\ReportController::class, 'rental'])->name('rental');
 
     });
 

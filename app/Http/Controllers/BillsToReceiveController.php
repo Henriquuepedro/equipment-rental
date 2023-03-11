@@ -100,7 +100,7 @@ class BillsToReceiveController extends Controller
         $permissionDelete = hasPermission('BillsToReceiveDeletePost');
 
         foreach ($data as $key => $value) {
-            $rental_code = str_pad($value['code'], 5, 0, STR_PAD_LEFT);
+            $rental_code = formatCodeRental($value['code']);
             $data_prop_button = "data-rental-payment-id='{$value['rental_payment_id']}' data-rental-code='$rental_code' data-name-client='{$value['client_name']}' data-date-rental='" . date('d/m/Y H:i', strtotime($value['created_at'])) . "' data-due-date='" . date('d/m/Y', strtotime($value['due_date'])) . "' data-payment-id='{$value['payment_id']}' data-payday='" . date('d/m/Y', strtotime($value['payday'])) . "' data-due-value='" . number_format($value['due_value'], 2, ',', '.') . "'";
 
             $txt_btn_paid = $typeRental == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';

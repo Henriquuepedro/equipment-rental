@@ -71,11 +71,11 @@ class BillToPay extends Model
 
         foreach (array(
              'late' => array(
-                 ['due_date', '<', date('Y-m-d')],
+                 ['due_date', '<', date(DATE_INTERNATIONAL)],
                  ['payday', '=', NULL]
              ),
              'without_pay' => array(
-                 ['due_date', '>=', date('Y-m-d')],
+                 ['due_date', '>=', date(DATE_INTERNATIONAL)],
                  ['payday', '=', NULL]
              ),
              'paid' => array(
@@ -119,7 +119,7 @@ class BillToPay extends Model
             $bill->where(function ($query) use ($search_provider) {
 
                 $search_format_value = transformMoneyBr_En($search_provider);
-                $search_format_date = transformDateBr_En($search_provider);
+                $search_format_date = dateBrazilToDateInternational($search_provider);
 
                 $query->where('bill_to_pays.code', 'like', "%".(int)onlyNumbers($search_provider)."%")
                     ->orWhere('providers.name', 'like', "%$search_provider%")
@@ -142,13 +142,13 @@ class BillToPay extends Model
             switch ($type_bill) {
                 case 'late':
                     $bill->where(array(
-                        ['bill_to_pay_payments.due_date', '<', date('Y-m-d')],
+                        ['bill_to_pay_payments.due_date', '<', date(DATE_INTERNATIONAL)],
                         ['bill_to_pay_payments.payday', '=', NULL]
                     ));
                     break;
                 case 'without_pay':
                     $bill->where(array(
-                        ['bill_to_pay_payments.due_date', '>=', date('Y-m-d')],
+                        ['bill_to_pay_payments.due_date', '>=', date(DATE_INTERNATIONAL)],
                         ['bill_to_pay_payments.payday', '=', NULL]
                     ));
                     break;

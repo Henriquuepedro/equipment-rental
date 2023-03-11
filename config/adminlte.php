@@ -239,22 +239,6 @@ return [
             'text' => 'Dashboard',
             'route'  => 'dashboard',
             'icon' => 'typcn-document-text'
-        ],
-        [
-            'text'    => 'Cadastros',
-            'icon'    => 'flaticon-list-1',
-            'submenu' => [
-                [
-                    'text' => 'Clientes',
-                    'route'  => 'client.index',
-                    'active'  => ['client.index', 'client.create', 'client.edit']
-                ],
-                [
-                    'text' => 'Equipmentos',
-                    'route'  => 'equipment.index',
-                    'active'  => ['equipment.index', 'equipment.create', 'equipment.edit']
-                ]
-            ],
         ]
     ],
 

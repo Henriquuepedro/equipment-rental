@@ -224,7 +224,7 @@ class RentalController extends Controller
             }
 
             $result[$key] = array(
-                str_pad($value['code'], 5, 0, STR_PAD_LEFT),
+                formatCodeRental($value['code']),
 //                json_encode([$dateStart, $dateFinish]),
                 "<div class='d-flex flex-wrap'>
                     <div class='w-100 mb-2'>
@@ -389,8 +389,8 @@ class RentalController extends Controller
             'address_state'                 => $state,
             'address_lat'                   => $lat,
             'address_lng'                   => $lng,
-            'expected_delivery_date'        => $dateDelivery->format('Y-m-d H:i:s'),
-            'expected_withdrawal_date'      => $dateWithdrawal ? $dateWithdrawal->format('Y-m-d H:i:s') : null,
+            'expected_delivery_date'        => $dateDelivery->format(DATETIME_INTERNATIONAL),
+            'expected_withdrawal_date'      => $dateWithdrawal ? $dateWithdrawal->format(DATETIME_INTERNATIONAL) : null,
             'not_use_date_withdrawal'       => $notUseDateWithdrawal,
             'gross_value'                   => $haveCharged ? $responseEquipment->grossValue : null,
             'extra_value'                   => $haveCharged ? $responsePayment->extraValue : null,
@@ -529,8 +529,8 @@ class RentalController extends Controller
 //            if (!$budget)
                 $arrEquipment = array_merge($arrEquipment, array(
                     'use_date_diff_equip'       => $useDateDiff,
-                    'expected_delivery_date'    => $dateDeliveryEquip->format('Y-m-d H:i:s'),
-                    'expected_withdrawal_date'  => $dateWithdrawalEquip ? $dateWithdrawalEquip->format('Y-m-d H:i:s') : null,
+                    'expected_delivery_date'    => $dateDeliveryEquip->format(DATETIME_INTERNATIONAL),
+                    'expected_withdrawal_date'  => $dateWithdrawalEquip ? $dateWithdrawalEquip->format(DATETIME_INTERNATIONAL) : null,
                     'not_use_date_withdrawal'   => $notUseDateWithdrawalEquip
                 ));
 
@@ -628,7 +628,7 @@ class RentalController extends Controller
                 $nameFieldID    => 0,
                 'parcel'        => 1,
                 'due_day'       => 0,
-                'due_date'      => date('Y-m-d'),
+                'due_date'      => date(DATE_INTERNATIONAL),
                 'due_value'     => $netValue,
                 'user_insert'   => $request->user()->id
             );
