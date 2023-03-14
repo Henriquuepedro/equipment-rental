@@ -51,7 +51,7 @@
                         </ol>
                     </div>
                     @endif
-                    <form action="{{ route('print.report_rental') }}" method="POST" enctype="multipart/form-data" id="formCreateClient">
+                    <form action="{{ route('print.report_rental') }}" method="POST" enctype="multipart/form-data" id="formCreateClient" target="_blank">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">

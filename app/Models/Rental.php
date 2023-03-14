@@ -301,10 +301,10 @@ class Rental extends Model
         return false;
     }
 
-    public function getRentalsWithFilters(int $company_id, array $filters, bool $simplified = true)
+    public function getRentalsWithFilters(int $company_id, array $filters, bool $synthetic = true)
     {
         $rental = $this ->select(
-            $simplified ? DB::raw('DISTINCT rentals.id') : 'rentals.id',
+            'rentals.id',
             'rentals.code',
             'clients.name as client_name',
             'rentals.net_value',
@@ -317,15 +317,19 @@ class Rental extends Model
             'rentals.address_state',
             'rentals.created_at',
             'rental_equipments.actual_delivery_date',
-            'rental_equipments.actual_withdrawal_date'
+            'rental_equipments.actual_withdrawal_date',
+            'equipments.name',
+            'equipments.volume'
         )
         ->join('clients','clients.id','=','rentals.client_id')
         ->join('rental_equipments','rental_equipments.rental_id','=','rentals.id')
+        ->join('equipments','equipments.id','=','rental_equipments.equipment_id')
         ->where(['rentals.company_id' => $company_id, 'rentals.deleted' => false]);
 
         // Filtrar registros por data.
         switch ($filters['_date_filter']) {
             case 'created':
+            default:
                 $date_filter = 'rentals.created_at';
                 break;
             case 'delivered':
@@ -334,8 +338,6 @@ class Rental extends Model
             case 'withdrawn':
                 $date_filter = 'rental_equipments.actual_withdrawal_date';
                 break;
-            default:
-                $date_filter = 'rentals.created_at';
         }
 
         $rental->whereBetween($date_filter, ["{$filters['_date_start']} 00:00:00", "{$filters['_date_end']} 23:59:59"]);
@@ -348,6 +350,14 @@ class Rental extends Model
             }
 
             $rental->where($filter_key, $filter_value);
+        }
+
+        // Filtrou o motorista.
+        if (!empty($filters['_driver'])) {
+            $rental->where(function ($query) use ($filters) {
+                $query->where('rental_equipments.actual_driver_delivery', $filters['_driver'])
+                    ->orWhere('rental_equipments.actual_driver_withdrawal', $filters['_driver']);
+            });
         }
 
         // Filtrar registro por situação, caso foi informado.
@@ -364,8 +374,8 @@ class Rental extends Model
                     break;
                 case 'finished':
                     $rental->where([
-                        ['rentals.actual_delivery_date', '<>', null],
-                        ['rentals.actual_withdrawal_date', '<>', null]
+                        ['rental_equipments.actual_delivery_date', '<>', null],
+                        ['rental_equipments.actual_withdrawal_date', '<>', null]
                     ]);
                     break;
             }
@@ -375,9 +385,9 @@ class Rental extends Model
         $rental->orderBy('rentals.code', 'DESC');
 
         // Agrupa os registros por locação.
-        /*if ($simplified) {
+        if ($synthetic) {
             $rental->groupBy('rentals.id');
-        }*/
+        }
 
         return $rental->get();
     }
