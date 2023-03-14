@@ -2,6 +2,10 @@
     <head>
         <title>Relatório de Locações</title>
         <style>
+            @page {
+                margin: 30px 25px;
+            }
+
             body{
                 font-family: 'Microsoft YaHei','Source Sans Pro', sans-serif;
                 font-size:13px;
@@ -12,17 +16,8 @@
                 font-size: 11px;
                 border: 0;
                 width: 100%;
-                margin: 0px;
+                margin: 0;
                 cellspacing: 0;
-            }
-            .table .info{
-                padding: 0px !important;
-                height: 30px;
-            }
-            .table .info span{
-                font-size: 9px;
-                font-weight: bold;
-                padding-left: 3px
             }
             .text-center{
                 text-align: center !important
@@ -33,35 +28,49 @@
             .text-left{
                 text-align: left !important
             }
-
-
-
             .table.header tr td.data-filter {
                 border-top: 1px solid #000;
                 border-right: 1px solid #000;
                 text-align: left;
                 padding-left: 30%;
             }
-
             .table.header tr .img {
                 border-top: 1px solid #000;
                 border-left: 1px solid #000;
                 padding: 5px;
             }
-
             .table.header tr .img img{
                 max-width: 110px;
                 max-height: 110px
             }
-
+            .table.header {
+                border-bottom: 1px solid #000;
+            }
             .table.content {
+                margin-top: 10px
+            }
+            .table.equipment {
+                padding: 1px 5px
+            }
+            .table.equipment-header td{
+                font-weight: bold;
+                padding: 0 5px
+            }
+            .table.content.analytic tbody tr.rental-line td {
                 border-top: 1px solid #000;
             }
-
+            .table.content.analytic tbody .table.equipment .eq-line td {
+                border-top: 1px solid #999;
+            }
+            .table.content.analytic .equipment-header td,
+            .table.content.analytic tbody .table.equipment .eq-line-no-border td,
+            .table.content.analytic tbody .table.equipment .eq-line-one td {
+                border-top: 1px solid #fff !important;
+            }
         </style>
     </head>
     <body>
-        <table class='table header'>
+        <table class='table date'>
             <tr>
                 <td class='text-right' style='width: 100%'>
                     {{ dateNowInternational(null, DATETIME_BRAZIL_NO_SECONDS) }}
@@ -80,39 +89,13 @@
                 </td>
             </tr>
         </table>
-        <table class='table content'>
-            <thead>
-                <th class='info title text-left'>
-                    Locação
-                </th>
-                <th class='info title text-left'>
-                    Cliente
-                </th>
-                <th class='info title text-left'>
-                    Criado em
-                </th>
-                <th class='info title text-left'>
-                    Valor
-                </th>
-            </thead>
-            <tbody>
-                @foreach($rentals as $rental)
-                    <tr>
-                        <td class='info' style='width: 10%'>
-                            {{ formatCodeRental($rental->code) }}
-                        </td>
-                        <td class='info' style='width: 50%'>
-                            {{ $rental->client_name }}
-                        </td>
-                        <td class='info' style='width: 20%'>
-                            {{ formdatDateBrazil($rental->created_at, 'd/m/Y H:i') }}
-                        </td>
-                        <td class='info' style='width: 20%'>
-                            {{ formatMoney($rental->net_value, 2, 'R$ ') }}
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+
+        @if ($type_report === 'analytic')
+            @include('print.report.rental.analytic')
+        @elseif ($type_report === 'synthetic')
+            @include('print.report.rental.synthetic')
+
+        @endif
+
     </body>
 </html>

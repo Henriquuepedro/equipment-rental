@@ -134,7 +134,7 @@ class PrintController extends Controller
     public function reportRental(Request $request)
     {
         $company_id             = $request->user()->company_id;
-        $type_person            = $request->input('type_person');
+        $type_report            = $request->input('type_report');
         $client                 = $request->input('client');
         $driver                 = $request->input('driver');
         $status                 = $request->input('status');
@@ -176,7 +176,7 @@ class PrintController extends Controller
         }
         if (!empty($driver)) {
             $driver_data = $this->driver->getDriver($driver, $company_id);
-            $filters['rental_equipments.actual_driver_delivery'] = $driver;
+            $filters['_driver'] = $driver;
             $data_filter_view_pdf['Motorista'] = $driver_data->name;
         }
         if (!empty($status)) {
@@ -205,9 +205,7 @@ class PrintController extends Controller
             $data_filter_view_pdf['Cidade'] = $city;
         }
 
-        DB::enableQueryLog();
-        $rentals = $this->rental->getRentalsWithFilters($company_id, $filters);
-        dd(DB::getQueryLog());
+        $rentals = $this->rental->getRentalsWithFilters($company_id, $filters, $type_report === 'synthetic');
         if (!$rentals) {
             return redirect()->route('report.rental')
                 ->with('warning', "Nenhum registro encontrado para o filtro aplicado!");
@@ -218,8 +216,14 @@ class PrintController extends Controller
             'company'               => $company_data,
             'logo_company'          => $this->getImageCompanyBase64($company_data),
             'rentals'               => $rentals,
-            'data_filter_view_pdf'  => $data_filter_view_pdf
+            'data_filter_view_pdf'  => $data_filter_view_pdf,
+            'type_report'           => $type_report
         ];
+
+        /*$company = $contentPrint['company'];
+        $logo_company = $contentPrint['logo_company'];
+
+        return view('print.report.rental', compact('company', 'logo_company', 'rentals', 'data_filter_view_pdf', 'type_report'));*/
 
         $pdf = $this->pdf->loadView('print.report.rental', $contentPrint);
         return $pdf->stream();
