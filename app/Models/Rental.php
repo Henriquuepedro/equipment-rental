@@ -360,6 +360,14 @@ class Rental extends Model
             });
         }
 
+        // Filtrou o veículo.
+        if (!empty($filters['_vehicle'])) {
+            $rental->where(function ($query) use ($filters) {
+                $query->where('rental_equipments.actual_vehicle_delivery', $filters['_vehicle'])
+                    ->orWhere('rental_equipments.actual_vehicle_withdrawal', $filters['_vehicle']);
+            });
+        }
+
         // Filtrar registro por situação, caso foi informado.
         if (!empty($filters['_status'])) {
             switch ($filters['_status']) {

@@ -58,19 +58,27 @@ class Equipment extends Model
     public function getEquipments($company_id, $init = null, $length = null, $searchEquipment = null, $orderBy = array(), $getCacamba = false)
     {
         $equipment = $this->where('company_id', $company_id);
-        if ($searchEquipment)
-            $equipment->where(function($query) use ($searchEquipment, $getCacamba) {
+        if ($searchEquipment) {
+            $equipment->where(function ($query) use ($searchEquipment, $getCacamba) {
                 $query->where('name', 'like', "%{$searchEquipment}%")
                     ->orWhere('reference', 'like', "%{$searchEquipment}%")
                     ->orWhere('stock', 'like', "%{$searchEquipment}%");
 
-                if ($getCacamba) $query->orWhere('name', null);
+                if ($getCacamba) {
+                    $query->orWhere('name', null);
+                }
             });
+        }
 
-        if (count($orderBy) !== 0) $equipment->orderBy($orderBy['field'], $orderBy['order']);
-        else $equipment->orderBy('id', 'desc');
+        if (count($orderBy) !== 0) {
+            $equipment->orderBy($orderBy['field'], $orderBy['order']);
+        } else {
+            $equipment->orderBy('id', 'desc');
+        }
 
-        if ($init !== null && $length !== null) $equipment->offset($init)->limit($length);
+        if ($init !== null && $length !== null) {
+            $equipment->offset($init)->limit($length);
+        }
 
         return $equipment->get();
     }
@@ -78,14 +86,17 @@ class Equipment extends Model
     public function getCountEquipments($company_id, $searchEquipment = null, $getCacamba = false)
     {
         $equipment = $this->where('company_id', $company_id);
-        if ($searchEquipment)
-            $equipment->where(function($query) use ($searchEquipment, $getCacamba) {
+        if ($searchEquipment) {
+            $equipment->where(function ($query) use ($searchEquipment, $getCacamba) {
                 $query->where('name', 'like', "%{$searchEquipment}%")
                     ->orWhere('reference', 'like', "%{$searchEquipment}%")
                     ->orWhere('stock', 'like', "%{$searchEquipment}%");
 
-                if ($getCacamba) $query->orWhere('name', null);
+                if ($getCacamba) {
+                    $query->orWhere('name', null);
+                }
             });
+        }
 
         return $equipment->count();
     }
@@ -112,8 +123,9 @@ class Equipment extends Model
 
                         if ($getCacamba) $query->orWhere('name', null);
                     });
-        if ($equipmentInUse && count($equipmentInUse))
+        if ($equipmentInUse && count($equipmentInUse)) {
             $equipments = $equipments->whereNotIn('id', $equipmentInUse);
+        }
 
         return $equipments->get();
     }

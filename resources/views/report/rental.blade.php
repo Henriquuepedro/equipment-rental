@@ -69,7 +69,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="form-group col-md-5">
+                                    <div class="form-group col-md-7">
                                         <label for="client">Cliente</label>
                                         <select class="form-control select2" id="client" name="client">
                                             <option value="0">Todos</option>
@@ -78,6 +78,17 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                    <div class="form-group col-md-5">
+                                        <label for="status">Situação da Locação</label>
+                                        <select class="form-control" id="status" name="status">
+                                            <option value="0">Todas</option>
+                                            <option value="deliver">Para Entregar</option>
+                                            <option value="withdraw">Para Retirar</option>
+                                            <option value="finished">Finalizada</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="form-group col-md-4">
                                         <label for="driver">Motorista</label>
                                         <select class="form-control select2" id="driver" name="driver">
@@ -87,13 +98,22 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group col-md-3">
-                                        <label for="status">Situação da Locação</label>
-                                        <select class="form-control" id="status" name="status">
-                                            <option value="0">Todas</option>
-                                            <option value="deliver">Para Entregar</option>
-                                            <option value="withdraw">Para Retirar</option>
-                                            <option value="finished">Finalizada</option>
+                                    <div class="form-group col-md-4">
+                                        <label for="vehicle">Veículo</label>
+                                        <select class="form-control select2" id="vehicle" name="vehicle">
+                                            <option value="0">Todos</option>
+                                            @foreach($vehicles as $vehicle)
+                                                <option value="{{ $vehicle->id }}">{{ $vehicle->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="equipment">Equipamento</label>
+                                        <select class="form-control select2" id="equipment" name="equipment">
+                                            <option value="0">Todos</option>
+                                            @foreach($equipments as $equipment)
+                                                <option value="{{ $equipment->id }}">{{ $equipment->name ?? "Caçamba {$equipment->volume}m³" }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
