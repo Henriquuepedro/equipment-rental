@@ -4,17 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Driver;
+use App\Models\Equipment;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
     private $client;
+    private $vehicle;
     private $driver;
+    private $equipment;
     public function __construct()
     {
-        $this->client = new Client();
-        $this->driver = new Driver();
+        $this->client    = new Client();
+        $this->driver    = new Driver();
+        $this->vehicle   = new Vehicle();
+        $this->equipment = new Equipment();
     }
 
     public function rental()
@@ -24,9 +30,11 @@ class ReportController extends Controller
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        $clients = $this->client->getClients(Auth::user()->company_id);
-        $drivers = $this->driver->getDrivers(Auth::user()->company_id);
+        $clients    = $this->client->getClients(Auth::user()->company_id);
+        $drivers    = $this->driver->getDrivers(Auth::user()->company_id);
+        $vehicles   = $this->vehicle->getVehicles(Auth::user()->company_id);
+        $equipments = $this->equipment->getEquipments(Auth::user()->company_id);
 
-        return view('report.rental', compact('clients', 'drivers'));
+        return view('report.rental', compact('clients', 'drivers', 'vehicles', 'equipments'));
     }
 }

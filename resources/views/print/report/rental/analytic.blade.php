@@ -9,9 +9,9 @@
         <th class='text-center'>
             <table class="table equipment-header">
                 <tr style="width: 33%">
-                    <td class="text-left">Equipamento</td>
-                    <td class="text-center">Entregue em</td>
-                    <td class="text-right">Retirado em</td>
+                    <td class="text-left" style="width: 40%">Equipamento</td>
+                    <td class="text-left" style="width: 30%">Entregue em</td>
+                    <td class="text-left" style="width: 30%">Retirado em</td>
                 </tr>
             </table>
         </th>
@@ -38,9 +38,9 @@
                     <table class="table equipment">
                         @foreach($rental as $key => $equipment)
                             <tr style="width: 33%" class="@if(count($rental) != 1 && $key == 0) eq-line-one @elseif(count($rental) == 1) eq-line-no-border @else eq-line @endif">
-                                <td class="text-left">{{ $equipment['name'] ?? "Caçamba {$equipment['volume']}m³" }}</td>
-                                <td class="text-center">{{ formdatDateBrazil($equipment['actual_delivery_date'], DATETIME_BRAZIL_NO_SECONDS) ?? 'Não entregue' }}</td>
-                                <td class="text-right">{{ formdatDateBrazil($equipment['actual_withdrawal_date'], DATETIME_BRAZIL_NO_SECONDS) ?? 'Não retirado' }}</td>
+                                <td class="text-left" style="width: 40%">{{ $equipment['name'] ?? "Caçamba {$equipment['volume']}m³" }}</td>
+                                <td class="text-left" style="width: 30%;padding-left: 3px">{{ formdatDateBrazil($equipment['actual_delivery_date'], DATETIME_BRAZIL_NO_SECONDS) ?? 'Não entregue' }}</td>
+                                <td class="text-left" style="width: 30%;padding-left: 7px">{{ formdatDateBrazil($equipment['actual_withdrawal_date'], DATETIME_BRAZIL_NO_SECONDS) ?? 'Não retirado' }}</td>
                             </tr>
                         @endforeach
                     </table>

@@ -8,9 +8,11 @@ use App\Models\BudgetPayment;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Driver;
+use App\Models\Equipment;
 use App\Models\Rental;
 use App\Models\RentalEquipment;
 use App\Models\RentalPayment;
+use App\Models\Vehicle;
 use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +31,8 @@ class PrintController extends Controller
     private $budget_equipment;
     private $budget_payment;
     private $driver;
+    private $vehicle;
+    private $equipment;
 
     public function __construct(PDF $pdf)
     {
@@ -42,6 +46,8 @@ class PrintController extends Controller
         $this->budget_equipment = new BudgetEquipment();
         $this->budget_payment = new BudgetPayment();
         $this->driver = new Driver();
+        $this->vehicle   = new Vehicle();
+        $this->equipment = new Equipment();
         $this->pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 
         define("DOMPDF_ENABLE_REMOTE", false);
@@ -137,6 +143,8 @@ class PrintController extends Controller
         $type_report            = $request->input('type_report');
         $client                 = $request->input('client');
         $driver                 = $request->input('driver');
+        $vehicle                = $request->input('vehicle');
+        $equipment              = $request->input('equipment');
         $status                 = $request->input('status');
         $state                  = $request->input('state');
         $city                   = $request->input('city');
@@ -174,11 +182,25 @@ class PrintController extends Controller
             $filters['rentals.client_id'] = $client;
             $data_filter_view_pdf['Cliente'] = $client_data->name;
         }
+
         if (!empty($driver)) {
             $driver_data = $this->driver->getDriver($driver, $company_id);
             $filters['_driver'] = $driver;
             $data_filter_view_pdf['Motorista'] = $driver_data->name;
         }
+
+        if (!empty($vehicle)) {
+            $vehicle_data = $this->vehicle->getVehicle($vehicle, $company_id);
+            $filters['_vehicle'] = $vehicle;
+            $data_filter_view_pdf['Veículo'] = $vehicle_data->name;
+        }
+
+        if (!empty($equipment)) {
+            $equipment_data = $this->equipment->getEquipment($equipment, $company_id);
+            $filters['rental_equipments.equipment_id'] = $equipment;
+            $data_filter_view_pdf['Equipamento'] = $equipment_data->name ?? "Caçamba {$equipment_data->volume}m³";
+        }
+
         if (!empty($status)) {
             $filters['_status'] = $status;
             switch ($status) {
