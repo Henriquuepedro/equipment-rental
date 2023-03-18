@@ -141,6 +141,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('report.rental') }}">Locação</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('report.bill') }}">Financeiro</a>
+                            </li>
                         @endif
                     </ul>
                 </div>

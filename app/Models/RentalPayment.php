@@ -187,4 +187,59 @@ class RentalPayment extends Model
 
         return $rental->get();
     }
+
+    public function getBillsToReportWithFilters(int $company_id, array $filters, bool $synthetic = true)
+    {
+        $rental = $this ->select(
+            'rentals.id',
+            'rentals.code',
+            'clients.name as client_name',
+            'form_payments.name as payment_name',
+            'rental_payments.parcel',
+            'rental_payments.due_date',
+            'rental_payments.payday',
+            'rental_payments.due_value',
+            'rental_payments.payment_id'
+        )
+        ->join('rentals','rental_payments.rental_id','=','rentals.id')
+        ->join('clients','clients.id','=','rentals.client_id')
+        ->leftJoin('form_payments','form_payments.id','=','rental_payments.payment_id')
+        ->where(['rentals.company_id' => $company_id, 'rentals.deleted' => false]);
+
+        // Filtrar registros por data.
+        switch ($filters['_date_filter']) {
+            case 'created':
+            default:
+                $date_filter = 'rentals.created_at';
+                break;
+            case 'due':
+                $date_filter = 'rental_payments.due_date';
+                break;
+            case 'pay':
+                $date_filter = 'rental_payments.payday';
+                break;
+        }
+
+        $rental->whereBetween($date_filter, ["{$filters['_date_start']} 00:00:00", "{$filters['_date_end']} 23:59:59"]);
+
+        // Faz os filtros conforme o que foi informado.
+        foreach ($filters as $filter_key => $filter_value) {
+            // chave que comecem com "_", devem se ignoradas.
+            if (substr($filter_key, 0, 1) === '_') {
+                continue;
+            }
+
+            $rental->where($filter_key, $filter_value[0], $filter_value[1]);
+        }
+
+        // Ordena os registros.
+        $rental->orderBy('rentals.code', 'DESC');
+
+        // Agrupa os registros por locação.
+        if ($synthetic) {
+            $rental->groupBy('rentals.id');
+        }
+
+        return $rental->get();
+    }
 }

@@ -33,6 +33,7 @@ class Company extends Model
         'city',
         'state',
         'plan_id',
+        'status',
         'user_update'
     ];
 
@@ -53,6 +54,15 @@ class Company extends Model
     public function getCompany($id)
     {
         return $this->find($id);
+    }
+
+    public function getAllCompaniesActive()
+    {
+        if (hasAdminMaster()) {
+            return $this->select('id', 'name')->where('status', true)->get();
+        }
+
+        return array();
     }
 
     public function edit($data, $id)
