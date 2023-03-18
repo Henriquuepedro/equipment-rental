@@ -15,6 +15,7 @@
         $('[name="state"], [name="city"]').select2();
         loadStates($('[name="state"]'), null, 'Todos');
         loadCities($('[name="city"]'), null, null, 'Selecione o Estado');
+        getOptionsForm('clients', $('[name="client"]').select2(), null, '<option value="0">Todos</option>');
 
         $('#date_filter').trigger('change');
         moment.locale('pt-br');
@@ -51,7 +52,7 @@
                         </ol>
                     </div>
                     @endif
-                    <form action="{{ route('print.report_rental') }}" method="POST" enctype="multipart/form-data" id="formCreateClient" target="_blank">
+                    <form action="{{ route('print.report_rental') }}" method="POST" enctype="multipart/form-data" target="_blank">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">
@@ -68,15 +69,22 @@
                         </div>
                         <div class="card">
                             <div class="card-body">
+                                @if (count($companies))
+                                    <div class="row">
+                                        <div class="form-group col-md-12">
+                                            <label for="company">Empresas</label>
+                                            <select class="form-control select2" id="company" name="company" required>
+                                                <option value="0">Selecione a empresa</option>
+                                                @foreach($companies as $company)
+                                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                @endif
                                 <div class="row">
                                     <div class="form-group col-md-7">
-                                        <label for="client">Cliente</label>
-                                        <select class="form-control select2" id="client" name="client">
-                                            <option value="0">Todos</option>
-                                            @foreach($clients as $client)
-                                                <option value="{{ $client->id }}">{{ $client->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        @include('includes.client.form', ['show_btn_create' => false, 'required' => false])
                                     </div>
                                     <div class="form-group col-md-5">
                                         <label for="status">Situação da Locação</label>

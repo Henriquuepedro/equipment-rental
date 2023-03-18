@@ -301,7 +301,7 @@ class Rental extends Model
         return false;
     }
 
-    public function getRentalsWithFilters(int $company_id, array $filters, bool $synthetic = true)
+    public function getRentalsToReportWithFilters(int $company_id, array $filters, bool $synthetic = true)
     {
         $rental = $this ->select(
             'rentals.id',
@@ -349,7 +349,7 @@ class Rental extends Model
                 continue;
             }
 
-            $rental->where($filter_key, $filter_value);
+            $rental->where($filter_key, $filter_value[0], $filter_value[1]);
         }
 
         // Filtrou o motorista.

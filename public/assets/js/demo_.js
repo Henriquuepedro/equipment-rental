@@ -276,7 +276,7 @@ String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.substr(1);
 }
 
-const getOptionsForm = async (type, el, selected = null) => {
+const getOptionsForm = async (type, el, selected = null, select_default = null) => {
 
     const base_uri = $('[name="base_url"]').val() + '/ajax';
     let options = '<option value="0">Selecione ...</option>';
@@ -309,8 +309,19 @@ const getOptionsForm = async (type, el, selected = null) => {
             options = '<option value="">Selecione ...</option>';
             data_search = 'data';
             break;
+        case 'clients':
+            endpoint = `${base_uri}/cliente/visualizar-clientes`;
+            field_id = 'id';
+            field_text = 'name';
+            options = '<option value="">Selecione ...</option>';
+            data_search = 'data';
+            break;
         default:
             return el.empty().append(options);
+    }
+
+    if (select_default) {
+        options = select_default;
     }
 
     const response = await fetch(endpoint);

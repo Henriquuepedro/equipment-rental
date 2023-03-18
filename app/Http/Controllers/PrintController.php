@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BillToPayPayment;
 use App\Models\Budget;
 use App\Models\BudgetEquipment;
 use App\Models\BudgetPayment;
@@ -9,6 +10,8 @@ use App\Models\Client;
 use App\Models\Company;
 use App\Models\Driver;
 use App\Models\Equipment;
+use App\Models\FormPayment;
+use App\Models\Provider;
 use App\Models\Rental;
 use App\Models\RentalEquipment;
 use App\Models\RentalPayment;
@@ -25,6 +28,7 @@ class PrintController extends Controller
     private $rental_equipment;
     private $rental;
     private $client;
+    private $provider;
     private $company;
     private $rental_payment;
     private $budget;
@@ -33,21 +37,27 @@ class PrintController extends Controller
     private $driver;
     private $vehicle;
     private $equipment;
+    private $form_payment;
+    private $bill_to_pay_payment;
 
     public function __construct(PDF $pdf)
     {
-        $this->pdf = $pdf;
-        $this->rental_equipment = new RentalEquipment();
-        $this->rental = new Rental();
-        $this->client = new Client();
-        $this->company = new Company();
-        $this->rental_payment = new RentalPayment();
-        $this->budget = new Budget();
-        $this->budget_equipment = new BudgetEquipment();
-        $this->budget_payment = new BudgetPayment();
-        $this->driver = new Driver();
-        $this->vehicle   = new Vehicle();
-        $this->equipment = new Equipment();
+        $this->pdf                  = $pdf;
+        $this->rental_equipment     = new RentalEquipment;
+        $this->rental               = new Rental;
+        $this->client               = new Client;
+        $this->provider             = new Provider;
+        $this->company              = new Company;
+        $this->rental_payment       = new RentalPayment;
+        $this->budget               = new Budget;
+        $this->budget_equipment     = new BudgetEquipment;
+        $this->budget_payment       = new BudgetPayment;
+        $this->driver               = new Driver;
+        $this->vehicle              = new Vehicle;
+        $this->equipment            = new Equipment;
+        $this->form_payment         = new FormPayment;
+        $this->bill_to_pay_payment  = new BillToPayPayment;
+
         $this->pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 
         define("DOMPDF_ENABLE_REMOTE", false);
@@ -139,7 +149,7 @@ class PrintController extends Controller
 
     public function reportRental(Request $request)
     {
-        $company_id             = $request->user()->company_id;
+        $company_id             = hasAdminMaster() ? $request->input('company') : $request->user()->company_id;
         $type_report            = $request->input('type_report');
         $client                 = $request->input('client');
         $driver                 = $request->input('driver');
@@ -179,7 +189,7 @@ class PrintController extends Controller
 
         if (!empty($client)) {
             $client_data = $this->client->getClient($client, $company_id);
-            $filters['rentals.client_id'] = $client;
+            $filters['rentals.client_id'] = ['=', $client];
             $data_filter_view_pdf['Cliente'] = $client_data->name;
         }
 
@@ -197,7 +207,7 @@ class PrintController extends Controller
 
         if (!empty($equipment)) {
             $equipment_data = $this->equipment->getEquipment($equipment, $company_id);
-            $filters['rental_equipments.equipment_id'] = $equipment;
+            $filters['rental_equipments.equipment_id'] = ['=', $equipment];
             $data_filter_view_pdf['Equipamento'] = $equipment_data->name ?? "Caçamba {$equipment_data->volume}m³";
         }
 
@@ -219,15 +229,15 @@ class PrintController extends Controller
             $data_filter_view_pdf['Situação'] = $status_str;
         }
         if (!empty($state)) {
-            $filters['rentals.address_state'] = $state;
+            $filters['rentals.address_state'] = ['=', $state];
             $data_filter_view_pdf['Estado'] = $state;
         }
         if (!empty($city)) {
-            $filters['rentals.address_city'] = $city;
+            $filters['rentals.address_city'] = ['=', $city];
             $data_filter_view_pdf['Cidade'] = $city;
         }
 
-        $rentals = $this->rental->getRentalsWithFilters($company_id, $filters, $type_report === 'synthetic');
+        $rentals = $this->rental->getRentalsToReportWithFilters($company_id, $filters, $type_report === 'synthetic');
         if (!$rentals) {
             return redirect()->route('report.rental')
                 ->with('warning', "Nenhum registro encontrado para o filtro aplicado!");
@@ -248,6 +258,114 @@ class PrintController extends Controller
         return view('print.report.rental', compact('company', 'logo_company', 'rentals', 'data_filter_view_pdf', 'type_report'));*/
 
         $pdf = $this->pdf->loadView('print.report.rental', $contentPrint);
+        return $pdf->stream();
+    }
+
+    public function reportBill(Request $request)
+    {
+        $company_id             = hasAdminMaster() ? $request->input('company') : $request->user()->company_id;
+        $type_report            = $request->input('type_report');
+        $client                 = $request->input('client');
+        $provider               = $request->input('provider');
+        $bill_type              = $request->input('bill_type');
+        $form_payment           = $request->input('form_payment');
+        $date_filter            = $request->input('date_filter');
+        $bill_status            = $request->input('bill_status');
+        $interval_dates         = explode(' - ', $request->input('intervalDates'));
+        $data_filter_view_pdf   = array();
+
+        $date_start     = dateBrazilToDateInternational($interval_dates[0]);
+        $date_end       = dateBrazilToDateInternational($interval_dates[1]);
+
+        $filters = array(
+            '_date_start'    => $date_start,
+            '_date_end'      => $date_end,
+            '_date_filter'   => $date_filter
+        );
+
+        switch ($date_filter) {
+            case 'created':
+                $date_filter_str = 'Lançamento';
+                break;
+            case 'due':
+                $date_filter_str = 'Vencimento';
+                break;
+            case 'pay':
+                $date_filter_str = 'Pagamento';
+                break;
+            default:
+                $date_filter_str = '';
+        }
+
+        $data_filter_view_pdf["Data de $date_filter_str"] = "de $interval_dates[0] até $interval_dates[1]";
+
+        $index_filter_status = $index_filter_bill_status = $bill_type === 'receive' ? 'rental_payments.payment_id' : 'bill_to_pay_payments.payment_id';
+        $filters[$index_filter_status] = ['=', null];
+
+        // Se não foi pago, adiciono um diferente de null. IS NOT NULL.
+        if ($bill_status === 'paid') {
+            $filters[$index_filter_status] = ['!=', null];
+        }
+
+        $status_str = '';
+        switch ($bill_status) {
+            case 'paid':
+                $status_str = 'Pago';
+                break;
+            case 'no_paid':
+                $status_str = 'Não Pago';
+                break;
+        }
+        $data_filter_view_pdf['Situação do Lançamento'] = $status_str;
+
+        if ($bill_type === 'receive' && !empty($client)) {
+            $client_data = $this->client->getClient($client, $company_id);
+            $filters['rentals.client_id'] = ['=', $client];
+            $data_filter_view_pdf['Cliente'] = $client_data->name;
+        }
+
+        if ($bill_type === 'pay' && !empty($provider)) {
+            $privder_data = $this->provider->getProvider($provider, $company_id);
+            $filters['bill_to_pays.provider_id'] = ['=', $provider];
+            $data_filter_view_pdf['Fornecedor'] = $privder_data->name;
+        }
+
+        if ($bill_status === 'paid' && !empty($form_payment)) {
+            // Destrói o filtro caso exista como diferente de nulo.
+            unset($filters["$index_filter_status"]);
+            $form_payment_data = $this->form_payment->getById($form_payment);
+            $filters[$index_filter_bill_status] = ['=', $form_payment];
+            $data_filter_view_pdf['Forma de Pagamento'] = $form_payment_data->name;
+        }
+
+        if ($bill_type === 'receive') {
+            $bills = $this->rental_payment->getBillsToReportWithFilters($company_id, $filters, $type_report === 'synthetic');
+        } else {
+            $bills = $this->bill_to_pay_payment->getBillsToReportWithFilters($company_id, $filters, $type_report === 'synthetic');
+        }
+
+        if (!$bills) {
+            return redirect()->route('report.bill')
+                ->with('warning', "Nenhum registro encontrado para o filtro aplicado!");
+        }
+
+        $company_data = $this->company->getCompany($company_id);
+        $contentPrint = [
+            'company'               => $company_data,
+            'logo_company'          => $this->getImageCompanyBase64($company_data),
+            'bills'                 => $bills,
+            'data_filter_view_pdf'  => $data_filter_view_pdf,
+            'type_report'           => $type_report,
+            'bill_type'             => $bill_type,
+            'bill_status'           => $bill_status
+        ];
+
+        /*$company = $contentPrint['company'];
+        $logo_company = $contentPrint['logo_company'];
+
+        return view('print.report.bill', compact('company', 'logo_company', 'bills', 'data_filter_view_pdf', 'type_report', 'bill_type', 'bill_status'));*/
+
+        $pdf = $this->pdf->loadView('print.report.bill', $contentPrint);
         return $pdf->stream();
     }
 }
