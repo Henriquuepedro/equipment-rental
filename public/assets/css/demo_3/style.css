@@ -13915,19 +13915,24 @@ ul {
 
 /* Modals */
 .modal .modal-dialog .modal-content {
-  background: #2a2c44; }
-  .modal .modal-dialog .modal-content .modal-header {
+    background: #222437;
+}
+.modal .modal-dialog .modal-content .modal-header {
     padding: 25px 26px;
-    border-bottom: 1px solid #383e5d; }
-    .modal .modal-dialog .modal-content .modal-header .close span {
-      font-size: 20px;
-      font-weight: 400;
-      color: #6a6a6a; }
-  .modal .modal-dialog .modal-content .modal-body {
-    padding: 35px 26px; }
-  .modal .modal-dialog .modal-content .modal-footer {
+    border-bottom: 1px solid #383e5d;
+}
+.modal .modal-dialog .modal-content .modal-header .close span {
+    font-size: 20px;
+    font-weight: 400;
+    color: #6a6a6a;
+}
+.modal .modal-dialog .modal-content .modal-body {
+    padding: 35px 26px;
+}
+.modal .modal-dialog .modal-content .modal-footer {
     padding: 15px 31px;
-    border-top: 1px solid #383e5d; }
+    border-top: 1px solid #383e5d;
+}
 
 /* New Account */
 .new-accounts {
@@ -19927,4 +19932,50 @@ div.dataTables_wrapper div.dataTables_filter input {
 .wizard > .steps .disabled a {
     background: #131725 !important;
     color: #fff !important;
+}
+.form-control:disabled, .form-control:read-only:not(select) {
+    background-color: #222437;
+}
+
+/* Start Flatpickr Calendar */
+.flatpickr-calendar .flatpickr-innerContainer {
+    background: #383e5d;
+}
+.flatpickr-calendar .flatpickr-day.prevMonthDay {
+    color: #999;
+}
+.flatpickr-calendar .flatpickr-day {
+    color: #fff
+}
+.flatpickr-calendar .flatpickr-time input {
+    background: #222437 !important;
+    color: #fff !important;
+}
+.flatpickr-calendar .flatpickr-time .flatpickr-time-separator, .flatpickr-time .flatpickr-am-pm, .flatpickr-time input:hover {
+    background: #222437 !important;
+    color: #fff !important;
+}
+.flatpickr-calendar .flatpickr-time input:hover {
+    background: #131725 !important;
+}
+.flatpickr-calendar.hasTime .flatpickr-time {
+    border: 1px solid #222437 !important;
+}
+.flatpickr-calendar .flatpickr-time {
+    background: #222437;
+}
+/* End Flatpickr Calendar */
+
+.swal2-top-end.swal2-container.swal2-backdrop-show {
+    background: unset !important;
+}
+.swal2-timer-progress-bar {
+    background: rgba(0,0,0,0.5) !important;
+}
+.swal2-title {
+    color: #bbb !important;
+}
+
+.form-control:focus {
+    color: #ccc
 }

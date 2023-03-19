@@ -216,7 +216,6 @@
         }
 
         recalculeParcels();
-
     });
 
     $('#automatic_parcel_distribution').change(function(){
@@ -228,7 +227,10 @@
         } else {
             $('#parcels .form-group [name="value_parcel[]"]').attr('disabled', false);
         }
+    });
 
+    $('[name="value"]').on('keyup', function(){
+        recalculeParcels();
     });
 
     const createParcel = due => {

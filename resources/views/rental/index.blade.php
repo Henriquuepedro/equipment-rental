@@ -395,7 +395,8 @@
 
             const check = !$(this).is(':checked');
 
-            $(this).closest('tr').find('.flatpickr-input, select, .input-button-calendar a').attr('disabled', check);
+            $(this).closest('tr').find('.flatpickr-input, select').attr('readonly', check);
+            $(this).closest('tr').find('.input-button-calendar a').attr('disabled', check);
 
             $(this).closest('tr').toggleClass('noSelected selected');
         });
