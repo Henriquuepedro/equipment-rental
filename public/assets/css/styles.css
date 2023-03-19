@@ -1,3 +1,8 @@
+select[readonly] {
+    pointer-events: none;
+    touch-action: none;
+}
+
 .no-border{
     border: 0 !important;
 }

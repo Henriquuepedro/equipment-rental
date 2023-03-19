@@ -412,7 +412,7 @@
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
                         <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
-                        <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-check"></i> Confirmar Pagamento</button>
+                        <button type="submit" class="btn btn-success col-md-4"><i class="fa fa-check"></i> Confirmar Pagamento</button>
                     </div>
                     <input type="hidden" class="form-control" name="payment_id">
                 </form>
