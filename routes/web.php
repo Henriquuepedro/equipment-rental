@@ -157,6 +157,7 @@ Route::group(['middleware' => 'auth'], function (){
 
         Route::get('/locacao', [App\Http\Controllers\ReportController::class, 'rental'])->name('rental');
         Route::get('/financeiro', [App\Http\Controllers\ReportController::class, 'bill'])->name('bill');
+        Route::get('/cadastro', [App\Http\Controllers\ReportController::class, 'register'])->name('register');
 
     });
 

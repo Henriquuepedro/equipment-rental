@@ -61,4 +61,19 @@ class ReportController extends Controller
 
         return view('report.bill', compact('companies'));
     }
+
+    public function register()
+    {
+        if (!hasPermission('ReportView')) {
+            return redirect()->route('dashboard')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
+        $companies = array();
+        if (hasAdminMaster()) {
+            $companies = $this->company->getAllCompaniesActive();
+        }
+
+        return view('report.register', compact('companies'));
+    }
 }
