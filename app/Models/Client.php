@@ -32,6 +32,11 @@ class Client extends Model
      */
     protected $casts = [];
 
+    public function __get( $key )
+    {
+        return $this->$key;
+    }
+
     public function insert($data)
     {
         return $this->create($data);
@@ -47,20 +52,26 @@ class Client extends Model
         return $this->where('id', $client_id)->update($data);
     }
 
-    public function getClients($company_id, $init = null, $length = null, $searchUser = null, $orderBy = array())
+    public function getClients($company_id, $init = null, $length = null, $searchUser = null, $orderBy = array(), $select = '*')
     {
-        $client = $this->where('company_id', $company_id);
-        if ($searchUser)
-            $client->where(function($query) use ($searchUser) {
+        $client = $this->select($select)->where('company_id', $company_id);
+        if ($searchUser) {
+            $client->where(function ($query) use ($searchUser) {
                 $query->where('name', 'like', "%{$searchUser}%")
                     ->orWhere('email', 'like', "%{$searchUser}%")
                     ->orWhere('phone_1', 'like', "%{$searchUser}%");
             });
+        }
 
-        if (count($orderBy) !== 0) $client->orderBy($orderBy['field'], $orderBy['order']);
-        else $client->orderBy('id', 'desc');
+        if (count($orderBy) !== 0) {
+            $client->orderBy($orderBy['field'], $orderBy['order']);
+        } else {
+            $client->orderBy('id', 'desc');
+        }
 
-        if ($init !== null && $length !== null) $client->offset($init)->limit($length);
+        if ($init !== null && $length !== null) {
+            $client->offset($init)->limit($length);
+        }
 
         return $client->get();
     }

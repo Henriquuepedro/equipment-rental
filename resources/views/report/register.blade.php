@@ -7,11 +7,11 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('assets/vendors/dragula/dragula.min.css') }}">
+    <link href="{{ asset('vendor/bootstrap4-duallistbox/bootstrap-duallistbox.css') }}" rel="stylesheet"/>
 @stop
 
 @section('js')
-<script src="{{ asset('assets/vendors/dragula/dragula.min.js') }}"></script>
+<script src="{{ asset('vendor/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.js') }}"></script>
 <script>
     $(function(){
         $('[name="state"], [name="city"]').select2();
@@ -27,15 +27,84 @@
             }
         });
 
-        let iconTochange;
-        dragula([document.getElementById("dragula-event-left"), document.getElementById("dragula-event-right")])
-        .on('drop', function(el) {
-            iconTochange = $(el).find('.mdi');
-            if ($(el).closest('#dragula-event-right').length) {
-                iconTochange.removeClass('mdi-close text-danger').addClass('mdi-check text-success');
-            } else {
-                iconTochange.removeClass('mdi-check text-success').addClass('mdi-close text-danger');
-            }
+        $('.select-listbox').bootstrapDualListbox({
+            // default text
+            filterTextClear: 'Mostrar todos',
+            filterPlaceHolder: 'Filtro',
+            moveSelectedLabel: 'Mover selecionado',
+            moveAllLabel: 'Mover todos',
+            removeSelectedLabel: 'Remover selecionado',
+            removeAllLabel: 'Remover todos',
+
+            // true/false (forced true on androids, see the comment later)
+            moveOnSelect: true,
+
+            // 'all' / 'moved' / false
+            preserveSelectionOnMove: 'all',
+
+            // 'string', false
+            selectedListLabel: false,
+
+            // 'string', false
+            nonSelectedListLabel: false,
+
+            // 'string_of_postfix' / false
+            helperSelectNamePostfix: '_helper',
+
+            // minimal height in pixels
+            selectorMinimalHeight: 100,
+
+            // whether to show filter inputs
+            showFilterInputs: true,
+
+            // string, filter the non selected options
+            nonSelectedFilter: '',
+
+            // string, filter the selected options
+            selectedFilter: '',
+
+            // text when all options are visible / false for no info text
+            infoText: 'Mostrando todos {0}',
+
+            // when not all of the options are visible due to the filter
+            infoTextFiltered: '<span class="badge badge-warning">Filtrado</span> {0} de {1}',
+
+            // when there are no options present in the list
+            infoTextEmpty: 'Lista vazia',
+
+            // sort by input order
+            sortByInputOrder: false,
+
+            // filter by selector's values, boolean
+            filterOnValues: false,
+
+            // boolean, allows user to unbind default event behaviour and run their own instead
+            eventMoveOverride: true,
+
+            // boolean, allows user to unbind default event behaviour and run their own instead
+            eventMoveAllOverride: false,
+
+            // boolean, allows user to unbind default event behaviour and run their own instead
+            eventRemoveOverride: false,
+
+            // boolean, allows user to unbind default event behaviour and run their own instead
+            eventRemoveAllOverride: false,
+
+            // sets the button style class for all the buttons
+            btnClass: 'btn-outline-secondary',
+
+            // string, sets the text for the "Move" button
+            btnMoveText: '&gt;',
+
+            // string, sets the text for the "Remove" button
+            btnRemoveText: '&lt;',
+
+            // string, sets the text for the "Move All" button
+            btnMoveAllText: '&gt;&gt;',
+
+            // string, sets the text for the "Remove All" button
+            btnRemoveAllText: '&lt;&lt;'
+
         });
 
     });
@@ -47,6 +116,23 @@
     $('#date_filter').on('change', function(){
         const label = $(`#date_filter option[value="${$(this).val()}"]`).text();
         $('[for="intervalDates"] span.label_date_filter').text(label);
+    });
+
+    $('[name="type"]').on('change', async function (){
+
+        const type = $(this).val();
+
+        const base_uri  = $('[name="base_url"]').val() + '/ajax';
+        const response  = await fetch(`${base_uri}/exportar/fields/${type}`);
+        let results     = await response.json();
+        let options     = '';
+
+        await $(results).each(await function (key, value) {
+            options += `<option value="${value}">${value}</option>`;
+        });
+
+        $('.select-listbox').empty().append(options);
+        $(".select-listbox").bootstrapDualListbox('refresh');
     });
 
 </script>
@@ -66,7 +152,7 @@
                         </ol>
                     </div>
                     @endif
-                    <form action="{{ route('print.report_rental') }}" method="POST" enctype="multipart/form-data" target="_blank">
+                    <form action="{{ route('export.register') }}" method="POST" enctype="multipart/form-data" target="_blank">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">
@@ -114,27 +200,19 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <h6 class="card-title">Não selecionados</h6>
-                                        <div id="dragula-event-left" class="py-2">
-                                            <div class="card rounded border mb-2">
-                                                <div class="card-body p-2">
-                                                    <div class="media d-flex justify-content-start flex-nowrap align-items-center">
-                                                        <i class="mdi mdi-close icon-sm text-danger align-self-center mr-2"></i>
-                                                        <div class="media-body">
-                                                            <h6 class="mb-0">Build wireframe</h6>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6 class="card-title">Selecionados</h6>
-                                        <div id="dragula-event-right" class="py-2">
 
+
+                                    <section class="section">
+                                        <div class="container">
+                                            <h2 class="subtitle">
+                                                Selecione os campos que deseja incluir no relatório.
+                                            </h2>
+                                            <select class="select-listbox" name="fields-selected[]" multiple></select>
                                         </div>
-                                    </div>
+                                    </section>
+
+
+
                                 </div>
                             </div>
                         </div>
