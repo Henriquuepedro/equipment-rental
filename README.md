@@ -77,10 +77,15 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 ENV PATH=$PATH:/root/composer/vendor/bin COMPOSER_ALLOW_SUPERUSER=1
 ```
 
-Executar ```docker-compose up --build --force-recreate```
+Executar `docker-compose up --build --force-recreate`
 
-Acessar container ```docker exec -it locacao-php /bin/bash```
+Acessar container `docker exec -it locacao-php /bin/bash`
 
-Alterar em ```/etc/apache2/sites-available/000-default.conf``` para ```DocumentRoot /var/www/public```
+Alterar em `/etc/apache2/sites-available/000-default.conf` para `DocumentRoot /var/www/public`
 
+Permissão para o projeto em caso do seguinte erro: `docker  - Cannot save \\wsl$\Ubuntu\home\... Unable to open the file for writing.`
 
+```
+sudo chown -R www-data:www-data {PROJECT}/
+sudo chmod g+w {PROJECT}/
+```

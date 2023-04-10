@@ -132,11 +132,11 @@
                         {{ $bill->parcel }}ª
                     </td>
                     <td class='info' style='width: 13%'>
-                        {{ formdatDateBrazil($bill->due_date) }}
+                        {{ dateInternationalToDateBrazil($bill->due_date) }}
                     </td>
                     @if ($bill_status === 'paid' && $type_report === 'analytic')
                         <td class='info' style='width: 13%'>
-                            {{ formdatDateBrazil(str_replace(' 00:00:00', '', $bill->payday)) }}
+                            {{ dateInternationalToDateBrazil(str_replace(' 00:00:00', '', $bill->payday)) }}
                         </td>
                         <td class='info' style='width: 13%'>
                             {{ $bill->payment_name }}

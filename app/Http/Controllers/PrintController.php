@@ -70,7 +70,7 @@ class PrintController extends Controller
             return redirect()->route('rental.index');
         }
 
-        $contentRecibo['company']->logo = $this->getImageCompanyBase64($contentRecibo['company']);
+        $contentRecibo['company']->logo = getImageCompanyBase64($contentRecibo['company']);
 
         $pdf = $this->pdf->loadView('print.rental', $contentRecibo);
         return $pdf->stream();
@@ -83,24 +83,10 @@ class PrintController extends Controller
             return redirect()->route('budget.index');
         }
 
-        $contentRecibo['company']->logo = $this->getImageCompanyBase64($contentRecibo['company']);
+        $contentRecibo['company']->logo = getImageCompanyBase64($contentRecibo['company']);
 
         $pdf = $this->pdf->loadView('print.rental', $contentRecibo);
         return $pdf->stream();
-    }
-
-    public function getImageCompanyBase64(object $company): string
-    {
-        if ($company->logo) {
-            $image = "assets/images/company/$company->id/$company->logo";
-        } else {
-            $image = "assets/images/company/company.png";
-        }
-
-        $extension = File::extension($image);
-
-        $img_to_base64 = base64_encode(File::get($image));
-        return "data:image/$extension;base64, $img_to_base64";
     }
 
     private function getDataFormatBudgetRental(int $code, bool $budget)
@@ -246,7 +232,7 @@ class PrintController extends Controller
         $company_data = $this->company->getCompany($company_id);
         $contentPrint = [
             'company'               => $company_data,
-            'logo_company'          => $this->getImageCompanyBase64($company_data),
+            'logo_company'          => getImageCompanyBase64($company_data),
             'rentals'               => $rentals,
             'data_filter_view_pdf'  => $data_filter_view_pdf,
             'type_report'           => $type_report
@@ -352,7 +338,7 @@ class PrintController extends Controller
         $company_data = $this->company->getCompany($company_id);
         $contentPrint = [
             'company'               => $company_data,
-            'logo_company'          => $this->getImageCompanyBase64($company_data),
+            'logo_company'          => getImageCompanyBase64($company_data),
             'bills'                 => $bills,
             'data_filter_view_pdf'  => $data_filter_view_pdf,
             'type_report'           => $type_report,

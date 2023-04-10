@@ -8,6 +8,7 @@ use App\Models\Provider;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Lang;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
 class RegistersExport implements FromCollection
@@ -28,24 +29,48 @@ class RegistersExport implements FromCollection
         $this->fileds       = $fileds;
 
         $this->client       = new Client;
-        $this->equipment    = new Equipment;
-        $this->vehicle      = new Vehicle;
         $this->driver       = new Driver;
+        $this->equipment    = new Equipment;
         $this->provider     = new Provider;
+        $this->vehicle      = new Vehicle;
     }
 
     /**
      * @return Collection
      */
-    public function collection()
+    public function collection(): Collection
     {
         $result = match ($this->type) {
             'client' => $this->client->getClients($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
-            'equipment' => $this->equipment->getEquipments($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
+            'driver' => $this->driver->getDrivers($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
+            'equipment' => $this->equipment->getEquipments($this->company_id, null, null, null, array(), false, $this->fileds)->toArray(),
+            'provider' => $this->provider->getProviders($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
+            'vehicle' => $this->vehicle->getVehicles($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
             default => array(),
         };
 
-        array_unshift($result, $this->fileds);
+        $result = array_map(function($register) {
+            foreach ($register as $field_key => $field_value) {
+                if (strtotime($field_value) !== false) {
+                    $register[$field_key] = dateInternationalToDateBrazil($field_value) ?? $field_value;
+                }
+                if (likeText('%cpf%', $field_key) || likeText('%cnpj%', $field_key)) {
+                    $register[$field_key] = formatCPF_CNPJ($field_value) ?? $field_value;
+                }
+                if (likeText('%phone%', $field_key)) {
+                    $register[$field_key] = formatPhone($field_value, '') ?? $field_value;
+                }
+            }
+
+            return $register;
+        }, $result);
+
+        array_unshift(
+            $result,
+            array_map(function ($field) {
+                return Lang::get("field.$field");
+            }, $this->fileds)
+        );
 
         return new Collection($result);
     }

@@ -8,6 +8,12 @@
 
 @section('css')
     <link href="{{ asset('vendor/bootstrap4-duallistbox/bootstrap-duallistbox.css') }}" rel="stylesheet"/>
+    <style>
+        .bootstrap-duallistbox-container .box1,
+        .bootstrap-duallistbox-container .box2 {
+            width: 350px;
+        }
+    </style>
 @stop
 
 @section('js')
@@ -17,7 +23,6 @@
         $('[name="state"], [name="city"]').select2();
         loadStates($('[name="state"]'), null, 'Todos');
         loadCities($('[name="city"]'), null, null, 'Selecione o Estado');
-        getOptionsForm('clients', $('[name="client"]').select2(), null, '<option value="0">Todos</option>');
 
         $('#date_filter').trigger('change');
         moment.locale('pt-br');
@@ -36,34 +41,14 @@
             removeSelectedLabel: 'Remover selecionado',
             removeAllLabel: 'Remover todos',
 
-            // true/false (forced true on androids, see the comment later)
-            moveOnSelect: true,
-
-            // 'all' / 'moved' / false
-            preserveSelectionOnMove: 'all',
-
-            // 'string', false
-            selectedListLabel: false,
-
-            // 'string', false
-            nonSelectedListLabel: false,
-
-            // 'string_of_postfix' / false
-            helperSelectNamePostfix: '_helper',
-
             // minimal height in pixels
-            selectorMinimalHeight: 100,
+            selectorMinimalHeight: 200,
+
+            selectorMinimalWidth: 300,
 
             // whether to show filter inputs
             showFilterInputs: true,
 
-            // string, filter the non selected options
-            nonSelectedFilter: '',
-
-            // string, filter the selected options
-            selectedFilter: '',
-
-            // text when all options are visible / false for no info text
             infoText: 'Mostrando todos {0}',
 
             // when not all of the options are visible due to the filter
@@ -72,39 +57,8 @@
             // when there are no options present in the list
             infoTextEmpty: 'Lista vazia',
 
-            // sort by input order
-            sortByInputOrder: false,
-
-            // filter by selector's values, boolean
-            filterOnValues: false,
-
-            // boolean, allows user to unbind default event behaviour and run their own instead
-            eventMoveOverride: true,
-
-            // boolean, allows user to unbind default event behaviour and run their own instead
-            eventMoveAllOverride: false,
-
-            // boolean, allows user to unbind default event behaviour and run their own instead
-            eventRemoveOverride: false,
-
-            // boolean, allows user to unbind default event behaviour and run their own instead
-            eventRemoveAllOverride: false,
-
             // sets the button style class for all the buttons
             btnClass: 'btn-outline-secondary',
-
-            // string, sets the text for the "Move" button
-            btnMoveText: '&gt;',
-
-            // string, sets the text for the "Remove" button
-            btnRemoveText: '&lt;',
-
-            // string, sets the text for the "Move All" button
-            btnMoveAllText: '&gt;&gt;',
-
-            // string, sets the text for the "Remove All" button
-            btnRemoveAllText: '&lt;&lt;'
-
         });
 
     });
@@ -127,8 +81,8 @@
         let results     = await response.json();
         let options     = '';
 
-        await $(results).each(await function (key, value) {
-            options += `<option value="${value}">${value}</option>`;
+        await Object.entries(results).forEach(([key, value]) => {
+            options += `<option value="${key}">${value}</option>`;
         });
 
         $('.select-listbox').empty().append(options);
@@ -153,20 +107,6 @@
                     </div>
                     @endif
                     <form action="{{ route('export.register') }}" method="POST" enctype="multipart/form-data" target="_blank">
-                        <div class="card">
-                            <div class="card-body d-flex justify-content-around">
-                                <div class="form-radio form-radio-flat">
-                                    <label class="form-check-label">
-                                        <input type="radio" class="form-check-input" name="type_report" value="synthetic" checked> Sintético <i class="input-helper"></i>
-                                    </label>
-                                </div>
-                                <div class="form-radio form-radio-flat">
-                                    <label class="form-check-label">
-                                        <input type="radio" class="form-check-input" name="type_report" value="analytic" > Analítico <i class="input-helper"></i>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
                         <div class="card">
                             <div class="card-body">
                                 @if (count($companies))
@@ -200,26 +140,25 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="row">
-
-
-                                    <section class="section">
-                                        <div class="container">
-                                            <h2 class="subtitle">
-                                                Selecione os campos que deseja incluir no relatório.
-                                            </h2>
-                                            <select class="select-listbox" name="fields-selected[]" multiple></select>
-                                        </div>
-                                    </section>
-
-
-
+                                    <div class="col-md-12">
+                                        <section class="section">
+                                            <div class="container">
+                                                <h2 class="subtitle">
+                                                    Selecione os campos que deseja incluir no relatório.
+                                                </h2>
+                                                <select class="select-listbox" name="fields-selected[]" multiple></select>
+                                            </div>
+                                        </section>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('dashboard') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Voltar</a>
-                                <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-file-pdf"></i> Gerar Relatório</button>
+                                <button type="submit" name="export_csv" class="btn btn-success col-md-3"><i class="fa fa-file-pdf"></i> Exportar em Excel</button>
+                                <button type="submit" name="print_a4_h" class="btn btn-primary col-md-3"><i class="fa fa-file-pdf"></i> Gerar Relatório Horizontal</button>
+                                <button type="submit" name="print_a4_v" class="btn btn-info col-md-3"><i class="fa fa-file-pdf"></i> Gerar Relatório Vertical</button>
                             </div>
                         </div>
                         {{ csrf_field() }}
