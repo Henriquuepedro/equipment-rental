@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Permission;
+use Illuminate\Support\Facades\File;
 
 const DATETIME_INTERNATIONAL = 'Y-m-d H:i:s';
 const DATE_INTERNATIONAL = 'Y-m-d';
@@ -208,8 +209,13 @@ if (! function_exists('dateBrazilToDateInternational')) {
             return null;
         }
 
-        if (strlen($date) !== 10 && strlen($date) !== 19) {
+        if (strlen($date) !== 10 && strlen($date) !== 19 && strlen($date) !== 27) {
             return null;
+        }
+
+        // Data tem time. 2022-12-17T03:07:08.000000Z
+        if (strlen($date) === 27) {
+            $date = date(DATETIME_INTERNATIONAL, strtotime($date));
         }
 
         $format_in  = DATE_BRAZIL;
@@ -228,25 +234,30 @@ if (! function_exists('dateBrazilToDateInternational')) {
     }
 }
 
-if (! function_exists('formdatDateBrazil')) {
+if (! function_exists('dateInternationalToDateBrazil')) {
     /**
      * Formata a data.
      *
      * @param   string|null $date
      * @return  string|null
      */
-    function formdatDateBrazil(?string $date, string $format = null): ?string
+    function dateInternationalToDateBrazil(?string $date, string $format = null): ?string
     {
         if (is_null($date)) {
             return null;
         }
 
-        if (strlen($date) !== 10 && strlen($date) !== 19) {
+        if (strlen($date) !== 10 && strlen($date) !== 19 && strlen($date) !== 27) {
             return null;
         }
 
-        $format_out = DATE_BRAZIL;
+        // Data tem time. 2022-12-17T03:07:08.000000Z
+        if (strlen($date) === 27) {
+            $date = date(DATETIME_INTERNATIONAL, strtotime($date));
+        }
+
         $format_in  = DATE_INTERNATIONAL;
+        $format_out = DATE_BRAZIL;
 
         if (strlen($date) === 19) {
             $format_in  .= ' H:i:s';
@@ -290,5 +301,21 @@ if (!function_exists('dateNowInternational')) {
 
         return (new DateTime())->setTimezone($dateTimeNow)->format($format ?? DATETIME_INTERNATIONAL);
 
+    }
+}
+
+if (!function_exists('getImageCompanyBase64')) {
+    function getImageCompanyBase64(object $company): string
+    {
+        if ($company->logo) {
+            $image = "assets/images/company/$company->id/$company->logo";
+        } else {
+            $image = "assets/images/company/company.png";
+        }
+
+        $extension = File::extension($image);
+
+        $img_to_base64 = base64_encode(File::get($image));
+        return "data:image/$extension;base64, $img_to_base64";
     }
 }

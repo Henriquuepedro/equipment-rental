@@ -8,7 +8,10 @@ use App\Models\Driver;
 use App\Models\Equipment;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReportController extends Controller
 {
@@ -60,5 +63,20 @@ class ReportController extends Controller
         }
 
         return view('report.bill', compact('companies'));
+    }
+
+    public function register()
+    {
+        if (!hasPermission('ReportView')) {
+            return redirect()->route('dashboard')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
+        $companies = array();
+        if (hasAdminMaster()) {
+            $companies = $this->company->getAllCompaniesActive();
+        }
+
+        return view('report.register', compact('companies'));
     }
 }

@@ -47,9 +47,9 @@ class Driver extends Model
         return $this->where('id', $driver_id)->update($data);
     }
 
-    public function getDrivers($company_id, $init = null, $length = null, $searchDriver = null, $orderBy = array())
+    public function getDrivers($company_id, $init = null, $length = null, $searchDriver = null, $orderBy = array(), $select = '*')
     {
-        $driver = $this->where('company_id', $company_id);
+        $driver = $this->select($select)->where('company_id', $company_id);
         if ($searchDriver) {
             $driver->where(function ($query) use ($searchDriver) {
                 $query->where('name', 'like', "%{$searchDriver}%")

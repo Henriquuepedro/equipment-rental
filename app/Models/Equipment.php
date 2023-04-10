@@ -55,9 +55,9 @@ class Equipment extends Model
         return $this->where('id', $equipment_id)->update($data);
     }
 
-    public function getEquipments($company_id, $init = null, $length = null, $searchEquipment = null, $orderBy = array(), $getCacamba = false)
+    public function getEquipments($company_id, $init = null, $length = null, $searchEquipment = null, $orderBy = array(), $getCacamba = false, $select = '*')
     {
-        $equipment = $this->where('company_id', $company_id);
+        $equipment = $this->select($select)->where('company_id', $company_id);
         if ($searchEquipment) {
             $equipment->where(function ($query) use ($searchEquipment, $getCacamba) {
                 $query->where('name', 'like', "%{$searchEquipment}%")

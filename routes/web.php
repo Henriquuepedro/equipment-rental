@@ -157,6 +157,7 @@ Route::group(['middleware' => 'auth'], function (){
 
         Route::get('/locacao', [App\Http\Controllers\ReportController::class, 'rental'])->name('rental');
         Route::get('/financeiro', [App\Http\Controllers\ReportController::class, 'bill'])->name('bill');
+        Route::get('/cadastro', [App\Http\Controllers\ReportController::class, 'register'])->name('register');
 
     });
 
@@ -265,5 +266,15 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToPayController::class, 'getQtyTypeBills'])->name('get-qty-type-bills');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToPayController::class, 'confirmPayment'])->name('confirm_payment');
         });
+        Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
+            Route::get('/fields/{option}', [App\Http\Controllers\ExportController::class, 'getFields'])->name('client_fields');
+        });
+    });
+
+    // Exportação
+    Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
+
+        Route::post('/cadastro', [App\Http\Controllers\ExportController::class, 'register'])->name('register');
+
     });
 });

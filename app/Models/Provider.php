@@ -47,9 +47,9 @@ class Provider extends Model
         return $this->where('id', $provider_id)->update($data);
     }
 
-    public function getProviders($company_id, $init = null, $length = null, $searchUser = null, $orderBy = array())
+    public function getProviders($company_id, $init = null, $length = null, $searchUser = null, $orderBy = array(), $select = '*')
     {
-        $provider = $this->where('company_id', $company_id);
+        $provider = $this->select($select)->where('company_id', $company_id);
         if ($searchUser)
             $provider->where(function($query) use ($searchUser) {
                 $query->where('name', 'like', "%{$searchUser}%")

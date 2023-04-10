@@ -144,6 +144,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('report.bill') }}">Financeiro</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('report.register') }}">Cadastro</a>
+                            </li>
                         @endif
                     </ul>
                 </div>

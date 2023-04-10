@@ -47,9 +47,9 @@ class Vehicle extends Model
         return $this->where('id', $vehicle_id)->update($data);
     }
 
-    public function getVehicles($company_id, $init = null, $length = null, $searchVehicle = null, $orderBy = array())
+    public function getVehicles($company_id, $init = null, $length = null, $searchVehicle = null, $orderBy = array(), $select = '*')
     {
-        $vehicle = $this->where('company_id', $company_id);
+        $vehicle = $this->select($select)->where('company_id', $company_id);
         if ($searchVehicle)
             $vehicle->where(function($query) use ($searchVehicle) {
                 $query->where('name', 'like', "%{$searchVehicle}%")
