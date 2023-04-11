@@ -32,11 +32,6 @@ class Client extends Model
      */
     protected $casts = [];
 
-    public function __get( $key )
-    {
-        return $this->$key;
-    }
-
     public function insert($data)
     {
         return $this->create($data);
