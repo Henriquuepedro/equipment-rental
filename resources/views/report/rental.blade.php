@@ -70,11 +70,11 @@
                         <div class="card">
                             <div class="card-body">
                                 @if (count($companies))
-                                    <div class="row">
+                                    <div class="row @if (count($companies) === 1) d-none @endif">
                                         <div class="form-group col-md-12">
                                             <label for="company">Empresas</label>
                                             <select class="form-control select2" id="company" name="company" required>
-                                                <option value="0">Selecione a empresa</option>
+                                                @if (count($companies) !== 1)<option value="0">Selecione a empresa</option>@endif
                                                 @foreach($companies as $company)
                                                     <option value="{{ $company->id }}">{{ $company->name }}</option>
                                                 @endforeach

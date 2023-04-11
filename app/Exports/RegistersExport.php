@@ -41,15 +41,15 @@ class RegistersExport implements FromCollection
     public function collection(): Collection
     {
         $result = match ($this->type) {
-            'client' => $this->client->getClients($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
-            'driver' => $this->driver->getDrivers($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
+            'client'    => $this->client->getClients($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
+            'driver'    => $this->driver->getDrivers($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
             'equipment' => $this->equipment->getEquipments($this->company_id, null, null, null, array(), false, $this->fileds)->toArray(),
-            'provider' => $this->provider->getProviders($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
-            'vehicle' => $this->vehicle->getVehicles($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
-            default => array(),
+            'provider'  => $this->provider->getProviders($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
+            'vehicle'   => $this->vehicle->getVehicles($this->company_id, null, null, null, array(), $this->fileds)->toArray(),
+            default     => array(),
         };
 
-        $result = array_map(function($register) {
+        $result = array_filter(array_map(function($register) {
             foreach ($register as $field_key => $field_value) {
                 if (strtotime($field_value) !== false) {
                     $register[$field_key] = dateInternationalToDateBrazil($field_value) ?? $field_value;
@@ -63,7 +63,14 @@ class RegistersExport implements FromCollection
             }
 
             return $register;
-        }, $result);
+        }, $result), function($register) {
+            foreach ($register as $field_value) {
+                if (!is_null($field_value) && $field_value !== "") {
+                    return true;
+                }
+            }
+            return false;
+        });
 
         array_unshift(
             $result,
