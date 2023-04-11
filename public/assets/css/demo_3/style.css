@@ -19977,5 +19977,19 @@ div.dataTables_wrapper div.dataTables_filter input {
 }
 
 .form-control:focus {
-    color: #ccc
+    color: #ccc;
+    background: unset;
+}
+.bootstrap-duallistbox-container select {
+    background: #383e5d;
+    border: 1px solid #383e5d;
+}
+.bootstrap-duallistbox-container select option {
+    color: #ccc;
+}
+.bootstrap-duallistbox-container.moveonselect button {
+    color: #ccc;
+}
+.bootstrap-duallistbox-container.moveonselect button:hover {
+    color: #444;
 }
