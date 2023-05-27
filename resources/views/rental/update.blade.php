@@ -15,16 +15,14 @@
 
 @section('js')
 <script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}" type="application/javascript"></script>
-<script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
 <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
-
-@include('includes.client.modal-script')
-@include('includes.address.modal-script')
-@include('includes.equipment.modal-script')
-@include('includes.driver.modal-script')
-@include('includes.vehicle.modal-script')
-@include('includes.residue.modal-script')
+    @include('includes.client.modal-script')
+    @include('includes.address.modal-script')
+    @include('includes.equipment.modal-script')
+    @include('includes.driver.modal-script')
+    @include('includes.vehicle.modal-script')
+    @include('includes.residue.modal-script')
 
     @if(in_array('ClientCreatePost', $permissions))    <script src="{{ asset('assets/js/views/client/form.js') }}" type="application/javascript"></script>    @endif
     @if(in_array('EquipmentCreatePost', $permissions)) <script src="{{ asset('assets/js/views/equipment/form.js') }}" type="application/javascript"></script> @endif
@@ -161,11 +159,11 @@
                 address_state = $('[name="address_state"]').val();
             }
 
-            loadStates($('[name="state"]'), address_state);
+            await loadStates($('[name="state"]'), address_state);
 
             if (address_state && $('[name="address_city"]').length) {
                 address_city = $('[name="address_city"]').val();
-                loadCities($('[name="city"]'), address_state, address_city);
+                await loadCities($('[name="city"]'), address_state, address_city);
             }
 
         });
@@ -190,6 +188,7 @@
             }
         });
     </script>
+    <script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
 @stop
 
 @section('content')
