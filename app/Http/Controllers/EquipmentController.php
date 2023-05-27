@@ -155,7 +155,7 @@ class EquipmentController extends Controller
 
     public function edit($id)
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         $equipment = $this->equipment->getEquipment($id, $company_id);
         if (!$equipment)
@@ -549,7 +549,7 @@ class EquipmentController extends Controller
     public function availableStock(int $id = null)
     {
         $is_ajax = isAjax();
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         $available_stock = $this->equipment->getAllStockEquipment($company_id, $id);
 

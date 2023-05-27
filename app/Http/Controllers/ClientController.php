@@ -179,7 +179,7 @@ class ClientController extends Controller
 
     public function edit($id)
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         $client = $this->client->getClient($id, $company_id);
         if (!$client)

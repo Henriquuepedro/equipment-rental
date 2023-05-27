@@ -19993,3 +19993,6 @@ div.dataTables_wrapper div.dataTables_filter input {
 .bootstrap-duallistbox-container.moveonselect button:hover {
     color: #444;
 }
+select option {
+    color: #000
+}

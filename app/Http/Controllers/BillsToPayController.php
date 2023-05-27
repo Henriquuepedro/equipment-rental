@@ -29,7 +29,7 @@ class BillsToPayController extends Controller
 
     public function index()
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $providers = $this->provider->getProviders($company_id);
 
         return view('bills_to_pay.index', compact('providers'));

@@ -14,6 +14,14 @@
             let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
             let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
 
+            if (newIndex === getIndexStep(1)) {
+                setTimeout(() => {
+                    $('[name="client"]').select2();
+                    $('[name="state"]').select2('destroy').select2();
+                    $('[name="city"]').select2('destroy').select2();
+                }, 200);
+            }
+
             if (currentIndex === getIndexStep(0)) {// tipo locacao
                 if (debug) {
                     changeStepPosAbsolute();
@@ -27,32 +35,43 @@
                     });
                     return false;
                 }
-                setTimeout(() => {
-                    $('[name="client"]').select2();
-                }, 200)
             }
             if (currentIndex <= getIndexStep(1) && newIndex > getIndexStep(1)) { // cliente e endereo
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
                 }
+
                 if ($('select[name="client"]').val() === '0') {
                     arrErrors.push('Selecione um cliente.');
                 }
 
                 if (arrErrors.length === 0) {
-                    if ($('input[name="address"]').val() === '') arrErrors.push('Informe um endereço.');
-                    if ($('input[name="number"]').val() === '') arrErrors.push('Informe um número para o endereço.');
-                    if ($('input[name="neigh"]').val() === '') arrErrors.push('Informe um bairro.');
-                    if ($('select[name="city"]').val() === '') arrErrors.push('Informe uma cidade.');
-                    if ($('select[name="state"]').val() === '') arrErrors.push('Informe um estado.');
-                    if ($('input[name="lat"]').val() === '' || $('input[name="lng"]').val() === '') arrErrors.push('Confirme o endereço no mapa.');
+                    if ($('input[name="address"]').val() === '') {
+                        arrErrors.push('Informe um endereço.');
+                    }
+                    if ($('input[name="number"]').val() === '') {
+                        arrErrors.push('Informe um número para o endereço.');
+                    }
+                    if ($('input[name="neigh"]').val() === '') {
+                        arrErrors.push('Informe um bairro.');
+                    }
+                    if ($('select[name="city"]').val() === '') {
+                        arrErrors.push('Informe uma cidade.');
+                    }
+                    if ($('select[name="state"]').val() === '') {
+                        arrErrors.push('Informe um estado.');
+                    }
+                    if ($('input[name="lat"]').val() === '' || $('input[name="lng"]').val() === '') {
+                        arrErrors.push('Confirme o endereço no mapa.');
+                    }
                 }
 
                 if (arrErrors.length) {
 
-                    if (currentIndex !== getIndexStep(1))
+                    if (currentIndex !== getIndexStep(1)) {
                         setErrorStepWrong(getIndexStep(1));
+                    }
 
                     Swal.fire({
                         icon: 'warning',
@@ -72,8 +91,12 @@
                 let dateDelivery = $('input[name="date_delivery"]').val();
                 let dateWithdrawal = $('input[name="date_withdrawal"]').val();
 
-                if (dateDelivery.length < 16) arrErrors.push('Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm.');
-                if (!notUseDateWithdrawal && dateWithdrawal.length < 16) arrErrors.push('Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy hh:mm.');
+                if (dateDelivery.length < 16) {
+                    arrErrors.push('Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm.');
+                }
+                if (!notUseDateWithdrawal && dateWithdrawal.length < 16) {
+                    arrErrors.push('Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy hh:mm.');
+                }
 
                 if (arrErrors.length === 0) {
                     let dateDeliveryTime = new Date(transformDateForEn(dateDelivery)).getTime();
@@ -84,9 +107,9 @@
                 }
 
                 if (arrErrors.length) {
-
-                    if (currentIndex < getIndexStep(2))
+                    if (currentIndex < getIndexStep(2)) {
                         setErrorStepWrong(getIndexStep(2));
+                    }
 
                     Swal.fire({
                         icon: 'warning',
@@ -105,9 +128,9 @@
                 }
 
                 if ($('#equipments-selected div').length === 0) {
-
-                    if (currentIndex < getIndexStep(3))
+                    if (currentIndex < getIndexStep(3)) {
                         setErrorStepWrong(getIndexStep(3));
+                    }
 
                     Swal.fire({
                         icon: 'warning',
@@ -150,8 +173,9 @@
 
                 if (arrErrors.length) {
 
-                    if (currentIndex < getIndexStep(3))
+                    if (currentIndex < getIndexStep(3)) {
                         setErrorStepWrong(getIndexStep(3));
+                    }
 
                     Swal.fire({
                         icon: 'warning',
@@ -174,8 +198,9 @@
 
                 if (netValue < 0) {
 
-                    if (currentIndex < getIndexStep(4))
+                    if (currentIndex < getIndexStep(4)) {
                         setErrorStepWrong(getIndexStep(4));
+                    }
 
                     Swal.fire({
                         icon: 'warning',
@@ -194,8 +219,9 @@
 
                     if (netValue == 0) {
 
-                        if (currentIndex < getIndexStep(4))
+                        if (currentIndex < getIndexStep(4)) {
                             setErrorStepWrong(getIndexStep(4));
+                        }
 
                         Swal.fire({
                             icon: 'warning',
@@ -207,9 +233,9 @@
 
                     // valores divergente
                     if (netValue != (grossValue - discountValue + extraValue)) {
-
-                        if (currentIndex < getIndexStep(4))
+                        if (currentIndex < getIndexStep(4)) {
                             setErrorStepWrong(getIndexStep(4));
+                        }
 
                         Swal.fire({
                             icon: 'warning',
@@ -226,10 +252,13 @@
                         let haveError = [false];
 
                         $('#parcels .parcel').each(function () {
-                            if (daysTemp === undefined) daysTemp = parseInt($('[name="due_day[]"]', this).val());
-                            else if (daysTemp >= parseInt($('[name="due_day[]"]', this).val())) {
+                            if (daysTemp === undefined) {
+                                daysTemp = parseInt($('[name="due_day[]"]', this).val());
+                            } else if (daysTemp >= parseInt($('[name="due_day[]"]', this).val())) {
                                 haveError = [true, 'A ordem dos vencimentos devem ser informados em ordem crescente.'];
-                            } else daysTemp = parseInt($('[name="due_day[]"]', this).val());
+                            } else {
+                                daysTemp = parseInt($('[name="due_day[]"]', this).val());
+                            }
 
                             if (realToNumber($('[name="value_parcel[]"]', this).val()) <= 0) {
                                 haveError = [true, 'Não podem existir vencimentos com valor menor ou igual a zero.'];
@@ -240,8 +269,9 @@
 
                         if (haveError[0]) { // ecnontrou erro nas datas de vencimento
 
-                            if (currentIndex < getIndexStep(4))
+                            if (currentIndex < getIndexStep(4)) {
                                 setErrorStepWrong(getIndexStep(4));
+                            }
 
                             Swal.fire({
                                 icon: 'warning',
@@ -252,11 +282,12 @@
                         }
 
                         if (priceTemp.toFixed(2) !== netValue.toFixed(2)) { // os valores das parcelas não corresponde ao valor líquido
-                            if ($('#automatic_parcel_distribution').is(':checked')) recalculeParcels();
-                            else {
-
-                                if (currentIndex < getIndexStep(4))
+                            if ($('#automatic_parcel_distribution').is(':checked')) {
+                                recalculeParcels();
+                            } else {
+                                if (currentIndex < getIndexStep(4)) {
                                     setErrorStepWrong(getIndexStep(4));
+                                }
 
                                 Swal.fire({
                                     icon: 'warning',
@@ -292,11 +323,10 @@
                 typeLocation === 0 ? payment.removeClass('payment-no').addClass('payment-yes') : payment.removeClass('payment-yes').addClass('payment-no');
 
                 if (typeLocation === 0) {
-                    $(`#${rental_p} h6`).text('Pagamento');
+                    $(`#${rental_p} h6.title-step`).text('Pagamento');
                     $(`#${rental_t}`).html(`<span class="number">${numberIndex}.</span> Pagamento`);
-                }
-                else {
-                    $(`#${rental_p} h6`).text('Resumo Equipamento');
+                } else {
+                    $(`#${rental_p} h6.title-step`).text('Resumo Equipamento');
                     $(`#${rental_t}`).html(`<span class="number">${numberIndex}.</span> Resumo Equipamento`);
                 }
             }
@@ -304,7 +334,6 @@
             time0 = date.getTime();
 
             if (priorIndex <= getIndexStep(3) && currentIndex >= getIndexStep(4)) { // equipamento
-
                 let pricesAndStocks;
                 let dataEquipments = [];
                 let dataEquipmentsPayCheck = [];
@@ -328,8 +357,9 @@
                 $('.list-equipments-payment-load').show();
                 $('.list-equipments-payment').hide();
                 $('#gross_value').html('<i class="fa fa-spin fa-spinner"></i>&nbsp;&nbsp;Calculando');
-                if ($('#calculate_net_amount_automatic').is(':checked'))
+                if ($('#calculate_net_amount_automatic').is(':checked')) {
                     $('#net_value').val('Calculando...');
+                }
 
                 date = new Date();
                 time3 = date.getTime();
@@ -345,8 +375,9 @@
                             arrErrors.push(`O equipamento ( <strong>${equipment[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipment[0]].stock} un</strong>`);
                         }
 
-                        if (!$(`.list-equipments-payment li[id-equipment="${equipment[0]}"]`).length) await createEquipmentPayment(equipment[0], pricesAndStocks[equipment[0]]);
-                        else {
+                        if (!$(`.list-equipments-payment li[id-equipment="${equipment[0]}"]`).length) {
+                            await createEquipmentPayment(equipment[0], pricesAndStocks[equipment[0]]);
+                        } else {
                             priceEquipment = pricesAndStocks[equipment[0]].price;
 
                             date = new Date();
@@ -371,8 +402,9 @@
 
                 await $('.list-equipments-payment li').each(async function() {
                     idEquipment = parseInt($(this).attr('id-equipment'));
-                    if (!dataEquipmentsPayCheck.includes(idEquipment))
-                        $(`.list-equipments-payment li[id-equipment="${idEquipment}"]`).remove()
+                    if (!dataEquipmentsPayCheck.includes(idEquipment)) {
+                        $(`.list-equipments-payment li[id-equipment="${idEquipment}"]`).remove();
+                    }
                 });
                 date = new Date();
                 time8 = date.getTime();
@@ -399,13 +431,13 @@
                     let countMenuIndex = 0;
                     $('#formCreateRental .steps ul li').each(function (){
                         countMenuIndex++;
-                        if (countMenuIndex > 4)
+                        if (countMenuIndex > 4) {
                             $(this).removeClass('done').addClass('disabled last');
+                        }
                     });
                     $('#formCreateRental .steps ul li.current').addClass('error');
                 } else {
-
-                    if (typeLocation == 0 && newPricesUpdate.length) {
+                    if (!$('[name="rental_id"]').length && typeLocation == 0 && newPricesUpdate.length) {
                         await Swal.fire({
                             title: newPricesUpdate.length === 1 ? 'Valor de equipamento atualizado.' : 'Valores de equipamentos atualizados.',
                             html: newPricesUpdate.length === 1 ? `O valor do equipamento abaixo foi alterado: <br><br><ol><li><b>${newPricesUpdateNames[0]}</b></li></ol><h4>Deseja atualizar?</h4>` : "Os valores dos equipamentos abaixo foram alterados: <br><br><ol><li><b>" + newPricesUpdateNames.join('</b></li><li><b>') + '</b></li></ol><h4>Deseja atualizar?</h4>',
@@ -417,16 +449,17 @@
                             cancelButtonText: 'Não atualizar',
                             reverseButtons: true
                         }).then((result) => {
-                            if (result.isConfirmed)
+                            if (result.isConfirmed) {
                                 $.each(newPricesUpdate, function (key, val) {
                                     val.el.val(val.price);
                                 });
+                            }
 
                             reloadTotalRental();
                             $('.list-equipments-payment-load').hide();
                             $('.list-equipments-payment').slideDown('slow');
                         })
-                    } else if (typeLocation == 1 && newPricesUpdate.length) {
+                    } else if (!$('[name="rental_id"]').length && typeLocation == 1 && newPricesUpdate.length) {
 
                         $.each(newPricesUpdate, function (key, val) {
                             val.el.val(val.price);
@@ -468,9 +501,6 @@
                 url: $('#formCreateRental').attr('action'),
                 data: $('#formCreateRental').serialize(),
                 success: response => {
-
-                    console.log(response);
-
                     if (response.success) {
                         $('#createRental').modal();
                         $('#createRental h3.code_rental strong').text(response.code);
@@ -692,201 +722,7 @@ $('#cleanSearchEquipment').on('click', function (){
 $('table.list-equipment').on('click', '.equipment', function(){
     const idEquipment = $(this).attr('id-equipment');
 
-    $(`.equipment[id-equipment="${idEquipment}"]`).empty().toggleClass('equipment load-equipment').append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
-
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'POST',
-        url: $('#routeGetEquipment').val(),
-        data: { idEquipment, validStock: !budget },
-        success: response => {
-
-            if (!response.success) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Atenção',
-                    html: `<ol><li>${response.data}</li></ol>`
-                });
-                searchEquipmentOld = '';
-                $('#searchEquipment').trigger('blur');
-                return false;
-            }
-
-            const permissions = response.permissions;
-            response = response.data;
-
-            const date_delivery = $('input[name="date_delivery"]').val();
-            const date_withdrawal = $('input[name="date_withdrawal"]').val();
-            const disabledVehicle = permissions.vehicle ? '' : 'disabled';
-            const disabledDriver = permissions.driver ? '' : 'disabled';
-
-            let regEquipment = `
-                    <div class="card">
-                        <div class="card-header" role="tab" id="headingEquipment-${response.id}" id-equipment="${response.id}">
-                            <h5 class="mb-0 d-flex align-items-center">
-                                <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseEquipment-${response.id}" aria-expanded="false" aria-controls="collapseEquipment-${response.id}" is-cacamba="${response.cacamba}">
-                                    ${response.name}
-                                </a>
-                                <a class="remove-equipment pull-right"><i class="fa fa-trash"></i></a>
-                            </h5>
-                        </div>
-                        <div id="collapseEquipment-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipment-${response.id}" data-parent="#equipments-selected" id-equipment="${response.id}">
-                            <input type="hidden" value="${response.id}" name="equipment_id[]">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-8" style="margin-top: -20px">
-                                        <div class="form-group">
-                                            <label>Referência</label>
-                                            <input type="text" class="form-control" value="${response.reference}" name="reference_equipment_${response.id}" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group flatpickr label-animate stock-group d-flex">
-                                            <label class="label-date-btns">Quantidade</label>
-                                            <input type="tel" name="stock_equipment_${response.id}" class="form-control col-md-9 flatpickr-input bbr-r-0 btr-r-0" value="1" max-stock="${response.stock}">
-                                            <div class="input-button-calendar col-md-3 no-padding">
-                                                <button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipment" data-toggle="tootip" title="Visualizar valor por período" id-equipment="${response.id}">
-                                                    <i class="fas fa-file-invoice-dollar"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <small class="text-danger font-weight-bold stock_available pull-left">Disponível: ${response.stock}</small>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-6 label-animate">
-                                        <label>Veículo</label>
-                                        <div class="input-group label-animate">
-                                            <select class="form-control" name="vehicle_${response.id}" disabled>
-                                                <option>Carregando ...</option>
-                                            </select>
-                                            <div class="input-group-addon input-group-append">
-                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newVehicleModal" title="Novo Veículo" ${disabledVehicle}><i class="fas fa-plus-circle"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-md-6 label-animate">
-                                        <label>Motorista</label>
-                                        <div class="input-group label-animate">
-                                            <select class="form-control" name="driver_${response.id}" disabled>
-                                                <option>Carregando ...</option>
-                                            </select>
-                                            <div class="input-group-addon input-group-append">
-                                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newDriverModal" title="Novo Motorista" ${disabledDriver}><i class="fas fa-plus-circle"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="switch pt-3">
-                                            <input type="checkbox" class="check-style check-xs use_date_diff_equip" name="use_date_diff_equip_${response.id}" id="use_date_diff_equip_${response.id}">
-                                            <label for="use_date_diff_equip_${response.id}" class="check-style check-xs"></label> Usar datas de entrega e/ou retirada diferentes para esse equipamento.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row display-none use_date_diff_equip_show mt-2">
-                                    <div class="col-md-6">
-                                        <div class="form-group flatpickr d-flex">
-                                            <label class="label-date-btns">Data Prevista de Entrega</label>
-                                            <input type="text" name="date_delivery_equipment_${response.id}" class="form-control col-md-9" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
-                                            <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
-                                                <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
-                                                    <i class="fa fa-calendar text-white"></i>
-                                                </a>
-                                                <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
-                                                    <i class="fa fa-times text-white"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group flatpickr d-flex">
-                                            <label class="label-date-btns">Data Prevista de Retirada</label>
-                                            <input type="text" name="date_withdrawal_equipment_${response.id}" class="form-control col-md-9" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
-                                            <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
-                                                <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
-                                                    <i class="fa fa-calendar text-white"></i>
-                                                </a>
-                                                <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
-                                                    <i class="fa fa-times text-white"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="switch pt-1">
-                                                <input type="checkbox" class="check-style check-xs not_use_date_withdrawal" name="not_use_date_withdrawal_equip_${response.id}" id="not_use_date_withdrawal_${response.id}" disabled>
-                                                <label for="not_use_date_withdrawal_${response.id}" class="check-style check-xs"></label> Não informar data de retirada
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>`;
-
-                                regEquipment += `
-                                <div class="row">
-                                    <div class="form-group col-md-12 mt-2">
-                                        <button type="button" class="btn btn-primary pull-right hideEquipment" id-equipment="${response.id}"><i class="fa fa-angle-up"></i> Ocultar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-            $('#equipments-selected').append(regEquipment);
-            $(`.load-equipment[id-equipment="${idEquipment}"]`).hide(300);
-            showSeparatorEquipmentSelected();
-            $('#cleanSearchEquipment').trigger('click')
-            setTimeout(() => {
-                $(`.load-equipment[id-equipment="${idEquipment}"]`).remove();
-
-                if (!$(`.list-equipment tbody tr`).length) {
-                    equipmentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
-                }
-                checkLabelAnimate();
-                $(`#collapseEquipment-${idEquipment}`).collapse('show');
-                $(`#collapseEquipment-${idEquipment} input[name^="stock_equipment_"]`).mask('0#');
-                // if (!budget) {
-                    $(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).inputmask();
-                    $(`#collapseEquipment-${idEquipment} input[name^="date_delivery_equipment_"]`).inputmask();
-                    $(`#collapseEquipment-${idEquipment} .flatpickr:not(.stock-group)`).flatpickr({
-                        enableTime: true,
-                        dateFormat: "d/m/Y H:i",
-                        time_24hr: true,
-                        wrap: true,
-                        clickOpens: false,
-                        allowInput: true,
-                        locale: "pt",
-                        onClose: function(selectedDates, dateStr, instance){
-                            checkLabelAnimate();
-                        }
-                    });
-                    if ($('#not_use_date_withdrawal').is(':checked')) {
-                        $(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).val('');
-                        $(`#collapseEquipment-${idEquipment} .not_use_date_withdrawal`).prop('checked', true);
-                    }
-                // }
-                $(`#collapseEquipment-${idEquipment} .btn-view-price-period-equipment`).tooltip();
-
-                if (response.cacamba) {
-                    $('.container-residues').slideDown('slow');
-                }
-
-                loadVehicles(0,`#collapseEquipment-${idEquipment} select[name^="vehicle_"]`);
-                loadDrivers(0, `#collapseEquipment-${idEquipment} select[name^="driver_"]`);
-            }, 350);
-        }, error: e => {
-            console.log(e);
-        },
-        complete: function(xhr) {
-            if (xhr.status === 403) {
-                Toast.fire({
-                    icon: 'error',
-                    title: 'Você não tem permissão para fazer essa operação!'
-                });
-            }
-        }
-    });
+    setEquipmentRental(idEquipment);
 });
 
 $(document).on('click', '.remove-equipment i', function (){
@@ -914,11 +750,13 @@ $(document).on('click', '.use_date_diff_equip', function (){
     elEquip.find('input[name^="date_delivery_equipment_"]').attr('disabled', !$(this).is(':checked'));
     elEquip.find('.not_use_date_withdrawal').attr('disabled', !$(this).is(':checked'));
 
-    if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
+    if (!elEquip.find('.not_use_date_withdrawal').is(':checked')) {
         elEquip.find('input[name^="date_withdrawal_equipment_"]').attr('disabled', !$(this).is(':checked'));
+    }
 
-    if (!elEquip.find('.not_use_date_withdrawal').is(':checked'))
+    if (!elEquip.find('.not_use_date_withdrawal').is(':checked')) {
         elEquip.find('.calendar_equipment:eq(1) a').attr('disabled', !$(this).is(':checked'));
+    }
 
     elEquip.find('.calendar_equipment:eq(0) a').attr('disabled', !$(this).is(':checked'));
 
@@ -929,15 +767,16 @@ $(document).on('click', '.use_date_diff_equip', function (){
         elEquip.find('input[name^="date_delivery_equipment_"]').val(date_delivery);
         elEquip.find('input[name^="date_withdrawal_equipment_"]').val(date_withdrawal);
 
-        if ($('#not_use_date_withdrawal').is(':checked'))
+        if ($('#not_use_date_withdrawal').is(':checked')) {
             elEquip.find('.not_use_date_withdrawal').prop('checked', true);
-        else
+        } else {
             elEquip.find('.not_use_date_withdrawal').prop('checked', false);
+        }
 
         checkLabelAnimate();
 
         elEquip.find('.use_date_diff_equip_show').slideUp('slow');
-    } else
+    } else {
         elEquip.find('.use_date_diff_equip_show').slideDown({
             start: function () {
                 $(this).css({
@@ -945,6 +784,7 @@ $(document).on('click', '.use_date_diff_equip', function (){
                 })
             }
         });
+    }
 });
 
 $(document).on('blur change', '[name^="stock_equipment_"]', function (){
@@ -965,7 +805,7 @@ $(document).on('blur change', '[name^="stock_equipment_"]', function (){
     }
 });
 
-$('#not_use_date_withdrawal').on('click', function (){
+$('#not_use_date_withdrawal').on('change', function (){
     const elEquip = $(this).closest('.col-md-6');
 
     elEquip.find('input[name="date_withdrawal"]').attr('disabled', $(this).is(':checked'));
@@ -1227,20 +1067,25 @@ const recalculeParcels = () => {
     }
 }
 
-const createParcel = due => {
+const createParcel = (due, due_day = null, due_date = null, due_value = null) => {
+
+    due_day = due_day === null ? calculateDays(sumMonthsDateNow(0), sumMonthsDateNow(due)) : due_day;
+    due_date = due_date === null ? sumMonthsDateNow(due) : due_date;
+    due_value = due_value === null ? '0,00' : numberToReal(due_value);
+
     const disabledValue = $('#automatic_parcel_distribution').is(':checked') ? 'disabled' : '';
     return `<div class="form-group mt-1 parcel display-none">
-            <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center justify-content-between payment-item">
                 <div class="input-group col-md-12 no-padding">
                     <div class="input-group-prepend stock-Equipment-payment col-md-3 no-padding">
                         <span class="input-group-text col-md-12 no-border-radius "><strong>${(due+1)}º Vencimento</strong></span>
                     </div>
-                    <input type="text" class="form-control col-md-2 text-center" name="due_day[]" value="${calculateDays(sumMonthsDateNow(0), sumMonthsDateNow(due))}">
-                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${sumMonthsDateNow(due)}">
+                    <input type="text" class="form-control col-md-2 text-center" name="due_day[]" value="${due_day}">
+                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${due_date}">
                     <div class="input-group-prepend col-md-1 no-padding">
                         <span class="input-group-text pl-3 pr-3 col-md-12"><strong>R$</strong></span>
                     </div>
-                    <input type="text" class="form-control col-md-2 no-border-radius text-center" name="value_parcel[]" value="0,00" ${disabledValue}>
+                    <input type="text" class="form-control col-md-2 no-border-radius text-center" name="value_parcel[]" value="${due_value}" ${disabledValue}>
                 </div>
             </div>
         </div>`
@@ -1353,15 +1198,17 @@ const getEquipment = async equipment => {
     return data.success ? data.data : false;
 }
 
-const createEquipmentPayment = async (equipment, priceStock = null) => {
+const createEquipmentPayment = async (equipment, priceStock = null, unity_price = null, total_price = null, quantity = null) => {
 
-    let dataEquipment = await getEquipment(equipment);
-    let stockEquipment = $(`#collapseEquipment-${equipment} input[name^="stock_equipment_"]`).val();
-    const priceEquipment = priceStock === null ? await getPriceEquipment(equipment) : priceStock.price;
+    let dataEquipment        = await getEquipment(equipment);
+    let stockEquipment       = quantity === null ? $(`#collapseEquipment-${equipment} input[name^="stock_equipment_"]`).val() : quantity;
+    const priceEquipment     = unity_price === null ? (priceStock === null ? await getPriceEquipment(equipment) : priceStock.price) : unity_price;
     let priceEquipmentFormat = numberToReal(priceEquipment);
-    let priceEquipmentTotal = numberToReal(priceEquipment * stockEquipment);
+    let priceEquipmentTotal  = numberToReal(total_price === null ? (priceEquipment * stockEquipment) : total_price);
 
-    if (!dataEquipment) return false;
+    if (!dataEquipment) {
+        return false;
+    }
 
     let paymentEquipment = `
         <li class="pb-3" id-equipment="${equipment}">
@@ -1390,13 +1237,18 @@ const createEquipmentPayment = async (equipment, priceStock = null) => {
 
     setTimeout(() => {
         $(`#price-un-equipment-${equipment}, #price-total-equipment-${equipment}`).maskMoney({thousands: '.', decimal: ',', allowZero: true});
-        if ($('.list-equipments-payment li').length === 1) $('.list-equipments-payment li').addClass('one-li-list-equipments-payment');
-        else $('.list-equipments-payment li').removeClass('one-li-list-equipments-payment');
+        if ($('.list-equipments-payment li').length === 1) {
+            $('.list-equipments-payment li').addClass('one-li-list-equipments-payment');
+        } else {
+            $('.list-equipments-payment li').removeClass('one-li-list-equipments-payment');
+        }
 
         $(`#price-total-equipment-${equipment}`).on('keyup', () => {
             reloadTotalRental();
         }).on('blur', function(){
-            if ($(this).val() === '') $(this).val('0,00')
+            if ($(this).val() === '') {
+                $(this).val('0,00')
+            }
         });
     }, 250);
 }
@@ -1459,7 +1311,9 @@ const getPriceStockEquipments = async idEquipment => {
         arrEquipments.push(idEquipment);
     });
 
-    if (!arrDiffDays.length || !arrEquipments.length) return false;
+    if (!arrDiffDays.length || !arrEquipments.length) {
+        return false;
+    }
 
     let priceStock = await $.ajax({
         headers: {
@@ -1475,4 +1329,252 @@ const getPriceStockEquipments = async idEquipment => {
     });
 
     return priceStock;
+}
+
+const setEquipmentRental = (
+    idEquipment,
+    quantity = null,
+    vehicle_suggestion = null,
+    driver_suggestion = null,
+    use_date_diff_equip = null,
+    expected_delivery_date = null,
+    expected_withdrawal_date = null,
+    not_use_date_withdrawal = null
+) => {
+    $(`.equipment[id-equipment="${idEquipment}"]`).empty().toggleClass('equipment load-equipment').append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: $('#routeGetEquipment').val(),
+        data: { idEquipment, validStock: !budget },
+        success: response => {
+
+            if (!response.success) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    html: `<ol><li>${response.data}</li></ol>`
+                });
+                searchEquipmentOld = '';
+                $('#searchEquipment').trigger('blur');
+                return false;
+            }
+
+            const permissions = response.permissions;
+            response = response.data;
+
+            let date_delivery = $('input[name="date_delivery"]').val();
+            let date_withdrawal = $('input[name="date_withdrawal"]').val();
+            const disabledVehicle = permissions.vehicle ? '' : 'disabled';
+            const disabledDriver = permissions.driver ? '' : 'disabled';
+
+            let prefix_equipment_name = '';
+            let field_old_equipment_id = '';
+            let equipment_quantity = 1;
+            let equipment_vehicle = 0;
+            let equipment_driver = 0;
+            let equipment_use_date_diff_equip = '';
+            let equipment_content_use_date_diff_equip = 'display-none';
+            let equipment_not_use_date_withdrawal = '';
+            let equipment_disabled_not_use_date_withdrawal = 'disabled';
+
+            if (quantity !== null) {
+                equipment_quantity = quantity;
+                prefix_equipment_name = '<span class="font-weight-bold">[ATUAL]</span> '
+                field_old_equipment_id = `<input type="hidden" name = "old_equipment_id_${response.id}" value = "${response.id}">`;
+            }
+            if (vehicle_suggestion !== null) {
+                equipment_vehicle = vehicle_suggestion;
+            }
+            if (driver_suggestion !== null) {
+                equipment_driver = driver_suggestion;
+            }
+            if (use_date_diff_equip !== null && use_date_diff_equip == 1) {
+                equipment_use_date_diff_equip = 'checked';
+                equipment_content_use_date_diff_equip = '';
+            }
+            if (expected_delivery_date !== null) {
+                date_delivery = transformDateForBr(expected_delivery_date);
+            }
+            if (expected_withdrawal_date !== null) {
+                date_withdrawal = transformDateForBr(expected_withdrawal_date);
+            }
+            if (not_use_date_withdrawal !== null && not_use_date_withdrawal == 1) {
+                equipment_not_use_date_withdrawal = 'checked';
+                equipment_disabled_not_use_date_withdrawal = '';
+            }
+
+            let regEquipment = `
+            <div class="card">
+                <div class="card-header" role="tab" id="headingEquipment-${response.id}" id-equipment="${response.id}">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <a class="collapsed pull-left w-100" data-toggle="collapse" href="#collapseEquipment-${response.id}" aria-expanded="false" aria-controls="collapseEquipment-${response.id}" is-cacamba="${response.cacamba}">
+                            ${prefix_equipment_name}${response.name}
+                        </a>
+                        <a class="remove-equipment pull-right"><i class="fa fa-trash"></i></a>
+                    </h5>
+                </div>
+                <div id="collapseEquipment-${response.id}" class="collapse" role="tabpanel" aria-labelledby="headingEquipment-${response.id}" data-parent="#equipments-selected" id-equipment="${response.id}">
+                    <input type="hidden" value="${response.id}" name="equipment_id[]">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8" style="margin-top: -20px">
+                                <div class="form-group">
+                                    <label>Referência</label>
+                                    <input type="text" class="form-control" value="${response.reference}" name="reference_equipment_${response.id}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group flatpickr label-animate stock-group d-flex">
+                                    <label class="label-date-btns">Quantidade</label>
+                                    <input type="tel" name="stock_equipment_${response.id}" class="form-control col-md-9 flatpickr-input bbr-r-0 btr-r-0" value="${equipment_quantity}" max-stock="${response.stock}">
+                                    <div class="input-button-calendar col-md-3 no-padding">
+                                        <button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipment" data-toggle="tootip" title="Visualizar valor por período" id-equipment="${response.id}">
+                                            <i class="fas fa-file-invoice-dollar"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="text-danger font-weight-bold stock_available pull-left">Disponível: ${response.stock}</small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6 label-animate">
+                                <label>Veículo</label>
+                                <div class="input-group label-animate">
+                                    <select class="form-control" name="vehicle_${response.id}" disabled>
+                                        <option>Carregando ...</option>
+                                    </select>
+                                    <div class="input-group-addon input-group-append">
+                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newVehicleModal" title="Novo Veículo" ${disabledVehicle}><i class="fas fa-plus-circle"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6 label-animate">
+                                <label>Motorista</label>
+                                <div class="input-group label-animate">
+                                    <select class="form-control" name="driver_${response.id}" disabled>
+                                        <option>Carregando ...</option>
+                                    </select>
+                                    <div class="input-group-addon input-group-append">
+                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newDriverModal" title="Novo Motorista" ${disabledDriver}><i class="fas fa-plus-circle"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="switch pt-3">
+                                    <input type="checkbox" class="check-style check-xs use_date_diff_equip" name="use_date_diff_equip_${response.id}" id="use_date_diff_equip_${response.id}" ${equipment_use_date_diff_equip}>
+                                    <label for="use_date_diff_equip_${response.id}" class="check-style check-xs"></label> Usar datas de entrega e/ou retirada diferentes para esse equipamento.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row ${equipment_content_use_date_diff_equip} use_date_diff_equip_show mt-2">
+                            <div class="col-md-6">
+                                <div class="form-group flatpickr d-flex">
+                                    <label class="label-date-btns">Data Prevista de Entrega</label>
+                                    <input type="text" name="date_delivery_equipment_${response.id}" class="form-control col-md-9" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                    <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
+                                        <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                            <i class="fa fa-calendar text-white"></i>
+                                        </a>
+                                        <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                            <i class="fa fa-times text-white"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group flatpickr d-flex">
+                                    <label class="label-date-btns">Data Prevista de Retirada</label>
+                                    <input type="text" name="date_withdrawal_equipment_${response.id}" class="form-control col-md-9" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                    <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
+                                        <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                            <i class="fa fa-calendar text-white"></i>
+                                        </a>
+                                        <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                            <i class="fa fa-times text-white"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="switch pt-1">
+                                        <input type="checkbox" class="check-style check-xs not_use_date_withdrawal" name="not_use_date_withdrawal_equip_${response.id}" id="not_use_date_withdrawal_${response.id}" ${equipment_not_use_date_withdrawal} ${equipment_disabled_not_use_date_withdrawal}>
+                                        <label for="not_use_date_withdrawal_${response.id}" class="check-style check-xs"></label> Não informar data de retirada
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12 mt-2">
+                                <button type="button" class="btn btn-primary pull-right hideEquipment" id-equipment="${response.id}"><i class="fa fa-angle-up"></i> Ocultar</button>
+                            </div>
+                        </div>
+                        ${field_old_equipment_id}
+                    </div>
+                </div>
+            </div>`;
+            $('#equipments-selected').append(regEquipment);
+            $(`.load-equipment[id-equipment="${idEquipment}"]`).hide(300);
+            showSeparatorEquipmentSelected();
+            $('#cleanSearchEquipment').trigger('click')
+            setTimeout(() => {
+                $(`.load-equipment[id-equipment="${idEquipment}"]`).remove();
+
+                if (!$(`.list-equipment tbody tr`).length) {
+                    equipmentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
+                }
+                checkLabelAnimate();
+
+                // é uam edição, não adição.
+                if (quantity === null) {
+                    $(`#collapseEquipment-${idEquipment}`).collapse('show');
+                }
+
+                $(`#collapseEquipment-${idEquipment} input[name^="stock_equipment_"]`).mask('0#');
+                $(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).inputmask();
+                $(`#collapseEquipment-${idEquipment} input[name^="date_delivery_equipment_"]`).inputmask();
+                $(`#collapseEquipment-${idEquipment} .flatpickr:not(.stock-group)`).flatpickr({
+                    enableTime: true,
+                    dateFormat: "d/m/Y H:i",
+                    time_24hr: true,
+                    wrap: true,
+                    clickOpens: false,
+                    allowInput: true,
+                    locale: "pt",
+                    onClose: function(selectedDates, dateStr, instance){
+                        checkLabelAnimate();
+                    }
+                });
+                if (not_use_date_withdrawal === null && $('#not_use_date_withdrawal').is(':checked')) {
+                    $(`#collapseEquipment-${idEquipment} input[name^="date_withdrawal_equipment_"]`).val('');
+                    $(`#collapseEquipment-${idEquipment} .not_use_date_withdrawal`).prop('checked', true);
+                }
+                $(`#collapseEquipment-${idEquipment} .btn-view-price-period-equipment`).tooltip();
+
+                if (response.cacamba) {
+                    $('.container-residues').slideDown('slow');
+                }
+
+                loadVehicles(equipment_vehicle,`#collapseEquipment-${idEquipment} select[name^="vehicle_"]`);
+                loadDrivers(equipment_driver, `#collapseEquipment-${idEquipment} select[name^="driver_"]`);
+
+                $('#not_use_date_withdrawal').trigger('change');
+
+            }, 350);
+        }, error: e => {
+            console.log(e);
+        },
+        complete: function(xhr) {
+            if (xhr.status === 403) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Você não tem permissão para fazer essa operação!'
+                });
+            }
+        }
+    });
 }

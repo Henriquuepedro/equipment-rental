@@ -1,0 +1,144 @@
+.wizard > .actions > ul {
+    display: flex;
+    justify-content: space-between;
+}
+.wizard > .content > .body {
+    height: unset;
+}
+.show-address {
+    display: none;
+}
+.flatpickr a.input-button,
+.flatpickr button.input-button{
+    height: calc(1.5em + 0.75rem + 3px);
+    width: 50%;
+    /*text-align: center;*/
+    /*padding-top: 13%;*/
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.flatpickr a.input-button:last-child,
+.flatpickr button.input-button:last-child{
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+}
+[name^="date_withdrawal"], [name^="date_delivery"], [name="stock_equipment"] {
+    border-bottom-right-radius: 0 !important;
+    border-top-right-radius: 0 !important;;
+}
+.input-group-append.btn-primary{
+    background: #2196f3;
+    cursor: pointer;
+}
+.input-group-append.btn-success{
+    background: #19d895;
+    cursor: pointer;
+}
+.input-group-append.btn-danger{
+    background: #ff6258;
+    cursor: pointer;
+}
+.list-equipment .equipment {
+    cursor: pointer;
+}
+.list-equipment .equipment td{
+    padding: 5px 2px;
+}
+.list-equipment .equipment td:nth-child(1){
+    align-items: center;
+    display: flex;
+}
+.list-equipment .equipment td:nth-child(1) p{
+    margin: 0;
+}
+.wizard > .content > .body {
+    position: unset;
+}
+.accordion .card .card-header a{
+    background: #2196f3 !important;
+}
+.remove-equipment i {
+    cursor: pointer;
+}
+.accordion.accordion-multiple-filled .card .card-header a:last-child {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    overflow: unset;
+}
+i.fa.input-group-text.text-white {
+    font-size: 15px;
+}
+.stepRental.body {
+    width: 100% !important;
+}
+.content-equipment {
+    max-height: 300px;
+}
+.content-equipment::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px #2196f3;
+    border-radius: 10px;
+}
+.content-equipment::-webkit-scrollbar {
+    width: 12px;
+}
+.content-equipment::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px #2196f3;
+    background-color: #52a4e5;
+}
+.calendar_equipment a {
+    height: calc(1.5em + 0.75rem + 4px) !important;
+}
+.calendar_equipment i {
+    font-size: 14px !important;
+}
+.list-equipments-payment li.one-li-list-equipments-payment:after{
+    display: none;
+}
+.btn-view-price-period-equipment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 5px;
+    height: calc(1.5em + 0.75rem + 3px);
+}
+.btn-view-price-period-equipment i {
+    font-size: 18px !important;
+}
+#payment.payment-no .payment-hidden {
+    display: none !important;
+}
+#payment.payment-no .payment-hidden-invert-stock {
+    justify-content: flex-end !important;
+    display: flex !important;;
+}
+.wizard > .content > .body input.select2-search__field {
+    border: 0;
+}
+.wizard > .content > .body ul {
+    padding-top: 5px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #2196f3 !important;
+}
+.container-residues .select2.select2-container {
+    position: relative;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: 1%;
+    margin-bottom: 0;
+}
+#observationDiv {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+.ql-tooltip {
+    left: 5% !important;
+}
+ul[id^="select2-residues"] li[aria-selected="true"] {
+    display: none;
+}

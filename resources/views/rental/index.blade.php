@@ -125,7 +125,7 @@
                             icon: 'error',
                             title: 'Você não tem permissão para fazer essa operação!'
                         });
-                        $(`button[rental-id="${rental_id}"]`).trigger('blur');
+                        $(`button[data-rental-id="${rental_id}"]`).trigger('blur');
                     }
                 }
             });
@@ -308,7 +308,7 @@
                             icon: 'error',
                             title: 'Você não tem permissão para fazer essa operação!'
                         });
-                        $(`button[rental-id="${rental_id}"]`).trigger('blur');
+                        $(`button[data-rental-id="${rental_id}"]`).trigger('blur');
                     }
                 }
             });
@@ -331,7 +331,7 @@
         }
 
         $(document).on('click', '.btnRemoveRental', function (){
-            const rental_id = $(this).attr('rental-id');
+            const rental_id = $(this).data('rental-id');
             const rental_name = $(this).closest('tr').find('td:eq(1)').html();
 
             Swal.fire({
@@ -369,7 +369,7 @@
                                     icon: 'error',
                                     title: 'Você não tem permissão para fazer essa operação!'
                                 });
-                                $(`button[rental-id="${rental_id}"]`).trigger('blur');
+                                $(`button[data-rental-id="${rental_id}"]`).trigger('blur');
                             }
                         }
                     });
@@ -379,14 +379,14 @@
 
         $(document).on('click', '.btnDeliver', function(){
 
-            const rental_id = $(this).attr('rental-id');
+            const rental_id = $(this).data('rental-id');
 
             showModalEquipment('deliver', rental_id);
         });
 
         $(document).on('click', '.btnWithdraw', function(){
 
-            const rental_id = $(this).attr('rental-id');
+            const rental_id = $(this).data('rental-id');
 
             showModalEquipment('withdraw', rental_id);
         });

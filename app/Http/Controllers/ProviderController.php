@@ -144,7 +144,7 @@ class ProviderController extends Controller
 
     public function edit($id)
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         $provider = $this->provider->getProvider($id, $company_id);
         if (!$provider) {

@@ -54,4 +54,14 @@ class RentalResidue extends Model
     {
         return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->delete();
     }
+
+    public function getResidue(int $company_id, int $rental_id)
+    {
+        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->first();
+    }
+
+    public function getResidues(int $company_id, int $rental_id)
+    {
+        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->get();
+    }
 }

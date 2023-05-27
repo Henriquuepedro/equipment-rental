@@ -126,6 +126,10 @@
 
     const loadClients = (client_id = null) => {
 
+        if ($('[name="client_id"]').length) {
+            client_id = parseInt($('[name="client_id"]').val());
+        }
+
         $('.client-load [name="client"]').empty().append('<option>Carregando ...</option>');
 
         $.ajax({

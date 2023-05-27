@@ -17,7 +17,7 @@ class DashboardController extends Controller
 
     public function dashboard()
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $indicator = array(
             'clients' => $this->client->getCountClients($company_id)
         );

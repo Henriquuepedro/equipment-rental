@@ -216,7 +216,7 @@ class BudgetController extends Controller
         // Pagamento
         $arrPayment = array();
         if ($haveCharged) {
-            $responsePayment = $this->rentalController->setPaymentRental($request, $responseEquipment->grossValue, true);
+                $responsePayment = $this->rentalController->setPaymentRental($request, $responseEquipment->grossValue, true);
             if (isset($responsePayment->error)) {
                 return response()->json(['success' => false, 'message' => $responsePayment->error]);
             }

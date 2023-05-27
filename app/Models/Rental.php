@@ -197,7 +197,7 @@ class Rental extends Model
         return $rental->get()->count();
     }
 
-    public function getRental(int $rental_id, int $company_id)
+    public function getRental(int $company_id, int $rental_id)
     {
         return $this->where(['id' => $rental_id, 'company_id' => $company_id])->first();
     }
@@ -232,7 +232,7 @@ class Rental extends Model
 
             $query = $this->from($type === 'finished' ? 'rentals' : 'rental_equipments')
                 ->where($where)
-                ->whereBetween('rentals.created_at', [$start_date, $end_date]);
+                ->whereBetween('rentals.created_at', ["$start_date 00:00:00", "$end_date 23:59:59"]);
 
             if ($type !== 'finished') {
                 $query->join('rentals', 'rental_equipments.rental_id', '=', 'rentals.id');

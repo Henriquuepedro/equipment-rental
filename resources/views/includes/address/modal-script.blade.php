@@ -1,10 +1,10 @@
 <script>
-    var targetRental;
-    var markerRental;
+    let targetRental;
+    let markerRental;
     // Where you want to render the map.
-    var elementRental = document.getElementById('mapRental');
+    let elementRental = document.getElementById('mapRental');
     // Create Leaflet map on map element.
-    var mapRental = L.map(elementRental, {
+    let mapRental = L.map(elementRental, {
         // fullscreenControl: true,
         // OR
         fullscreenControl: {
@@ -56,14 +56,15 @@
             return false;
         }
 
-        if ($('#formCreateRental input[name="lat"]').val() === '')
+        if ($('#formCreateRental input[name="lat"]').val() === '') {
             setTimeout(() => {
                 updateLocationRental($('#formCreateRental'));
             }, 250);
-        else
+        } else {
             setTimeout(() => {
                 locationLatLngRental($('#formCreateRental [name="lat"]').val(), $('#formCreateRental [name="lng"]').val());
             }, 250);
+        }
 
         $('#confirmAddressRental').modal();
     });
@@ -79,6 +80,7 @@
 
     const loadAddresses = (client_id = null) => {
 
+        let can_selected = !$('[name="rental_id"]').length;
         $('.show-address').css('display', 'flex');
         //$('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
         disabledFieldAddress();
@@ -100,12 +102,14 @@
 
                 $('select[name="name_address"]').empty().append('<option value="0">Não selecionado</option>');
                 $.each(response.data, function( index, value ) {
-                    selected = value.id === client_id || response.data.length === 1 ? 'selected' : '';
+                    selected = can_selected && (value.id === client_id || response.data.length === 1) ? 'selected' : '';
                     nameAddress = value.name ?? 'Endereço #' + countNameAddr++;
                     $('select[name="name_address"]').append(`<option value='${value.id}' ${selected}>${nameAddress}</option>`);
                 });
 
-                $('select[name="name_address"]').trigger('change');
+                if (can_selected) {
+                    $('select[name="name_address"]').trigger('change');
+                }
 
             }, error: e => {
                 enabledFieldAddress();
