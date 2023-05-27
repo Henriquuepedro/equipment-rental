@@ -116,7 +116,7 @@ class VehicleController extends Controller
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $drivers = $this->driver->getDrivers($company_id);
 
         return view('vehicle.create', compact('drivers'));
@@ -164,7 +164,7 @@ class VehicleController extends Controller
 
     public function edit($id)
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         $vehicle = $this->vehicle->getVehicle($id, $company_id);
         if (!$vehicle)

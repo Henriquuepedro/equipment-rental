@@ -9,31 +9,31 @@
 <div class="row show-address">
     <div class="form-group col-md-4">
         <label>CEP</label>
-        <input type="tel" name="cep" class="form-control">
+        <input type="tel" name="cep" class="form-control" value="{{ $address_zipcode ?? '' }}">
     </div>
     <div class="form-group col-md-8">
         <label>Endereço <sup>*</sup></label>
-        <input type="text" name="address" class="form-control">
+        <input type="text" name="address" class="form-control" value="{{ $address_name ?? '' }}">
     </div>
 </div>
 <div class="row show-address">
     <div class="form-group col-md-4">
         <label>Número <sup>*</sup></label>
-        <input type="text" name="number" class="form-control">
+        <input type="text" name="number" class="form-control" value="{{ $address_number ?? '' }}">
     </div>
     <div class="form-group col-md-8">
         <label>Complemento</label>
-        <input type="text" name="complement" class="form-control">
+        <input type="text" name="complement" class="form-control" value="{{ $address_complement ?? '' }}">
     </div>
 </div>
 <div class="row show-address">
     <div class="form-group col-md-7">
         <label>Referência</label>
-        <input type="text" name="reference" class="form-control">
+        <input type="text" name="reference" class="form-control" value="{{ $address_reference ?? '' }}">
     </div>
     <div class="form-group col-md-5">
         <label>Bairro <sup>*</sup></label>
-        <input type="text" name="neigh" class="form-control">
+        <input type="text" name="neigh" class="form-control" value="{{ $address_neigh ?? '' }}">
     </div>
 </div>
 <div class="row show-address">
@@ -51,5 +51,5 @@
         <button type="button" class="btn btn-primary col-md-9" id="confirmAddressMap">Confirmar Endereço no Mapa</button>
     </div>
 </div>
-<input type="hidden" name="lat">
-<input type="hidden" name="lng">
+<input type="hidden" name="lat" value="{{ $address_lat ?? '' }}">
+<input type="hidden" name="lng" value="{{ $address_lng ?? '' }}">

@@ -91,12 +91,12 @@ class PrintController extends Controller
 
     private function getDataFormatBudgetRental(int $code, bool $budget)
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         if ($budget) {
             $rentalBudget = $this->budget->getBudget($code, $company_id);
         } else {
-            $rentalBudget = $this->rental->getRental($code, $company_id);
+            $rentalBudget = $this->rental->getRental($company_id, $code);
         }
 
         if (!$rentalBudget) {

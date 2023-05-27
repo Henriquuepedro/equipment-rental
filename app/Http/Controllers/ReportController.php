@@ -36,7 +36,7 @@ class ReportController extends Controller
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         $drivers    = $this->driver->getDrivers($company_id);
         $vehicles   = $this->vehicle->getVehicles($company_id);

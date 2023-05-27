@@ -24,7 +24,7 @@ class BillsToReceiveController extends Controller
 
     public function index()
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $clients = $this->client->getClients($company_id);
 
         return view('bills_to_receive.index', compact('clients'));

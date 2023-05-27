@@ -31,7 +31,7 @@ class CompanyController extends Controller
         if (!hasAdmin())
             return redirect()->route('dashboard');
 
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         $company = $this->company->getCompany($company_id);
         $company->logo = asset($company->logo ? "assets/images/company/{$company_id}/{$company->logo}" : "assets/images/company/company.png");

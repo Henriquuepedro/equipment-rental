@@ -93,6 +93,8 @@ Route::group(['middleware' => 'auth'], function (){
         Route::get('/', [App\Http\Controllers\RentalController::class, 'index'])->name('index');
         Route::get('/novo', [App\Http\Controllers\RentalController::class, 'create'])->name('create');
         Route::post('/cadastro', [App\Http\Controllers\RentalController::class, 'insert'])->name('insert');
+        Route::get('/atualizar/{id}', [App\Http\Controllers\RentalController::class, 'edit'])->name('edit');
+        Route::post('/atualizar/{id}', [App\Http\Controllers\RentalController::class, 'update'])->name('update');
 
     });
 
@@ -223,6 +225,7 @@ Route::group(['middleware' => 'auth'], function (){
         });
         Route::group(['prefix' => '/locacao', 'as' => 'rental.'], function () {
             Route::post('/nova-locacao', [App\Http\Controllers\RentalController::class, 'insert'])->name('new-rental');
+            Route::post('/alterar-locacao/{id}', [App\Http\Controllers\RentalController::class, 'update'])->name('update-rental');
             Route::post('/buscar', [App\Http\Controllers\RentalController::class, 'fetchRentals'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\RentalController::class, 'delete'])->name('delete');
             Route::post('/quantidade-tipo-locacoes', [App\Http\Controllers\RentalController::class, 'getQtyTypeRentals'])->name('get-qty-type-rentals');
@@ -233,6 +236,7 @@ Route::group(['middleware' => 'auth'], function (){
         });
         Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');
+            Route::post('/alterar-orcamento/{id}', [App\Http\Controllers\BudgetController::class, 'update'])->name('update-rental');
             Route::post('/buscar', [App\Http\Controllers\BudgetController::class, 'fetchBudgets'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\BudgetController::class, 'delete'])->name('delete');
             Route::post('/confirmar', [App\Http\Controllers\BudgetController::class, 'confirm'])->name('confirm');

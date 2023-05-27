@@ -58,7 +58,14 @@ class RentalEquipmentController extends Controller
         $rental_equipments_id   = $request->input('rental_equipment_id');
         $rental_id              = $request->input('rental_id')[0] ?? 0;
 
-        if (!$this->rental->getRental($rental_id, $company_id)) {
+        if (!$checked) {
+            return response()->json(array(
+                'success' => false,
+                'message' => "Nenhum equipamento selecionado."
+            ));
+        }
+
+        if (!$this->rental->getRental($company_id, $rental_id)) {
             return response()->json(array(
                 'success' => false,
                 'message' => "Não foi possível localizar a locação."
@@ -132,7 +139,14 @@ class RentalEquipmentController extends Controller
         $rental_equipments_id   = $request->input('rental_equipment_id');
         $rental_id              = $request->input('rental_id')[0] ?? 0;
 
-        if (!$this->rental->getRental($rental_id, $company_id)) {
+        if (!$checked) {
+            return response()->json(array(
+                'success' => false,
+                'message' => "Nenhum equipamento selecionado."
+            ));
+        }
+
+        if (!$this->rental->getRental($company_id, $rental_id)) {
             return response()->json(array(
                 'success' => false,
                 'message' => "Não foi possível localizar a locação."

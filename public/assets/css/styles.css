@@ -886,3 +886,6 @@ a[disabled] {
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     height: 34px;
 }
+.sidebar > .nav .nav-item:not(.hover-open) .collapse .sub-menu .nav-item:first-child .nav-link {
+    padding-top: 10px;
+}

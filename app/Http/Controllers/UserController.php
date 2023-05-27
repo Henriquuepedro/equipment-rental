@@ -26,7 +26,7 @@ class UserController extends Controller
     public function profile()
     {
         $user_id    = Auth::user()->id;
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
 
         $user = $this->user->getUser($user_id, $company_id);
 
@@ -151,7 +151,7 @@ class UserController extends Controller
 
     public function newUser(UserCreatePost $request)
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $name       = filter_var($request->name_modal, FILTER_SANITIZE_STRING);
         $phone      = $request->phone_modal ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_modal), FILTER_SANITIZE_NUMBER_INT) : null;
         $email      = filter_var($request->email_modal, FILTER_VALIDATE_EMAIL);
@@ -228,7 +228,7 @@ class UserController extends Controller
             return response()->json([]);
 
         $dataUsers = [];
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $user_id = Auth::user()->id;
 
         $users   = $this->user->getUsersCompany($company_id);
