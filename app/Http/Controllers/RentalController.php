@@ -750,7 +750,7 @@ class RentalController extends Controller
     }
     public function update(int $id, Request $request): Factory|View|RedirectResponse|Application
     {
-        dd('Em andamento...', $request);
+        dd('Em andamento...', $request->all());
         if (!hasPermission('RentalCreatePost')) {
             return response()->json(['success' => false, 'message' => "Você não tem permissão para criar locações."]);
         }
