@@ -15,8 +15,9 @@ use App\Models\RentalPayment;
 use App\Models\RentalResidue;
 use App\Models\Residue;
 use App\Models\Vehicle;
+use App\Traits\Validation\RentalTrait;
 use DateTime;
-use http\Env\Response;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -30,17 +31,19 @@ use StdClass;
 
 class RentalController extends Controller
 {
-    private $client;
-    private $address;
-    private $equipment;
-    private $driver;
-    private $vehicle;
-    private $equipment_wallet;
-    private $residue;
-    private $rental;
-    private $rental_equipment;
-    private $rental_payment;
-    private $rental_residue;
+    use RentalTrait;
+
+    private Client $client;
+    private Address $address;
+    private Equipment $equipment;
+    private Driver $driver;
+    private Vehicle $vehicle;
+    private EquipmentWallet $equipment_wallet;
+    private Residue $residue;
+    private Rental $rental;
+    private RentalEquipment $rental_equipment;
+    private RentalPayment $rental_payment;
+    private RentalResidue $rental_residue;
 
     public function __construct(
         Client $client,
@@ -298,119 +301,19 @@ class RentalController extends Controller
             return response()->json(['success' => false, 'message' => "Você não tem permissão para criar locações."]);
         }
 
-        $company_id  = $request->user()->company_id;
-        $noCharged = $request->input('type_rental'); // 0 = Com cobrança, 1 = Sem cobrança
-
-        $clientId   = (int)$request->input('client');
-        $zipcode    = onlyNumbers($request->input('cep'));
-        $address    = filter_var($request->input('address'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $number     = filter_var($request->input('number'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $complement = filter_var($request->input('complement'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $reference  = filter_var($request->input('reference'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $neigh      = filter_var($request->input('neigh'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $city       = filter_var($request->input('city'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $state      = filter_var($request->input('state'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $lat        = filter_var($request->input('lat'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $lng        = filter_var($request->input('lng'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-
-        if (empty($clientId) || !$this->client->getClient($clientId, $company_id)) {
-            return response()->json(['success' => false, 'message' => "Cliente não foi encontrado. Revise a aba de Cliente e Endereço."]);
+        try {
+            $data_validation = $this->makeValidationRental($request, false);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
 
-        if ($address == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um endereço. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($number == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um número para o endereço. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($neigh == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um bairro. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($city == '') {
-            return response()->json(['success' => false, 'message' => 'Informe uma cidade. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($state == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um estado. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($lat == '' || $lng == '') {
-            return response()->json(['success' => false, 'message' => 'Confirme o endereço no mapa. Revise a aba de Cliente e Endereço.']);
-        }
+        // Locacão.
+        $arrRental      = $data_validation['rental'];
+        $arrEquipment   = $data_validation['arrEquipment'];
+        $arrResidue     = $data_validation['arrResidue'];
+        $arrPayment     = $data_validation['arrPayment'];
 
-        // datas da locação
-        $dateDelivery = $request->input('date_delivery') ? DateTime::createFromFormat('d/m/Y H:i', $request->input('date_delivery')) : null;
-        $dateWithdrawal = $request->input('date_withdrawal') ? DateTime::createFromFormat('d/m/Y H:i', $request->input('date_withdrawal')) : null;
-        $notUseDateWithdrawal = (bool)$request->input('not_use_date_withdrawal');
-
-        if (!$dateDelivery) { // não reconheceu a data de entrega
-            return response()->json(['success' => false, 'message' => "Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
-        }
-
-        if (!$notUseDateWithdrawal) { // usará data de retirada
-
-            if (!$dateWithdrawal) { // não reconheceu a data de retirada
-                return response()->json(['success' => false, 'message' => "Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
-            }
-
-            if ($dateDelivery->getTimestamp() >= $dateWithdrawal->getTimestamp()) { // data de entrega é maior ou igual a data de retirada
-                return response()->json(['success' => false, 'message' => "Data prevista de entrega não pode ser maior ou igual que a data prevista de retirada."]);
-            }
-        }
-
-        // Equipamentos
-        $responseEquipment = $this->setEquipmentRental($request);
-        if (isset($responseEquipment->error)) {
-            return response()->json(['success' => false, 'message' => $responseEquipment->error]);
-        }
-        $arrEquipment = $responseEquipment->arrEquipment;
-
-        // Pagamento
-        $arrPayment = array();
-        if (!$noCharged) {
-            $responsePayment = $this->setPaymentRental($request, $responseEquipment->grossValue);
-            if (isset($responsePayment->error)) {
-                return response()->json(['success' => false, 'message' => $responsePayment->error]);
-            }
-
-            $arrPayment = $responsePayment->arrPayment;
-        }
-
-        // Resíduo
-        $arrResidue = $this->setResidueRental($request);
-        if (isset($arrResidue['error'])) {
-            return response()->json(['success' => false, 'message' => $arrResidue['error']]);
-        }
-
-        // Locacão
-        $arrRental = array(
-            'code'                          => $this->rental->getNextCode($company_id), // get last code
-            'company_id'                    => $company_id,
-            'type_rental'                   => $noCharged,
-            'client_id'                     => $clientId,
-            'address_zipcode'               => $zipcode,
-            'address_name'                  => $address,
-            'address_number'                => $number,
-            'address_complement'            => $complement,
-            'address_reference'             => $reference,
-            'address_neigh'                 => $neigh,
-            'address_city'                  => $city,
-            'address_state'                 => $state,
-            'address_lat'                   => $lat,
-            'address_lng'                   => $lng,
-            'expected_delivery_date'        => $dateDelivery->format(DATETIME_INTERNATIONAL),
-            'expected_withdrawal_date'      => $dateWithdrawal?->format(DATETIME_INTERNATIONAL),
-            'not_use_date_withdrawal'       => $notUseDateWithdrawal,
-            'gross_value'                   => !$noCharged ? $responseEquipment->grossValue : null,
-            'extra_value'                   => !$noCharged ? $responsePayment->extraValue : null,
-            'discount_value'                => !$noCharged ? $responsePayment->discountValue : null,
-            'net_value'                     => !$noCharged ? $responsePayment->netValue : null,
-            'calculate_net_amount_automatic'=> (bool)$request->input('calculate_net_amount_automatic'),
-            'use_parceled'                  => (bool)$request->input('is_parceled'),
-            'automatic_parcel_distribution' => (bool)$request->input('automatic_parcel_distribution'),
-            'observation'                   => strip_tags($request->input('observation'), $this->allowableTags),
-            'user_insert'                   => $request->user()->id
-        );
-
-        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis.
 
         $this->updateLatLngAddressSelected($request);
 
@@ -436,7 +339,7 @@ class RentalController extends Controller
         return response()->json(['success' => false, 'message' => 'Não foi possível gravar a locação, recarregue a página e tente novamente.']);
     }
 
-    public function setEquipmentRental($request, bool $budget = false): string|StdClass
+    public function setEquipmentRental($request, bool $budget = false, ?int $rental_id = null): string|StdClass
     {
         $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         $response = new StdClass();
@@ -457,7 +360,6 @@ class RentalController extends Controller
         }
 
         foreach ($equipments as $equipmentId) {
-
             $stockRequest               = (int)$request->{"stock_equipment_$equipmentId->id"};
             $stockDb                    = (int)$equipmentId->stock;
             $reference                  = $request->{"reference_equipment_$equipmentId->id"};
@@ -468,7 +370,7 @@ class RentalController extends Controller
             $driverEquip                = (int)$request->{"driver_$equipmentId->id"};
             $vehicleEquip               = (int)$request->{"vehicle_$equipmentId->id"};
             $priceTotalEquip            = !$noCharged ? transformMoneyBr_En($request->{"priceTotalEquipment_$equipmentId->id"}) : 0;
-            $unitaryValue               = !$noCharged ? $equipmentId->value : 0;
+            $unitaryValue               = !$noCharged ? (float)$equipmentId->value : 0;
             $response->grossValue       += $priceTotalEquip;
 
             $dateDeliveryEquip = $dateDeliveryEquip ? DateTime::createFromFormat('d/m/Y H:i', $dateDeliveryEquip) : null;
@@ -497,7 +399,14 @@ class RentalController extends Controller
                     // diferença entre as datas
                     $dateDiff = $dateDeliveryEquip->diff($dateWithdrawalEquip);
                     // recupera valores configurados para valor unitário
-                    $unitaryValue = !$noCharged ? $this->equipment_wallet->getValueWalletsEquipment($company_id, $equipmentId->id, $dateDiff->days) : 0;
+                    $unitaryValue = 0;
+
+                    if (!$noCharged) {
+                        $valueWalletsEquipment = $this->equipment_wallet->getValueWalletsEquipment($company_id, $equipmentId->id, $dateDiff->days);
+                        if ($valueWalletsEquipment) {
+                            $unitaryValue = (float)$valueWalletsEquipment->value;
+                        }
+                    }
                 }
             } else { // será utilizada a data da locação
 
@@ -534,7 +443,7 @@ class RentalController extends Controller
 
             $arrEquipment = array(
                 'company_id'            => $company_id,
-                $nameFieldID            => 0,
+                $nameFieldID            => $rental_id ?: 0,
                 'equipment_id'          => $equipmentId->id,
                 'reference'             => $equipmentId->reference,
                 'name'                  => $equipmentId->name,
@@ -560,7 +469,7 @@ class RentalController extends Controller
         return $response;
     }
 
-    public function setPaymentRental(RentalCreatePost | BudgetCreatePost $request, $grossValue, bool $budget = false): StdClass
+    public function setPaymentRental(RentalCreatePost | BudgetCreatePost $request, $grossValue, bool $budget = false, ?int $rental_id = null): StdClass
     {
         $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         $company_id = $request->user()->company_id;
@@ -608,11 +517,9 @@ class RentalController extends Controller
                         $valueParcel = (float)number_format($netValue - $valueSumParcel,2,'.','');
                     }
                     $valueSumParcel += $valueParcel;
-
                 } else {
                     $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
                 }
-
 
                 if ($daysTemp === null) {
                     $daysTemp = $request->input('due_day')[$parcel];
@@ -627,7 +534,7 @@ class RentalController extends Controller
 
                 $response->arrPayment[] = array(
                     'company_id'    => $company_id,
-                    $nameFieldID    => 0,
+                    $nameFieldID    => $rental_id ?: 0,
                     'parcel'        => $parcel + 1,
                     'due_day'       => $request->input('due_day')[$parcel],
                     'due_date'      => $request->input('due_date')[$parcel],
@@ -660,23 +567,26 @@ class RentalController extends Controller
         return $response;
     }
 
-    public function setResidueRental(object $request, bool $budget = false): array
+    public function setResidueRental(object $request, bool $budget = false, ?int $rental_id = null): array
     {
         $nameFieldID = $budget ? 'budget_id' : 'rental_id';
-        if (empty($request->residues)) return [];
+        if (empty($request->residues)) {
+            return [];
+        }
 
         $company_id = $request->user()->company_id;
 
         $arrResidue = array();
         $residues = $this->residue->getResidues_In($company_id, $request->residues);
 
-        if (count($request->residues) != count($residues))
+        if (count($request->residues) != count($residues)) {
             return ['error' => 'Não foram encontrados os resíduos selecionados, reveja os resíduos.'];
+        }
 
         foreach ($residues as $residue) {
             $arrResidue[] = array(
                 'company_id'    => $company_id,
-                $nameFieldID    => 0,
+                $nameFieldID    => $rental_id ?: 0,
                 'residue_id'    => $residue->id,
                 'name_residue'  => $residue->name,
                 'user_insert'   => $request->user()->id
@@ -700,7 +610,9 @@ class RentalController extends Controller
 
     public function updateLatLngAddressSelected($request): bool
     {
-        if ((int)$request->name_address == 0) return false;
+        if ((int)$request->name_address == 0) {
+            return false;
+        }
 
         $company_id = $request->user()->company_id;
 
@@ -748,144 +660,78 @@ class RentalController extends Controller
 
         return view('rental.update', compact('budget', 'rental', 'rental_equipment', 'rental_payment', 'rental_residue'));
     }
-    public function update(int $id, Request $request): Factory|View|RedirectResponse|Application
+    public function update(int $id, RentalCreatePost $request): JsonResponse
     {
-        dd('Em andamento...', $request->all());
-        if (!hasPermission('RentalCreatePost')) {
-            return response()->json(['success' => false, 'message' => "Você não tem permissão para criar locações."]);
+        if (!hasPermission('RentalUpdatePost')) {
+            return response()->json(['success' => false, 'message' => "Você não tem permissão para atualizar locações."]);
         }
 
-        $company_id  = $request->user()->company_id;
-        $noCharged = $request->input('type_rental'); // 0 = Com cobrança, 1 = Sem cobrança
+        $company_id = $request->user()->company_id;
+        $this->setDataRental($this->rental->getRental($company_id, $id));
+        $this->setDataRentalEquipment($this->rental_equipment->getEquipments($company_id, $id));
+        $this->setDataRentalPayment($this->rental_payment->getPayments($company_id, $id));
 
-        $clientId   = (int)$request->input('client');
-        $zipcode    = onlyNumbers($request->input('cep'));
-        $address    = filter_var($request->input('address'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $number     = filter_var($request->input('number'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $complement = filter_var($request->input('complement'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $reference  = filter_var($request->input('reference'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $neigh      = filter_var($request->input('neigh'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $city       = filter_var($request->input('city'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $state      = filter_var($request->input('state'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $lat        = filter_var($request->input('lat'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $lng        = filter_var($request->input('lng'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-
-        if (empty($clientId) || !$this->client->getClient($clientId, $company_id)) {
-            return response()->json(['success' => false, 'message' => "Cliente não foi encontrado. Revise a aba de Cliente e Endereço."]);
+        if (!$this->getDataRental()) {
+            return response()->json(['success' => false, 'message' => "Locação não encontrada."]);
         }
 
-        if ($address == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um endereço. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($number == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um número para o endereço. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($neigh == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um bairro. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($city == '') {
-            return response()->json(['success' => false, 'message' => 'Informe uma cidade. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($state == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um estado. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($lat == '' || $lng == '') {
-            return response()->json(['success' => false, 'message' => 'Confirme o endereço no mapa. Revise a aba de Cliente e Endereço.']);
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis.
+
+        try {
+            $data_validation = $this->makeValidationRental($request, $id);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
 
-        // datas da locação
-        $dateDelivery = $request->input('date_delivery') ? DateTime::createFromFormat('d/m/Y H:i', $request->input('date_delivery')) : null;
-        $dateWithdrawal = $request->input('date_withdrawal') ? DateTime::createFromFormat('d/m/Y H:i', $request->input('date_withdrawal')) : null;
-        $notUseDateWithdrawal = (bool)$request->input('not_use_date_withdrawal');
+        // Locacão.
+        $arrRental      = $data_validation['rental'];
+        $arrEquipment   = $data_validation['arrEquipment'];
+        $arrResidue     = $data_validation['arrResidue'];
+        $arrPayment     = $data_validation['arrPayment'];
 
-        if (!$dateDelivery) { // não reconheceu a data de entrega
-            return response()->json(['success' => false, 'message' => "Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
+        // remove o campo 'code' da atualização.
+        unset($arrRental['code']);
+
+        try {
+            $validate_payment_equipment = $this->makeValidationToUpdate($request, $arrRental, $arrEquipment, $arrPayment);
+            $create_payment     = !$validate_payment_equipment['payment'];
+            $create_equipment   = !$validate_payment_equipment['equipment'];
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
 
-        if (!$notUseDateWithdrawal) { // usará data de retirada
-
-            if (!$dateWithdrawal) { // não reconheceu a data de retirada
-                return response()->json(['success' => false, 'message' => "Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
+        // Se pode criar os equipamentos novamente, significa os valores de entrega e retirada devem voltar a ser nulos.
+        if ($create_equipment || $create_payment) {
+            if ($request->has('confirm_update_equipment_or_payment') && !$request->input('confirm_update_equipment_or_payment')) {
+                DB::rollBack();
+                return response()->json(['success' => true, 'message' => null, 'show_alert_update_equipment_or_payment' => array(
+                    'equipment' => $create_equipment,
+                    'payment'   => $create_payment
+                )]);
             }
 
-            if ($dateDelivery->getTimestamp() >= $dateWithdrawal->getTimestamp()) { // data de entrega é maior ou igual a data de retirada
-                return response()->json(['success' => false, 'message' => "Data prevista de entrega não pode ser maior ou igual que a data prevista de retirada."]);
-            }
+            $arrRental['actual_delivery_date'] = null;
+            $arrRental['actual_withdrawal_date'] = null;
         }
 
-        // Equipamentos
-        $responseEquipment = $this->setEquipmentRental($request);
-        if (isset($responseEquipment->error)) {
-            return response()->json(['success' => false, 'message' => $responseEquipment->error]);
+        $updateRental = $this->rental->updateByRentalAndCompany($id, $company_id, $arrRental);
+
+        if ($create_equipment) {
+            $this->rental_equipment->remove($id, $company_id);
+            $this->rental_equipment->inserts($arrEquipment);
         }
-        $arrEquipment = $responseEquipment->arrEquipment;
-
-        // Pagamento
-        $arrPayment = array();
-        if (!$noCharged) {
-            $responsePayment = $this->setPaymentRental($request, $responseEquipment->grossValue);
-            if (isset($responsePayment->error)) {
-                return response()->json(['success' => false, 'message' => $responsePayment->error]);
-            }
-
-            $arrPayment = $responsePayment->arrPayment;
-        }
-
-        // Resíduo
-        $arrResidue = $this->setResidueRental($request);
-        if (isset($arrResidue['error'])) {
-            return response()->json(['success' => false, 'message' => $arrResidue['error']]);
-        }
-
-        // Locacão
-        $arrRental = array(
-            'code'                          => $this->rental->getNextCode($company_id), // get last code
-            'company_id'                    => $company_id,
-            'type_rental'                   => $noCharged,
-            'client_id'                     => $clientId,
-            'address_zipcode'               => $zipcode,
-            'address_name'                  => $address,
-            'address_number'                => $number,
-            'address_complement'            => $complement,
-            'address_reference'             => $reference,
-            'address_neigh'                 => $neigh,
-            'address_city'                  => $city,
-            'address_state'                 => $state,
-            'address_lat'                   => $lat,
-            'address_lng'                   => $lng,
-            'expected_delivery_date'        => $dateDelivery->format(DATETIME_INTERNATIONAL),
-            'expected_withdrawal_date'      => $dateWithdrawal?->format(DATETIME_INTERNATIONAL),
-            'not_use_date_withdrawal'       => $notUseDateWithdrawal,
-            'gross_value'                   => !$noCharged ? $responseEquipment->grossValue : null,
-            'extra_value'                   => !$noCharged ? $responsePayment->extraValue : null,
-            'discount_value'                => !$noCharged ? $responsePayment->discountValue : null,
-            'net_value'                     => !$noCharged ? $responsePayment->netValue : null,
-            'calculate_net_amount_automatic'=> (bool)$request->input('calculate_net_amount_automatic'),
-            'use_parceled'                  => (bool)$request->input('is_parceled'),
-            'automatic_parcel_distribution' => (bool)$request->input('automatic_parcel_distribution'),
-            'observation'                   => strip_tags($request->input('observation'), $this->allowableTags),
-            'user_insert'                   => $request->user()->id
-        );
-
-        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
-
-        $this->updateLatLngAddressSelected($request);
-
-        $insertRental   = $this->rental->insert($arrRental);
-
-        $arrEquipment   = $this->addRentalIdArray($arrEquipment, $insertRental->id);
-        $arrResidue     = $this->addRentalIdArray($arrResidue, $insertRental->id);
-        $arrPayment     = $this->addRentalIdArray($arrPayment, $insertRental->id);
-
-        $this->rental_equipment->inserts($arrEquipment);
-        $this->rental_residue->inserts($arrResidue);
-        if (count($arrPayment)) {
+        if ($create_payment && count($arrPayment)) {
+            $this->rental_payment->remove($id, $company_id);
             $this->rental_payment->inserts($arrPayment);
         }
 
-        if ($insertRental) {
+        // Remove os resíduos para serem criados novamente.
+        $this->rental_residue->remove($id, $company_id);
+        $this->rental_residue->inserts($arrResidue);
+
+        if ($updateRental) {
             DB::commit();
-            return response()->json(['success' => true, 'urlPrint' => route('print.rental', ['rental' => $insertRental->id]), 'code' => $insertRental->code]);
+            return response()->json(['success' => true, 'urlPrint' => route('print.rental', ['rental' => $this->dataRental->id]), 'code' => $this->dataRental->code]);
         }
 
         DB::rollBack();

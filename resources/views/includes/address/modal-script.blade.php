@@ -56,13 +56,13 @@
             return false;
         }
 
-        if ($('#formCreateRental input[name="lat"]').val() === '') {
+        if ($('#formRental input[name="lat"]').val() === '') {
             setTimeout(() => {
-                updateLocationRental($('#formCreateRental'));
+                updateLocationRental($('#formRental'));
             }, 250);
         } else {
             setTimeout(() => {
-                locationLatLngRental($('#formCreateRental [name="lat"]').val(), $('#formCreateRental [name="lng"]').val());
+                locationLatLngRental($('#formRental [name="lat"]').val(), $('#formRental [name="lng"]').val());
             }, 250);
         }
 
@@ -70,7 +70,7 @@
     });
 
     $('#updateLocationMapRental').click(function (){
-        updateLocationRental($('#formCreateRental'));
+        updateLocationRental($('#formRental'));
     });
 
     $("#confirmAddressRental").on("hidden.bs.modal", function () {
@@ -266,7 +266,7 @@
         markerRental = L.marker(targetRental, { draggable:'true' }).addTo(mapRental);
         markerRental.on('dragend', () => {
             const position = markerRental.getLatLng();
-            const element = $('#formCreateRental');
+            const element = $('#formRental');
             element.find('[name="lat"]').val(position.lat);
             element.find('[name="lng"]').val(position.lng);
         });

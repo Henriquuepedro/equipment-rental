@@ -233,6 +233,9 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/equipamentos-para-retirar', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRentalToWithdraw'])->name('get-equipments-to-withdraw');
             Route::post('/atualizar-para-entregue', [App\Http\Controllers\RentalEquipmentController::class, 'deliverEquipment'])->name('delivery_equipment');
             Route::post('/atualizar-para-retirado', [App\Http\Controllers\RentalEquipmentController::class, 'withdrawEquipment'])->name('withdrawal_equipment');
+
+            Route::get('/equipamentos/{rental_id}', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRental'])->name('get_equipments_rental');
+            Route::get('/pagamentos/{rental_id}', [App\Http\Controllers\BillsToReceiveController::class, 'getPaymentsRental'])->name('get_payments_rental');
         });
         Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');

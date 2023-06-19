@@ -20,19 +20,19 @@
                 padding: 0px !important;
                 height: 30px;
             }
-            .table .info span{
+            .table .info:not(.obs) span{
                 font-size: 9px;
                 font-weight: bold;
                 padding-left: 3px
             }
-            .table .info p{
+            .table .info:not(.obs) p{
                 font-size: 11px
             }
-            .table .info p{
+            .table .info:not(.obs) p{
                 text-align: right;
                 padding-right: 3px
             }
-            .table .info p.dadosLocacao{
+            .table .info:not(.obs) p.dadosLocacao{
                 text-align: left;
                 padding-right: 0px
             }

@@ -242,4 +242,14 @@ class RentalPayment extends Model
 
         return $rental->get();
     }
+
+    public function getPaymentByRentalAndDueDateAndValue(int $company_id, int $rental_id, string $due_date, float $due_value)
+    {
+        return $this->where(array(
+            'company_id'    => $company_id,
+            'rental_id'     => $rental_id,
+            'due_date'      => $due_date,
+            'due_value'     => $due_value
+        ))->first();
+    }
 }

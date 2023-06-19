@@ -1,6 +1,6 @@
 (function ($) {
     'use strict';
-    var form = $("#formCreateRental");
+    var form = $("#formRental");
     var budget = $('#budget').val() ? true : false;
     form.steps({
         headerTag: "h3",
@@ -301,8 +301,8 @@
                 }
             }
 
-            $('#formCreateRental .actions a').hide();
-            $('#formCreateRental .steps ul li a').attr('disabled', true);
+            $('#formRental .actions a').hide();
+            $('#formRental .steps ul li a').attr('disabled', true);
             changeStepPosAbsolute();
             return true;
         },
@@ -315,16 +315,16 @@
 
             if (priorIndex === getIndexStep(0)) { // tipo de cobrança
 
-                const rental_p = 'formCreateRental-p-4';
-                const rental_t = 'formCreateRental-t-4';
+                const rental_p = 'formRental-p-4';
+                const rental_t = 'formRental-t-4';
                 const numberIndex = 5;
                 const payment  = $(`#${rental_p} #payment`);
 
                 typeLocation === 0 ? payment.removeClass('payment-no').addClass('payment-yes') : payment.removeClass('payment-yes').addClass('payment-no');
 
                 if (typeLocation === 0) {
-                    $(`#${rental_p} h6.title-step`).text('Pagamento');
-                    $(`#${rental_t}`).html(`<span class="number">${numberIndex}.</span> Pagamento`);
+                    $(`#${rental_p} h6.title-step`).text('Valores e Pagamento');
+                    $(`#${rental_t}`).html(`<span class="number">${numberIndex}.</span> Valores e Pagamento`);
                 } else {
                     $(`#${rental_p} h6.title-step`).text('Resumo Equipamento');
                     $(`#${rental_t}`).html(`<span class="number">${numberIndex}.</span> Resumo Equipamento`);
@@ -429,13 +429,13 @@
                     changeStepPosUnset();
                     form.steps("previous");
                     let countMenuIndex = 0;
-                    $('#formCreateRental .steps ul li').each(function (){
+                    $('#formRental .steps ul li').each(function (){
                         countMenuIndex++;
                         if (countMenuIndex > 4) {
                             $(this).removeClass('done').addClass('disabled last');
                         }
                     });
-                    $('#formCreateRental .steps ul li.current').addClass('error');
+                    $('#formRental .steps ul li.current').addClass('error');
                 } else {
                     if (!$('[name="rental_id"]').length && typeLocation == 0 && newPricesUpdate.length) {
                         await Swal.fire({
@@ -477,8 +477,8 @@
                 }
             }
 
-            $('#formCreateRental .actions a').show();
-            $('#formCreateRental .steps ul li a').attr('disabled', false);
+            $('#formRental .actions a').show();
+            $('#formRental .steps ul li a').attr('disabled', false);
 
             // Used to skip the "Warning" step if the user is old enough.
             // form.steps("next");
@@ -486,7 +486,7 @@
         },
         onFinishing: function (event, currentIndex)
         {
-            $('#formCreateRental .actions a[href="#finish"]').attr('disabled', true);
+            $('#formRental .actions a[href="#finish"]').attr('disabled', true);
             form.validate().settings.ignore = ":disabled";
             return form.valid();
         },
@@ -498,13 +498,40 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: 'POST',
-                url: $('#formCreateRental').attr('action'),
-                data: $('#formCreateRental').serialize(),
+                url: $('#formRental').attr('action'),
+                data: $('#formRental').serialize(),
                 success: response => {
                     if (response.success) {
-                        $('#createRental').modal();
-                        $('#createRental h3.code_rental strong').text(response.code);
-                        $('#createRental a.rental_print').attr('href', response.urlPrint);
+                        if (response.hasOwnProperty("show_alert_update_equipment_or_payment") && response.show_alert_update_equipment_or_payment) {
+                            const update_equipment  = response.show_alert_update_equipment_or_payment.equipment;
+                            const update_payment    = response.show_alert_update_equipment_or_payment.payment;
+                            const title_alert = update_equipment && update_payment ? "Alteração de equipamento e pagamento" :
+                                (update_equipment ? "Alteração de equipamento" : "Alteração de pagamento");
+                            const description_alert = update_equipment && update_payment ? "equipamentos e pagamentos, caso exista parcela paga ou equipamento entregue ou retirado" :
+                                (update_equipment ? "equipamentos, caso exista equipamento entregue ou retirado" : "pagamentos, caso exista parcela paga");
+
+                            Swal.fire({
+                                title: title_alert,
+                                html: `Existem alterações de ${description_alert}, deve ser realizado a ação novamente. <br>Deseja atualizar?`,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#19d895',
+                                cancelButtonColor: '#bbb',
+                                confirmButtonText: 'Sim, atualizar',
+                                cancelButtonText: 'Não atualizar',
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $('[name="confirm_update_equipment_or_payment"]').val(1);
+                                    $('#formRental a[href="#finish"]').trigger('click')
+                                }
+                            })
+                            $('#formRental .actions a[href="#finish"]').attr('disabled', false);
+                        } else {
+                            $('#createRental').modal();
+                            $('#createRental h3.code_rental strong').text(response.code);
+                            $('#createRental a.rental_print').attr('href', response.urlPrint);
+                        }
 
                     } else {
                         Swal.fire({
@@ -512,7 +539,7 @@
                             title: 'Atenção',
                             html: '<ol><li>'+response.message+'</li></ol>'
                         });
-                        $('#formCreateRental .actions a[href="#finish"]').attr('disabled', false);
+                        $('#formRental .actions a[href="#finish"]').attr('disabled', false);
                     }
 
                 }, error: e => {
@@ -524,15 +551,16 @@
                         arrErrors.push(value);
                     });
 
-                    if (!arrErrors.length && e.responseJSON.message !== undefined)
+                    if (!arrErrors.length && e.responseJSON.message !== undefined) {
                         arrErrors.push('Não foi possível identificar o motivo do erro, recarregue a página e tente novamente!');
+                    }
 
                     Swal.fire({
                         icon: 'warning',
                         title: 'Atenção',
                         html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
                     });
-                    $('#formCreateRental .actions a[href="#finish"]').attr('disabled', false);
+                    $('#formRental .actions a[href="#finish"]').attr('disabled', false);
                 },
                 complete: function(e) {
                     if (e.status === 403) {
@@ -612,7 +640,7 @@ $(function() {
     }
 });
 
-$("#formCreateRental").validate({
+$("#formRental").validate({
     rules: {
 
     },
@@ -634,7 +662,7 @@ $("#formCreateRental").validate({
         }, 150);
     },
     submitHandler: function(form) {
-        $('#formCreateRental [type="submit"]').attr('disabled', true);
+        $('#formRental [type="submit"]').attr('disabled', true);
         form.submit();
     }
 });
@@ -1041,11 +1069,11 @@ $("#createRental").on("hidden.bs.modal", function () {
 const setErrorStepWrong = step => {
 
     setTimeout(() => {
-        $('#formCreateRental .steps ul li').removeClass('error');
+        $('#formRental .steps ul li').removeClass('error');
         for (let i = 0; i < step; i++)
-            $(`#formCreateRental .steps ul li:eq(${i})`).removeClass('current').addClass('done');
+            $(`#formRental .steps ul li:eq(${i})`).removeClass('current').addClass('done');
 
-        $(`#formCreateRental .steps ul li:eq(${step})`).addClass('error').find('a').trigger('click');
+        $(`#formRental .steps ul li:eq(${step})`).addClass('error').find('a').trigger('click');
     }, 150);
 }
 
@@ -1377,9 +1405,11 @@ const setEquipmentRental = (
             let equipment_vehicle = 0;
             let equipment_driver = 0;
             let equipment_use_date_diff_equip = '';
+            let equipment_use_date_diff_equip_date = 'disabled';
             let equipment_content_use_date_diff_equip = 'display-none';
             let equipment_not_use_date_withdrawal = '';
             let equipment_disabled_not_use_date_withdrawal = 'disabled';
+            let equipment_disabled_not_use_date_withdrawal_equip = '';
 
             if (quantity !== null) {
                 equipment_quantity = quantity;
@@ -1394,6 +1424,7 @@ const setEquipmentRental = (
             }
             if (use_date_diff_equip !== null && use_date_diff_equip == 1) {
                 equipment_use_date_diff_equip = 'checked';
+                equipment_use_date_diff_equip_date = '';
                 equipment_content_use_date_diff_equip = '';
             }
             if (expected_delivery_date !== null) {
@@ -1405,6 +1436,7 @@ const setEquipmentRental = (
             if (not_use_date_withdrawal !== null && not_use_date_withdrawal == 1) {
                 equipment_not_use_date_withdrawal = 'checked';
                 equipment_disabled_not_use_date_withdrawal = '';
+                equipment_disabled_not_use_date_withdrawal_equip = 'disabled';
             }
 
             let regEquipment = `
@@ -1476,12 +1508,12 @@ const setEquipmentRental = (
                             <div class="col-md-6">
                                 <div class="form-group flatpickr d-flex">
                                     <label class="label-date-btns">Data Prevista de Entrega</label>
-                                    <input type="text" name="date_delivery_equipment_${response.id}" class="form-control col-md-9" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                    <input type="text" name="date_delivery_equipment_${response.id}" class="form-control col-md-9" value="${date_delivery}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input ${equipment_use_date_diff_equip_date}>
                                     <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
-                                        <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                        <a class="input-button pull-left btn-primary" title="toggle" data-toggle ${equipment_use_date_diff_equip_date}>
                                             <i class="fa fa-calendar text-white"></i>
                                         </a>
-                                        <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                        <a class="input-button pull-right btn-primary" title="clear" data-clear ${equipment_use_date_diff_equip_date}>
                                             <i class="fa fa-times text-white"></i>
                                         </a>
                                     </div>
@@ -1490,12 +1522,12 @@ const setEquipmentRental = (
                             <div class="col-md-6">
                                 <div class="form-group flatpickr d-flex">
                                     <label class="label-date-btns">Data Prevista de Retirada</label>
-                                    <input type="text" name="date_withdrawal_equipment_${response.id}" class="form-control col-md-9" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input disabled>
+                                    <input type="text" name="date_withdrawal_equipment_${response.id}" class="form-control col-md-9" value="${date_withdrawal}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input ${equipment_disabled_not_use_date_withdrawal_equip}>
                                     <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
-                                        <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                        <a class="input-button pull-left btn-primary" title="toggle" data-toggle ${equipment_disabled_not_use_date_withdrawal_equip}>
                                             <i class="fa fa-calendar text-white"></i>
                                         </a>
-                                        <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                        <a class="input-button pull-right btn-primary" title="clear" data-clear ${equipment_disabled_not_use_date_withdrawal_equip}>
                                             <i class="fa fa-times text-white"></i>
                                         </a>
                                     </div>
@@ -1562,7 +1594,7 @@ const setEquipmentRental = (
                 loadVehicles(equipment_vehicle,`#collapseEquipment-${idEquipment} select[name^="vehicle_"]`);
                 loadDrivers(equipment_driver, `#collapseEquipment-${idEquipment} select[name^="driver_"]`);
 
-                $('#not_use_date_withdrawal').trigger('change');
+                $(`#not_use_date_withdrawal_${idEquipment}`).trigger('change');
 
             }, 350);
         }, error: e => {
@@ -1576,5 +1608,33 @@ const setEquipmentRental = (
                 });
             }
         }
+    });
+}
+
+const getEquipmentsRental = (rental_id, callback) => {
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'GET',
+        url: `${$('[name="base_url"]').val()}/ajax/locacao/equipamentos/${rental_id}`,
+        async: true,
+        success: response => {
+            callback(response);
+        }, error: e => { console.log(e) }
+    });
+}
+
+const getPaymentsRental = (rental_id, callback) => {
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'GET',
+        url: `${$('[name="base_url"]').val()}/ajax/locacao/pagamentos/${rental_id}`,
+        async: true,
+        success: response => {
+            callback(response);
+        }, error: e => { console.log(e) }
     });
 }

@@ -8,6 +8,9 @@
 
 @section('css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    @if ($settings['style_template'] == 3)
+        <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    @endif
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
     <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/views/rental.css') }}" rel="stylesheet">
@@ -29,7 +32,6 @@
 
     <script>
         $(async () => {
-            let data_equipment;
             let equipment_id;
             let quantity;
             let vehicle_suggestion;
@@ -40,7 +42,6 @@
             let not_use_date_withdrawal;
             let total_value;
             let unitary_value;
-            let data_payment;
             let parcel;
             let due_day;
             let due_date;
@@ -51,6 +52,7 @@
             let address_state = null;
             let address_city = null;
             let exist_payment = false;
+            const rental_id = $('[name="rental_id"]').val();
 
             setTimeout(async () => {
                 $('.show-address').each(function () {
@@ -66,75 +68,75 @@
                     $('[name="residues[]"]').val($('[name="residues"]').val().split(',')).select2('destroy').select2();
                 }
 
-                $($('[name="equipments"]').val().split(',')).each(async function (k, v) {
-                    data_equipment           = v.split(';');
+                getEquipmentsRental(rental_id, async function(response){
+                    $(response).each(async function (k, equipment) {
+                        equipment_id             = equipment.equipment_id;
+                        quantity                 = equipment.quantity;
+                        vehicle_suggestion       = equipment.vehicle_suggestion;
+                        driver_suggestion        = equipment.driver_suggestion;
+                        use_date_diff_equip      = equipment.use_date_diff_equip;
+                        expected_delivery_date   = equipment.expected_delivery_date;
+                        expected_withdrawal_date = equipment.expected_withdrawal_date;
+                        not_use_date_withdrawal  = equipment.not_use_date_withdrawal;
+                        total_value              = equipment.total_value;
+                        unitary_value            = equipment.unitary_value;
 
-                    equipment_id             = data_equipment[0].trim();
-                    quantity                 = data_equipment[1].trim();
-                    vehicle_suggestion       = data_equipment[2].trim();
-                    driver_suggestion        = data_equipment[3].trim();
-                    use_date_diff_equip      = data_equipment[4].trim();
-                    expected_delivery_date   = data_equipment[5].trim();
-                    expected_withdrawal_date = data_equipment[6].trim();
-                    not_use_date_withdrawal  = data_equipment[7].trim();
-                    total_value              = data_equipment[8].trim();
-                    unitary_value            = data_equipment[9].trim();
-
-                    setEquipmentRental(
-                        equipment_id,
-                        quantity,
-                        vehicle_suggestion,
-                        driver_suggestion,
-                        use_date_diff_equip,
-                        expected_delivery_date,
-                        expected_withdrawal_date,
-                        not_use_date_withdrawal
-                    );
+                        await setEquipmentRental(
+                            equipment_id,
+                            quantity,
+                            vehicle_suggestion,
+                            driver_suggestion,
+                            use_date_diff_equip,
+                            expected_delivery_date,
+                            expected_withdrawal_date,
+                            not_use_date_withdrawal
+                        );
+                    });
                 });
 
-                $('#add_parcel, #del_parcel, .automatic_parcel_distribution_parent').slideDown(500);
+                await $('#add_parcel, #del_parcel, .automatic_parcel_distribution_parent').slideDown(500);
 
-                $($('[name="payments"]').val().split(',')).each(async function (k, v) {
-                    data_payment = v.split(';');
+                await getPaymentsRental(rental_id, function(response){
+                    $(response).each(async function (k, payment) {
+                        parcel       = parseInt(payment.parcel) - 1;
+                        due_day      = payment.due_day;
+                        due_date     = payment.due_date;
+                        due_value    = payment.due_value;
+                        payment_id   = payment.payment_id;
+                        payment_name = payment.payment_name;
+                        payday       = payment.payday;
 
-                    parcel       = parseInt(data_payment[0].trim()) - 1;
-                    due_day      = data_payment[1].trim();
-                    due_date     = data_payment[2].trim();
-                    due_value    = data_payment[3].trim();
-                    payment_id   = data_payment[4].trim();
-                    payment_name = data_payment[5].trim();
-                    payday       = data_payment[6].trim();
+                        if (exist_payment === false && payment_id) {
+                            exist_payment = true;
+                            $('#paid_installment_notice').show();
+                        }
 
-                    if (exist_payment === false && payment_id) {
-                        exist_payment = true;
-                        $('#paid_installment_notice').show();
-                    }
+                        if ($('#is_parceled').is(':checked')) {
+                            $('#parcels').show().append(
+                                createParcel(parcel, due_day, due_date, due_value)
+                            ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({
+                                thousands: '.',
+                                decimal: ',',
+                                allowZero: true
+                            }).closest('.payment-item').find('[name="due_date[]"]').trigger('blur');
+                        }
+                    });
 
-                    if ($('#is_parceled').is(':checked')) {
-                        $('#parcels').show().append(
-                            createParcel(parcel, due_day, due_date, due_value)
-                        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({
-                            thousands: '.',
-                            decimal: ',',
-                            allowZero: true
-                        }).closest('.payment-item').find('[name="due_date[]"]').trigger('blur');
+                    if (response.length) {
+                        $('#del_parcel').prop('disabled', false);
                     }
                 });
-
-                if ($('[name="payments"]').val().split(',').length) {
-                    $('#del_parcel').prop('disabled', false);
-                }
             }, 500);
 
-            setTimeout(() => {
-                $($('[name="equipments"]').val().split(',')).each(function (k, v) {
-                    data_equipment           = v.split(';');
-                    equipment_id             = data_equipment[0].trim();
-                    quantity                 = data_equipment[1].trim();
-                    total_value              = data_equipment[8].trim();
-                    unitary_value            = data_equipment[9].trim();
+                setTimeout(() => {getEquipmentsRental(rental_id, async function(response){
+                    $(response).each(async function (k, equipment) {
+                        equipment_id             = equipment.equipment_id;
+                        quantity                 = equipment.quantity;
+                        total_value              = equipment.total_value;
+                        unitary_value            = equipment.unitary_value;
 
-                    createEquipmentPayment(equipment_id, null, unitary_value, total_value, quantity);
+                        createEquipmentPayment(equipment_id, null, unitary_value, total_value, quantity);
+                    });
                 });
 
                 $('.list-equipments-payment-load').hide();
@@ -166,26 +168,27 @@
                 await loadCities($('[name="city"]'), address_state, address_city);
             }
 
-        });
+            $('input[name="type_rental"]').on('ifChanged', function(){
+                console.log($('input[name="type_rental"]').val());
 
-        $('input[name="type_rental"]').on('change', function(){
-            if (parseInt($('input[name="type_rental"]:checked').val()) === 1 && $('#parcels div').length) {
-                Swal.fire({
-                    title: 'Alteração de Tipo de Locação',
-                    html: `Atualmente, existem pagamentos para sua locação, caso altere, os pagamentos serão excluídos. <br><br><h4>Deseja continuar?</h4>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#19d895',
-                    cancelButtonColor: '#bbb',
-                    confirmButtonText: 'Sim',
-                    cancelButtonText: 'Não',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (!result.isConfirmed) {
-                        $('input[name="type_rental"][value="0"]').iCheck('check')
-                    }
-                })
-            }
+                if (parseInt($('input[name="type_rental"]:checked').val()) === 1 && $('#parcels div').length) {
+                    Swal.fire({
+                        title: 'Alteração de Tipo de Locação',
+                        html: `Atualmente, existem pagamentos para sua locação, caso altere, os pagamentos serão excluídos. <br><br><h4>Deseja continuar?</h4>`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#19d895',
+                        cancelButtonColor: '#bbb',
+                        confirmButtonText: 'Sim',
+                        cancelButtonText: 'Não',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (!result.isConfirmed) {
+                            $('input[name="type_rental"][value="0"]').iCheck('check')
+                        }
+                    })
+                }
+            });
         });
     </script>
     <script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
@@ -209,18 +212,18 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route($budget ? 'ajax.budget.update-rental' : 'ajax.rental.update-rental', ['id' => $rental->id]) }}" method="POST" enctype="multipart/form-data" id="formCreateRental" class="pb-2">
+                            <form action="{{ route($budget ? 'ajax.budget.update-rental' : 'ajax.rental.update-rental', ['id' => $rental->id]) }}" method="POST" enctype="multipart/form-data" id="formRental" class="pb-2">
                                 <h3>Tipo de {{ $budget ? 'Orçamento' : 'Locação' }}</h3>
                                 <div class="stepRental">
                                     <h6 class="title-step">Tipo de {!! $budget ? 'Orçamento' : 'Locação <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
                                             <div class="">
-                                                <input type="radio" name="type_rental" id="have-payment" value="0" {{ $rental->type_rental == 1 ? 'checked' : '' }}>
+                                                <input type="radio" name="type_rental" id="have-payment" value="0" {{ $rental->type_rental == 0 ? 'checked' : '' }}>
                                                 <label for="have-payment">Com Cobrança</label>
                                             </div>
                                             <div class="">
-                                                <input type="radio" name="type_rental" id="no-have-payment" value="1" {{ $rental->type_rental == 0 ? 'checked' : '' }}>
+                                                <input type="radio" name="type_rental" id="no-have-payment" value="1" {{ $rental->type_rental == 1 ? 'checked' : '' }}>
                                                 <label for="no-have-payment">Sem Cobrança</label>
                                             </div>
                                         </div>
@@ -235,7 +238,7 @@
                                         </div>
                                     </div>
                                     @include('includes.address.form', [
-                                        'address_zipcode'   => $rental->address_zipcode,
+                                        'address_zipcode'   => formatZipcode($rental->address_zipcode),
                                         'address_name'      => $rental->address_name,
                                         'address_number'    => $rental->address_number,
                                         'address_complement'=> $rental->address_complement,
@@ -335,9 +338,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h3>Pagamento</h3>
+                                <h3>Valores e Pagamento</h3>
                                 <div class="stepRental">
-                                    <h6 class="title-step">Pagamento</h6>
+                                    <h6 class="title-step">Valores e Pagamento</h6>
                                     <div class="row">
                                         <div id="payment" class="col-md-12 mt-3">
                                             <div class="col-md-12 grid-margin stretch-card">
@@ -419,7 +422,7 @@
                                             <div class="col-md-12 display-none mt-4" id="paid_installment_notice">
                                                 <div class="alert alert-warning">
                                                     <h4>Você tem parcelas pagas!</h4>
-                                                    <p>Existem parcelas já pagas para essa locação, caso você altere a locação o pagamento das parcelas, deverá ser feita novamente.</p>
+                                                    <p>Existem parcelas já pagas para essa locação, caso você altere algum dado das parcelas, deverá ser feito o pagamento novamente.</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -436,24 +439,12 @@
                                         </div>
                                     </div>
                                 </div>
+                                <input type="hidden" name="confirm_update_equipment_or_payment" value="0">
                                 {{ csrf_field() }}
                             </form>
                         </div>
                     </div>
-{{--                    <div class="card">--}}
-{{--                        <div class="card-body d-flex justify-content-between">--}}
-{{--                            <a href="{{ route('driver.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>--}}
-{{--                            <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Cadastrar</button>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
                 </div>
-{{--                <div class="col-md-4">--}}
-{{--                    <div class="card">--}}
-{{--                        <div class="card-body">--}}
-{{--                            <p>Em andamento ...</p>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
             </div>
         </div>
     </div>
@@ -501,7 +492,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="text-center code_rental">{{ $budget ? 'Orçamento' : 'Locação' }} código <strong></strong> criada com sucesso!</h3>
+                            <h3 class="text-center code_rental">{{ $budget ? 'Orçamento' : 'Locação' }} código <strong></strong> atualizada com sucesso!</h3>
                         </div>
                     </div>
                     <div class="row">
@@ -512,7 +503,6 @@
                     <div class="row">
                         <div class="col-md-12 d-flex justify-content-around flex-wrap mt-5">
                             <a href="{{ route($budget ? 'budget.index' : 'rental.index') }}" class="btn btn-primary col-md-4">Listagem de {{ $budget ? 'Orçamentos' : 'Locações' }}</a>
-                            <a href="{{ route($budget ? 'budget.create' : 'rental.create') }}" class="btn btn-secondary col-md-4">Realizar {{ $budget ? 'novo Orçamento' : 'nova Locação' }}</a>
                         </div>
                     </div>
                 </div>
@@ -537,20 +527,4 @@
     <input type="hidden" name="address_state" value="{{ $rental->address_state }}">
 
     <input type="hidden" name="residues" value="{{ implode(',', array_map(function($residue) { return $residue['id']; }, $rental_residue->toArray())) }}">
-
-    <input type="hidden" name="equipments" value="{{ implode(
-                                        ',',
-                                        array_map(function($residue) {
-                                               return "$residue[equipment_id];$residue[quantity];$residue[vehicle_suggestion];$residue[driver_suggestion];$residue[use_date_diff_equip];$residue[expected_delivery_date];$residue[expected_withdrawal_date];$residue[not_use_date_withdrawal];$residue[total_value];$residue[unitary_value]";
-                                        },
-                                        $rental_equipment->toArray()))
-                                    }}">
-    <input type="hidden" name="payments" value="{{ implode(
-                                        ',',
-                                        array_map(function($residue) {
-                                               return "$residue[parcel];$residue[due_day];$residue[due_date];$residue[due_value];$residue[payment_id];$residue[payment_name];$residue[payday]";
-                                        },
-                                        $rental_payment->toArray()))
-                                    }}">
-
 @stop

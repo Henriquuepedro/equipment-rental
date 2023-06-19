@@ -7,16 +7,20 @@ use App\Models\Company;
 use App\Models\Config;
 use App\Models\Permission;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
 class CompanyController extends Controller
 {
-    private $user;
-    private $company;
-    private $permission;
-    private $config;
+    private User $user;
+    private Company $company;
+    private Permission $permission;
+    private Config $config;
 
     public function __construct(User $user, Company $company, Permission $permission, Config $config)
     {
@@ -26,7 +30,7 @@ class CompanyController extends Controller
         $this->config       = $config;
     }
 
-    public function index()
+    public function index(): View|Factory|RedirectResponse|Application
     {
         if (!hasAdmin())
             return redirect()->route('dashboard');
@@ -97,7 +101,7 @@ class CompanyController extends Controller
         return view('config.index', compact('company', 'htmlPermissions', 'configCompany'));
     }
 
-    public function updateCompany(CompanyUpdatePost $request)
+    public function updateCompany(CompanyUpdatePost $request): RedirectResponse
     {
         $user_id    = $request->user()->id;
         $company_id = $request->user()->company_id;
@@ -161,7 +165,7 @@ class CompanyController extends Controller
 
     }
 
-    private function uploadLogoCompany($company_id, $file)
+    private function uploadLogoCompany($company_id, $file): bool|string
     {
         $uploadPath = "assets/images/company/$company_id";
         $extension = $file->getClientOriginalExtension(); // Recupera extensão da imagem
