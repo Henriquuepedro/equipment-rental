@@ -7,6 +7,7 @@ use DateTime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\RentalEquipment;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class RentalEquipmentController extends Controller
@@ -18,6 +19,15 @@ class RentalEquipmentController extends Controller
     {
         $this->rental_equipment = $rental_equipment;
         $this->rental = new Rental();
+    }
+
+    public function getEquipmentsRental(int $rental_id)
+    {
+        $company_id = Auth::user()->__get('company_id');
+
+        $equipments = $this->rental_equipment->getEquipments($company_id, $rental_id);
+
+        return response()->json($equipments);
     }
 
     public function getEquipmentsRentalToDeliver(Request $request)

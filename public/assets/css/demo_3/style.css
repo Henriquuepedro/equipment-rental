@@ -19959,7 +19959,7 @@ div.dataTables_wrapper div.dataTables_filter input {
     background: #131725 !important;
 }
 .flatpickr-calendar.hasTime .flatpickr-time {
-    border: 1px solid #222437 !important;
+    /*border: 1px solid #222437 !important;*/
 }
 .flatpickr-calendar .flatpickr-time {
     background: #222437;

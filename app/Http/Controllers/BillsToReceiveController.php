@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class BillsToReceiveController extends Controller
 {
-    private $client;
-    private $rental_payment;
-    private $form_payment;
+    private Client $client;
+    private RentalPayment $rental_payment;
+    private FormPayment $form_payment;
 
     public function __construct()
     {
@@ -24,6 +24,11 @@ class BillsToReceiveController extends Controller
 
     public function index()
     {
+        if (!hasPermission('BillsToReceiveView')) {
+            return redirect()->route('dashboard')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         $company_id = Auth::user()->__get('company_id');
         $clients = $this->client->getClients($company_id);
 
@@ -32,6 +37,14 @@ class BillsToReceiveController extends Controller
 
     public function getQtyTypeRentals(Request $request): JsonResponse
     {
+        if (!hasPermission('BillsToReceiveView')) {
+            return response()->json(array(
+                'late'          => 0,
+                'without_pay'   => 0,
+                'paid'          => 0
+            ));
+        }
+
         $company_id = $request->user()->company_id;
         $client = $request->input('client');
         $start_date = $request->input('start_date');
@@ -165,5 +178,18 @@ class BillsToReceiveController extends Controller
         ), $payment_id);
 
         return response()->json(array('success' => true, 'message' => "Pagamento confirmado!"));
+    }
+
+    public function getPaymentsRental(int $rental_id): JsonResponse
+    {
+        if (!hasPermission('RentalUpdatePost')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        $equipments = $this->rental_payment->getPayments($company_id, $rental_id);
+
+        return response()->json($equipments);
     }
 }

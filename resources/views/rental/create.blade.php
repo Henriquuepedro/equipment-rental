@@ -49,7 +49,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route($budget ? 'ajax.budget.new-rental' : 'ajax.rental.new-rental') }}" method="POST" enctype="multipart/form-data" id="formCreateRental" class="pb-2">
+                            <form action="{{ route($budget ? 'ajax.budget.new-rental' : 'ajax.rental.new-rental') }}" method="POST" enctype="multipart/form-data" id="formRental" class="pb-2">
                                 <h3>Tipo de {{ $budget ? 'Orçamento' : 'Locação' }}</h3>
                                 <div class="stepRental">
                                     <h6>Tipo de {!! $budget ? 'Orçamento' : 'Locação <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
@@ -164,9 +164,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h3>Pagamento</h3>
+                                <h3>Valores e Pagamento</h3>
                                 <div class="stepRental">
-                                    <h6>Pagamento</h6>
+                                    <h6>Valores e Pagamento</h6>
                                     <div class="row">
                                         <div id="payment" class="col-md-12 mt-3">
                                             <div class="col-md-12 grid-margin stretch-card">

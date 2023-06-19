@@ -118,4 +118,33 @@ class RentalEquipment extends Model
 
         return $equipment->get()->count();
     }
+
+    public function getMatchingEquipmentToValidateLeaseUpdate(
+        int $company_id,
+        int $rental_id,
+        int $equipment_id,
+        int $quantity,
+        ?int $vehicle_suggestion,
+        ?int $driver_suggestion,
+        bool $use_date_diff_equip,
+        ?string $expected_delivery_date,
+        ?string $expected_withdrawal_date,
+        bool $not_use_date_withdrawal,
+        float $total_value
+    )
+    {
+        return $this->where(array(
+            'company_id'                => $company_id,
+            'rental_id'                 => $rental_id,
+            'equipment_id'              => $equipment_id,
+            'quantity'                  => $quantity,
+            'vehicle_suggestion'        => $vehicle_suggestion,
+            'driver_suggestion'         => $driver_suggestion,
+            'use_date_diff_equip'       => $use_date_diff_equip,
+            'expected_delivery_date'    => $expected_delivery_date,
+            'expected_withdrawal_date'  => $expected_withdrawal_date,
+            'not_use_date_withdrawal'   => $not_use_date_withdrawal,
+            'total_value'               => $total_value,
+        ))->first();
+    }
 }

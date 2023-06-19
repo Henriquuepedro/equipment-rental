@@ -889,3 +889,15 @@ a[disabled] {
 .sidebar > .nav .nav-item:not(.hover-open) .collapse .sub-menu .nav-item:first-child .nav-link {
     padding-top: 10px;
 }
+.bullet-line-list li:after {
+    left: -18px;
+}
+.bullet-line-list li::marker {
+    left: 10px;
+}
+.bullet-line-list li:before {
+    left: -23px
+}
+#payment .list-equipments-payment li[id-equipment] small.text-muted {
+    font-size: 0.7em;
+}
