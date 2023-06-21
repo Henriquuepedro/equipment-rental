@@ -502,7 +502,14 @@
                 data: $('#formRental').serialize(),
                 success: response => {
                     if (response.success) {
-                        if (response.hasOwnProperty("show_alert_update_equipment_or_payment") && response.show_alert_update_equipment_or_payment) {
+                        if (
+                            response.hasOwnProperty("show_alert_update_equipment_or_payment") &&
+                            response.show_alert_update_equipment_or_payment &&
+                            (
+                                (response.show_alert_update_equipment_or_payment.hasOwnProperty("equipment") && response.show_alert_update_equipment_or_payment.equipment) ||
+                                (response.show_alert_update_equipment_or_payment.hasOwnProperty("payment") && response.show_alert_update_equipment_or_payment.payment)
+                            )
+                        ) {
                             const update_equipment  = response.show_alert_update_equipment_or_payment.equipment;
                             const update_payment    = response.show_alert_update_equipment_or_payment.payment;
                             const title_alert = update_equipment && update_payment ? "Alteração de equipamento e pagamento" :
@@ -526,7 +533,6 @@
                                     $('#formRental a[href="#finish"]').trigger('click')
                                 }
                             })
-                            $('#formRental .actions a[href="#finish"]').attr('disabled', false);
                         } else {
                             $('#createRental').modal();
                             $('#createRental h3.code_rental strong').text(response.code);

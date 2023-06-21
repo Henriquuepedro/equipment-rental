@@ -252,4 +252,12 @@ class RentalPayment extends Model
             'due_value'     => $due_value
         ))->first();
     }
+
+    public function getPaymentsPaidByRental(int $company_id, int $rental_id)
+    {
+        return $this->where(array(
+            'company_id'    => $company_id,
+            'rental_id'     => $rental_id
+        ))->where('payment_id', '!=', null)->get();
+    }
 }
