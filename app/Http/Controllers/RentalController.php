@@ -667,6 +667,7 @@ class RentalController extends Controller
         }
 
         $company_id = $request->user()->company_id;
+        // Define os dados para ser usado na Trait.
         $this->setDataRental($this->rental->getRental($company_id, $id));
         $this->setDataRentalEquipment($this->rental_equipment->getEquipments($company_id, $id));
         $this->setDataRentalPayment($this->rental_payment->getPayments($company_id, $id));
@@ -678,6 +679,7 @@ class RentalController extends Controller
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis.
 
         try {
+            // Faz as validações iniciais padrões para poder seguir com a atualização.
             $data_validation = $this->makeValidationRental($request, $id);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
@@ -693,6 +695,7 @@ class RentalController extends Controller
         unset($arrRental['code']);
 
         try {
+            // Faz as validações para atualizar a locação.
             $validate_payment_equipment = $this->makeValidationToUpdate($request, $arrRental, $arrEquipment, $arrPayment);
             $create_payment     = !$validate_payment_equipment['payment'];
             $create_equipment   = !$validate_payment_equipment['equipment'];
@@ -700,26 +703,36 @@ class RentalController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
 
-        // Se pode criar os equipamentos novamente, significa os valores de entrega e retirada devem voltar a ser nulos.
         if ($create_equipment || $create_payment) {
             if ($request->has('confirm_update_equipment_or_payment') && !$request->input('confirm_update_equipment_or_payment')) {
-                DB::rollBack();
-                return response()->json(['success' => true, 'message' => null, 'show_alert_update_equipment_or_payment' => array(
-                    'equipment' => $create_equipment,
-                    'payment'   => $create_payment
-                )]);
-            }
+                $show_alert_equipment   = count($this->rental_equipment->getEquipmentInProgressByRental($company_id, $id)) > 0;
+                $show_alert_payment     = count($this->rental_payment->getPaymentsPaidByRental($company_id, $id)) > 0;
 
+                // Se já tinha algum equipamento entregue/retirado ou pagamento pago, precisa mostrar o alerta.
+                if ($show_alert_equipment || $show_alert_payment) {
+                    DB::rollBack();
+                    return response()->json(['success' => true, 'message' => null, 'show_alert_update_equipment_or_payment' => array(
+                        'equipment' => $create_equipment && $show_alert_equipment,
+                        'payment'   => $create_payment && $show_alert_payment
+                    )]);
+                }
+            }
+        }
+
+        // Se deve criar os equipamentos novamente, significa os valores de entrega e retirada devem voltar a ser nulos.
+        if ($create_equipment) {
             $arrRental['actual_delivery_date'] = null;
             $arrRental['actual_withdrawal_date'] = null;
         }
 
         $updateRental = $this->rental->updateByRentalAndCompany($id, $company_id, $arrRental);
 
+        // Remove os equipamentos e cria novamente.
         if ($create_equipment) {
             $this->rental_equipment->remove($id, $company_id);
             $this->rental_equipment->inserts($arrEquipment);
         }
+        // Remove os pagamento e cria novamente.
         if ($create_payment && count($arrPayment)) {
             $this->rental_payment->remove($id, $company_id);
             $this->rental_payment->inserts($arrPayment);

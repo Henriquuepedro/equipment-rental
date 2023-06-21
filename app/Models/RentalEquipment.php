@@ -147,4 +147,19 @@ class RentalEquipment extends Model
             'total_value'               => $total_value,
         ))->first();
     }
+
+    public function getEquipmentInProgressByRental(int $company_id, int $rental_id)
+    {
+        $equipments = $this->where(array(
+            'company_id'    => $company_id,
+            'rental_id'     => $rental_id
+        ));
+
+        $equipments->where(function($query) {
+            $query->where('actual_delivery_date', '!=', null)
+                ->orWhere('actual_withdrawal_date', '!=', null);
+        });
+
+        return $equipments->get();
+    }
 }
