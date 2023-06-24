@@ -46,7 +46,7 @@
         }
 
         $(document).on('click', '.btnRemoveClient', function (){
-            const client_id = $(this).attr('client-id');
+            const client_id = $(this).data('client-id');
             const client_name = $(this).closest('tr').find('td:eq(1)').text();
 
             Swal.fire({
@@ -88,7 +88,7 @@
                                     icon: 'error',
                                     title: 'Você não tem permissão para fazer essa operação!'
                                 });
-                                $(`button[client-id="${client_id}"]`).trigger('blur');
+                                $(`button[data-client-id="${client_id}"]`).trigger('blur');
                             }
                             if (xhr.status === 422) {
 

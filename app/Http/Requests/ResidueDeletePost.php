@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class ResidueDeletePost extends FormRequest
@@ -12,7 +14,7 @@ class ResidueDeletePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -22,7 +24,7 @@ class ResidueDeletePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'residue_id' => [
@@ -47,7 +49,7 @@ class ResidueDeletePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'residue_id.*' => 'Não foi possível localizar o resíduo!'
@@ -58,11 +60,13 @@ class ResidueDeletePost extends FormRequest
      * Get the proper failed validation response for the request.
      *
      * @param array $errors
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
-    public function response(array $errors)
+    public function response(array $errors): JsonResponse|RedirectResponse
     {
-        if (isAjax()) return response()->json(['errors' => $errors]);
+        if (isAjax()) {
+            return response()->json(['errors' => $errors]);
+        }
 
         return $this->redirector->to($this->getRedirectUrl())
             ->withInput($this->except($this->dontFlash))

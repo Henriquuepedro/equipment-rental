@@ -12,7 +12,7 @@ class VehicleUpdatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -22,35 +22,47 @@ class VehicleUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name'   => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('vehicles')
-                        ->where(['name' => $this->name, 'company_id' => $this->user()->company_id])
-                        ->whereNotIn('id', [$this->vehicle_id])
-                        ->count();
-                    if ($exists) $fail('Nome do veículo já está em uso');
+                    if (!empty($value)) {
+                        $exists = DB::table('vehicles')
+                            ->where(['name' => $this->get('name'), 'company_id' => $this->user()->company_id])
+                            ->whereNotIn('id', [$this->get('vehicle_id')])
+                            ->count();
+                        if ($exists) {
+                            $fail('Nome do veículo já está em uso');
+                        }
+                    }
                 }
             ],
             'reference' => [
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('vehicles')
-                        ->where(['reference' => $this->reference, 'company_id' => $this->user()->company_id])
-                        ->whereNotIn('id', [$this->vehicle_id])
-                        ->count();
-                    if ($exists) $fail('Referência do veículo já está em uso');
+                    if (!empty($value)) {
+                        $exists = DB::table('vehicles')
+                            ->where(['reference' => $this->get('reference'), 'company_id' => $this->user()->company_id])
+                            ->whereNotIn('id', [$this->get('vehicle_id')])
+                            ->count();
+                        if ($exists) {
+                            $fail('Referência do veículo já está em uso');
+                        }
+                    }
                 }
             ],
             'board'     => [
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('vehicles')
-                        ->where(['board' => $this->board, 'company_id' => $this->user()->company_id])
-                        ->whereNotIn('id', [$this->vehicle_id])
-                        ->count();
-                    if ($exists) $fail('Placa do veículo já está em uso');
+                    if (!empty($value)) {
+                        $exists = DB::table('vehicles')
+                            ->where(['board' => $this->get('board'), 'company_id' => $this->user()->company_id])
+                            ->whereNotIn('id', [$this->get('vehicle_id')])
+                            ->count();
+                        if ($exists) {
+                            $fail('Placa do veículo já está em uso');
+                        }
+                    }
                 }
             ]
         ];
@@ -60,7 +72,7 @@ class VehicleUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required'  => 'Nome do veículo é obrigatório',

@@ -12,7 +12,7 @@ class DriverUpdatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -22,15 +22,15 @@ class DriverUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name'      => [
                 'required',
                 function ($attribute, $value, $fail) {
                     $exists = DB::table('drivers')
-                        ->where(['name' => $this->name, 'company_id' => $this->user()->company_id])
-                        ->whereNotIn('id', [$this->driver_id])
+                        ->where(['name' => $this->get('name'), 'company_id' => $this->user()->company_id])
+                        ->whereNotIn('id', [$this->get('driver_id')])
                         ->count();
                     if ($exists) {
                         $fail('Nome do motorista já está em uso');
@@ -41,13 +41,15 @@ class DriverUpdatePost extends FormRequest
             'phone'     => 'min:13|max:14|nullable',
             'cpf'       => [
                 function ($attribute, $value, $fail) {
-                    $cpf = filter_var(onlyNumbers($this->cpf), FILTER_SANITIZE_NUMBER_INT);
-                    $exists = DB::table('drivers')
-                        ->where(['cpf' => $cpf, 'company_id' => $this->user()->company_id])
-                        ->whereNotIn('id', [$this->driver_id])
-                        ->count();
-                    if ($exists && !empty($cpf)) {
-                        $fail('CPF do motorista já está em uso');
+                    $cpf = filter_var(onlyNumbers($this->get('cpf')), FILTER_SANITIZE_NUMBER_INT);
+                    if (!empty($cpf)) {
+                        $exists = DB::table('drivers')
+                            ->where(['cpf' => $cpf, 'company_id' => $this->user()->company_id])
+                            ->whereNotIn('id', [$this->get('driver_id')])
+                            ->count();
+                        if ($exists) {
+                            $fail('CPF do motorista já está em uso');
+                        }
                     }
                 }
             ],
@@ -61,7 +63,7 @@ class DriverUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required' => 'O Nome é obrigatório',
@@ -70,7 +72,7 @@ class DriverUpdatePost extends FormRequest
             'phone.max'     => 'O telefone deve conter o DDD e o número telefônico',
             'rg.numeric'    => 'O RG deve conter apenas números',
             'cnh.numeric'   => 'O RG deve conter apenas números',
-            'cnh_exp.date'  => 'A data de expiraçao da CNH deve ser uma data válida',
+            'cnh_exp.date'  => 'A data de expiração da CNH deve ser uma data válida',
         ];
     }
 }

@@ -12,7 +12,7 @@ class ProviderUpdatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -22,18 +22,18 @@ class ProviderUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'type_person'   => 'size:2',
             'name'          => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    $type = $this->type_person;
+                    $type = $this->get('type_person');
 
                     $exists = DB::table('providers')
-                                ->where(['name' => $this->name, 'company_id' => $this->user()->company_id])
-                                ->whereNotIn('id', [$this->provider_id])
+                                ->where(['name' => $this->get('name'), 'company_id' => $this->user()->company_id])
+                                ->whereNotIn('id', [$this->get('provider_id')])
                                 ->count();
                     if ($exists) {
                         $fail($type == 'pf' ? 'Nome do fornecedor já está em uso' : 'Razão Social do fornecedor já está em uso');
@@ -45,15 +45,17 @@ class ProviderUpdatePost extends FormRequest
             'email'         => 'email:rfc,dns|nullable',
             'cpf_cnpj'      => [
                 function ($attribute, $value, $fail) {
-                    $cpf_cnpj = filter_var(onlyNumbers($this->cpf_cnpj), FILTER_SANITIZE_NUMBER_INT);
-                    $type = $this->type_person;
+                    $cpf_cnpj = filter_var(onlyNumbers($this->get('cpf_cnpj')), FILTER_SANITIZE_NUMBER_INT);
+                    if (!empty($cpf_cnpj)) {
+                        $type = $this->get('type_person');
 
-                    $exists = DB::table('providers')
-                                ->where(['cpf_cnpj' => $cpf_cnpj, 'company_id' => $this->user()->company_id])
-                                ->whereNotIn('id', [$this->provider_id])
-                                ->count();
-                    if ($exists && !empty($cpf_cnpj)) {
-                        $fail($type == 'pf' ? 'CPF do fornecedor já está em uso' : 'CNPJ do fornecedor já está em uso');
+                        $exists = DB::table('providers')
+                            ->where(['cpf_cnpj' => $cpf_cnpj, 'company_id' => $this->user()->company_id])
+                            ->whereNotIn('id', [$this->get('provider_id')])
+                            ->count();
+                        if ($exists) {
+                            $fail($type == 'pf' ? 'CPF do fornecedor já está em uso' : 'CNPJ do fornecedor já está em uso');
+                        }
                     }
                 }
             ],
@@ -64,9 +66,9 @@ class ProviderUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
-        $type = $this->type_person;
+        $type = $this->get('type_person');
 
         return [
             'type_person.size'  => 'Tipo de pessoa mal informado, selecione entre Pessoa Física ou Pesso Jurídica',

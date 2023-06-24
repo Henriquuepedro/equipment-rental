@@ -7,22 +7,28 @@ use App\Http\Requests\VehicleDeletePost;
 use App\Http\Requests\VehicleUpdatePost;
 use App\Models\Driver;
 use App\Models\Vehicle;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class VehicleController extends Controller
 {
-    public $vehicle;
-    public $driver;
+    public Vehicle $vehicle;
+    public Driver $driver;
 
-    public function __construct(Vehicle $vehicle, Driver $driver)
+    public function __construct()
     {
-        $this->vehicle = $vehicle;
-        $this->driver = $driver;
+        $this->vehicle = new Vehicle();
+        $this->driver = new Driver();
     }
 
-    public function index()
+    public function index(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('VehicleView')) {
             return redirect()->route('dashboard')
@@ -32,40 +38,42 @@ class VehicleController extends Controller
         return view('vehicle.index');
     }
 
-    public function fetchVehicles(Request $request)
+    public function fetchVehicles(Request $request): JsonResponse
     {
-        if (!hasPermission('VehicleView'))
-            return response()->json([]);
+        if (!hasPermission('VehicleView')) {
+            return response()->json();
+        }
 
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
 
-        $ini        = $request->start;
-        $draw       = $request->draw;
-        $length     = $request->length;
+        $ini        = $request->input('start');
+        $draw       = $request->input('draw');
+        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        $search = $request->search;
-        if ($search['value']) $searchUser = $search['value'];
+        $search = $request->input('search');
+        if ($search['value']) {
+            $searchUser = $search['value'];
+        }
 
-        if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+        if ($request->input('order')) {
+            if ($request->input('order')[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('id','name','brand','model','reference', '');
-            $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
+            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
                 $orderBy['order'] = $direction;
             }
         }
 
-
         $data = $this->vehicle->getVehicles($company_id, $ini, $length, $searchUser, $orderBy);
-
-        // get string query
-        // DB::getQueryLog();
 
         $permissionUpdate = hasPermission('VehicleUpdatePost');
         $permissionDelete = hasPermission('VehicleDeletePost');
@@ -95,21 +103,23 @@ class VehicleController extends Controller
         return response()->json($output);
     }
 
-    public function delete(VehicleDeletePost $request)
+    public function delete(VehicleDeletePost $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
-        $vehicle_id = $request->vehicle_id;
+        $vehicle_id = $request->input('vehicle_id');
 
-        if (!$this->vehicle->getVehicle($vehicle_id, $company_id))
+        if (!$this->vehicle->getVehicle($vehicle_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível localizar o veículo!']);
+        }
 
-        if (!$this->vehicle->remove($vehicle_id, $company_id))
+        if (!$this->vehicle->remove($vehicle_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível excluir o veículo!']);
+        }
 
         return response()->json(['success' => true, 'message' => 'Veículo excluído com sucesso!']);
     }
 
-    public function create()
+    public function create(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('VehicleCreatePost')) {
             return redirect()->route('driver.index')
@@ -122,7 +132,7 @@ class VehicleController extends Controller
         return view('vehicle.create', compact('drivers'));
     }
 
-    public function insert(VehicleCreatePost $request)
+    public function insert(VehicleCreatePost $request): JsonResponse|RedirectResponse
     {
         // data driver
         $dataVehicle = $this->formatDataVehicle($request);
@@ -145,8 +155,9 @@ class VehicleController extends Controller
         if($updateVehicle) {
             DB::commit();
 
-            if ($isAjax)
+            if ($isAjax) {
                 return response()->json(['success' => true, 'message' => 'Veículo cadastrado com sucesso.', 'vehicle_id' => $updateVehicle->id]);
+            }
 
             return redirect()->route('vehicle.index')
                 ->with('success', "Veículo com o código {$updateVehicle->id}, cadastrado com sucesso!");
@@ -154,36 +165,39 @@ class VehicleController extends Controller
 
         DB::rollBack();
 
-        if ($isAjax)
+        if ($isAjax) {
             return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o veículo, tente novamente!']);
+        }
 
         return redirect()->back()
             ->withErrors(['Não foi possível cadastrar o veículo, tente novamente!'])
             ->withInput();
     }
 
-    public function edit($id)
+    public function edit($id): View|Factory|RedirectResponse|Application
     {
         $company_id = Auth::user()->__get('company_id');
 
         $vehicle = $this->vehicle->getVehicle($id, $company_id);
-        if (!$vehicle)
+        if (!$vehicle) {
             return redirect()->route('vehicle.index');
+        }
 
         $drivers = $this->driver->getDrivers($company_id);
 
         return view('vehicle.update', compact('vehicle', 'drivers'));
     }
 
-    public function update(VehicleUpdatePost $request)
+    public function update(VehicleUpdatePost $request): RedirectResponse
     {
         // data driver
         $dataVehicle = $this->formatDataVehicle($request);
 
-        if (!$this->vehicle->getVehicle($dataVehicle->vehicle_id, $dataVehicle->company_id))
+        if (!$this->vehicle->getVehicle($dataVehicle->vehicle_id, $dataVehicle->company_id)) {
             return redirect()->back()
                 ->withErrors(['Não foi possível localizar o veículo para atualizar!'])
                 ->withInput();
+        }
 
         $updateVehicle = $this->vehicle->edit(
             array(
@@ -202,7 +216,7 @@ class VehicleController extends Controller
         if($updateVehicle) {
             DB::commit();
             return redirect()->route('vehicle.index')
-                ->with('success', "Veículo com o código {$dataVehicle->vehicle_id}, alterado com sucesso!");
+                ->with('success', "Veículo com o código $dataVehicle->vehicle_id, alterado com sucesso!");
         }
 
         DB::rollBack();
@@ -211,26 +225,26 @@ class VehicleController extends Controller
             ->withInput();
     }
 
-    private function formatDataVehicle($request)
+    private function formatDataVehicle(VehicleCreatePost|VehicleUpdatePost $request): stdClass
     {
-        $obj = new \stdClass;
+        $obj = new stdClass;
 
         $obj->company_id    = $request->user()->company_id;
         $obj->user_id       = $request->user()->id;
-        $obj->name          = filter_var($request->name, FILTER_SANITIZE_STRING);
-        $obj->reference     = $request->reference ? (filter_var($request->reference, FILTER_SANITIZE_STRING) ? $request->reference : null) : null;
-        $obj->driver        = $request->driver ? (filter_var($request->driver, FILTER_VALIDATE_INT) ? (int)$request->driver : null) : null;
-        $obj->reference     = $request->reference ? filter_var($request->reference, FILTER_SANITIZE_STRING) : null;
-        $obj->brand         = $request->brand ? filter_var($request->brand, FILTER_SANITIZE_STRING) : null;
-        $obj->model         = $request->model ? filter_var($request->model, FILTER_SANITIZE_STRING) : null;
-        $obj->board         = $request->board ? filter_var($request->board, FILTER_SANITIZE_STRING) : null;
-        $obj->observation   = $request->observation ? filter_var($request->observation, FILTER_SANITIZE_STRING) : null;
-        $obj->vehicle_id    = isset($request->vehicle_id) ? (int)$request->vehicle_id : null;
+        $obj->name          = filter_var($request->input('name'));
+        $obj->reference     = $request->input('reference')    ? (filter_var($request->input('reference')) ? $request->input('reference') : null) : null;
+        $obj->driver        = $request->input('driver')       ? (filter_var($request->input('driver'), FILTER_VALIDATE_INT) ? (int)$request->input('driver') : null) : null;
+        $obj->reference     = $request->input('reference')    ? filter_var($request->input('reference')) : null;
+        $obj->brand         = $request->input('brand')        ? filter_var($request->input('brand')) : null;
+        $obj->model         = $request->input('model')        ? filter_var($request->input('model')) : null;
+        $obj->board         = $request->input('board')        ? filter_var($request->input('board')) : null;
+        $obj->observation   = $request->input('observation')  ? filter_var($request->input('observation')) : null;
+        $obj->vehicle_id    = $request->input('vehicle_id')   ? (int)$request->input('vehicle_id') : null;
 
         return $obj;
     }
 
-    public function getVehicles(Request $request)
+    public function getVehicles(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
         $vehicleData = [];
@@ -239,23 +253,25 @@ class VehicleController extends Controller
         $vehicles = $this->vehicle->getVehicles($company_id, null, null, null, array('field' => 'name', 'order' => 'ASC'));
 
         foreach ($vehicles as $vehicle) {
-            array_push($vehicleData, ['id' => $vehicle->id, 'name' => $vehicle->name]);
-            if ($vehicle->id > $lastId) $lastId = $vehicle->id;
+            $vehicleData[] = ['id' => $vehicle->id, 'name' => $vehicle->name];
+            if ($vehicle->id > $lastId) {
+                $lastId = $vehicle->id;
+            }
         }
 
         return response()->json(['data' => $vehicleData, 'lastId' => $lastId]);
     }
 
-    public function getVehicle(Request $request)
+    public function getVehicle(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
-        $vehicle_id = $request->vehicle_id;
+        $vehicle_id = $request->input('vehicle_id');
         $driver = false;
 
         $vehicles = $this->vehicle->getVehicle($vehicle_id, $company_id);
-        if ($vehicles->driver_id)
+        if ($vehicles->driver_id) {
             $driver = $this->driver->getDriver($vehicles->driver_id, $company_id);
-
+        }
 
         return response()->json(array(
             'name'          => $vehicles->name,

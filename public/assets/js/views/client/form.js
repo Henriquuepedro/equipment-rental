@@ -56,22 +56,25 @@ const onLocationFound = e => {
 }
 // Callback error getLocation
 async function onLocationError(e){
-    if(e.code == 1){
+    if (e.code == 1) {
         const address = await deniedLocation();
         if(address){
             $.get(`https://dev.virtualearth.net/REST/v1/Locations?query=${address}&key=ApqqlD_Jap1C4pGj114WS4WgKo_YbBBY3yXu1FtHnJUdmCUOusnx67oS3M6UGhor`, latLng => {
                 latLng = latLng.resourceSets[0].resources[0].geocodePoints[0].coordinates;
-                latCenter = latLng[0];
-                lngCenter = latLng[1];
+                const latCenter = latLng[0];
+                const lngCenter = latLng[1];
 
                 const center = L.latLng(latCenter, lngCenter);
                 startMarker(center);
             });
+        } else {
+            startMarkerRental(L.latLng(0, 0));
         }
     }
 }
-// MOSTRAR MAP APÓS NEGAÇÃO DO BROWSER
+// MOSTRAR MAP APÓS NAVEGAÇÃO DO BROWSER
 async function deniedLocation(){
+    return false;
     const recusouLocalizacao = true;
     const rsLocation = await $.getJSON('...',{ recusouLocalizacao }); // obter endereço empresa
     if(rsLocation != null){

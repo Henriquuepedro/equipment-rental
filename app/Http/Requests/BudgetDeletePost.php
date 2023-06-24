@@ -11,7 +11,7 @@ class BudgetDeletePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -21,7 +21,7 @@ class BudgetDeletePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //

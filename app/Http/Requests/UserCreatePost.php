@@ -12,7 +12,7 @@ class UserCreatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasAdmin();
     }
@@ -22,15 +22,16 @@ class UserCreatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name_modal'        => [
                 'required',
                 function ($attribute, $value, $fail) {
                     $exists = DB::table('users')->where(['name' => $value, 'company_id' => $this->user()->company_id])->count();
-                    if ($exists)
+                    if ($exists) {
                         return response()->json(['success' => false, 'message' => 'Nome informado do novo usuário já está em uso.']);
+                    }
                 }
             ],
             'email_modal'       => [
@@ -38,8 +39,9 @@ class UserCreatePost extends FormRequest
                 'email:rfc,dns',
                 function ($attribute, $value, $fail) {
                     $exists = DB::table('users')->where('email', $value)->count();
-                    if ($exists)
+                    if ($exists) {
                         return response()->json(['success' => false, 'message' => 'E-mail informado do novo usuário já está em uso.']);
+                    }
                 }
             ],
             'phone_modal'       => 'min:13|max:14|required',
@@ -51,7 +53,7 @@ class UserCreatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'name_modal.required'       => 'O Nome é obrigatório',
