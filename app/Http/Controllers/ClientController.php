@@ -6,6 +6,11 @@ use App\Http\Requests\ClientCreatePost;
 use App\Http\Requests\ClientDeletePost;
 use App\Http\Requests\ClientUpdatePost;
 use App\Models\Config;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\Address;
@@ -14,19 +19,18 @@ use Illuminate\Support\Facades\DB;
 
 class ClientController extends Controller
 {
-    private $client;
-    private $address;
-    private $cpf_cnpj;
-    private $config;
+    private Client $client;
+    private Address $address;
+    private Config $config;
 
-    public function __construct(Client $client, Address $address, Config $config)
+    public function __construct()
     {
-        $this->client = $client;
-        $this->address = $address;
-        $this->config = $config;
+        $this->client   = new Client();
+        $this->address  = new Address();
+        $this->config   = new Config();
     }
 
-    public function index()
+    public function index(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('ClientView')) {
             return redirect()->route('dashboard')
@@ -36,7 +40,7 @@ class ClientController extends Controller
         return view('client.index');
     }
 
-    public function create()
+    public function create(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('ClientCreatePost')) {
             return redirect()->route('client.index')
@@ -46,25 +50,25 @@ class ClientController extends Controller
         return view('client.create');
     }
 
-    public function insert(ClientCreatePost $request)
+    public function insert(ClientCreatePost $request): JsonResponse|RedirectResponse
     {
         // data client
         $company_id     = $request->user()->company_id;
         $user_id        = $request->user()->id;
-        $name           = filter_var($request->input('name_client'), FILTER_SANITIZE_STRING);
-        $type           = filter_var($request->input('type_person'), FILTER_SANITIZE_STRING);
-        $fantasy        = filter_var($request->input('fantasy_client'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $email          = filter_var($request->input('email'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $contact        = filter_var($request->input('contact'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $sex            = filter_var($request->input('sex'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $birth_date     = filter_var($request->input('birth_date'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $nationality    = filter_var($request->input('nationality'), FILTER_SANITIZE_STRING);
-        $marital_status = filter_var($request->input('marital_status'), FILTER_SANITIZE_STRING);
-        $observation    = filter_var($request->input('observation'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $name           = filter_var($request->input('name_client'));
+        $type           = filter_var($request->input('type_person'));
+        $fantasy        = filter_var($request->input('fantasy_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $email          = filter_var($request->input('email'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $contact        = filter_var($request->input('contact'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $sex            = filter_var($request->input('sex'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $birth_date     = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $nationality    = filter_var($request->input('nationality'));
+        $marital_status = filter_var($request->input('marital_status'));
+        $observation    = filter_var($request->input('observation'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $isAjax         = isAjax();
 
         if (empty($nationality)) {
@@ -107,30 +111,28 @@ class ClientController extends Controller
         $createAddress = true;
         $clientId = $createClient->id;
 
-        // data address
-
-        $qtyAddress = isset($request->name_address) ? count($request->name_address) : 0;
+        $qtyAddress = is_array($request->input('name_address')) ? count($request->input('name_address')) : 0;
         for ($adr = 0; $adr < $qtyAddress; $adr++) {
-            $name_address   = $request->name_address[$adr] ? filter_var($request->name_address[$adr], FILTER_SANITIZE_STRING) : null;
-            $cep            = $request->cep[$adr] ? filter_var(preg_replace('/[^0-9]/', '', $request->cep[$adr]), FILTER_SANITIZE_NUMBER_INT) : null;
-            $address        = $request->address[$adr] ? filter_var($request->address[$adr], FILTER_SANITIZE_STRING) : null;
-            $number         = $request->number[$adr] ? filter_var($request->number[$adr], FILTER_SANITIZE_STRING) : null;
-            $complement     = $request->complement[$adr] ? filter_var($request->complement[$adr], FILTER_SANITIZE_STRING) : null;
-            $reference      = $request->reference[$adr] ? filter_var($request->reference[$adr], FILTER_SANITIZE_STRING) : null;
-            $neigh          = $request->neigh[$adr] ? filter_var($request->neigh[$adr], FILTER_SANITIZE_STRING) : null;
-            $city           = $request->city[$adr] ? filter_var($request->city[$adr], FILTER_SANITIZE_STRING) : null;
-            $state          = $request->state[$adr] ? filter_var($request->state[$adr], FILTER_SANITIZE_STRING) : null;
-            $lat            = $request->lat[$adr] ? filter_var($request->lat[$adr], FILTER_SANITIZE_STRING) : null;
-            $lng            = $request->lng[$adr] ? filter_var($request->lng[$adr], FILTER_SANITIZE_STRING) : null;
+            $name_address   = $request->input('name_address')[$adr] ? filter_var($request->input('name_address')[$adr]) : null;
+            $cep            = $request->input('cep')[$adr]          ? filter_var(onlyNumbers($request->input('cep')[$adr]), FILTER_SANITIZE_NUMBER_INT) : null;
+            $address        = $request->input('address')[$adr]      ? filter_var($request->input('address')[$adr]) : null;
+            $number         = $request->input('number')[$adr]       ? filter_var($request->input('number')[$adr]) : null;
+            $complement     = $request->input('complement')[$adr]   ? filter_var($request->input('complement')[$adr]) : null;
+            $reference      = $request->input('reference')[$adr]    ? filter_var($request->input('reference')[$adr]) : null;
+            $neigh          = $request->input('neigh')[$adr]        ? filter_var($request->input('neigh')[$adr]) : null;
+            $city           = $request->input('city')[$adr]         ? filter_var($request->input('city')[$adr]) : null;
+            $state          = $request->input('state')[$adr]        ? filter_var($request->input('state')[$adr]) : null;
+            $lat            = $request->input('lat')[$adr]          ? filter_var($request->input('lat')[$adr]) : null;
+            $lng            = $request->input('lng')[$adr]          ? filter_var($request->input('lng')[$adr]) : null;
 
             $verifyAddressStep_1 = $name_address || $cep || $address || $number || $complement || $reference || $neigh || $city || $state;
             $verifyAddressStep_2 = $address && $number && $neigh && $city && $state;
 
             // verifica se foi digitado algo no endereço para validar
             if ($verifyAddressStep_1 && !$verifyAddressStep_2) {
-
-                if ($isAjax)
+                if ($isAjax) {
                     return response()->json(['success' => false, 'message' => 'É necessário informar os campos de endereço obrigatório. Identificação do Endereço, Endereço, Número, Bairro, Cidade e Estado.']);
+                }
 
                 return redirect()->back()
                     ->withErrors(['É necessário informar os campos de endereço obrigatório. Identificação do Endereço, Endereço, Número, Bairro, Cidade e Estado.'])
@@ -158,8 +160,9 @@ class ClientController extends Controller
         if($createClient && $createAddress) {
             DB::commit();
 
-            if ($isAjax)
+            if ($isAjax) {
                 return response()->json(['success' => true, 'message' => 'Cliente cadastrado com sucesso!', 'client_id' => $clientId]);
+            }
 
             return redirect()->route('client.index')
                 ->with('success', "Cliente com o código {$clientId}, cadastrado com sucesso!");
@@ -177,13 +180,14 @@ class ClientController extends Controller
 
     }
 
-    public function edit($id)
+    public function edit($id): View|Factory|RedirectResponse|Application
     {
         $company_id = Auth::user()->__get('company_id');
 
         $client = $this->client->getClient($id, $company_id);
-        if (!$client)
+        if (!$client) {
             return redirect()->route('client.index');
+        }
 
         $addresses = $this->address->getAddressClient($company_id, $id);
 
@@ -191,10 +195,10 @@ class ClientController extends Controller
 
     }
 
-    public function update(ClientUpdatePost $request)
+    public function update(ClientUpdatePost $request): RedirectResponse
     {
         // data client
-        $client_id = $request->client_id;
+        $client_id  = $request->input('client_id');
         $company_id = $request->user()->company_id;
 
         if (!$this->client->getClient($client_id, $company_id)) {
@@ -204,20 +208,20 @@ class ClientController extends Controller
         }
 
         $user_id        = $request->user()->id;
-        $name           = filter_var($request->input('name_client'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $type           = filter_var($request->input('type_person'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $fantasy        = filter_var($request->input('fantasy_client'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $email          = filter_var($request->input('email'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $contact        = filter_var($request->input('contact'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $observation    = filter_var($request->input('observation'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $sex            = filter_var($request->input('sex'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $birth_date     = filter_var($request->input('birth_date'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $nationality    = filter_var($request->input('nationality'), FILTER_SANITIZE_STRING);
-        $marital_status = filter_var($request->input('marital_status'), FILTER_SANITIZE_STRING);
+        $name           = filter_var($request->input('name_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $type           = filter_var($request->input('type_person'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $fantasy        = filter_var($request->input('fantasy_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $email          = filter_var($request->input('email'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $contact        = filter_var($request->input('contact'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $observation    = filter_var($request->input('observation'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $sex            = filter_var($request->input('sex'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $birth_date     = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $nationality    = filter_var($request->input('nationality'));
+        $marital_status = filter_var($request->input('marital_status'));
 
         if (empty($nationality)) {
             $nationality = null;
@@ -262,26 +266,27 @@ class ClientController extends Controller
         // remover todos os endereços desse cliente
         $this->address->deleteAddressClient($client_id);
         for ($adr = 0; $adr < $qtyAddress; $adr++) {
-            $name_address   = $request->name_address[$adr] ? filter_var($request->name_address[$adr], FILTER_SANITIZE_STRING) : null;
-            $cep            = $request->cep[$adr] ? filter_var(preg_replace('/[^0-9]/', '', $request->cep[$adr]), FILTER_SANITIZE_NUMBER_INT) : null;
-            $address        = $request->address[$adr] ? filter_var($request->address[$adr], FILTER_SANITIZE_STRING) : null;
-            $number         = $request->number[$adr] ? filter_var($request->number[$adr], FILTER_SANITIZE_STRING) : null;
-            $complement     = $request->complement[$adr] ? filter_var($request->complement[$adr], FILTER_SANITIZE_STRING) : null;
-            $reference      = $request->reference[$adr] ? filter_var($request->reference[$adr], FILTER_SANITIZE_STRING) : null;
-            $neigh          = $request->neigh[$adr] ? filter_var($request->neigh[$adr], FILTER_SANITIZE_STRING) : null;
-            $city           = $request->city[$adr] ? filter_var($request->city[$adr], FILTER_SANITIZE_STRING) : null;
-            $state          = $request->state[$adr] ? filter_var($request->state[$adr], FILTER_SANITIZE_STRING) : null;
-            $lat            = $request->lat[$adr] ? filter_var($request->lat[$adr], FILTER_SANITIZE_STRING) : null;
-            $lng            = $request->lng[$adr] ? filter_var($request->lng[$adr], FILTER_SANITIZE_STRING) : null;
+            $name_address   = $request->input('name_address')[$adr] ? filter_var($request->input('name_address')[$adr]) : null;
+            $cep            = $request->input('cep')[$adr]          ? filter_var(onlyNumbers($request->input('cep')[$adr]), FILTER_SANITIZE_NUMBER_INT) : null;
+            $address        = $request->input('address')[$adr]      ? filter_var($request->input('address')[$adr]) : null;
+            $number         = $request->input('number')[$adr]       ? filter_var($request->input('number')[$adr]) : null;
+            $complement     = $request->input('complement')[$adr]   ? filter_var($request->input('complement')[$adr]) : null;
+            $reference      = $request->input('reference')[$adr]    ? filter_var($request->input('reference')[$adr]) : null;
+            $neigh          = $request->input('neigh')[$adr]        ? filter_var($request->input('neigh')[$adr]) : null;
+            $city           = $request->input('city')[$adr]         ? filter_var($request->input('city')[$adr]) : null;
+            $state          = $request->input('state')[$adr]        ? filter_var($request->input('state')[$adr]) : null;
+            $lat            = $request->input('lat')[$adr]          ? filter_var($request->input('lat')[$adr]) : null;
+            $lng            = $request->input('lng')[$adr]          ? filter_var($request->input('lng')[$adr]) : null;
 
             $verifyAddressStep_1 = $name_address || $cep || $address || $number || $complement || $reference || $neigh || $city || $state;
             $verifyAddressStep_2 = $address && $number && $neigh && $city && $state;
 
             // verifica se foi digitado algo no endereço para validar
-            if ($verifyAddressStep_1 && !$verifyAddressStep_2)
+            if ($verifyAddressStep_1 && !$verifyAddressStep_2) {
                 return redirect()->back()
                     ->withErrors(['É necessário informar os campos de endereço obrigatório. Endereço, Número, Bairro, Cidade e Estado.'])
                     ->withInput();
+            }
 
             $createAddress = $this->address->insert(array(
                 'company_id'    => $company_id,
@@ -299,7 +304,9 @@ class ClientController extends Controller
                 'lng'           => $lng,
                 'user_insert'   => $user_id
             ));
-            if (!$createAddress) $createAddressStatus = false;
+            if (!$createAddress) {
+                $createAddressStatus = false;
+            }
 
         }
 
@@ -315,52 +322,54 @@ class ClientController extends Controller
             ->withInput();
     }
 
-    public function delete(ClientDeletePost $request)
+    public function delete(ClientDeletePost $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
-        $client_id = $request->client_id;
+        $client_id = $request->input('client_id');
 
-        if (!$this->client->getClient($client_id, $company_id))
+        if (!$this->client->getClient($client_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível localizar o cliente!']);
+        }
 
-        if (!$this->client->remove($client_id, $company_id))
+        if (!$this->client->remove($client_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível excluir o cliente!']);
+        }
 
         return response()->json(['success' => true, 'message' => 'Cliente excluído com sucesso!']);
     }
 
-    public function fetchClients(Request $request)
+    public function fetchClients(Request $request): JsonResponse
     {
-        // DB::enableQueryLog();
-
-        $orderBy    = array();
+        $order_by   = array();
         $result     = array();
         $searchUser = null;
 
-        $ini        = $request->start;
-        $draw       = $request->draw;
-        $length     = $request->length;
+        $ini        = $request->input('start');
+        $draw       = $request->input('draw');
+        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        $search = $request->search;
-        if ($search['value']) $searchUser = $search['value'];
+        $search = $request->input('search');
+        if ($search['value']) {
+            $searchUser = $search['value'];
+        }
 
-        if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+        if ($request->input('order')) {
+            if ($request->input('order')[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('id','name','email','phone_1', '');
-            $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
+            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
             if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
+                $order_by['field'] = $fieldOrder;
+                $order_by['order'] = $direction;
             }
         }
 
-        $data = $this->client->getClients($company_id, $ini, $length, $searchUser, $orderBy);
-
-        // get string query
-        // DB::getQueryLog();
+        $data = $this->client->getClients($company_id, $ini, $length, $searchUser, $order_by);
 
         $permissionUpdate = hasPermission('ClientUpdatePost');
         $permissionDelete = hasPermission('ClientDeletePost');
@@ -368,7 +377,7 @@ class ClientController extends Controller
         foreach ($data as $key => $value) {
             $buttons = "<a href='".route('client.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
             $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' client-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' data-client-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
 
             $result[$key] = array(
                 $value['id'],
@@ -389,7 +398,7 @@ class ClientController extends Controller
         return response()->json($output);
     }
 
-    public function getClients(Request $request)
+    public function getClients(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
         $clientData = [];
@@ -398,24 +407,26 @@ class ClientController extends Controller
         $clients = $this->client->getClients($company_id);
 
         foreach ($clients as $client) {
-            array_push($clientData, ['id' => $client->id, 'name' => $client->name]);
-            if ($client->id > $lastId) $lastId = $client->id;
+            $clientData[] = ['id' => $client->id, 'name' => $client->name];
+            if ($client->id > $lastId) {
+                $lastId = $client->id;
+            }
         }
 
         return response()->json(['data' => $clientData, 'lastId' => $lastId]);
     }
 
-    public function getClient(Request $request)
+    public function getClient(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
-        $client_id  = $request->client_id;
+        $client_id  = $request->input('client_id');
 
         $client = $this->client->getClient($client_id, $company_id);
 
-        $configObs = $this->config->getConfigCompany(auth()->user()->company_id, 'view_obervation_client_rental');
+        $config_obs = $this->config->getConfigCompany($company_id, 'view_obervation_client_rental');
 
         return response()->json([
-            'observation' => $configObs ? $client->observation : null
+            'observation' => $config_obs ? $client->observation : null
         ]);
     }
 }

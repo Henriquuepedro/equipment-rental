@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 
 class BudgetCreatePost extends FormRequest
 {
@@ -12,7 +13,7 @@ class BudgetCreatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -22,7 +23,7 @@ class BudgetCreatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'client' => 'required|numeric',
@@ -38,11 +39,11 @@ class BudgetCreatePost extends FormRequest
                 'required',
                 function ($attribute, $value, $fail) {
                     foreach ($value as $v) {
-                        $reference = $this->{'reference_equipment_'.$v};
-                        $qty = $this->{'stock_equipment_'.$v};
+                        $reference = $this->get('reference_equipment_'.$v);
+                        $qty = $this->get('stock_equipment_'.$v);
 
                         if ($qty <= 0) {
-                            $fail("Deve ser informada uma quantidade para o equipamento ( {$reference} ).");
+                            $fail("Deve ser informada uma quantidade para o equipamento ( $reference ).");
                             break;
                         }
                     }
@@ -56,7 +57,7 @@ class BudgetCreatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'client.*'          => 'Cliente mal informado.',
@@ -74,11 +75,13 @@ class BudgetCreatePost extends FormRequest
      * Get the proper failed validation response for the request.
      *
      * @param array $errors
-     * @return JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
-    public function response(array $errors)
+    public function response(array $errors): JsonResponse|RedirectResponse
     {
-        if (isAjax()) return response()->json(['errors' => $errors]);
+        if (isAjax()) {
+            return response()->json(['errors' => $errors]);
+        }
 
         return $this->redirector->to($this->getRedirectUrl())
             ->withInput($this->except($this->dontFlash))

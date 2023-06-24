@@ -13,7 +13,7 @@ class ProfileUpdatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -23,7 +23,7 @@ class ProfileUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name'      => 'required',
@@ -32,12 +32,14 @@ class ProfileUpdatePost extends FormRequest
             'email'     => [
                 'nullable',
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('users')
-                        ->where('email', $value)
-                        ->whereNotIn('id', [$this->input('user_id')])
-                        ->count();
-                    if ($exists) {
-                        $fail('Endereço de e-mail já está em uso.');
+                    if (!empty($value)) {
+                        $exists = DB::table('users')
+                            ->where('email', $value)
+                            ->whereNotIn('id', [$this->input('user_id')])
+                            ->count();
+                        if ($exists) {
+                            $fail('Endereço de e-mail já está em uso.');
+                        }
                     }
                 }
             ],
@@ -49,7 +51,7 @@ class ProfileUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required'         => 'Digite o seu nome.',

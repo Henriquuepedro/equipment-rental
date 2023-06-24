@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class DriverDeletePost extends FormRequest
@@ -12,7 +14,7 @@ class DriverDeletePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -22,7 +24,7 @@ class DriverDeletePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'driver_id' => [
@@ -32,18 +34,16 @@ class DriverDeletePost extends FormRequest
                     $exists = DB::table('rental_equipments')
                         ->where(['driver_suggestion' => $value, 'company_id' => $this->user()->company_id])
                         ->count();
-                    if ($exists == 1) {
-                        $fail('Motorista está sendo utilizado em alguma locação. Realize a troca do motorista na locação para continuar.');
-                    } elseif ($exists > 1) {
-                        $fail('Motorista está sendo utilizado em algumas locações. Realize a troca do motorista nas locações para continuar.');
+
+                    if ($exists > 0) {
+                        $fail('Motorista está em uso, não será possível excluir!');
                     } else {
                         $exists = DB::table('vehicles')
                             ->where(['driver_id' => $value, 'company_id' => $this->user()->company_id])
                             ->count();
-                        if ($exists == 1) {
-                            $fail('Motorista está sendo utilizado em algum cadastro de veículo. Realize a troca do motorista no cadastro de veículo para continuar.');
-                        } elseif ($exists > 1) {
-                            $fail('Motorista está sendo utilizado em alguns cadastros de veículo. Realize a troca do motorista nos cadastros de veículo para continuar.');
+
+                        if ($exists > 0) {
+                            $fail('Motorista está em uso no cadastro de veículo, não será possível excluir!');
                         }
                     }
                 }
@@ -56,7 +56,7 @@ class DriverDeletePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'driver_id.*' => 'Não foi possível localizar o motorista!'
@@ -67,11 +67,13 @@ class DriverDeletePost extends FormRequest
      * Get the proper failed validation response for the request.
      *
      * @param array $errors
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
-    public function response(array $errors)
+    public function response(array $errors): JsonResponse|RedirectResponse
     {
-        if (isAjax()) return response()->json(['errors' => $errors]);
+        if (isAjax()) {
+            return response()->json(['errors' => $errors]);
+        }
 
         return $this->redirector->to($this->getRedirectUrl())
             ->withInput($this->except($this->dontFlash))

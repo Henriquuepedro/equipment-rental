@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -13,7 +15,7 @@ class EquipmentCreatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -23,7 +25,7 @@ class EquipmentCreatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'type_equipment'   => ['required', Rule::in(['cacamba', 'others'])],
@@ -32,9 +34,9 @@ class EquipmentCreatePost extends FormRequest
             'reference'         => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('equipments')->where(['reference' => $this->reference, 'company_id' => $this->user()->company_id])->count();
+                    $exists = DB::table('equipments')->where(['reference' => $this->get('reference'), 'company_id' => $this->user()->company_id])->count();
                     if ($exists) {
-                        $fail('Referência do Equipmento já está em uso, informe outra.');
+                        $fail('Referência do Equipamento já está em uso, informe outra.');
                     }
                 }
             ]
@@ -45,7 +47,7 @@ class EquipmentCreatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'type_equipment.*'     => 'Tipo de equipamento mal informado, tente novamente.',
@@ -60,11 +62,13 @@ class EquipmentCreatePost extends FormRequest
      * Get the proper failed validation response for the request.
      *
      * @param array $errors
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
-    public function response(array $errors)
+    public function response(array $errors): JsonResponse|RedirectResponse
     {
-        if (isAjax()) return response()->json(['errors' => $errors]);
+        if (isAjax()) {
+            return response()->json(['errors' => $errors]);
+        }
 
         return $this->redirector->to($this->getRedirectUrl())
             ->withInput($this->except($this->dontFlash))

@@ -62,7 +62,7 @@ class ProviderDeletePost extends FormRequest
      * @param array $errors
      * @return JsonResponse|RedirectResponse
      */
-    public function response(array $errors)
+    public function response(array $errors): JsonResponse|RedirectResponse
     {
         if (isAjax()) {
             return response()->json(['errors' => $errors]);

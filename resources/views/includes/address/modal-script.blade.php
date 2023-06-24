@@ -231,11 +231,14 @@
                     const center = L.latLng(latCenter, lngCenter);
                     startMarkerRental(center);
                 });
+            } else {
+                startMarkerRental(L.latLng(0, 0));
             }
         }
     }
-    // MOSTRAR MAP APÓS NEGAÇÃO DO BROWSER
+    // MOSTRAR MAP APÓS NAVEGAÇÃO DO BROWSER
     async function deniedLocationRental(){
+        return false;
         const recusouLocalizacao = true;
         const rsLocation = await $.getJSON('...',{ recusouLocalizacao }); // obter endereço empresa
         if(rsLocation != null){
@@ -330,7 +333,9 @@
         let lat;
         let lng;
         $.get(`https://dev.virtualearth.net/REST/v1/Locations?query=${address}&key=ApqqlD_Jap1C4pGj114WS4WgKo_YbBBY3yXu1FtHnJUdmCUOusnx67oS3M6UGhor`, latLng => {
-            if (!latLng.resourceSets[0].resources.length) return locationLatLngRental(0,0);
+            if (!latLng.resourceSets[0].resources.length) {
+                return locationLatLngRental(0,0);
+            }
 
             latLng = latLng.resourceSets[0].resources[0].geocodePoints[0].coordinates;
             lat = latLng[0];

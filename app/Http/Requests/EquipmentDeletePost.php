@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class EquipmentDeletePost extends FormRequest
@@ -12,7 +14,7 @@ class EquipmentDeletePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -22,7 +24,7 @@ class EquipmentDeletePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'equipment_id' => [
@@ -32,10 +34,9 @@ class EquipmentDeletePost extends FormRequest
                     $exists = DB::table('rental_equipments')
                         ->where(['equipment_id' => $value, 'company_id' => $this->user()->company_id])
                         ->count();
-                    if ($exists == 1) {
-                        $fail('Equipamento está sendo utilizado em alguma locação. Realize a troca do equipamento na locação para continuar.');
-                    } elseif ($exists > 1) {
-                        $fail('Equipamento está sendo utilizado em algumas locações. Realize a troca do equipamento nas locações para continuar.');
+
+                    if ($exists > 0) {
+                        $fail('Equipamento está em uso, não será possível excluir!');
                     }
                 }
             ]
@@ -47,7 +48,7 @@ class EquipmentDeletePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'equipment_id.*' => 'Não foi possível localizar o equipamento!'
@@ -58,11 +59,13 @@ class EquipmentDeletePost extends FormRequest
      * Get the proper failed validation response for the request.
      *
      * @param array $errors
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
-    public function response(array $errors)
+    public function response(array $errors): JsonResponse|RedirectResponse
     {
-        if (isAjax()) return response()->json(['errors' => $errors]);
+        if (isAjax()) {
+            return response()->json(['errors' => $errors]);
+        }
 
         return $this->redirector->to($this->getRedirectUrl())
             ->withInput($this->except($this->dontFlash))

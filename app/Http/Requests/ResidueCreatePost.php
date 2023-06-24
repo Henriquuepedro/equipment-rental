@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class ResidueCreatePost extends FormRequest
@@ -13,7 +14,7 @@ class ResidueCreatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasPermission(join('', array_slice(explode('\\', __CLASS__), -1)));
     }
@@ -23,13 +24,13 @@ class ResidueCreatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name'      => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    $exists = DB::table('residues')->where(['name' => $this->name, 'company_id' => $this->user()->company_id])->count();
+                    $exists = DB::table('residues')->where(['name' => $this->get('name'), 'company_id' => $this->user()->company_id])->count();
                     if ($exists) {
                         $fail('Nome do resíduo já está em uso');
                     }
@@ -43,7 +44,7 @@ class ResidueCreatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required' => 'O Nome é obrigatório',
@@ -54,11 +55,13 @@ class ResidueCreatePost extends FormRequest
      * Get the proper failed validation response for the request.
      *
      * @param array $errors
-     * @return JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
-    public function response(array $errors)
+    public function response(array $errors): JsonResponse|RedirectResponse
     {
-        if (isAjax()) return response()->json(['errors' => $errors]);
+        if (isAjax()) {
+            return response()->json(['errors' => $errors]);
+        }
 
         return $this->redirector->to($this->getRedirectUrl())
             ->withInput($this->except($this->dontFlash))

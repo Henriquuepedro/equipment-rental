@@ -48,6 +48,6 @@ class Config extends Model
     public function getConfigCompany($company_id, $config): bool
     {
         $db = $this->where('company_id', $company_id)->first();
-        return $db->$config ? true : false;
+        return (bool)$db->$config;
     }
 }

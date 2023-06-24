@@ -11,7 +11,7 @@ class CompanyUpdatePost extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return hasAdmin();
     }
@@ -21,7 +21,7 @@ class CompanyUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name'          => 'required',
@@ -36,7 +36,7 @@ class CompanyUpdatePost extends FormRequest
      *
      * @return array
      */
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required'     => 'Digite o nome/razão social da empresa.',
