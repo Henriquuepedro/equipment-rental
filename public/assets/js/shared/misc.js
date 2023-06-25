@@ -101,22 +101,12 @@ if ($('canvas').length) {
     var scroller = $('.container-scroller');
     var footer = $('.footer');
     var sidebar = $('#sidebar');
+    var base_url = $('[name="base_url"]');
 
     //Add active class to nav-link based on url dynamically
     //Active class can be hard coded directly in html file also as required
-    if (!$('#sidebar').hasClass("dynamic-active-class-disabled")) {
-      let arr_path = location.pathname.split("/");
-      const base_url = $('[name="base_url"]').val();
-
-      // é número então é edição de algo.
-      if ($.isNumeric(arr_path[arr_path.length - 1])) {
-          arr_path.pop();
-      }
-
-      const current = base_url + arr_path.join('/');
-
-
-        console.log(current)
+    if (!sidebar.hasClass("dynamic-active-class-disabled")) {
+      const current = base_url.val() + location.href.replace(base_url.val(), '');
       $('#sidebar >.nav > li:not(.not-navigation-link) a').each(function () {
         var $this = $(this);
         if (current === "") {

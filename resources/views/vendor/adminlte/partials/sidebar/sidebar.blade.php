@@ -9,26 +9,27 @@
     if ($route->getName() == 'dashboard') {
         $dashboardActive = 'active';
     } elseif (
-        strstr($route->getName(),'client.')      !== false ||
-        strstr($route->getName(),'equipment.')   !== false ||
-        strstr($route->getName(),'driver.')      !== false ||
-        strstr($route->getName(),'vehicle.')     !== false ||
-        strstr($route->getName(),'residue.')     !== false ||
-        strstr($route->getName(),'provider.')    !== false
+        likeText('client.%', $route->getName())      !== false ||
+        likeText('equipment.%', $route->getName())   !== false ||
+        likeText('driver.%', $route->getName())      !== false ||
+        likeText('vehicle.%', $route->getName())     !== false ||
+        likeText('residue.%', $route->getName())     !== false ||
+        likeText('provider.%', $route->getName())    !== false
     ) {
         $registerActive = 'active';
     } elseif (
-        strstr($route->getName(),'rental\.') !== false ||
-        strstr($route->getName(),'budget.') !== false ||
-        strstr($route->getName(),'bills_to_receive.') !== false ||
-        strstr($route->getName(),'bills_to_pay.') !== false
+        likeText('rental.%', $route->getName()) !== false ||
+        likeText('budget.%', $route->getName()) !== false ||
+        likeText('bills_to_receive.%', $route->getName()) !== false ||
+        likeText('bills_to_pay.%', $route->getName()) !== false
     ) {
         $controlActive = 'active';
     } elseif (
-        strstr($route->getName(),'report.')
+        likeText('report.%', $route->getName())
     ) {
         $reportActive = 'active';
     }
+//    dd($route->getName(),strstr($route->getName(),'rental\.'), $reportActive);
 @endphp
 
 <!-- partial -->
