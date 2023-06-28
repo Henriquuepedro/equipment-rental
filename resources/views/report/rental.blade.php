@@ -19,11 +19,7 @@
 
         $('#date_filter').trigger('change');
         moment.locale('pt-br');
-        $('input[name="intervalDates"]').daterangepicker({
-            locale: {
-                format: 'DD/MM/YYYY'
-            }
-        });
+        loadDaterangePickerInput($('input[name="intervalDates"]'), function () {});
     });
 
     $('[name="state"]').on('change', function(){
