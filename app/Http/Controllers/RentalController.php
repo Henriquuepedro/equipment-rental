@@ -552,7 +552,7 @@ class RentalController extends Controller
             // 1x o pagamento, vencimento para hoje
             $response->arrPayment[] = array(
                 'company_id'    => $company_id,
-                $nameFieldID    => 0,
+                $nameFieldID    => $rental_id ?: 0,
                 'parcel'        => 1,
                 'due_day'       => 0,
                 'due_date'      => date(DATE_INTERNATIONAL),
