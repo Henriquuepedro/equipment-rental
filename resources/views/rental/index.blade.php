@@ -59,11 +59,7 @@
 
         $(function () {
             moment.locale('pt-br');
-            $('input[name="intervalDates"]').daterangepicker({
-                locale: {
-                    format: 'DD/MM/YYYY'
-                }
-            });
+            loadDaterangePickerInput($('input[name="intervalDates"]'), function () {});
 
             setTabRental();
         });

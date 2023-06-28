@@ -14,11 +14,7 @@
     $(function(){
         $('#date_filter').trigger('change');
         moment.locale('pt-br');
-        $('input[name="intervalDates"]').daterangepicker({
-            locale: {
-                format: 'DD/MM/YYYY'
-            }
-        });
+        loadDaterangePickerInput($('input[name="intervalDates"]'), function () {});
         getOptionsForm('form-of-payment', $('[name="form_payment"]'), null, '<option value="0">Todos</option>');
         getOptionsForm('providers', $('[name="provider"]').select2(), null, '<option value="0">Todos</option>');
         getOptionsForm('clients', $('[name="client"]').select2(), null, '<option value="0">Todos</option>');
