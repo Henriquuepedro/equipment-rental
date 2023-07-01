@@ -153,15 +153,15 @@ class BudgetController extends Controller
 
         $clientId   = (int)$request->input('client');
         $zipcode    = onlyNumbers($request->input('cep'));
-        $address    = filter_var($request->input('address'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $number     = filter_var($request->input('number'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $complement = filter_var($request->input('complement'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $reference  = filter_var($request->input('reference'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $neigh      = filter_var($request->input('neigh'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $city       = filter_var($request->input('city'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $state      = filter_var($request->input('state'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $lat        = filter_var($request->input('lat'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $lng        = filter_var($request->input('lng'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $address    = filter_var($request->input('address'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $number     = filter_var($request->input('number'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $complement = filter_var($request->input('complement'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $reference  = filter_var($request->input('reference'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $neigh      = filter_var($request->input('neigh'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $city       = filter_var($request->input('city'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $state      = filter_var($request->input('state'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $lat        = filter_var($request->input('lat'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $lng        = filter_var($request->input('lng'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
 
         if (empty($clientId) || !$this->client->getClient($clientId, $company_id)) {
             return response()->json(['success' => false, 'message' => "Cliente não foi encontrado. Revise a aba de Cliente e Endereço."]);
@@ -254,7 +254,6 @@ class BudgetController extends Controller
             'discount_value'                => $haveCharged ? $responsePayment->discountValue : null,
             'net_value'                     => $haveCharged ? $responsePayment->netValue : null,
             'calculate_net_amount_automatic'=> (bool)$request->input('calculate_net_amount_automatic'),
-            'use_parceled'                  => (bool)$request->input('is_parceled'),
             'automatic_parcel_distribution' => (bool)$request->input('automatic_parcel_distribution'),
             'observation'                   => strip_tags($request->input('observation'), $this->allowableTags),
             'user_insert'                   => $request->user()->id
@@ -323,7 +322,8 @@ class BudgetController extends Controller
         try {
             DB::beginTransaction();// Iniciando transação manual para evitar atualizações não desejáveis.
 
-            $create_rental  = $this->rental->insert($this->formatConfirmBudget($this->budget->getBudget($budget_id, $company_id)->toArray()));
+            $data_rental = $this->formatConfirmBudget($this->budget->getBudget($budget_id, $company_id)->toArray());
+            $create_rental  = $this->rental->insert($data_rental);
 
             foreach ($this->budget_payment->getPayments($company_id, $budget_id) as $payment) {
                 $this->rental_payment->insert($this->formatConfirmBudget($payment->toArray(), $create_rental->id));
@@ -341,7 +341,7 @@ class BudgetController extends Controller
             $this->budget->remove($budget_id, $company_id);
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Orçamento aprovado com sucesso!', 'rental_id' => $create_rental->id]);
+            return response()->json(['success' => true, 'message' => "Orçamento aprovado com sucesso!<br> Foi gerado o código <b>$data_rental[code]</b> para a locação.", 'rental_id' => $create_rental->id]);
         } catch (Throwable $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Não foi possível aprovado o orçamento!' . $e->getMessage()]);

@@ -6,7 +6,11 @@ use App\Models\BillToPay;
 use App\Models\BillToPayPayment;
 use App\Models\FormPayment;
 use App\Models\Provider;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,10 +18,10 @@ use StdClass;
 
 class BillsToPayController extends Controller
 {
-    private $provider;
-    private $bill_to_pay;
-    private $bill_to_pay_payment;
-    private $form_payment;
+    private Provider $provider;
+    private BillToPay $bill_to_pay;
+    private BillToPayPayment $bill_to_pay_payment;
+    private FormPayment $form_payment;
 
     public function __construct()
     {
@@ -27,7 +31,7 @@ class BillsToPayController extends Controller
         $this->bill_to_pay_payment = new BillToPayPayment();
     }
 
-    public function index()
+    public function index(): Factory|View|Application
     {
         $company_id = Auth::user()->__get('company_id');
         $providers = $this->provider->getProviders($company_id);
@@ -87,8 +91,11 @@ class BillsToPayController extends Controller
         }
 
         if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+            if ($request->input('order')[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('bill_to_pays.code','providers.name','bill_to_pay_payments.due_value','bill_to_pay_payments.due_date', '');
             $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
@@ -168,7 +175,7 @@ class BillsToPayController extends Controller
         return response()->json(array('success' => true, 'message' => "Pagamento confirmado!"));
     }
 
-    public function create()
+    public function create(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('BillsToPayCreatePost')) {
             return redirect()->route('bills_to_pay.index')
@@ -185,10 +192,9 @@ class BillsToPayController extends Controller
         $user_id                        = $request->user()->id;
         $provider                       = (int)filter_var($request->input('provider'), FILTER_SANITIZE_NUMBER_INT);
         $description                    = strip_tags($request->input('description'), $this->allowableTags);
-        $value                          = transformMoneyBr_En(filter_var($request->input('value'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL));
-        $form_payment                   = (int)filter_var($request->input('form_payment'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $value                          = transformMoneyBr_En(filter_var($request->input('value'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL));
+        $form_payment                   = (int)filter_var($request->input('form_payment'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $calculate_net_amount_automatic = (bool)$request->input('calculate_net_amount_automatic');
-        $is_parceled                    = (bool)$request->input('is_parceled');
         $automatic_parcel_distribution  = (bool)$request->input('automatic_parcel_distribution');
         $user_field                     = $create ? 'user_insert' : 'user_update';
 
@@ -201,7 +207,6 @@ class BillsToPayController extends Controller
             'discount_value'                => 0,
             'net_value'                     => $value,
             'calculate_net_amount_automatic'=> $calculate_net_amount_automatic,
-            'use_parceled'                  => $is_parceled,
             'automatic_parcel_distribution' => $automatic_parcel_distribution,
             'form_payment'                  => $form_payment,
             'observation'                   => $description,
@@ -209,7 +214,7 @@ class BillsToPayController extends Controller
         );
     }
 
-    public function insert(Request $request)
+    public function insert(Request $request): JsonResponse|RedirectResponse
     {
         $isAjax = isAjax();
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
@@ -270,59 +275,56 @@ class BillsToPayController extends Controller
 
         $value = transformMoneyBr_En($request->input('value'));
 
-        $is_parceled = (bool)$request->input('is_parceled');
         $automaticParcelDistribution = (bool)$request->input('automatic_parcel_distribution');
 
         // existe parcelamento
-        if ($is_parceled) {
-            $daysTemp = null;
-            $priceTemp = 0;
+        $daysTemp = null;
+        $priceTemp = 0;
 
-            $valueSumParcel = 0;
-            $qtyParcel = count($request->input('due_date'));
-            $valueParcel = (float)number_format($value / $qtyParcel, 2,'.','');
+        $valueSumParcel = 0;
+        $qtyParcel = count($request->input('due_date'));
+        $valueParcel = (float)number_format($value / $qtyParcel, 2,'.','');
 
-            foreach ($request->input('due_date') as $parcel => $_) {
-                if ($automaticParcelDistribution) {
-                    if (($parcel + 1) === $qtyParcel) {
-                        $valueParcel = (float)number_format($value - $valueSumParcel,2,'.','');
-                    }
-                    $valueSumParcel += $valueParcel;
-                } else {
-                    $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
+        foreach ($request->input('due_date') as $parcel => $_) {
+            if ($automaticParcelDistribution) {
+                if (($parcel + 1) === $qtyParcel) {
+                    $valueParcel = (float)number_format($value - $valueSumParcel,2,'.','');
                 }
-
-                if ($daysTemp === null) {
-                    $daysTemp = $request->input('due_day')[$parcel];
-                }
-                elseif ($daysTemp >= $request->input('due_day')[$parcel]) {
-                    $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
-                    return $response;
-                } else {
-                    $daysTemp = $request->input('due_day')[$parcel];
-                }
-
-                $priceTemp += $valueParcel;
-
-                $response->arrPayment[] = array(
-                    'company_id'    => $company_id,
-                    'bill_to_pay_id'=> 0,
-                    'parcel'        => $parcel + 1,
-                    'due_day'       => $request->input('due_day')[$parcel],
-                    'due_date'      => $request->input('due_date')[$parcel],
-                    'due_value'     => $valueParcel,
-                    'user_insert'   => $request->user()->id
-                );
+                $valueSumParcel += $valueParcel;
+            } else {
+                $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
             }
 
-            // os valores das parcelas não corresponde ao valor líquido
-            if (number_format($priceTemp,2, '.','') != number_format($value,2, '.','')) {
-                $response->error = 'A soma das parcelas deve corresponder ao valor líquido.';
+            if ($daysTemp === null) {
+                $daysTemp = $request->input('due_day')[$parcel];
+            } elseif ($daysTemp >= $request->input('due_day')[$parcel]) {
+                $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
                 return $response;
+            } else {
+                $daysTemp = $request->input('due_day')[$parcel];
             }
 
-        } else {
-            // 1x o pagamento, vencimento para hoje
+            $priceTemp += $valueParcel;
+
+            $response->arrPayment[] = array(
+                'company_id'    => $company_id,
+                'bill_to_pay_id'=> 0,
+                'parcel'        => $parcel + 1,
+                'due_day'       => $request->input('due_day')[$parcel],
+                'due_date'      => $request->input('due_date')[$parcel],
+                'due_value'     => $valueParcel,
+                'user_insert'   => $request->user()->id
+            );
+        }
+
+        // os valores das parcelas não corresponde ao valor líquido
+        if (number_format($priceTemp,2, '.','') != number_format($value,2, '.','')) {
+            $response->error = 'A soma das parcelas deve corresponder ao valor líquido.';
+            return $response;
+        }
+
+        // Pagamento não encontrado, cria o pagamento para o dia de hoje.
+        if (!count($response->arrPayment)) {
             $response->arrPayment[] = array(
                 'company_id'    => $company_id,
                 'bill_to_pay_id'=> 0,

@@ -499,57 +499,54 @@ class RentalController extends Controller
             return $response;
         }
 
-        $is_parceled = (bool)$request->input('is_parceled');
         $automaticParcelDistribution = (bool)$request->input('automatic_parcel_distribution');
 
-        // existe parcelamento
-        if ($is_parceled) {
-            $daysTemp = null;
-            $priceTemp = 0;
+        $daysTemp = null;
+        $priceTemp = 0;
 
-            $valueSumParcel = 0;
-            $qtyParcel = count($request->input('due_date'));
-            $valueParcel = (float)number_format($netValue / $qtyParcel, 2,'.','');
+        $valueSumParcel = 0;
+        $qtyParcel = count($request->input('due_date'));
+        $valueParcel = (float)number_format($netValue / $qtyParcel, 2,'.','');
 
-            foreach ($request->input('due_date') as $parcel => $_) {
-                if ($automaticParcelDistribution) {
-                    if (($parcel + 1) === $qtyParcel) {
-                        $valueParcel = (float)number_format($netValue - $valueSumParcel,2,'.','');
-                    }
-                    $valueSumParcel += $valueParcel;
-                } else {
-                    $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
+        foreach ($request->input('due_date') as $parcel => $_) {
+            if ($automaticParcelDistribution) {
+                if (($parcel + 1) === $qtyParcel) {
+                    $valueParcel = (float)number_format($netValue - $valueSumParcel,2,'.','');
                 }
-
-                if ($daysTemp === null) {
-                    $daysTemp = $request->input('due_day')[$parcel];
-                } elseif ($daysTemp >= $request->input('due_day')[$parcel]) {
-                    $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
-                    return $response;
-                } else {
-                    $daysTemp = $request->input('due_day')[$parcel];
-                }
-
-                $priceTemp += $valueParcel;
-
-                $response->arrPayment[] = array(
-                    'company_id'    => $company_id,
-                    $nameFieldID    => $rental_id ?: 0,
-                    'parcel'        => $parcel + 1,
-                    'due_day'       => $request->input('due_day')[$parcel],
-                    'due_date'      => $request->input('due_date')[$parcel],
-                    'due_value'     => $valueParcel,
-                    'user_insert'   => $request->user()->id
-                );
+                $valueSumParcel += $valueParcel;
+            } else {
+                $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
             }
 
-            if (number_format($priceTemp,2, '.','') != number_format($netValue,2, '.','')) { // os valores das parcelas não corresponde ao valor líquido
-                $response->error = 'A soma das parcelas deve corresponder ao valor líquido.';
+            if ($daysTemp === null) {
+                $daysTemp = $request->input('due_day')[$parcel];
+            } elseif ($daysTemp >= $request->input('due_day')[$parcel]) {
+                $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
                 return $response;
+            } else {
+                $daysTemp = $request->input('due_day')[$parcel];
             }
 
-        } else {
-            // 1x o pagamento, vencimento para hoje
+            $priceTemp += $valueParcel;
+
+            $response->arrPayment[] = array(
+                'company_id'    => $company_id,
+                $nameFieldID    => $rental_id ?: 0,
+                'parcel'        => $parcel + 1,
+                'due_day'       => $request->input('due_day')[$parcel],
+                'due_date'      => $request->input('due_date')[$parcel],
+                'due_value'     => $valueParcel,
+                'user_insert'   => $request->user()->id
+            );
+        }
+
+        if (number_format($priceTemp,2, '.','') != number_format($netValue,2, '.','')) { // os valores das parcelas não corresponde ao valor líquido
+            $response->error = 'A soma das parcelas deve corresponder ao valor líquido.';
+            return $response;
+        }
+
+        // Pagamento não encontrado, cria o pagamento para o dia de hoje.
+        if (!count($response->arrPayment)) {
             $response->arrPayment[] = array(
                 'company_id'    => $company_id,
                 $nameFieldID    => $rental_id ?: 0,
@@ -560,6 +557,7 @@ class RentalController extends Controller
                 'user_insert'   => $request->user()->id
             );
         }
+
         $response->netValue      = $netValue;
         $response->discountValue = $discountValue;
         $response->extraValue    = $extraValue;

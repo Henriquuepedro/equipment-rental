@@ -314,7 +314,7 @@ class EquipmentController extends Controller
         $company_id = $request->user()->company_id;
 
         $search = $request->search;
-        $search['value'] = str_replace('*','', filter_var($search['value'], FILTER_SANITIZE_STRING));
+        $search['value'] = str_replace('*','', filter_var($search['value'], FILTER_DEFAULT));
 
         if (likeText('%'.strtolower(str_replace(['ç', 'Ç'],'c',$search['value'])).'%', 'cacamba')) {
             $getCacamba = true;
@@ -377,10 +377,10 @@ class EquipmentController extends Controller
 
         $obj->company_id    = $request->user()->company_id;
         $obj->user_id       = $request->user()->id;
-        $obj->name          = $request->type_equipment === "cacamba" ? null : filter_var($request->name, FILTER_SANITIZE_STRING);
+        $obj->name          = $request->type_equipment === "cacamba" ? null : filter_var($request->name);
         $obj->volume        = $request->type_equipment === "others" ? null : filter_var($request->volume, FILTER_VALIDATE_INT);
-        $obj->reference     = filter_var($request->reference, FILTER_SANITIZE_STRING);
-        $obj->manufacturer  = $request->manufacturer ? filter_var($request->manufacturer, FILTER_SANITIZE_STRING) : null;
+        $obj->reference     = filter_var($request->reference);
+        $obj->manufacturer  = $request->manufacturer ? filter_var($request->manufacturer, FILTER_DEFAULT) : null;
         $obj->value         = $request->value ? transformMoneyBr_En($request->value) : 0.00;
         $obj->stock         = $request->stock ? filter_var($request->stock, FILTER_VALIDATE_INT) : 0;
         $obj->equipment_id = isset($request->equipment_id) ? (int)$request->equipment_id : null;
@@ -403,7 +403,7 @@ class EquipmentController extends Controller
     {
         //DB::enableQueryLog();
         $company_id         = $request->user()->company_id;
-        $searchEquipment   = str_replace('*','', filter_var($request->searchEquipment, FILTER_SANITIZE_STRING));
+        $searchEquipment   = str_replace('*','', filter_var($request->searchEquipment, FILTER_DEFAULT));
         $equipmentData     = [];
         $getCacamba         = false;
         $equipmentInUse    = $request->equipmentInUse;

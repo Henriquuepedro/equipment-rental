@@ -111,7 +111,7 @@ i.fa.input-group-text.text-white {
 #payment.payment-no .payment-hidden {
     display: none !important;
 }
-#payment.payment-no .payment-hidden-invert-stock {
+#payment.payment-no .payment-invert-stock {
     justify-content: flex-end !important;
     display: flex !important;;
 }

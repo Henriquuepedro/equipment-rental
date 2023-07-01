@@ -94,7 +94,7 @@
                     });
                 });
 
-                await $('#add_parcel, #del_parcel, .automatic_parcel_distribution_parent').slideDown(500);
+                await $('#add_parcel, .automatic_parcel_distribution_parent').slideDown(500);
 
                 await getPaymentsRental(rental_id, function(response){
                     $(response).each(async function (k, payment) {
@@ -111,20 +111,14 @@
                             $('#paid_installment_notice').show();
                         }
 
-                        if ($('#is_parceled').is(':checked')) {
-                            $('#parcels').show().append(
-                                createParcel(parcel, due_day, due_date, due_value)
-                            ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({
-                                thousands: '.',
-                                decimal: ',',
-                                allowZero: true
-                            }).closest('.payment-item').find('[name="due_date[]"]').trigger('blur');
-                        }
+                        $('#parcels').append(
+                            createParcel(parcel, due_day, due_date, due_value)
+                        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({
+                            thousands: '.',
+                            decimal: ',',
+                            allowZero: true
+                        }).closest('.payment-item').find('[name="due_date[]"]').trigger('blur').closest('.payment-item').find('.remove-payment').tooltip();
                     });
-
-                    if (response.length) {
-                        $('#del_parcel').prop('disabled', false);
-                    }
                 });
             }, 500);
 
@@ -389,36 +383,41 @@
                                                         </div>
                                                         <input type="text" class="form-control d-flex align-items-center" id="net_value" name="net_value" value="{{ formatMoney($rental->net_value) }}" disabled>
                                                     </div>
-                                                    <div class="form-group col-md-12 no-padding text-right mt-2">
-                                                        <div class="switch">
-                                                            <input type="checkbox" class="check-style check-xs" name="calculate_net_amount_automatic" id="calculate_net_amount_automatic" {{ $rental->calculate_net_amount_automatic ? 'checked' : '' }}>
-                                                            <label for="calculate_net_amount_automatic" class="check-style check-xs"></label> Calcular Valor Líquido
+                                                    <div class="form-group col-md-12 no-padding text-right mt-2 d-flex justify-content-end">
+                                                        <div class="form-group no-padding text-right mt-2">
+                                                            <div class="switch">
+                                                                <input type="checkbox" class="check-style check-xs" name="calculate_net_amount_automatic" id="calculate_net_amount_automatic" {{ $rental->calculate_net_amount_automatic ? 'checked' : '' }}>
+                                                                <label for="calculate_net_amount_automatic" class="check-style check-xs"></label> Calcular Valor Líquido
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group automatic_parcel_distribution_parent mt-2">
+                                                            <div class="switch">
+                                                                <input type="checkbox" class="check-style check-xs" name="automatic_parcel_distribution" id="automatic_parcel_distribution"  {{ $rental->automatic_parcel_distribution ? 'checked' : '' }}>
+                                                                <label for="automatic_parcel_distribution" class="check-style check-xs"></label> Distribuir Valores
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <hr class="separator-dashed payment-hidden">
-                                            <div class="col-md-12 d-flex justify-content-between payment-hidden">
+                                            <div class="col-md-12 d-flex justify-content-end payment-hidden">
                                                 <div class="form-group">
-                                                    <div class="switch">
-                                                        <input type="checkbox" class="check-style check-xs" name="is_parceled" id="is_parceled" {{ $rental->use_parceled ? 'checked' : '' }}>
-                                                        <label for="is_parceled" class="check-style check-xs"></label> Gerar Parcelamento
-                                                    </div>
-                                                </div>
-                                                <div class="form-group display-none automatic_parcel_distribution_parent">
-                                                    <div class="switch">
-                                                        <input type="checkbox" class="check-style check-xs" name="automatic_parcel_distribution" id="automatic_parcel_distribution"  {{ $rental->automatic_parcel_distribution ? 'checked' : '' }}>
-                                                        <label for="automatic_parcel_distribution" class="check-style check-xs"></label> Distribuir Valores
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <button type="button" class="btn btn-success display-none" id="add_parcel"><i class="fa fa-plus"></i> Parcela</button>
-                                                </div>
-                                                <div class="form-group">
-                                                    <button type="button" class="btn btn-danger display-none" id="del_parcel" disabled><i class="fa fa-trash"></i> Parcela</button>
+                                                    <button type="button" class="btn btn-success display-none" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
                                                 </div>
                                             </div>
-                                            <div class="col-md-12 display-none payment-hidden" id="parcels"></div>
+                                            <div class="col-md-12 payment-hidden">
+                                                <div class="form-group mt-1">
+                                                    <div class="d-flex align-items-center justify-content-between payment-item">
+                                                        <div class="input-group col-md-12 no-padding">
+                                                            <span class="col-md-3 text-center">Dia do vencimento</span>
+                                                            <span class="col-md-4 text-center">Data do vencimento</span>
+                                                            <span class="col-md-1 no-padding">&nbsp;</span>
+                                                            <span class="col-md-3 no-border-radius text-center">Valor</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 payment-hidden" id="parcels"></div>
                                             <div class="col-md-12 display-none mt-4" id="paid_installment_notice">
                                                 <div class="alert alert-warning">
                                                     <h4>Você tem parcelas pagas!</h4>

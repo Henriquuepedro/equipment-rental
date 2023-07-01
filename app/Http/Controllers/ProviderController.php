@@ -7,23 +7,27 @@ use App\Http\Requests\ProviderDeletePost;
 use App\Http\Requests\ProviderUpdatePost;
 use App\Models\Config;
 use App\Models\Provider;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProviderController extends Controller
 {
-    private $provider;
-    private $config;
+    private Provider $provider;
+    private Config $config;
 
-    public function __construct(Provider $provider, Config $config)
+    public function __construct()
     {
-        $this->provider = $provider;
-        $this->config = $config;
+        $this->provider = new Provider();
+        $this->config = new Config();
     }
 
-    public function index()
+    public function index(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('ProviderView')) {
             return redirect()->route('dashboard')
@@ -33,7 +37,7 @@ class ProviderController extends Controller
         return view('provider.index');
     }
 
-    public function create()
+    public function create(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('ProviderCreatePost')) {
             return redirect()->route('provider.index')
@@ -48,29 +52,29 @@ class ProviderController extends Controller
         // data provider
         $company_id     = $request->user()->company_id;
         $user_id        = $request->user()->id;
-        $name           = filter_var($request->input('name'), FILTER_SANITIZE_STRING);
-        $type           = filter_var($request->input('type_person'), FILTER_SANITIZE_STRING);
-        $fantasy        = filter_var($request->input('fantasy'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $email          = filter_var($request->input('email'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $contact        = filter_var($request->input('contact'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $sex            = filter_var($request->input('sex'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $birth_date     = filter_var($request->input('birth_date'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $name           = filter_var($request->input('name'));
+        $type           = filter_var($request->input('type_person'));
+        $fantasy        = filter_var($request->input('fantasy'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $email          = filter_var($request->input('email'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $contact        = filter_var($request->input('contact'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $sex            = filter_var($request->input('sex'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $birth_date     = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $nationality    = filter_var($request->input('nationality'), FILTER_SANITIZE_NUMBER_INT);
         $marital_status = filter_var($request->input('marital_status'), FILTER_SANITIZE_NUMBER_INT);
-        $observation    = filter_var($request->input('observation'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $observation    = filter_var($request->input('observation'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
 
-        $address        = filter_var($request->input('address'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $number         = filter_var($request->input('number'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $cep            = filter_var(onlyNumbers($request->input('cep')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $complement     = filter_var($request->input('complement'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $reference      = filter_var($request->input('reference'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $neigh          = filter_var($request->input('neigh'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $city           = filter_var($request->input('city'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
-        $state          = filter_var($request->input('state'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL);
+        $address        = filter_var($request->input('address'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $number         = filter_var($request->input('number'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $cep            = filter_var(onlyNumbers($request->input('cep')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $complement     = filter_var($request->input('complement'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $reference      = filter_var($request->input('reference'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $neigh          = filter_var($request->input('neigh'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $city           = filter_var($request->input('city'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $state          = filter_var($request->input('state'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
 
         if (empty($nationality)) {
             $nationality = null;
@@ -142,7 +146,7 @@ class ProviderController extends Controller
 
     }
 
-    public function edit($id)
+    public function edit($id): View|Factory|RedirectResponse|Application
     {
         $company_id = Auth::user()->__get('company_id');
 
@@ -155,7 +159,7 @@ class ProviderController extends Controller
 
     }
 
-    public function update(ProviderUpdatePost $request)
+    public function update(ProviderUpdatePost $request): RedirectResponse
     {
         // data provider
         $provider_id = $request->input('provider_id');
@@ -179,7 +183,7 @@ class ProviderController extends Controller
             ->withInput();
     }
 
-    public function delete(ProviderDeletePost $request)
+    public function delete(ProviderDeletePost $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
         $provider_id = $request->input('provider_id');
@@ -195,7 +199,7 @@ class ProviderController extends Controller
         return response()->json(['success' => true, 'message' => 'Fornecedor excluído com sucesso!']);
     }
 
-    public function fetchProviders(Request $request)
+    public function fetchProviders(Request $request): JsonResponse
     {
         $orderBy    = array();
         $result     = array();
@@ -212,8 +216,11 @@ class ProviderController extends Controller
         }
 
         if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+            if ($request->order[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('id','name','email','phone_1', '');
             $fieldOrder =  $fieldsOrder[$request->order[0]['column']];

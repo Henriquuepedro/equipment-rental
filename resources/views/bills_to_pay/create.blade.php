@@ -32,6 +32,10 @@
         });
         getOptionsForm('form-of-payment', $('#formCreateBillsToPay [name="form_payment"]'));
         $('#value').maskMoney({thousands: '.', decimal: ',', allowZero: true});
+
+        if (!$('#parcels .parcel').length) {
+            $('#add_parcel').trigger('click');
+        }
     });
 
     // Validar dados
@@ -149,25 +153,6 @@
         }
     });
 
-
-    $('#is_parceled').change(function (){
-        const check = $(this).is(':checked');
-
-        if (check) {
-            $('#add_parcel, #del_parcel, .automatic_parcel_distribution_parent').slideDown(500);
-            $('#parcels').show().append(
-                createParcel(0)
-            ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
-
-            recalculeParcels();
-        }
-        else {
-            $('#add_parcel, #del_parcel, #parcels, .automatic_parcel_distribution_parent').slideUp(500);
-            $('#automatic_parcel_distribution').prop('checked', true);
-            setTimeout(() => { $('#parcels .form-group').remove() }, 550)
-        }
-    })
-
     $('#parcels').on('keyup change', '[name="due_day[]"]', function(){
         let days = parseInt($(this).val());
         const el = $(this).closest('.form-group');
@@ -188,32 +173,18 @@
     $('#add_parcel').click(function(){
         const parcels = $('#parcels .parcel').length;
 
-        if (parcels == 12) {
+        if (parcels === 24) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Atenção',
-                html: '<ol><li>É permitido adicionar até 12 vencimentos.</li></ol>'
+                html: '<ol><li>É permitido adicionar até 24 vencimentos.</li></ol>'
             });
             return false;
         }
 
         $('#parcels').show().append(
             createParcel(parcels)
-        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
-
-        $('#del_parcel').attr('disabled', false);
-
-        recalculeParcels();
-    });
-
-    $('#del_parcel').click(function(){
-        const dues = $('#parcels .form-group').length - 1;
-
-        $(`#parcels .form-group:eq(${dues})`).remove();
-
-        if (dues === 1) {
-            $('#del_parcel').attr('disabled', true);
-        }
+        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true}).closest('.parcel').find('.remove-payment').tooltip();
 
         recalculeParcels();
     });
@@ -233,20 +204,47 @@
         recalculeParcels();
     });
 
+    $(document).on('click', '.remove-payment', function(){
+        const parcels = $('#parcels .parcel').length;
+
+        if (parcels === 1) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção',
+                html: '<ol><li>Deve conter no mínimo uma linha de pagamento.</li></ol>'
+            });
+            return;
+        }
+
+        $('#parcels').find('.remove-payment').tooltip('dispose');
+
+        $(this).closest('.parcel').remove();
+
+        $('#parcels').find('.remove-payment').tooltip();
+
+        recalculeParcels();
+    });
+
     const createParcel = due => {
         const disabledValue = $('#automatic_parcel_distribution').is(':checked') ? 'disabled' : '';
-        return `<div class="form-group mt-1 parcel display-none">
+        let last_day = parseInt($('#parcels .parcel:last [name="due_day[]"]').val());
+
+        if (isNaN(last_day)) {
+            last_day = 0;
+        }
+
+        return `<div class="form-group mt-1 parcel">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="input-group col-md-12 no-padding">
-                    <div class="input-group-prepend stock-Equipment-payment col-md-3 no-padding">
-                        <span class="input-group-text col-md-12 no-border-radius "><strong>${(due+1)}º Vencimento</strong></span>
-                    </div>
-                    <input type="text" class="form-control col-md-2 text-center" name="due_day[]" value="${calculateDays(sumMonthsDateNow(0), sumMonthsDateNow(due))}">
-                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${sumMonthsDateNow(due)}">
+                    <input type="text" class="form-control col-md-3 text-center" name="due_day[]" value="${(last_day + 30)}">
+                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${sumDaysDateNow(last_day + 30)}">
                     <div class="input-group-prepend col-md-1 no-padding">
                         <span class="input-group-text pl-3 pr-3 col-md-12"><strong>R$</strong></span>
                     </div>
-                    <input type="text" class="form-control col-md-2 no-border-radius text-center" name="value_parcel[]" value="0,00" ${disabledValue}>
+                    <input type="text" class="form-control col-md-3 no-border-radius text-center" name="value_parcel[]" value="0,00" ${disabledValue}>
+                    <div class="input-group-prepend stock-Equipment-payment col-md-1 no-padding">
+                        <button type="button" class="btn btn-danger btn-flat w-100 remove-payment" title="Excluir Pagamento"><i class="fa fa-trash"></i></button>
+                    </div>
                 </div>
             </div>
         </div>`
@@ -319,29 +317,32 @@
                                         <label>Forma de Pagamento</label>
                                         <select class="form-control" name="form_payment" required></select>
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group automatic_parcel_distribution_parent col-md-4">
                                         <div class="switch d-flex mt-4">
-                                            <input type="checkbox" class="check-style check-xs" name="is_parceled" id="is_parceled">
-                                            <label for="is_parceled" class="check-style check-xs"></label>&nbsp;Gerar Parcelamento
+                                            <input type="checkbox" class="check-style check-xs" name="automatic_parcel_distribution" id="automatic_parcel_distribution" checked>
+                                            <label for="automatic_parcel_distribution" class="check-style check-xs"></label>&nbsp;Distribuir Valores
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-12 d-flex justify-content-between payment-hidden mt-4">
-                                        <div class="form-group display-none automatic_parcel_distribution_parent col-md-6">
-                                            <div class="switch d-flex mt-1">
-                                                <input type="checkbox" class="check-style check-xs" name="automatic_parcel_distribution" id="automatic_parcel_distribution" checked>
-                                                <label for="automatic_parcel_distribution" class="check-style check-xs"></label>&nbsp;Distribuir Valores
-                                            </div>
-                                        </div>
+                                    <div class="col-md-12 d-flex justify-content-end mt-4">
                                         <div class="form-group">
-                                            <button type="button" class="btn btn-success display-none" id="add_parcel"><i class="fa fa-plus"></i> Parcela</button>
-                                        </div>
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-danger display-none" id="del_parcel" disabled><i class="fa fa-trash"></i> Parcela</button>
+                                            <button type="button" class="btn btn-success" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 display-none payment-hidden" id="parcels"></div>
+                                    <div class="col-md-12">
+                                        <div class="form-group mt-1">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="input-group col-md-12 no-padding">
+                                                    <span class="col-md-3 text-center">Dia do vencimento</span>
+                                                    <span class="col-md-4 text-center">Data do vencimento</span>
+                                                    <span class="col-md-1 no-padding">&nbsp;</span>
+                                                    <span class="col-md-3 no-border-radius text-center">Valor</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12" id="parcels"></div>
                                 </div>
                             </div>
                         </div>
