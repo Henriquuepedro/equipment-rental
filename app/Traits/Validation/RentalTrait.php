@@ -19,7 +19,7 @@ trait RentalTrait
     /**
      * @throws Exception
      */
-    public function makeValidationRental(RentalCreatePost | BudgetCreatePost $request, ?int $rental_id = null): array
+    public function makeValidationRental(RentalCreatePost | BudgetCreatePost $request, ?int $rental_id = null, bool $is_budget = false): array
     {
         $company_id = $request->user()->company_id;
         $noCharged  = $request->input('type_rental'); // 0 = Com cobrança, 1 = Sem cobrança
@@ -80,7 +80,7 @@ trait RentalTrait
         }
 
         // Equipamentos
-        $responseEquipment = $this->setEquipmentRental($request, false, $rental_id);
+        $responseEquipment = $this->setEquipmentRental($request, $is_budget, $rental_id);
         if (isset($responseEquipment->error)) {
             throw new Exception($responseEquipment->error);
         }
@@ -89,7 +89,7 @@ trait RentalTrait
         // Pagamento
         $arrPayment = array();
         if (!$noCharged) {
-            $responsePayment = $this->setPaymentRental($request, $responseEquipment->grossValue, false, $rental_id);
+            $responsePayment = $this->setPaymentRental($request, $responseEquipment->grossValue, $is_budget, $rental_id);
             if (isset($responsePayment->error)) {
                 throw new Exception($responsePayment->error);
             }
@@ -102,7 +102,7 @@ trait RentalTrait
         }
 
         // Resíduo
-        $arrResidue = $this->setResidueRental($request, false, $rental_id);
+        $arrResidue = $this->setResidueRental($request, $is_budget, $rental_id);
         if (isset($arrResidue['error'])) {
             throw new Exception($arrResidue['error']);
         }
@@ -112,7 +112,7 @@ trait RentalTrait
             'arrResidue'    => $arrResidue,
             'arrPayment'    => $arrPayment,
             'rental'        => array(
-                'code'                          => $rental_id ? null : $this->rental->getNextCode($company_id), // get last code
+                'code'                          => $rental_id ? null : ($is_budget ? $this->budget->getNextCode($company_id) : $this->rental->getNextCode($company_id)), // get last code
                 'company_id'                    => $company_id,
                 'type_rental'                   => $noCharged,
                 'client_id'                     => $clientId,

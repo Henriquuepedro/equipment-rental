@@ -61,6 +61,11 @@ class Budget extends Model
         return $this->create($data);
     }
 
+    public function updateByBudgetAndCompany(int $budget_id, int $company_id, array $data)
+    {
+        return $this->where(array('id' => $budget_id, 'company_id' => $company_id))->update($data);
+    }
+
     public function getNextCode(int $company_id)
     {
         $maxCode = $this->where('company_id', $company_id)->max('code');

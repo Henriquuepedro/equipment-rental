@@ -123,6 +123,8 @@ Route::group(['middleware' => 'auth'], function (){
         Route::get('/', [App\Http\Controllers\BudgetController::class, 'index'])->name('index');
         Route::get('/novo', [App\Http\Controllers\BudgetController::class, 'create'])->name('create');
         Route::post('/cadastro', [App\Http\Controllers\BudgetController::class, 'insert'])->name('insert');
+        Route::get('/atualizar/{id}', [App\Http\Controllers\BudgetController::class, 'edit'])->name('edit');
+        Route::post('/atualizar/{id}', [App\Http\Controllers\BudgetController::class, 'update'])->name('update');
 
     });
 
@@ -243,6 +245,9 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/buscar', [App\Http\Controllers\BudgetController::class, 'fetchBudgets'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\BudgetController::class, 'delete'])->name('delete');
             Route::post('/confirmar', [App\Http\Controllers\BudgetController::class, 'confirm'])->name('confirm');
+
+            Route::get('/equipamentos/{budget_id}', [App\Http\Controllers\BudgetEquipmentController::class, 'getEquipmentsBudget'])->name('get_equipments_budget');
+            Route::get('/pagamentos/{budget_id}', [App\Http\Controllers\BudgetPaymentController::class, 'getPaymentsBudget'])->name('get_payments_budget');
         });
         Route::group(['prefix' => '/nacionalidade', 'as' => 'nationality.'], function () {
             Route::get('', [App\Http\Controllers\NationalityController::class, 'getNationalities'])->name('get-nationalities');

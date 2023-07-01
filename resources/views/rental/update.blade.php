@@ -52,6 +52,7 @@
             let address_state = null;
             let address_city = null;
             let exist_payment = false;
+            const is_budget = $('#budget').val() == true;
             const rental_id = $('[name="rental_id"]').val();
 
             setTimeout(async () => {
@@ -68,7 +69,7 @@
                     $('[name="residues[]"]').val($('[name="residues"]').val().split(',')).select2('destroy').select2();
                 }
 
-                getEquipmentsRental(rental_id, async function(response){
+                getEquipmentsRental(rental_id, is_budget, async function(response){
                     $(response).each(async function (k, equipment) {
                         equipment_id             = equipment.equipment_id;
                         quantity                 = equipment.quantity;
@@ -96,7 +97,7 @@
 
                 await $('#add_parcel, .automatic_parcel_distribution_parent').slideDown(500);
 
-                await getPaymentsRental(rental_id, function(response){
+                await getPaymentsRental(rental_id, is_budget, function(response){
                     $(response).each(async function (k, payment) {
                         parcel       = parseInt(payment.parcel) - 1;
                         due_day      = payment.due_day;
@@ -122,7 +123,7 @@
                 });
             }, 500);
 
-                setTimeout(() => {getEquipmentsRental(rental_id, async function(response){
+                setTimeout(() => {getEquipmentsRental(rental_id, is_budget, async function(response){
                     $(response).each(async function (k, equipment) {
                         equipment_id             = equipment.equipment_id;
                         quantity                 = equipment.quantity;

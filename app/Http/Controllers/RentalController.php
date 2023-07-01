@@ -6,6 +6,7 @@ use App\Http\Requests\BudgetCreatePost;
 use App\Http\Requests\RentalCreatePost;
 use App\Http\Requests\RentalDeletePost;
 use App\Models\Address;
+use App\Models\Budget;
 use App\Models\Driver;
 use App\Models\Equipment;
 use App\Models\EquipmentWallet;
@@ -41,38 +42,28 @@ class RentalController extends Controller
     private EquipmentWallet $equipment_wallet;
     private Residue $residue;
     private Rental $rental;
+    private Budget $budget;
     private RentalEquipment $rental_equipment;
     private RentalPayment $rental_payment;
     private RentalResidue $rental_residue;
 
-    public function __construct(
-        Client $client,
-        Address $address,
-        Equipment $equipment,
-        Driver $driver,
-        Vehicle $vehicle,
-        EquipmentWallet $equipment_wallet,
-        Residue $residue,
-        Rental $rental,
-        RentalEquipment $rental_equipment,
-        RentalPayment $rental_payment,
-        RentalResidue $rental_residue
-    )
+    public function __construct()
     {
-        $this->rental = $rental;
-        $this->client = $client;
-        $this->address = $address;
-        $this->equipment = $equipment;
-        $this->driver = $driver;
-        $this->vehicle = $vehicle;
-        $this->equipment_wallet = $equipment_wallet;
-        $this->residue = $residue;
-        $this->rental_equipment = $rental_equipment;
-        $this->rental_payment = $rental_payment;
-        $this->rental_residue = $rental_residue;
+        $this->client = new Client();
+        $this->address = new Address();
+        $this->equipment = new Equipment();
+        $this->driver = new Driver();
+        $this->vehicle = new Vehicle();
+        $this->equipment_wallet = new EquipmentWallet();
+        $this->residue = new Residue();
+        $this->rental = new Rental();
+        $this->budget = new Budget();
+        $this->rental_equipment = new RentalEquipment();
+        $this->rental_payment = new RentalPayment();
+        $this->rental_residue = new RentalResidue();
     }
 
-    public function index()
+    public function index(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('RentalView')) {
             return redirect()->route('dashboard')
@@ -114,8 +105,11 @@ class RentalController extends Controller
         if ($search['value']) $searchUser = $search['value'];
 
         if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+            if ($request->input('order')[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('rentals.code','clients.name','rentals.created_at', '');
             $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
@@ -479,13 +473,13 @@ class RentalController extends Controller
         $extraValue = 0;
         $discountValue = 0;
         $calculateNetAmountAutomatic = (bool)$request->input('calculate_net_amount_automatic');
-        if ($calculateNetAmountAutomatic) { // valor liquido sera calculado automatico
+        if ($calculateNetAmountAutomatic) { // valor liquido sera calculado automático
             $extraValue = transformMoneyBr_En($request->input('extra_value'));
             $discountValue = transformMoneyBr_En($request->input('discount_value'));
             $netValue = $grossValue - $discountValue + $extraValue;
-        } else { // valor liquido será definido pelo usuario
+        } else { // valor líquido será definido pelo usuário
             $netValue = transformMoneyBr_En($request->input('net_value'));
-            // devo comparar o valor liquido com o bruto para definir desconto e acrescimo
+            // devo comparar o valor liquido com o bruto para definir desconto e acré scimo
             if ($netValue > $grossValue) {
                 $extraValue = $netValue - $grossValue;
             } elseif ($netValue < $grossValue) {
@@ -643,20 +637,17 @@ class RentalController extends Controller
 
     public function edit(int $id): Factory|View|RedirectResponse|Application
     {
-        $company_id = Auth::user()->__get('company_id');
-        $budget     = false;
-
         if (!hasPermission('RentalUpdatePost')) {
             return redirect()->route('rental.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        $rental             = $this->rental->getRental($company_id, $id);
-        $rental_equipment   = $this->rental_equipment->getEquipments($company_id, $id);
-        $rental_payment     = $this->rental_payment->getPayments($company_id, $id);
-        $rental_residue     = $this->rental_residue->getResidues($company_id, $id);
+        $company_id     = Auth::user()->__get('company_id');
+        $budget         = false;
+        $rental         = $this->rental->getRental($company_id, $id);
+        $rental_residue = $this->rental_residue->getResidues($company_id, $id);
 
-        return view('rental.update', compact('budget', 'rental', 'rental_equipment', 'rental_payment', 'rental_residue'));
+        return view('rental.update', compact('budget', 'rental', 'rental_residue'));
     }
     public function update(int $id, RentalCreatePost $request): JsonResponse
     {
