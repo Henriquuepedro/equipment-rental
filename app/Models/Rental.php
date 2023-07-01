@@ -77,7 +77,7 @@ class Rental extends Model
 
     public function getNextCode(int $company_id): int
     {
-        $max_code = $this->where(array('company_id' => $company_id, 'deleted' => false))->max('code');
+        $max_code = $this->where('company_id', $company_id)->max('code');
         if ($max_code) {
             return ++$max_code;
         }
@@ -102,7 +102,7 @@ class Rental extends Model
                         )
                         ->join('clients','clients.id','=','rentals.client_id')
                         ->join('rental_equipments','rental_equipments.rental_id','=','rentals.id')
-                        ->where(['rentals.company_id' => $company_id, 'rentals.deleted' => false])
+                        ->where('rentals.company_id', $company_id)
                         ->whereBetween('rentals.created_at', ["{$filters['dateStart']} 00:00:00", "{$filters['dateFinish']} 23:59:59"]);
         if ($search_rental)
             $rental->where(function($query) use ($search_rental) {
@@ -323,7 +323,7 @@ class Rental extends Model
         ->join('clients','clients.id','=','rentals.client_id')
         ->join('rental_equipments','rental_equipments.rental_id','=','rentals.id')
         ->join('equipments','equipments.id','=','rental_equipments.equipment_id')
-        ->where(['rentals.company_id' => $company_id, 'rentals.deleted' => false]);
+        ->where('rentals.company_id', $company_id);
 
         // Filtrar registros por data.
         switch ($filters['_date_filter']) {

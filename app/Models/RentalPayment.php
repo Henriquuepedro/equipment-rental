@@ -130,7 +130,7 @@ class RentalPayment extends Model
             'rental_payments.payday',
         )->join('rentals','rental_payments.rental_id','=','rentals.id')
         ->join('clients','clients.id','=','rentals.client_id')
-        ->where(['rentals.company_id' => $company_id, 'rentals.deleted' => false]);
+        ->where('rentals.company_id', $company_id);
 
         if ($search_client) {
             $rental->where(function ($query) use ($search_client) {
@@ -204,7 +204,7 @@ class RentalPayment extends Model
         ->join('rentals','rental_payments.rental_id','=','rentals.id')
         ->join('clients','clients.id','=','rentals.client_id')
         ->leftJoin('form_payments','form_payments.id','=','rental_payments.payment_id')
-        ->where(['rentals.company_id' => $company_id, 'rentals.deleted' => false]);
+        ->where('rentals.company_id', $company_id);
 
         // Filtrar registros por data.
         switch ($filters['_date_filter']) {
