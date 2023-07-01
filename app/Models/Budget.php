@@ -36,6 +36,7 @@ class Budget extends Model
         'discount_value',
         'net_value',
         'calculate_net_amount_automatic',
+        'automatic_parcel_distribution',
         'observation',
         'user_insert',
         'user_update'
@@ -84,19 +85,20 @@ class Budget extends Model
             'budgets.address_city',
             'budgets.address_state',
             'budgets.created_at'
-        )
-            ->join('clients','clients.id','=','budgets.client_id')
-            ->where(array(
-                'budgets.company_id' => $company_id,
-                'budgets.deleted'    => false
-            ));
-        if ($searchDriver)
-            $budget->where(function($query) use ($searchDriver) {
-                $query->where('budgets.code', 'like', "%{$searchDriver}%")
-                    ->orWhere('clients.name', 'like', "%{$searchDriver}%")
-                    ->orWhere('budgets.address_name', 'like', "%{$searchDriver}%")
-                    ->orWhere('budgets.created_at', 'like', "%{$searchDriver}%");
+        )->join('clients','clients.id','=','budgets.client_id')
+        ->where(array(
+            'budgets.company_id' => $company_id,
+            'budgets.deleted'    => false
+        ));
+
+        if ($searchDriver) {
+            $budget->where(function ($query) use ($searchDriver) {
+                $query->where('budgets.code', 'like', "%$searchDriver%")
+                    ->orWhere('clients.name', 'like', "%$searchDriver%")
+                    ->orWhere('budgets.address_name', 'like', "%$searchDriver%")
+                    ->orWhere('budgets.created_at', 'like', "%$searchDriver%");
             });
+        }
 
         if (count($orderBy) !== 0) $budget->orderBy($orderBy['field'], $orderBy['order']);
         else $budget->orderBy('budgets.code', 'asc');
@@ -113,13 +115,14 @@ class Budget extends Model
                 'budgets.company_id' => $company_id,
                 'budgets.deleted'    => false
             ));
-        if ($searchDriver)
-            $budget->where(function($query) use ($searchDriver) {
-                $query->where('budgets.code', 'like', "%{$searchDriver}%")
-                    ->orWhere('clients.name', 'like', "%{$searchDriver}%")
-                    ->orWhere('budgets.address_name', 'like', "%{$searchDriver}%")
-                    ->orWhere('budgets.created_at', 'like', "%{$searchDriver}%");
+        if ($searchDriver) {
+            $budget->where(function ($query) use ($searchDriver) {
+                $query->where('budgets.code', 'like', "%$searchDriver%")
+                    ->orWhere('clients.name', 'like', "%$searchDriver%")
+                    ->orWhere('budgets.address_name', 'like', "%$searchDriver%")
+                    ->orWhere('budgets.created_at', 'like', "%$searchDriver%");
             });
+        }
 
         return $budget->count();
     }

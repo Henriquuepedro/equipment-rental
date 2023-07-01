@@ -75,8 +75,8 @@ class UserController extends Controller
         }
 
         $dataUserUpdate = [
-            'name'  => filter_var($request->input('name'), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL),
-            'phone' => filter_var(onlyNumbers($request->input('phone')), FILTER_SANITIZE_STRING, FILTER_FLAG_EMPTY_STRING_NULL),
+            'name'  => filter_var($request->input('name'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL),
+            'phone' => filter_var(onlyNumbers($request->input('phone')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL),
             'style_template'  => $request->input('style_template')
         ];
 
@@ -152,7 +152,7 @@ class UserController extends Controller
     public function newUser(UserCreatePost $request)
     {
         $company_id = Auth::user()->__get('company_id');
-        $name       = filter_var($request->name_modal, FILTER_SANITIZE_STRING);
+        $name       = filter_var($request->name_modal);
         $phone      = $request->phone_modal ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_modal), FILTER_SANITIZE_NUMBER_INT) : null;
         $email      = filter_var($request->email_modal, FILTER_VALIDATE_EMAIL);
         $password   = Hash::make($request->password_modal);

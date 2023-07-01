@@ -149,7 +149,7 @@ class ResidueController extends Controller
 
         $obj->company_id    = $request->user()->company_id;
         $obj->user_id       = $request->user()->id;
-        $obj->name          = filter_var($request->name, FILTER_SANITIZE_STRING);
+        $obj->name          = filter_var($request->name);
         $obj->residue_id    = isset($request->residue_id) ? (int)$request->residue_id : null;
 
         return $obj;

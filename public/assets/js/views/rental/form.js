@@ -245,30 +245,44 @@
                         return false;
                     }
 
-                    // existe parcelamento
-                    if ($('#is_parceled').is(':checked')) {
-                        let daysTemp;
-                        let priceTemp = 0;
-                        let haveError = [false];
+                    let daysTemp;
+                    let priceTemp = 0;
+                    let haveError = [false];
 
-                        $('#parcels .parcel').each(function () {
-                            if (daysTemp === undefined) {
-                                daysTemp = parseInt($('[name="due_day[]"]', this).val());
-                            } else if (daysTemp >= parseInt($('[name="due_day[]"]', this).val())) {
-                                haveError = [true, 'A ordem dos vencimentos devem ser informados em ordem crescente.'];
-                            } else {
-                                daysTemp = parseInt($('[name="due_day[]"]', this).val());
-                            }
+                    $('#parcels .parcel').each(function () {
+                        if (daysTemp === undefined) {
+                            daysTemp = parseInt($('[name="due_day[]"]', this).val());
+                        } else if (daysTemp >= parseInt($('[name="due_day[]"]', this).val())) {
+                            haveError = [true, 'A ordem dos vencimentos devem ser informados em ordem crescente.'];
+                        } else {
+                            daysTemp = parseInt($('[name="due_day[]"]', this).val());
+                        }
 
-                            if (realToNumber($('[name="value_parcel[]"]', this).val()) <= 0) {
-                                haveError = [true, 'Não podem existir vencimentos com valor menor ou igual a zero.'];
-                            }
+                        if (realToNumber($('[name="value_parcel[]"]', this).val()) <= 0) {
+                            haveError = [true, 'Não podem existir vencimentos com valor menor ou igual a zero.'];
+                        }
 
-                            priceTemp += realToNumber($('[name="value_parcel[]"]', this).val());
+                        priceTemp += realToNumber($('[name="value_parcel[]"]', this).val());
+                    });
+
+                    if (haveError[0]) { // ecnontrou erro nas datas de vencimento
+
+                        if (currentIndex < getIndexStep(4)) {
+                            setErrorStepWrong(getIndexStep(4));
+                        }
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atenção',
+                            html: `<ol><li>${haveError[1]}</li></ol>`
                         });
+                        return false;
+                    }
 
-                        if (haveError[0]) { // ecnontrou erro nas datas de vencimento
-
+                    if (priceTemp.toFixed(2) !== netValue.toFixed(2)) { // os valores das parcelas não corresponde ao valor líquido
+                        if ($('#automatic_parcel_distribution').is(':checked')) {
+                            recalculeParcels();
+                        } else {
                             if (currentIndex < getIndexStep(4)) {
                                 setErrorStepWrong(getIndexStep(4));
                             }
@@ -276,26 +290,9 @@
                             Swal.fire({
                                 icon: 'warning',
                                 title: 'Atenção',
-                                html: `<ol><li>${haveError[1]}</li></ol>`
+                                html: '<ol><li>A soma das parcelas deve corresponder ao valor líquido.</li></ol>'
                             });
                             return false;
-                        }
-
-                        if (priceTemp.toFixed(2) !== netValue.toFixed(2)) { // os valores das parcelas não corresponde ao valor líquido
-                            if ($('#automatic_parcel_distribution').is(':checked')) {
-                                recalculeParcels();
-                            } else {
-                                if (currentIndex < getIndexStep(4)) {
-                                    setErrorStepWrong(getIndexStep(4));
-                                }
-
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Atenção',
-                                    html: '<ol><li>A soma das parcelas deve corresponder ao valor líquido.</li></ol>'
-                                });
-                                return false;
-                            }
                         }
                     }
                 }
@@ -644,6 +641,10 @@ $(function() {
             theme: 'snow' // or 'bubble'
         });
     }
+
+    if (!$('#parcels .parcel').length && !$('[name="rental_id"]').length) {
+        $('#add_parcel').trigger('click');
+    }
 });
 
 $("#formRental").validate({
@@ -937,24 +938,6 @@ $(document).on('click', '.btn-view-price-period-equipment', function (){
     return false;
 });
 
-$('#is_parceled').change(function (){
-    const check = $(this).is(':checked');
-
-    if (check) {
-        $('#add_parcel, #del_parcel, .automatic_parcel_distribution_parent').slideDown(500);
-        $('#parcels').show().append(
-            createParcel(0)
-        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
-
-        recalculeParcels();
-    }
-    else {
-        $('#add_parcel, #del_parcel, #parcels, .automatic_parcel_distribution_parent').slideUp(500);
-        $('#automatic_parcel_distribution').prop('checked', true);
-        setTimeout(() => { $('#parcels .form-group').remove() }, 550)
-    }
-})
-
 $('#parcels').on('keyup change', '[name="due_day[]"]', function(){
     let days = parseInt($(this).val());
     const el = $(this).closest('.form-group');
@@ -975,44 +958,51 @@ $('#parcels').on('blur', '[name="due_date[]"]', function(){
 $('#add_parcel').click(function(){
     const parcels = $('#parcels .parcel').length;
 
-    if (parcels == 12) {
+    if (parcels === 24) {
         Swal.fire({
             icon: 'warning',
             title: 'Atenção',
-            html: '<ol><li>É permitido adicionar até 12 vencimentos.</li></ol>'
+            html: '<ol><li>É permitido adicionar até 24 vencimentos.</li></ol>'
         });
         return false;
     }
 
     $('#parcels').show().append(
         createParcel(parcels)
-    ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
-
-    $('#del_parcel').attr('disabled', false);
+    ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true}).closest('.payment-item').find('.remove-payment').tooltip();
 
     recalculeParcels();
 });
 
-$('#del_parcel').click(function(){
-    const dues = $('#parcels .form-group').length - 1;
+$(document).on('click', '.remove-payment', function(){
+    const parcels = $('#parcels .parcel').length;
 
-    $(`#parcels .form-group:eq(${dues})`).remove();
+    if (parcels === 1) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atenção',
+            html: '<ol><li>Deve conter no mínimo uma linha de pagamento.</li></ol>'
+        });
+        return;
+    }
 
-    if (dues === 1)
-        $('#del_parcel').attr('disabled', true);
+    $('#parcels').find('.remove-payment').tooltip('dispose');
+
+    $(this).closest('.parcel').remove();
+
+    $('#parcels').find('.remove-payment').tooltip();
 
     recalculeParcels();
-
 });
 
 $('#automatic_parcel_distribution').change(function(){
     const check = $(this).is(':checked');
 
     if (check) {
-        $('#parcels .form-group [name="value_parcel[]"]').attr('disabled', true);
+        $('#parcels .parcel [name="value_parcel[]"]').attr('disabled', true);
         recalculeParcels();
     } else
-        $('#parcels .form-group [name="value_parcel[]"]').attr('disabled', false);
+        $('#parcels .parcel [name="value_parcel[]"]').attr('disabled', false);
 
 });
 
@@ -1072,6 +1062,14 @@ $("#createRental").on("hidden.bs.modal", function () {
     window.location.reload();
 });
 
+$('[name="type_rental"]').on('ifChanged', function() {
+    if (parseInt($(this).val()) === 0) {
+        if (!$('#parcels .parcel').length && $('[name="rental_id"]').length) {
+            $('#add_parcel').trigger('click');
+        }
+    }
+});
+
 const setErrorStepWrong = step => {
 
     setTimeout(() => {
@@ -1085,7 +1083,7 @@ const setErrorStepWrong = step => {
 
 const recalculeParcels = () => {
     if ($('#automatic_parcel_distribution').is(':checked')) {
-        const parcels = $('#parcels .form-group').length;
+        const parcels = $('#parcels .parcel').length;
         const netValue = realToNumber($('#net_value').val());
 
         let valueSumParcel = parseFloat(0.00);
@@ -1096,30 +1094,38 @@ const recalculeParcels = () => {
             if((count + 1) === parcels) valueParcel = netValue - valueSumParcel;
 
             valueSumParcel += parseFloat((netValue / parcels).toFixed(2));
-            $(`#parcels .form-group [name="value_parcel[]"]:eq(${count})`).val(numberToReal(valueParcel));
+            $(`#parcels .parcel [name="value_parcel[]"]:eq(${count})`).val(numberToReal(valueParcel));
         }
     }
 }
 
 const createParcel = (due, due_day = null, due_date = null, due_value = null) => {
 
-    due_day = due_day === null ? calculateDays(sumMonthsDateNow(0), sumMonthsDateNow(due)) : due_day;
-    due_date = due_date === null ? sumMonthsDateNow(due) : due_date;
+    let last_day = parseInt($('#parcels .parcel:last [name="due_day[]"]').val());
+
+    if (isNaN(last_day)) {
+        last_day = 0;
+    } else {
+        last_day += 30
+    }
+
+    due_day = due_day === null ? last_day : due_day;
+    due_date = due_date === null ? sumDaysDateNow(last_day) : due_date;
     due_value = due_value === null ? '0,00' : numberToReal(due_value);
 
     const disabledValue = $('#automatic_parcel_distribution').is(':checked') ? 'disabled' : '';
-    return `<div class="form-group mt-1 parcel display-none">
+    return `<div class="form-group mt-1 parcel">
             <div class="d-flex align-items-center justify-content-between payment-item">
                 <div class="input-group col-md-12 no-padding">
-                    <div class="input-group-prepend stock-Equipment-payment col-md-3 no-padding">
-                        <span class="input-group-text col-md-12 no-border-radius "><strong>${(due+1)}º Vencimento</strong></span>
-                    </div>
-                    <input type="text" class="form-control col-md-2 text-center" name="due_day[]" value="${due_day}">
+                    <input type="text" class="form-control col-md-3 text-center" name="due_day[]" value="${due_day}">
                     <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${due_date}">
                     <div class="input-group-prepend col-md-1 no-padding">
                         <span class="input-group-text pl-3 pr-3 col-md-12"><strong>R$</strong></span>
                     </div>
-                    <input type="text" class="form-control col-md-2 no-border-radius text-center" name="value_parcel[]" value="${due_value}" ${disabledValue}>
+                    <input type="text" class="form-control col-md-3 no-border-radius text-center" name="value_parcel[]" value="${due_value}" ${disabledValue}>
+                    <div class="input-group-prepend stock-Equipment-payment col-md-1 no-padding">
+                        <button type="button" class="btn btn-danger btn-flat w-100 remove-payment" title="Excluir Pagamento"><i class="fa fa-trash"></i></button>
+                    </div>
                 </div>
             </div>
         </div>`
@@ -1253,7 +1259,7 @@ const createEquipmentPayment = async (equipment, priceStock = null, unity_price 
                         <small class="text-muted"><strong>${dataEquipment.reference}</strong></small>
                     </div>
                 </div>
-                <div class="input-group col-md-6 no-padding payment-hidden-invert-stock">
+                <div class="input-group col-md-6 no-padding payment-invert-stock">
                     <div class="input-group-prepend stock-equipment-payment">
                         <span class="input-group-text pl-3 pr-3"><strong>${stockEquipment}un</strong></span>
                     </div>

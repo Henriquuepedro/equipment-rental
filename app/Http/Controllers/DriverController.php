@@ -206,14 +206,14 @@ class DriverController extends Controller
 
         $obj->company_id    = $request->user()->company_id;
         $obj->user_id       = $request->user()->id;
-        $obj->name          = filter_var($request->name, FILTER_SANITIZE_STRING);
+        $obj->name          = filter_var($request->name);
         $obj->email         = $request->email ? (filter_var($request->email, FILTER_VALIDATE_EMAIL) ? $request->email : null) : null;
         $obj->phone         = $request->phone ? filter_var(preg_replace('/[^0-9]/', '', $request->phone), FILTER_SANITIZE_NUMBER_INT) : null;
         $obj->cpf           = $request->cpf ? filter_var(preg_replace('/[^0-9]/', '', $request->cpf), FILTER_SANITIZE_NUMBER_INT) : null;
         $obj->rg            = $request->rg ? filter_var(preg_replace('/[^0-9]/', '', $request->rg), FILTER_SANITIZE_NUMBER_INT) : null;
         $obj->cnh           = $request->cnh ? filter_var(preg_replace('/[^0-9]/', '', $request->cnh), FILTER_SANITIZE_NUMBER_INT) : null;
         $obj->cnh_exp       = $request->cnh_exp;
-        $obj->observation   = $request->observation ? filter_var($request->observation, FILTER_SANITIZE_STRING) : null;
+        $obj->observation   = $request->observation ? filter_var($request->observation, FILTER_DEFAULT) : null;
         $obj->driver_id     = isset($request->driver_id) ? (int)$request->driver_id : null;
 
         return $obj;

@@ -23,7 +23,6 @@ class BillToPay extends Model
         'discount_value',
         'net_value',
         'calculate_net_amount_automatic',
-        'use_parceled',
         'automatic_parcel_distribution',
         'form_payment',
         'observation',

@@ -106,21 +106,21 @@ class CompanyController extends Controller
         $user_id    = $request->user()->id;
         $company_id = $request->user()->company_id;
 
-        $name       = filter_var($request->name, FILTER_SANITIZE_STRING);
-        $fantasy    = $request->fantasy ? filter_var($request->fantasy, FILTER_SANITIZE_STRING) : null;
+        $name       = filter_var($request->name);
+        $fantasy    = $request->fantasy ? filter_var($request->fantasy, FILTER_DEFAULT) : null;
         $email      = $request->email   ? filter_var($request->email, FILTER_VALIDATE_EMAIL) : null;
         $phone_1    = $request->phone_1 ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_1), FILTER_SANITIZE_NUMBER_INT) : null;
         $phone_2    = $request->phone_2 ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_2), FILTER_SANITIZE_NUMBER_INT) : null;
-        $contact    = $request->contact ? filter_var($request->contact, FILTER_SANITIZE_STRING) : null;
+        $contact    = $request->contact ? filter_var($request->contact, FILTER_DEFAULT) : null;
 
         $cep            = $request->cep ? filter_var(preg_replace('/[^0-9]/', '', $request->cep), FILTER_SANITIZE_NUMBER_INT) : null;
-        $address        = $request->address ? filter_var($request->address, FILTER_SANITIZE_STRING) : null;
-        $number         = $request->number ? filter_var($request->number, FILTER_SANITIZE_STRING) : null;
-        $complement     = $request->complement ? filter_var($request->complement, FILTER_SANITIZE_STRING) : null;
-        $reference      = $request->reference ? filter_var($request->reference, FILTER_SANITIZE_STRING) : null;
-        $neigh          = $request->neigh ? filter_var($request->neigh, FILTER_SANITIZE_STRING) : null;
-        $city           = $request->city ? filter_var($request->city, FILTER_SANITIZE_STRING) : null;
-        $state          = $request->state ? filter_var($request->state, FILTER_SANITIZE_STRING) : null;
+        $address        = $request->address ? filter_var($request->address, FILTER_DEFAULT) : null;
+        $number         = $request->number ? filter_var($request->number, FILTER_DEFAULT) : null;
+        $complement     = $request->complement ? filter_var($request->complement, FILTER_DEFAULT) : null;
+        $reference      = $request->reference ? filter_var($request->reference, FILTER_DEFAULT) : null;
+        $neigh          = $request->neigh ? filter_var($request->neigh, FILTER_DEFAULT) : null;
+        $city           = $request->city ? filter_var($request->city, FILTER_DEFAULT) : null;
+        $state          = $request->state ? filter_var($request->state, FILTER_DEFAULT) : null;
 
         if ($request->profile_logo) {
             $uploadLogo = $this->uploadLogoCompany($company_id, $request->file('profile_logo'));
