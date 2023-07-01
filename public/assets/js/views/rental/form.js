@@ -1623,13 +1623,15 @@ const setEquipmentRental = (
     });
 }
 
-const getEquipmentsRental = (rental_id, callback) => {
+const getEquipmentsRental = (rental_id, is_budget, callback) => {
+    const path_request = is_budget ? 'orcamento' : 'locacao';
+
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'GET',
-        url: `${$('[name="base_url"]').val()}/ajax/locacao/equipamentos/${rental_id}`,
+        url: `${$('[name="base_url"]').val()}/ajax/${path_request}/equipamentos/${rental_id}`,
         async: true,
         success: response => {
             callback(response);
@@ -1637,13 +1639,15 @@ const getEquipmentsRental = (rental_id, callback) => {
     });
 }
 
-const getPaymentsRental = (rental_id, callback) => {
+const getPaymentsRental = (rental_id, is_budget, callback) => {
+    const path_request = is_budget ? 'orcamento' : 'locacao';
+
     $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'GET',
-        url: `${$('[name="base_url"]').val()}/ajax/locacao/pagamentos/${rental_id}`,
+        url: `${$('[name="base_url"]').val()}/ajax/${path_request}/pagamentos/${rental_id}`,
         async: true,
         success: response => {
             callback(response);

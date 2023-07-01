@@ -70,7 +70,7 @@ class BudgetEquipment extends Model
 
     public function remove($budget_id, $company_id)
     {
-        return $this->where(['budget_id' => $budget_id, 'company_id' => $company_id])->update(array('deleted' => true));
+        return $this->where(['budget_id' => $budget_id, 'company_id' => $company_id])->delete();
     }
 
     public function getEquipments($company_id, $budget_id)

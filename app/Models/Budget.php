@@ -61,6 +61,11 @@ class Budget extends Model
         return $this->create($data);
     }
 
+    public function updateByBudgetAndCompany(int $budget_id, int $company_id, array $data)
+    {
+        return $this->where(array('id' => $budget_id, 'company_id' => $company_id))->update($data);
+    }
+
     public function getNextCode(int $company_id)
     {
         $maxCode = $this->where('company_id', $company_id)->max('code');
@@ -86,10 +91,7 @@ class Budget extends Model
             'budgets.address_state',
             'budgets.created_at'
         )->join('clients','clients.id','=','budgets.client_id')
-        ->where(array(
-            'budgets.company_id' => $company_id,
-            'budgets.deleted'    => false
-        ));
+        ->where('budgets.company_id', $company_id);
 
         if ($searchDriver) {
             $budget->where(function ($query) use ($searchDriver) {
@@ -111,10 +113,7 @@ class Budget extends Model
     public function getCountBudgets($company_id, $searchDriver = null)
     {
         $budget = $this ->join('clients','clients.id','=','budgets.client_id')
-            ->where(array(
-                'budgets.company_id' => $company_id,
-                'budgets.deleted'    => false
-            ));
+            ->where('budgets.company_id', $company_id);
         if ($searchDriver) {
             $budget->where(function ($query) use ($searchDriver) {
                 $query->where('budgets.code', 'like', "%$searchDriver%")
@@ -129,11 +128,11 @@ class Budget extends Model
 
     public function getBudget($budget_id, $company_id)
     {
-        return $this->where(['id' => $budget_id, 'company_id' => $company_id, 'deleted' => false])->first();
+        return $this->where(['id' => $budget_id, 'company_id' => $company_id])->first();
     }
 
     public function remove($budget_id, $company_id)
     {
-        return $this->where(['id' => $budget_id, 'company_id' => $company_id])->update(array('deleted' => true));
+        return $this->where(['id' => $budget_id, 'company_id' => $company_id])->delete();
     }
 }

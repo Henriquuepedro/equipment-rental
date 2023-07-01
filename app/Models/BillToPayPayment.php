@@ -64,7 +64,7 @@ class BillToPayPayment extends Model
         ->join('bill_to_pays','bill_to_pay_payments.bill_to_pay_id','=','bill_to_pays.id')
         ->join('providers','providers.id','=','bill_to_pays.provider_id')
         ->leftJoin('form_payments','form_payments.id','=','bill_to_pay_payments.payment_id')
-        ->where(['bill_to_pays.company_id' => $company_id, 'bill_to_pays.deleted' => false]);
+        ->where('bill_to_pays.company_id', $company_id);
 
         // Filtrar registros por data.
         switch ($filters['_date_filter']) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BudgetCreatePost;
 use App\Http\Requests\BudgetDeletePost;
+use App\Http\Requests\RentalCreatePost;
 use App\Models\Budget;
 use App\Models\BudgetEquipment;
 use App\Models\BudgetPayment;
@@ -13,50 +14,45 @@ use App\Models\RentalEquipment;
 use App\Models\RentalPayment;
 use App\Models\RentalResidue;
 use App\Models\Client;
-use App\Models\Address;
+use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class BudgetController extends Controller
 {
-    private $budget;
-    private $rentalController;
-    private $client;
-    private $address;
-    private $budget_equipment;
-    private $budget_residue;
-    private $budget_payment;
+    private Budget $budget;
+    private RentalController $rentalController;
+    private Client $client;
+    private BudgetEquipment $budget_equipment;
+    private BudgetResidue $budget_residue;
+    private BudgetPayment $budget_payment;
+    private Rental $rental;
+    private RentalEquipment $rental_equipment;
+    private RentalResidue $rental_residue;
+    private RentalPayment $rental_payment;
 
-    public function __construct(
-        RentalController $rentalController,
-        Client $client,
-        Address $address,
-        Budget $budget,
-        BudgetEquipment $budget_equipment,
-        BudgetResidue $budget_residue,
-        BudgetPayment $budget_payment,
-        Rental $rental,
-        RentalEquipment $rental_equipment,
-        RentalResidue $rental_residue,
-        RentalPayment $rental_payment
-    )
+    public function __construct()
     {
-        $this->rentalController = $rentalController;
-        $this->client = $client;
-        $this->address = $address;
-        $this->budget = $budget;
-        $this->budget_equipment = $budget_equipment;
-        $this->budget_residue = $budget_residue;
-        $this->budget_payment = $budget_payment;
-        $this->rental = $rental;
-        $this->rental_equipment = $rental_equipment;
-        $this->rental_residue = $rental_residue;
-        $this->rental_payment = $rental_payment;
+        $this->rentalController = new RentalController();
+        $this->client = new Client();
+        $this->budget = new Budget();
+        $this->budget_equipment = new BudgetEquipment();
+        $this->budget_residue = new BudgetResidue();
+        $this->budget_payment = new BudgetPayment();
+        $this->rental = new Rental();
+        $this->rental_equipment = new RentalEquipment();
+        $this->rental_residue = new RentalResidue();
+        $this->rental_payment = new RentalPayment();
     }
 
-    public function index()
+    public function index(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('BudgetView')) {
             return redirect()->route('dashboard')
@@ -68,8 +64,9 @@ class BudgetController extends Controller
 
     public function fetchBudgets(Request $request): JsonResponse
     {
-        if (!hasPermission('BudgetView'))
-            return response()->json([]);
+        if (!hasPermission('BudgetView')) {
+            return response()->json();
+        }
 
         $orderBy    = array();
         $result     = array();
@@ -102,6 +99,7 @@ class BudgetController extends Controller
 
         foreach ($data as $key => $value) {
             $buttons = "<button class='dropdown-item btnApproveBudget' budget-id='{$value['id']}'><i class='fas fa-check'></i> Aprovar Orçamento</button>";
+            $buttons .= $permissionUpdate ? "<a href='".route('budget.update', ['id' => $value['id']])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Orçamento</a>" : '';
             $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveBudget' budget-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Orçamento</button>" : '';
             $buttons .= "<a href='".route('print.budget', ['budget' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Orçamento</a>";
 
@@ -130,7 +128,7 @@ class BudgetController extends Controller
         return response()->json($output);
     }
 
-    public function create()
+    public function create(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('BudgetCreatePost')) {
             return redirect()->route('budget.index')
@@ -148,116 +146,17 @@ class BudgetController extends Controller
             return response()->json(['success' => false, 'message' => "Você não tem permissão para criar orçamentos."]);
         }
 
-        $company_id  = $request->user()->company_id;
-        $haveCharged = !$request->input('type_rental'); // true = com cobrança
-
-        $clientId   = (int)$request->input('client');
-        $zipcode    = onlyNumbers($request->input('cep'));
-        $address    = filter_var($request->input('address'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $number     = filter_var($request->input('number'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $complement = filter_var($request->input('complement'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $reference  = filter_var($request->input('reference'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $neigh      = filter_var($request->input('neigh'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $city       = filter_var($request->input('city'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $state      = filter_var($request->input('state'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $lat        = filter_var($request->input('lat'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $lng        = filter_var($request->input('lng'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-
-        if (empty($clientId) || !$this->client->getClient($clientId, $company_id)) {
-            return response()->json(['success' => false, 'message' => "Cliente não foi encontrado. Revise a aba de Cliente e Endereço."]);
+        try {
+            $data_validation = $this->rentalController->makeValidationRental($request, false, true);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
 
-        if ($address == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um endereço. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($number == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um número para o endereço. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($neigh == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um bairro. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($city == '') {
-            return response()->json(['success' => false, 'message' => 'Informe uma cidade. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($state == '') {
-            return response()->json(['success' => false, 'message' => 'Informe um estado. Revise a aba de Cliente e Endereço.']);
-        }
-        if ($lat == '' || $lng == '') {
-            return response()->json(['success' => false, 'message' => 'Confirme o endereço no mapa. Revise a aba de Cliente e Endereço.']);
-        }
-
-        // datas da locação
-        $dateDelivery = $request->input('date_delivery') ? \DateTime::createFromFormat('d/m/Y H:i', $request->input('date_delivery')) : null;
-        $dateWithdrawal = $request->input('date_withdrawal') ? \DateTime::createFromFormat('d/m/Y H:i', $request->input('date_withdrawal')) : null;
-        $notUseDateWithdrawal = (bool)$request->input('not_use_date_withdrawal');
-
-        if (!$dateDelivery) { // não reconheceu a data de entrega
-            return response()->json(['success' => false, 'message' => "Data prevista de entrega precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
-        }
-
-        if (!$notUseDateWithdrawal) { // usará data de retirada
-
-            if (!$dateWithdrawal) { // não reconheceu a data de retirada
-                return response()->json(['success' => false, 'message' => "Data prevista de retirada precisa ser informada corretamente dd/mm/yyyy hh:mm."]);
-            }
-
-            if ($dateDelivery->getTimestamp() >= $dateWithdrawal->getTimestamp()) { // data de entrega é maior ou igual a data de retirada
-                return response()->json(['success' => false, 'message' => "Data prevista de entrega não pode ser maior ou igual que a data prevista de retirada."]);
-            }
-        }
-
-        // Equipamentos
-        $responseEquipment = $this->rentalController->setEquipmentRental($request, true);
-        if (isset($responseEquipment->error)) {
-            return response()->json(['success' => false, 'message' => $responseEquipment->error]);
-        }
-        $arrEquipment = $responseEquipment->arrEquipment;
-
-        // Pagamento
-        $arrPayment = array();
-        if ($haveCharged) {
-            $responsePayment = $this->rentalController->setPaymentRental($request, $responseEquipment->grossValue, true);
-            if (isset($responsePayment->error)) {
-                return response()->json(['success' => false, 'message' => $responsePayment->error]);
-            }
-
-            $arrPayment = $responsePayment->arrPayment;
-        }
-
-        // Resíduo
-        $arrResidue = $this->rentalController->setResidueRental($request, true);
-        if (isset($arrResidue['error'])) {
-            return response()->json(['success' => false, 'message' => $arrResidue['error']]);
-        }
-
-        // Orçamento
-        $arrBudget = array(
-            'code'                          => $this->budget->getNextCode($company_id), // get last code
-            'company_id'                    => $company_id,
-            'type_rental'                   => $haveCharged,
-            'client_id'                     => $clientId,
-            'address_zipcode'               => $zipcode,
-            'address_name'                  => $address,
-            'address_number'                => $number,
-            'address_complement'            => $complement,
-            'address_reference'             => $reference,
-            'address_neigh'                 => $neigh,
-            'address_city'                  => $city,
-            'address_state'                 => $state,
-            'address_lat'                   => $lat,
-            'address_lng'                   => $lng,
-            'expected_delivery_date'        => $dateDelivery->format(DATETIME_INTERNATIONAL),
-            'expected_withdrawal_date'      => $dateWithdrawal ? $dateWithdrawal->format(DATETIME_INTERNATIONAL) : null,
-            'not_use_date_withdrawal'       => $notUseDateWithdrawal,
-            'gross_value'                   => $haveCharged ? $responseEquipment->grossValue : null,
-            'extra_value'                   => $haveCharged ? $responsePayment->extraValue : null,
-            'discount_value'                => $haveCharged ? $responsePayment->discountValue : null,
-            'net_value'                     => $haveCharged ? $responsePayment->netValue : null,
-            'calculate_net_amount_automatic'=> (bool)$request->input('calculate_net_amount_automatic'),
-            'automatic_parcel_distribution' => (bool)$request->input('automatic_parcel_distribution'),
-            'observation'                   => strip_tags($request->input('observation'), $this->allowableTags),
-            'user_insert'                   => $request->user()->id
-        );
+        // Orçamento.
+        $arrBudget      = $data_validation['rental'];
+        $arrEquipment   = $data_validation['arrEquipment'];
+        $arrResidue     = $data_validation['arrResidue'];
+        $arrPayment     = $data_validation['arrPayment'];
 
         DB::beginTransaction();// Iniciando transação manual para evitar atualizações não desejáveis.
 
@@ -363,5 +262,78 @@ class BudgetController extends Controller
         }
 
         return $budget;
+    }
+
+    public function edit(int $id): Factory|View|RedirectResponse|Application
+    {
+        if (!hasPermission('BudgetUpdatePost')) {
+            return redirect()->route('budget.index')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
+        $company_id     = Auth::user()->__get('company_id');
+        $budget         = true;
+        $rental         = $this->budget->getBudget($id, $company_id);
+        $rental_residue = $this->budget_residue->getResidues($company_id, $id);
+
+        return view('rental.update', compact('budget', 'rental', 'rental_residue'));
+    }
+
+    public function update(int $id, BudgetCreatePost $request): JsonResponse
+    {
+        if (!hasPermission('BudgetUpdatePost')) {
+            return response()->json(['success' => false, 'message' => "Você não tem permissão para atualizar orçamentos."]);
+        }
+
+        $company_id = $request->user()->company_id;
+        // Define os dados para ser usado na Trait.
+        $this->rentalController->setDataRental($this->budget->getBudget($id, $company_id));
+        $this->rentalController->setDataRentalEquipment($this->budget_equipment->getEquipments($company_id, $id));
+        $this->rentalController->setDataRentalPayment($this->budget_payment->getPayments($company_id, $id));
+
+        if (!$this->rentalController->getDataRental()) {
+            return response()->json(['success' => false, 'message' => "Orçamento não encontrado."]);
+        }
+
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis.
+
+        try {
+            // Faz as validações iniciais padrões para poder seguir com a atualização.
+            $data_validation = $this->rentalController->makeValidationRental($request, $id, true);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+
+        // Orçamento.
+        $arrBudget      = $data_validation['rental'];
+        $arrEquipment   = $data_validation['arrEquipment'];
+        $arrResidue     = $data_validation['arrResidue'];
+        $arrPayment     = $data_validation['arrPayment'];
+
+        // remove o campo 'code' da atualização.
+        unset($arrBudget['code']);
+
+        $updateBudget = $this->budget->updateByBudgetAndCompany($id, $company_id, $arrBudget);
+
+        // Remove os equipamentos e cria novamente.
+        $this->budget_equipment->remove($id, $company_id);
+        $this->budget_equipment->inserts($arrEquipment);
+
+        // Remove os pagamento e cria novamente.
+        $this->budget_payment->remove($id, $company_id);
+        $this->budget_payment->inserts($arrPayment);
+
+        // Remove os resíduos para serem criados novamente.
+        $this->budget_residue->remove($id, $company_id);
+        $this->budget_residue->inserts($arrResidue);
+
+        if ($updateBudget) {
+            DB::commit();
+            return response()->json(['success' => true, 'urlPrint' => route('print.budget', ['budget' => $this->rentalController->getDataRental()->id]), 'code' => $this->rentalController->getDataRental()->code]);
+        }
+
+        DB::rollBack();
+
+        return response()->json(['success' => false, 'message' => 'Não foi possível gravar o orçamento, recarregue a página e tente novamente.']);
     }
 }

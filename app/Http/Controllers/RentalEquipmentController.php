@@ -12,17 +12,21 @@ use Illuminate\Support\Facades\DB;
 
 class RentalEquipmentController extends Controller
 {
-    private $rental_equipment;
-    private $rental;
+    private RentalEquipment$rental_equipment;
+    private Rental $rental;
 
-    public function __construct(RentalEquipment $rental_equipment)
+    public function __construct()
     {
-        $this->rental_equipment = $rental_equipment;
+        $this->rental_equipment = new RentalEquipment();
         $this->rental = new Rental();
     }
 
-    public function getEquipmentsRental(int $rental_id)
+    public function getEquipmentsRental(int $rental_id): JsonResponse
     {
+        if (!hasPermission('RentalUpdatePost')) {
+            return response()->json();
+        }
+
         $company_id = Auth::user()->__get('company_id');
 
         $equipments = $this->rental_equipment->getEquipments($company_id, $rental_id);
@@ -30,7 +34,7 @@ class RentalEquipmentController extends Controller
         return response()->json($equipments);
     }
 
-    public function getEquipmentsRentalToDeliver(Request $request)
+    public function getEquipmentsRentalToDeliver(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
         $rental_id  = $request->input('rental_id');
@@ -44,7 +48,7 @@ class RentalEquipmentController extends Controller
         return response()->json(['success' => true, 'data' => $equipments]);
     }
 
-    public function getEquipmentsRentalToWithdraw(Request $request)
+    public function getEquipmentsRentalToWithdraw(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
         $rental_id  = $request->input('rental_id');
@@ -115,7 +119,6 @@ class RentalEquipmentController extends Controller
         DB::beginTransaction();
 
         foreach ($datas_update as $data_update) {
-
             $rental_equipment_id = $data_update['rental_equipment_id'];
             unset($data_update['rental_equipment_id']);
 
