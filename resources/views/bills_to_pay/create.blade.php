@@ -231,13 +231,15 @@
 
         if (isNaN(last_day)) {
             last_day = 0;
+        } else {
+            last_day += 30
         }
 
         return `<div class="form-group mt-1 parcel">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="input-group col-md-12 no-padding">
-                    <input type="text" class="form-control col-md-3 text-center" name="due_day[]" value="${(last_day + 30)}">
-                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${sumDaysDateNow(last_day + 30)}">
+                    <input type="text" class="form-control col-md-3 text-center" name="due_day[]" value="${last_day}">
+                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${sumDaysDateNow(last_day)}">
                     <div class="input-group-prepend col-md-1 no-padding">
                         <span class="input-group-text pl-3 pr-3 col-md-12"><strong>R$</strong></span>
                     </div>

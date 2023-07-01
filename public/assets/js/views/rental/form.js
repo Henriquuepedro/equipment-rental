@@ -1062,6 +1062,14 @@ $("#createRental").on("hidden.bs.modal", function () {
     window.location.reload();
 });
 
+$('[name="type_rental"]').on('ifChanged', function() {
+    if (parseInt($(this).val()) === 0) {
+        if (!$('#parcels .parcel').length && $('[name="rental_id"]').length) {
+            $('#add_parcel').trigger('click');
+        }
+    }
+});
+
 const setErrorStepWrong = step => {
 
     setTimeout(() => {
@@ -1097,10 +1105,12 @@ const createParcel = (due, due_day = null, due_date = null, due_value = null) =>
 
     if (isNaN(last_day)) {
         last_day = 0;
+    } else {
+        last_day += 30
     }
 
-    due_day = due_day === null ? (last_day + 30) : due_day;
-    due_date = due_date === null ? sumDaysDateNow(last_day + 30) : due_date;
+    due_day = due_day === null ? last_day : due_day;
+    due_date = due_date === null ? sumDaysDateNow(last_day) : due_date;
     due_value = due_value === null ? '0,00' : numberToReal(due_value);
 
     const disabledValue = $('#automatic_parcel_distribution').is(':checked') ? 'disabled' : '';
@@ -1253,11 +1263,11 @@ const createEquipmentPayment = async (equipment, priceStock = null, unity_price 
                     <div class="input-group-prepend stock-equipment-payment">
                         <span class="input-group-text pl-3 pr-3"><strong>${stockEquipment}un</strong></span>
                     </div>
-                    <input type="text" class="form-control price-un-equipment" id="price-un-equipment-${equipment}" value="${priceEquipmentFormat}" disabled>
-                    <div class="input-group-prepend">
+                    <input type="text" class="form-control price-un-equipment payment-hidden" id="price-un-equipment-${equipment}" value="${priceEquipmentFormat}" disabled>
+                    <div class="input-group-prepend payment-hidden">
                         <span class="input-group-text pl-3 pr-3"><strong>R$</strong></span>
                     </div>
-                    <input type="text" class="form-control price-total-equipment" name="priceTotalEquipment_${equipment}" id="price-total-equipment-${equipment}" value="${priceEquipmentTotal}">
+                    <input type="text" class="form-control price-total-equipment payment-hidden" name="priceTotalEquipment_${equipment}" id="price-total-equipment-${equipment}" value="${priceEquipmentTotal}">
                 </div>
             </div>
         </li>
