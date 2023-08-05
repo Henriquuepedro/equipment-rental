@@ -37,6 +37,8 @@ class RentalEquipment extends Model
         'expected_delivery_date',
         'expected_withdrawal_date',
         'not_use_date_withdrawal',
+        'exchange_rental_equipment_id',
+        'exchanged',
         'user_insert',
         'user_update'
     ];
@@ -68,17 +70,17 @@ class RentalEquipment extends Model
         return true;
     }
 
-    public function remove($rental_id, $company_id)
+    public function remove(int $company_id, int $rental_id)
     {
         return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->delete();
     }
 
-    public function getEquipments($company_id, $rental_id)
+    public function getEquipments(int $company_id, int $rental_id)
     {
         return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->get();
     }
 
-    public function getEquipmentsForDeliver($company_id, $rental_id)
+    public function getEquipmentsForDeliver(int $company_id, int $rental_id)
     {
         return $this->where([
             'rental_id' => $rental_id,
@@ -88,7 +90,7 @@ class RentalEquipment extends Model
         ])->get();
     }
 
-    public function getEquipmentsForWithdraw($company_id, $rental_id)
+    public function getEquipmentsForWithdraw(int $company_id, int $rental_id)
     {
         return $this->where([
             ['rental_id', '=', $rental_id],
@@ -161,5 +163,16 @@ class RentalEquipment extends Model
         });
 
         return $equipments->get();
+    }
+
+    public function getEquipmentToExchange(int $company_id, int $rental_id)
+    {
+        return $this->where([
+            'rental_id' => $rental_id,
+            'company_id' => $company_id,
+            ['actual_delivery_date', '!=', null],
+            'actual_withdrawal_date' => null,
+            'exchanged' => false
+        ])->get();
     }
 }

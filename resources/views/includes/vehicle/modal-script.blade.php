@@ -59,7 +59,7 @@
                     $('#newVehicleModal').modal('hide');
                     cleanFormVehicleModal();
                     checkLabelAnimate();
-                    @if(\Request::route()->getName() == 'rental.create')
+                    @if(\Request::route()->getName() == 'rental.create' || \Request::route()->getName() == 'rental.exchange' || \Request::route()->getName() == 'rental.update')
                         loadVehicles(response.vehicle_id, "div[id^='collapseEquipment-'].collapse.show [name^='vehicle_']");
 
                         $('#equipments-selected [id^=collapseEquipment-]').each(function(){

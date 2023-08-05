@@ -9,6 +9,7 @@ use App\Models\Rental;
 use DateTime;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 
 trait RentalTrait
 {
@@ -263,14 +264,49 @@ trait RentalTrait
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
+    public function makeValidationRentalToExchange(Request $request, int $rental_id): array
+    {
+        $noCharged  = $request->input('type_rental'); // 0 = Com cobrança, 1 = Sem cobrança
+
+        // Equipamentos
+        $responseEquipment = $this->setEquipmentRental($request, false, $rental_id, true);
+        if (isset($responseEquipment->error)) {
+            throw new Exception($responseEquipment->error);
+        }
+        $arrEquipment = $responseEquipment->arrEquipment;
+
+        // Pagamento
+        $arrPayment = array();
+        if (!$noCharged) {
+            $responsePayment = $this->setPaymentRental($request, $responseEquipment->grossValue, false, $rental_id);
+            if (isset($responsePayment->error)) {
+                throw new Exception($responsePayment->error);
+            }
+
+            $arrPayment = $responsePayment->arrPayment;
+        }
+
+        return array(
+            'arrEquipment'  => $arrEquipment,
+            'arrPayment'    => $arrPayment
+        );
+    }
+
     public function setDataRental(Rental | Budget $dataRental = null): void
     {
         $this->dataRental = $dataRental;
     }
 
-    public function getDataRental(): Budget|Rental|null
+    public function getDataRental(string $field = null)
     {
-        return $this->dataRental;
+        if (is_null($field)) {
+            return $this->dataRental;
+        }
+
+        return $this->dataRental->$field;
     }
 
     public function setDataRentalEquipment(Collection $dataRentalEquipment = null): void

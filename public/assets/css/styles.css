@@ -901,3 +901,10 @@ a[disabled] {
 #payment .list-equipments-payment li[id-equipment] small.text-muted {
     font-size: 0.7em;
 }
+.swal-wide{
+    width: 850px !important;
+}
+.swal-wide .swal2-content{
+    width: 100% !important;
+    text-align: left;
+}

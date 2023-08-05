@@ -187,6 +187,7 @@
         });
     </script>
     <script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
+    <script src="{{ asset('assets/js/views/rental/create.js') }}" type="application/javascript"></script>
 @stop
 
 @section('content')
@@ -195,7 +196,7 @@
             <div class="row flex-grow">
                 <div class="col-md-12">
                 @if ($errors->any())
-                    <div class="alert-animate alert-warning">
+                    <div class="alert alert-animate alert-warning">
                         <ol>
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>

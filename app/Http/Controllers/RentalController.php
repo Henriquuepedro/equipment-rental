@@ -139,6 +139,10 @@ class RentalController extends Controller
                 }
                 $buttons .="<button class='dropdown-item $btn_class' data-rental-id='{$value['id']}'><i class='fas fa-check'></i> Confirmar $btn_text</button>";
                 $buttons .="<a href='".route('rental.update', ['id' => $value['id']])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Locação</a>";
+
+                if ($typeRental === 'withdraw' && count($this->rental_equipment->getEquipmentToExchange($company_id, $value['id']))) {
+                    $buttons .="<a href='".route('rental.exchange', ['id' => $value['id']])."' class='dropdown-item'><i class='fa fa fa-arrow-right-arrow-left'></i> Trocar Equipamento</a>";
+                }
             }
 
             $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
@@ -266,8 +270,8 @@ class RentalController extends Controller
 
         $delPayment     = $this->rental_payment->remove($rental_id, $company_id);
         $delResidue     = $this->rental_residue->remove($rental_id, $company_id);
-        $delEquipment   = $this->rental_equipment->remove($rental_id, $company_id);
-        $delRental      = $this->rental->remove($rental_id, $company_id);
+        $delEquipment   = $this->rental_equipment->remove($company_id, $rental_id);
+        $delRental      = $this->rental->remove($company_id, $rental_id);
 
         if ($delEquipment && $delRental) {
             DB::commit();
@@ -333,12 +337,11 @@ class RentalController extends Controller
         return response()->json(['success' => false, 'message' => 'Não foi possível gravar a locação, recarregue a página e tente novamente.']);
     }
 
-    public function setEquipmentRental($request, bool $budget = false, ?int $rental_id = null): string|StdClass
+    public function setEquipmentRental($request, bool $budget = false, ?int $rental_id = null, bool $exchange_equipment_id = false): string|StdClass
     {
         $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         $response = new StdClass();
         $response->arrEquipment = array();
-        $response->grossValue = 0;
 
         $company_id = $request->user()->company_id;
 
@@ -346,6 +349,14 @@ class RentalController extends Controller
         $dateWithdrawal = $request->date_withdrawal ? DateTime::createFromFormat('d/m/Y H:i', $request->date_withdrawal) : null;
         $notUseDateWithdrawal = (bool)$request->not_use_date_withdrawal;
         $noCharged = $request->type_rental; // 0 = Com cobrança, 1 = Sem cobrança
+        $total_rental_paid = transformMoneyBr_En($request->input('total_rental_paid'));
+        $total_rental_no_paid = transformMoneyBr_En($request->input('total_rental_no_paid'));
+        $extraValue = transformMoneyBr_En($request->input('extra_value'));
+        $discountValue = transformMoneyBr_En($request->input('discount_value'));
+        $response->grossValue = 0;
+        if (!$noCharged) {
+            $response->grossValue += $total_rental_no_paid + $total_rental_paid + $discountValue - $extraValue;
+        }
 
         $equipments = $this->equipment->getEquipments_In($company_id, $request->equipment_id);
 
@@ -450,6 +461,10 @@ class RentalController extends Controller
                 'user_insert'           => $request->user()->id
             );
 
+            if ($exchange_equipment_id) {
+                $arrEquipment['exchange_rental_equipment_id'] = (int)$request->{"rental_equipment_id_$equipmentId->id"};
+            }
+
             $arrEquipment = array_merge($arrEquipment, array(
                 'use_date_diff_equip'       => $useDateDiff,
                 'expected_delivery_date'    => $dateDeliveryEquip->format(DATETIME_INTERNATIONAL),
@@ -463,7 +478,7 @@ class RentalController extends Controller
         return $response;
     }
 
-    public function setPaymentRental(RentalCreatePost | BudgetCreatePost $request, $grossValue, bool $budget = false, ?int $rental_id = null): StdClass
+    public function setPaymentRental($request, $grossValue, bool $budget = false, ?int $rental_id = null): StdClass
     {
         $nameFieldID = $budget ? 'budget_id' : 'rental_id';
         $company_id = $request->user()->company_id;
@@ -472,8 +487,11 @@ class RentalController extends Controller
 
         $extraValue = 0;
         $discountValue = 0;
+        $total_rental_paid = 0;
+
         $calculateNetAmountAutomatic = (bool)$request->input('calculate_net_amount_automatic');
         if ($calculateNetAmountAutomatic) { // valor liquido sera calculado automático
+            $total_rental_paid = transformMoneyBr_En($request->input('total_rental_paid'));
             $extraValue = transformMoneyBr_En($request->input('extra_value'));
             $discountValue = transformMoneyBr_En($request->input('discount_value'));
             $netValue = $grossValue - $discountValue + $extraValue;
@@ -495,8 +513,7 @@ class RentalController extends Controller
 
         $automaticParcelDistribution = (bool)$request->input('automatic_parcel_distribution');
 
-        $daysTemp = null;
-        $priceTemp = 0;
+        $priceTemp = $total_rental_paid;
 
         $valueSumParcel = 0;
         $qtyParcel = count($request->input('due_date'));
@@ -510,15 +527,6 @@ class RentalController extends Controller
                 $valueSumParcel += $valueParcel;
             } else {
                 $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
-            }
-
-            if ($daysTemp === null) {
-                $daysTemp = $request->input('due_day')[$parcel];
-            } elseif ($daysTemp >= $request->input('due_day')[$parcel]) {
-                $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
-                return $response;
-            } else {
-                $daysTemp = $request->input('due_day')[$parcel];
             }
 
             $priceTemp += $valueParcel;
@@ -647,8 +655,21 @@ class RentalController extends Controller
         $rental         = $this->rental->getRental($company_id, $id);
         $rental_residue = $this->rental_residue->getResidues($company_id, $id);
 
+        if (!$rental) {
+            return redirect()->route('rental.index')
+                ->with('warning', "Locação não encontrada!");
+        }
+
+        foreach ($this->rental_equipment->getEquipments($company_id, $id) as $equipment) {
+            if ($equipment['exchanged']) {
+                return redirect()->route('rental.index')
+                    ->with('warning', "Locação contém equipamentos trocados, não é mais permitido realizar alterações.");
+            }
+        }
+
         return view('rental.update', compact('budget', 'rental', 'rental_residue'));
     }
+
     public function update(int $id, RentalCreatePost $request): JsonResponse
     {
         if (!hasPermission('RentalUpdatePost')) {
@@ -714,11 +735,11 @@ class RentalController extends Controller
             $arrRental['actual_withdrawal_date'] = null;
         }
 
-        $updateRental = $this->rental->updateByRentalAndCompany($id, $company_id, $arrRental);
+        $updateRental = $this->rental->updateByRentalAndCompany($company_id, $id, $arrRental);
 
         // Remove os equipamentos e cria novamente.
         if ($create_equipment) {
-            $this->rental_equipment->remove($id, $company_id);
+            $this->rental_equipment->remove($company_id, $id);
             $this->rental_equipment->inserts($arrEquipment);
         }
         // Remove os pagamento e cria novamente.
@@ -730,6 +751,100 @@ class RentalController extends Controller
         // Remove os resíduos para serem criados novamente.
         $this->rental_residue->remove($id, $company_id);
         $this->rental_residue->inserts($arrResidue);
+
+        if ($updateRental) {
+            DB::commit();
+            return response()->json(['success' => true, 'urlPrint' => route('print.rental', ['rental' => $this->dataRental->id]), 'code' => $this->dataRental->code]);
+        }
+
+        DB::rollBack();
+
+        return response()->json(['success' => false, 'message' => 'Não foi possível gravar a locação, recarregue a página e tente novamente.']);
+    }
+
+    public function exchange(int $id): Factory|View|RedirectResponse|Application
+    {
+        if (!hasPermission('RentalUpdatePost')) {
+            return redirect()->route('rental.index')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+        $company_id = Auth::user()->__get('company_id');
+
+        $exist_equipment_to_exchange = false;
+        foreach ($this->rental_equipment->getEquipments($company_id, $id) as $equipment) {
+            if ($equipment['actual_delivery_date'] != null && $equipment['actual_withdrawal_date'] == null && !$equipment['exchanged']) {
+                $exist_equipment_to_exchange = true;
+            }
+        }
+
+        if (!$exist_equipment_to_exchange) {
+            return redirect()->route('rental.index')
+                ->with('warning', "Não existem equipamentos para trocar!");
+        }
+
+        $rental = $this->rental->getRental($company_id, $id);
+
+        return view('rental.exchange', compact('rental'));
+    }
+
+    public function exchangePost(int $id, Request $request): JsonResponse
+    {
+        if (!hasPermission('RentalUpdatePost')) {
+            return response()->json(['success' => false, 'message' => "Você não tem permissão para atualizar locações."]);
+        }
+
+        $company_id = $request->user()->company_id;
+        // Define os dados para ser usado na Trait.
+        $this->setDataRental($this->rental->getRental($company_id, $id));
+        $this->setDataRentalEquipment($this->rental_equipment->getEquipments($company_id, $id));
+        $this->setDataRentalPayment($this->rental_payment->getPayments($company_id, $id));
+
+        if (!$this->getDataRental()) {
+            return response()->json(['success' => false, 'message' => "Locação não encontrada."]);
+        }
+
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis.
+
+        try {
+            // Faz as validações iniciais padrões para poder seguir com a atualização.
+            $data_validation = $this->makeValidationRentalToExchange($request, $id);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+
+        // Locacão.
+        $arrEquipment    = $data_validation['arrEquipment'];
+        $arrPayment      = $data_validation['arrPayment'];
+
+        $arrRental = [
+            'actual_delivery_date' => null
+        ];
+
+        // Com cobrança.
+        if ($this->getDataRental('type_rental') == 0) {
+            $total_new_value = array_sum(array_column($arrPayment,'due_value')) + transformMoneyBr_En($request->input('total_rental_paid'));
+
+            $extra_value = transformMoneyBr_En($request->input('extra_value'));
+            $discount_value = transformMoneyBr_En($request->input('discount_value'));
+            $arrRental['automatic_parcel_distribution'] = false;
+            $arrRental['net_value'] = $total_new_value;
+            $arrRental['gross_value'] = $total_new_value - $extra_value + $discount_value;
+            $arrRental['extra_value'] = $extra_value;
+            $arrRental['discount_value'] = $discount_value;
+        }
+
+        // O valor de entrega deve voltar a ser nulo.
+        $updateRental = $this->rental->updateByRentalAndCompany($company_id, $id, $arrRental);
+
+        // Cria os novos equipamento e pagamentos.
+        $this->rental_equipment->inserts($arrEquipment);
+        $this->rental_payment->removeByPaid($company_id, $id);
+        $this->rental_payment->inserts($arrPayment);
+
+        // Coloca todos os equipamentos como já trocados.
+        foreach ($arrEquipment as $equipment) {
+            $this->rental_equipment->updateByRentalAndRentalEquipmentId($id, $equipment['exchange_rental_equipment_id'], array('exchanged' => true));
+        }
 
         if ($updateRental) {
             DB::commit();

@@ -16,6 +16,7 @@
 @section('js')
 <script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}" type="application/javascript"></script>
 <script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
+<script src="{{ asset('assets/js/views/rental/create.js') }}" type="application/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
 <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
 
@@ -37,7 +38,7 @@
             <div class="row flex-grow">
                 <div class="col-md-12">
                 @if ($errors->any())
-                    <div class="alert-animate alert-warning">
+                    <div class="alert alert-animate alert-warning">
                         <ol>
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>

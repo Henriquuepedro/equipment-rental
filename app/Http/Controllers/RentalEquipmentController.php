@@ -131,7 +131,7 @@ class RentalEquipmentController extends Controller
             }
         }
 
-        $rental_updated = $this->rental->checkAllEquipmentsDelivered($rental_id, $company_id);
+        $rental_updated = $this->rental->checkAllEquipmentsDelivered($company_id, $rental_id);
 
         DB::commit();
 
@@ -212,7 +212,7 @@ class RentalEquipmentController extends Controller
             }
         }
 
-        $rental_updated = $this->rental->checkAllEquipmentsWithdrawal($rental_id, $company_id);
+        $rental_updated = $this->rental->checkAllEquipmentsWithdrawal($company_id, $rental_id);
 
         DB::commit();
 

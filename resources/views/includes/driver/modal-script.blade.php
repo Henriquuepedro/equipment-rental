@@ -100,7 +100,7 @@
                     $('#newDriverModal').modal('hide');
                     cleanFormDriverModal();
                     checkLabelAnimate();
-                    @if(\Request::route()->getName() == 'rental.create')
+                    @if(\Request::route()->getName() == 'rental.create' || \Request::route()->getName() == 'rental.exchange' || \Request::route()->getName() == 'rental.update')
                         loadDrivers($('#newVehicleModal').is(':visible') ? 0 : response.driver_id, "div[id^='collapseEquipment-'].collapse.show [name^='driver_']");
                         loadDrivers($('#newVehicleModal').is(':visible') ? response.driver_id : 0, '#newVehicleModal [name="driver"]');
 

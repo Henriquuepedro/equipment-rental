@@ -278,7 +278,6 @@ class BillsToPayController extends Controller
         $automaticParcelDistribution = (bool)$request->input('automatic_parcel_distribution');
 
         // existe parcelamento
-        $daysTemp = null;
         $priceTemp = 0;
 
         $valueSumParcel = 0;
@@ -293,15 +292,6 @@ class BillsToPayController extends Controller
                 $valueSumParcel += $valueParcel;
             } else {
                 $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
-            }
-
-            if ($daysTemp === null) {
-                $daysTemp = $request->input('due_day')[$parcel];
-            } elseif ($daysTemp >= $request->input('due_day')[$parcel]) {
-                $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
-                return $response;
-            } else {
-                $daysTemp = $request->input('due_day')[$parcel];
             }
 
             $priceTemp += $valueParcel;
