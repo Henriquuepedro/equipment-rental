@@ -172,18 +172,18 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/buscar', [App\Http\Controllers\ClientController::class, 'fetchClients'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\ClientController::class, 'delete'])->name('delete');
             Route::get('/visualizar-clientes', [App\Http\Controllers\ClientController::class, 'getClients'])->name('get-clients');
-            Route::get('/visualizar-cliente', [App\Http\Controllers\ClientController::class, 'getClient'])->name('get-client');
+            Route::get('/visualizar-cliente/{client_id?}', [App\Http\Controllers\ClientController::class, 'getClient'])->name('get-client');
             Route::post('/novo-cliente', [App\Http\Controllers\ClientController::class, 'insert'])->name('new-client');
         });
         Route::group(['prefix' => '/endereco', 'as' => 'address.'], function () {
-            Route::post('/visualizar-enderecos', [App\Http\Controllers\AddressController::class, 'getAddresses'])->name('get-addresses');
-            Route::post('/visualizar-endereco', [App\Http\Controllers\AddressController::class, 'getAddress'])->name('get-address');
+            Route::get('/visualizar-enderecos/{client_id?}', [App\Http\Controllers\AddressController::class, 'getAddresses'])->name('get-addresses');
+            Route::get('/visualizar-endereco/{client_id?}/{address_id?}', [App\Http\Controllers\AddressController::class, 'getAddress'])->name('get-address');
         });
         Route::group(['prefix' => '/equipamento', 'as' => 'equipment.'], function () {
             Route::post('/buscar', [App\Http\Controllers\EquipmentController::class, 'fetchEquipments'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\EquipmentController::class, 'delete'])->name('delete');
             Route::post('/visualizar-equipamentos', [App\Http\Controllers\EquipmentController::class, 'getEquipments'])->name('get-equipments');
-            Route::post('/visualizar-equipamento', [App\Http\Controllers\EquipmentController::class, 'getEquipment'])->name('get-equipment');
+            Route::get('/visualizar-equipamento/{id?}/{validStock?}', [App\Http\Controllers\EquipmentController::class, 'getEquipment'])->name('get-equipment');
             Route::post('/novo-equipamento', [App\Http\Controllers\EquipmentController::class, 'insert'])->name('new-equipment');
             Route::post('/visualizar-estoque', [App\Http\Controllers\EquipmentController::class, 'getStockEquipment'])->name('get-stock');
             Route::post('/visualizar-preco', [App\Http\Controllers\EquipmentController::class, 'getPriceEquipment'])->name('get-price');
@@ -264,7 +264,7 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/buscar', [App\Http\Controllers\ProviderController::class, 'fetchProviders'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\ProviderController::class, 'delete'])->name('delete');
             Route::get('/visualizar-fornecedores', [App\Http\Controllers\ProviderController::class, 'getProviders'])->name('get-providers');
-            Route::get('/visualizar-fornecedor', [App\Http\Controllers\ProviderController::class, 'getProvider'])->name('get-provider');
+            Route::get('/visualizar-fornecedor/{provider_id?}', [App\Http\Controllers\ProviderController::class, 'getProvider'])->name('get-provider');
             Route::post('/novo-fornecedor', [App\Http\Controllers\ProviderController::class, 'insert'])->name('new-provider');
         });
         Route::group(['prefix' => '/contas-a-receber', 'as' => 'bills_to_receive.'], function () {

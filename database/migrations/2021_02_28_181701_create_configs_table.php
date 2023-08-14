@@ -17,7 +17,7 @@ class CreateConfigsTable extends Migration
             $table->id();
             $table->bigInteger('company_id')->unsigned();
 
-            $table->tinyInteger('view_obervation_client_rental')->default(1);
+            $table->tinyInteger('view_observation_client_rental')->default(1);
 
             $table->bigInteger('user_update')->unsigned()->nullable();
             $table->timestamps();

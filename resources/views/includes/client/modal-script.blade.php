@@ -180,8 +180,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             type: 'GET',
-            url: '{{ route('ajax.client.get-client') }}',
-            data: { client_id },
+            url: '{{ route('ajax.client.get-client') }}' + `/${client_id}`,
             dataType: 'json',
             success: response => {
 

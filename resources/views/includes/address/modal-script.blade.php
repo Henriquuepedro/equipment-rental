@@ -90,9 +90,8 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            type: 'POST',
-            url: '{{ route('ajax.address.get-addresses') }}',
-            data: { client_id },
+            type: 'GET',
+            url: '{{ route('ajax.address.get-addresses') }}' + `/${client_id}`,
             dataType: 'json',
             success: response => {
                 let selected;
@@ -137,9 +136,8 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            type: 'POST',
-            url: '{{ route('ajax.address.get-address') }}',
-            data: { address_id, client_id },
+            type: 'GET',
+            url: '{{ route('ajax.address.get-address') }}' + `${client_id}/${address_id}`,
             dataType: 'json',
             success: response => {
 

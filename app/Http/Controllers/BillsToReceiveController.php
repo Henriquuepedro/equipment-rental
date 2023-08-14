@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\FormPayment;
 use App\Models\RentalPayment;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +26,7 @@ class BillsToReceiveController extends Controller
         $this->form_payment = new FormPayment();
     }
 
-    public function index()
+    public function index(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('BillsToReceiveView')) {
             return redirect()->route('dashboard')
@@ -63,10 +67,6 @@ class BillsToReceiveController extends Controller
 
     public function fetchRentals(Request $request): JsonResponse
     {
-        if (!hasPermission('BillsToReceiveView')) {
-            return response()->json();
-        }
-
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
@@ -80,6 +80,16 @@ class BillsToReceiveController extends Controller
         $start_date = $request->input('start_date');
         $end_date   = $request->input('end_date');
 
+        if (!hasPermission('BillsToReceiveView')) {
+            return response()->json(array(
+                "draw" => $draw,
+                "recordsTotal" => 0,
+                "recordsFiltered" => 0,
+                "data" => array()
+            ));
+        }
+
+
         // Filtro cliente
         $client = $request->input('client') ?? (int)$request->input('client');
         if (empty($client)) {
@@ -91,13 +101,16 @@ class BillsToReceiveController extends Controller
         $filters['end_date']    = $end_date;
 
         $search = $request->input('search');
-        if ($search['value']) {
+        if ($search && $search['value']) {
             $searchUser = $search['value'];
         }
 
         if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+            if ($request->input('order')[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('rentals.code','clients.name','rental_payments.due_value', 'rental_payments.due_date', '');
             $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];

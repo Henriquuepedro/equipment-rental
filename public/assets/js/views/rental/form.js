@@ -619,9 +619,8 @@ const getEquipment = async equipment => {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        type: 'POST',
-        url: $('#routeGetEquipment').val(),
-        data: { idEquipment: equipment },
+        type: 'GET',
+        url: $('#routeGetEquipment').val() + `/${equipment}`,
         async: true,
         success: response => {
             return response;
@@ -795,9 +794,8 @@ const setEquipmentRental = (
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        type: 'POST',
-        url: $('#routeGetEquipment').val(),
-        data: { idEquipment, validStock: !budget },
+        type: 'GET',
+        url: $('#routeGetEquipment').val() + `/${idEquipment}/0`,
         success: response => {
 
             if (!response.success) {

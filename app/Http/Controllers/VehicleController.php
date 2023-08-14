@@ -40,10 +40,6 @@ class VehicleController extends Controller
 
     public function fetchVehicles(Request $request): JsonResponse
     {
-        if (!hasPermission('VehicleView')) {
-            return response()->json();
-        }
-
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
@@ -53,8 +49,17 @@ class VehicleController extends Controller
         $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
+        if (!hasPermission('VehicleView')) {
+            return response()->json(array(
+                "draw" => $draw,
+                "recordsTotal" => 0,
+                "recordsFiltered" => 0,
+                "data" => $result
+            ));
+        }
+
         $search = $request->input('search');
-        if ($search['value']) {
+        if ($search && $search['value']) {
             $searchUser = $search['value'];
         }
 
@@ -262,8 +267,12 @@ class VehicleController extends Controller
         return response()->json(['data' => $vehicleData, 'lastId' => $lastId]);
     }
 
-    public function getVehicle(int $id): JsonResponse
+    public function getVehicle(int $id = null): JsonResponse
     {
+        if (is_null($id)) {
+            return response()->json();
+        }
+
         $company_id = Auth::user()->__get('company_id');
         $driver = false;
 

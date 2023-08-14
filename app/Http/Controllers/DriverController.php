@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DriverCreatePost;
 use App\Http\Requests\DriverDeletePost;
 use App\Http\Requests\DriverUpdatePost;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\Driver;
 use Illuminate\Support\Facades\Auth;
@@ -12,14 +17,14 @@ use Illuminate\Support\Facades\DB;
 
 class DriverController extends Controller
 {
-    public $driver;
+    public Driver $driver;
 
-    public function __construct(Driver $driver)
+    public function __construct()
     {
-        $this->driver = $driver;
+        $this->driver = new Driver();
     }
 
-    public function index()
+    public function index(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('DriverView')) {
             return redirect()->route('dashboard')
@@ -29,29 +34,42 @@ class DriverController extends Controller
         return view('driver.index');
     }
 
-    public function fetchDrivers(Request $request)
+    public function fetchDrivers(Request $request): JsonResponse
     {
-        if (!hasPermission('DriverView'))
-            return response()->json([]);
-
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
 
-        $ini        = $request->start;
-        $draw       = $request->draw;
-        $length     = $request->length;
+        $ini        = $request->input('start');
+        $draw       = $request->input('draw');
+        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        $search = $request->search;
-        if ($search['value']) $searchUser = $search['value'];
+        if (!hasPermission('DriverView')) {
+            return response()->json(
+                array(
+                    "draw" => $draw,
+                    "recordsTotal" => 0,
+                    "recordsFiltered" => 0,
+                    "data" => array()
+                )
+            );
+        }
 
-        if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+        $search = $request->input('search');
+        if ($search && $search['value']) {
+            $searchUser = $search['value'];
+        }
+
+        if ($request->input('order')) {
+            if ($request->input('order')[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('id','name','cpf','phone', '');
-            $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
+            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
                 $orderBy['order'] = $direction;
@@ -59,9 +77,6 @@ class DriverController extends Controller
         }
 
         $data = $this->driver->getDrivers($company_id, $ini, $length, $searchUser, $orderBy);
-
-        // get string query
-        // DB::getQueryLog();
 
         $permissionUpdate = hasPermission('DriverUpdatePost');
         $permissionDelete = hasPermission('DriverDeletePost');
@@ -90,7 +105,7 @@ class DriverController extends Controller
         return response()->json($output);
     }
 
-    public function create()
+    public function create(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('DriverCreatePost')) {
             return redirect()->route('driver.index')
@@ -100,7 +115,7 @@ class DriverController extends Controller
         return view('driver.create');
     }
 
-    public function insert(DriverCreatePost $request)
+    public function insert(DriverCreatePost $request): JsonResponse|RedirectResponse
     {
         // data driver
         $dataDriver = $this->formatDataDriver($request);
@@ -122,56 +137,61 @@ class DriverController extends Controller
         $driverId = $createDriver->id;
 
         if($createDriver) {
-
-            if ($isAjax)
+            if ($isAjax) {
                 return response()->json(['success' => true, 'message' => 'Motorista cadastrado com sucesso.', 'driver_id' => $driverId]);
+            }
 
             return redirect()->route('driver.index')
                 ->with('success', "Motorista com o código {$driverId}, cadastrado com sucesso!");
         }
 
-        if ($isAjax)
+        if ($isAjax) {
             return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o motorista, tente novamente!']);
+        }
 
         return redirect()->back()
             ->withErrors(['Não foi possível cadastrar o motorista, tente novamente!'])
             ->withInput();
     }
 
-    public function delete(DriverDeletePost $request)
+    public function delete(DriverDeletePost $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
-        $driver_id = $request->driver_id;
+        $driver_id = $request->input('driver_id');
 
-        if (!$this->driver->getDriver($driver_id, $company_id))
+        if (!$this->driver->getDriver($driver_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível localizar o motorista!']);
+        }
 
-        if (!$this->driver->remove($driver_id, $company_id))
+        if (!$this->driver->remove($driver_id, $company_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível excluir o motorista!']);
+        }
 
         return response()->json(['success' => true, 'message' => 'Motorista excluído com sucesso!']);
     }
 
-    public function edit($id)
+    public function edit($id): View|Factory|RedirectResponse|Application
     {
         $company_id = Auth::user()->__get('company_id');
 
         $driver = $this->driver->getDriver($id, $company_id);
-        if (!$driver)
+        if (!$driver) {
             return redirect()->route('driver.index');
+        }
 
         return view('driver.update', compact('driver'));
     }
 
-    public function update(DriverUpdatePost $request)
+    public function update(DriverUpdatePost $request): RedirectResponse
     {
         // data driver
         $dataDriver = $this->formatDataDriver($request);
 
-        if (!$this->driver->getDriver($dataDriver->driver_id, $dataDriver->company_id))
+        if (!$this->driver->getDriver($dataDriver->driver_id, $dataDriver->company_id)) {
             return redirect()->back()
                 ->withErrors(['Não foi possível localizar o motorista para atualizar!'])
                 ->withInput();
+        }
 
         $updateDriver = $this->driver->edit(
             array(
@@ -200,36 +220,38 @@ class DriverController extends Controller
             ->withInput();
     }
 
-    private function formatDataDriver($request)
+    private function formatDataDriver(DriverCreatePost|DriverUpdatePost $request): \stdClass
     {
         $obj = new \stdClass;
 
         $obj->company_id    = $request->user()->company_id;
         $obj->user_id       = $request->user()->id;
-        $obj->name          = filter_var($request->name);
-        $obj->email         = $request->email ? (filter_var($request->email, FILTER_VALIDATE_EMAIL) ? $request->email : null) : null;
-        $obj->phone         = $request->phone ? filter_var(preg_replace('/[^0-9]/', '', $request->phone), FILTER_SANITIZE_NUMBER_INT) : null;
-        $obj->cpf           = $request->cpf ? filter_var(preg_replace('/[^0-9]/', '', $request->cpf), FILTER_SANITIZE_NUMBER_INT) : null;
-        $obj->rg            = $request->rg ? filter_var(preg_replace('/[^0-9]/', '', $request->rg), FILTER_SANITIZE_NUMBER_INT) : null;
-        $obj->cnh           = $request->cnh ? filter_var(preg_replace('/[^0-9]/', '', $request->cnh), FILTER_SANITIZE_NUMBER_INT) : null;
-        $obj->cnh_exp       = $request->cnh_exp;
-        $obj->observation   = $request->observation ? filter_var($request->observation, FILTER_DEFAULT) : null;
-        $obj->driver_id     = isset($request->driver_id) ? (int)$request->driver_id : null;
+        $obj->name          = filter_var($request->input('name'));
+        $obj->email         = $request->input('email') ? (filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) ? $request->input('email') : null) : null;
+        $obj->phone         = $request->input('phone') ? filter_var(onlyNumbers($request->input('phone')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $obj->cpf           = $request->input('cpf') ? filter_var(onlyNumbers($request->input('cpf')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $obj->rg            = $request->input('rg') ? filter_var(onlyNumbers($request->input('rg')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $obj->cnh           = $request->input('cnh') ? filter_var(onlyNumbers($request->input('cnh')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $obj->cnh_exp       = $request->input('cnh_exp');
+        $obj->observation   = $request->input('observation') ? filter_var($request->input('observation')) : null;
+        $obj->driver_id     = $request->input('driver_id') ? (int)$request->input('driver_id') : null;
 
         return $obj;
     }
 
-    public function getDrivers(Request $request)
+    public function getDrivers(): JsonResponse
     {
-        $company_id = $request->user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $driverData = [];
         $lastId = 0;
 
         $drivers = $this->driver->getDrivers($company_id);
 
         foreach ($drivers as $driver) {
-            array_push($driverData, ['id' => $driver->id, 'name' => $driver->name]);
-            if ($driver->id > $lastId) $lastId = $driver->id;
+            $driverData[] = ['id' => $driver->id, 'name' => $driver->name];
+            if ($driver->id > $lastId) {
+                $lastId = $driver->id;
+            }
         }
 
         return response()->json(['data' => $driverData, 'lastId' => $lastId]);

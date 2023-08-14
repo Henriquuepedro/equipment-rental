@@ -98,11 +98,15 @@ class RentalController extends Controller
         $filters['dateFinish']  = $request->input('end_date');
         // Filtro cliente
         $client = $request->input('client');
-        if (empty($client)) $client = null;
+        if (empty($client)) {
+            $client = null;
+        }
         $filters['client'] = $client;
 
         $search = $request->input('search');
-        if ($search['value']) $searchUser = $search['value'];
+        if ($search && $search['value']) {
+            $searchUser = $search['value'];
+        }
 
         if ($request->input('order')) {
             if ($request->input('order')[0]['dir'] == "asc") {

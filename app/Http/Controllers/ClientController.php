@@ -350,7 +350,7 @@ class ClientController extends Controller
         $company_id = $request->user()->company_id;
 
         $search = $request->input('search');
-        if ($search['value']) {
+        if ($search && $search['value']) {
             $searchUser = $search['value'];
         }
 
@@ -416,14 +416,17 @@ class ClientController extends Controller
         return response()->json(['data' => $clientData, 'lastId' => $lastId]);
     }
 
-    public function getClient(Request $request): JsonResponse
+    public function getClient(int $client_id = null): JsonResponse
     {
-        $company_id = $request->user()->company_id;
-        $client_id  = $request->input('client_id');
+        if (is_null($client_id)) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
 
         $client = $this->client->getClient($client_id, $company_id);
 
-        $config_obs = $this->config->getConfigCompany($company_id, 'view_obervation_client_rental');
+        $config_obs = $this->config->getConfigCompany($company_id, 'view_observation_client_rental');
 
         return response()->json([
             'observation' => $config_obs ? $client->observation : null

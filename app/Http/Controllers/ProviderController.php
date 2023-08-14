@@ -211,7 +211,7 @@ class ProviderController extends Controller
         $company_id = $request->user()->company_id;
 
         $search = $request->input('search');
-        if ($search['value']) {
+        if ($search && $search['value']) {
             $searchUser = $search['value'];
         }
 
@@ -259,9 +259,9 @@ class ProviderController extends Controller
         return response()->json($output);
     }
 
-    public function getProviders(Request $request): JsonResponse
+    public function getProviders(): JsonResponse
     {
-        $company_id = $request->user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $providerData = [];
         $lastId = 0;
 
@@ -275,14 +275,17 @@ class ProviderController extends Controller
         return response()->json(['data' => $providerData, 'lastId' => $lastId]);
     }
 
-    public function getProvider(Request $request): JsonResponse
+    public function getProvider(int $provider_id = null): JsonResponse
     {
-        $company_id = $request->user()->company_id;
-        $provider_id  = $request->input('provider_id');
+        if (is_null($provider_id)) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
 
         $provider = $this->provider->getProvider($provider_id, $company_id);
 
-        $configObs = $this->config->getConfigCompany(auth()->user()->company_id, 'view_obervation_client_rental');
+        $configObs = $this->config->getConfigCompany($company_id, 'view_observation_client_rental');
 
         return response()->json([
             'observation' => $configObs ? $provider->observation : null

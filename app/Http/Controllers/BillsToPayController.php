@@ -59,10 +59,6 @@ class BillsToPayController extends Controller
 
     public function fetchBills(Request $request): JsonResponse
     {
-        if (!hasPermission('BillsToPayView')) {
-            return response()->json();
-        }
-
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
@@ -76,6 +72,15 @@ class BillsToPayController extends Controller
         $start_date = $request->input('start_date');
         $end_date   = $request->input('end_date');
 
+        if (!hasPermission('BillsToPayView')) {
+            return response()->json(array(
+                "draw" => $draw,
+                "recordsTotal" => 0,
+                "recordsFiltered" => 0,
+                "data" => array()
+            ));
+        }
+
         // Filtro fornecedor
         $provider = $request->input('provider') ?? (int)$request->input('provider');
         if (empty($provider)) {
@@ -86,7 +91,7 @@ class BillsToPayController extends Controller
         $filters['end_date']    = $end_date;
 
         $search = $request->input('search');
-        if ($search['value']) {
+        if ($search && $search['value']) {
             $searchUser = $search['value'];
         }
 
