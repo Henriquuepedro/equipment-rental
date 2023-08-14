@@ -262,13 +262,12 @@ class VehicleController extends Controller
         return response()->json(['data' => $vehicleData, 'lastId' => $lastId]);
     }
 
-    public function getVehicle(Request $request): JsonResponse
+    public function getVehicle(int $id): JsonResponse
     {
-        $company_id = $request->user()->company_id;
-        $vehicle_id = $request->input('vehicle_id');
+        $company_id = Auth::user()->__get('company_id');
         $driver = false;
 
-        $vehicles = $this->vehicle->getVehicle($vehicle_id, $company_id);
+        $vehicles = $this->vehicle->getVehicle($id, $company_id);
         if ($vehicles->driver_id) {
             $driver = $this->driver->getDriver($vehicles->driver_id, $company_id);
         }

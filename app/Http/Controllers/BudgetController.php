@@ -103,12 +103,7 @@ class BudgetController extends Controller
             $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveBudget' budget-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Orçamento</button>" : '';
             $buttons .= "<a href='".route('print.budget', ['budget' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Orçamento</a>";
 
-            $buttons = "<div class='row'><div class='col-12'><div class='dropdown dropleft'>
-                            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsBudget-{$value['id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                              <i class='fa fa-cog'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropActionsBudget-{$value['id']}'>$buttons</div</div>
-                        </div>";
+            $buttons = dropdownButtonsDataList($buttons, $value['id']);
 
             $result[$key] = array(
                 formatCodeRental($value['code']),

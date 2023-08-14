@@ -289,7 +289,6 @@
                                 </div>
 
                                 <input type="hidden" name="rental_id" value="{{ $rental->id }}">
-                                <input type="hidden" id="not_use_date_withdrawal" value="{{ $rental->not_use_date_withdrawal }}">
                                 <input type="hidden" name="date_delivery" value="{{ $rental->expected_delivery_date ? dateInternationalToDateBrazil($rental->expected_delivery_date, DATETIME_BRAZIL_NO_SECONDS) : '' }}">
                                 <input type="hidden" name="date_withdrawal" value="{{ $rental->expected_withdrawal_date ? dateInternationalToDateBrazil($rental->expected_withdrawal_date, DATETIME_BRAZIL_NO_SECONDS) : '' }}">
                                 <input type="hidden" id="is_exchange" value="1">

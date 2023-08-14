@@ -123,12 +123,7 @@ class BillsToReceiveController extends Controller
                 $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
             }
 
-            $buttons = "<div class='row'><div class='col-12'><div class='dropdown dropleft'>
-                            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsRental-{$value['rental_payment_id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                              <i class='fa fa-cog'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropActionsRental-{$value['rental_payment_id']}'>$buttons</div</div>
-                        </div>";
+            $buttons = dropdownButtonsDataList($buttons, $value['rental_payment_id']);
 
             $result[$key] = array(
                 $rental_code,

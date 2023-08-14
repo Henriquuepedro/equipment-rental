@@ -419,8 +419,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: 'GET',
-                data: { vehicle_id },
-                url: "{{ route('ajax.vehicle.get-vehicle') }}",
+                url: "{{ route('ajax.vehicle.get-vehicle') }}" + `/${vehicle_id}`,
                 async: true,
                 success: response => {
                     console.log(response);

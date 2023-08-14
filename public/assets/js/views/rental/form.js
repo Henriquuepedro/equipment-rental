@@ -1,5 +1,5 @@
 var searchEquipmentOld = '';
-var budget = $('#budget').val() ? true : false;
+var budget = !!$('#budget').val();
 
 const getIndexStep = step => {
 
@@ -46,427 +46,434 @@ $("#formRental").validate({
     }
 });
 
-$(document).on('blur keyup', '#searchEquipment', function (e){
-    if(e.keyCode !== 13 && e.type === 'keyup') {
-        return false;
-    }
+$(function(){
+    $('#searchEquipment').on('blur keyup', function (e){
+        if(e.keyCode !== 13 && e.type === 'keyup') {
+            return false;
+        }
 
-    const searchEquipment = $(this).val();
-    let equipmentInUse = [];
+        const searchEquipment = $(this).val();
+        let equipmentInUse = [];
 
-    if (searchEquipment === searchEquipmentOld) {
-        return false;
-    }
-    $('#equipments-selected .card-header').each(function(){
-        equipmentInUse.push(parseInt($(this).attr('id-equipment')));
-    });
+        if (searchEquipment === searchEquipmentOld) {
+            return false;
+        }
+        $('#equipments-selected .card-header').each(function(){
+            equipmentInUse.push(parseInt($(this).attr('id-equipment')));
+        });
 
-    if (parseInt($('#is_exchange').val()) === 1) {
-        equipmentInUse = [];
-    }
+        if (parseInt($('#is_exchange').val()) === 1) {
+            equipmentInUse = [];
+        }
 
-    $('table.list-equipment tbody').empty();
+        $('table.list-equipment tbody').empty();
 
-    searchEquipmentOld = searchEquipment;
+        searchEquipmentOld = searchEquipment;
 
-    $('table.list-equipment tbody').empty();
+        $('table.list-equipment tbody').empty();
 
-    if (searchEquipment === '') {
-        equipmentMessageDefault('<i class="fas fa-search"></i> Pesquise por um equipamento');
-        return false;
-    }
+        if (searchEquipment === '') {
+            equipmentMessageDefault('<i class="fas fa-search"></i> Pesquise por um equipamento');
+            return false;
+        }
 
-    equipmentMessageDefault('<i class="fas fa-spinner fa-spin"></i> Carregando equipamentos ...');
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'POST',
-        url: $('#routeGetEquipments').val(),
-        data: { searchEquipment, equipmentInUse },
-        success: response => {
+        equipmentMessageDefault('<i class="fas fa-spinner fa-spin"></i> Carregando equipamentos ...');
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'POST',
+            url: $('#routeGetEquipments').val(),
+            data: { searchEquipment, equipmentInUse },
+            success: response => {
 
-            $('table.list-equipment tbody').empty();
+                $('table.list-equipment tbody').empty();
 
-            if (!response.length) {
-                equipmentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
-                return false;
-            }
+                if (!response.length) {
+                    equipmentMessageDefault('<i class="fas fa-surprise"></i> Nenhum equipamento encontrado');
+                    return false;
+                }
 
-            let badgeStock = '';
-            let dataEquipment = '';
-            $.each(response, function (key, val) {
-                badgeStock = val.stock <= 0 && !budget ? 'danger' : 'primary';
+                let badgeStock = '';
+                let dataEquipment = '';
+                $.each(response, function (key, val) {
+                    badgeStock = val.stock <= 0 && !budget ? 'danger' : 'primary';
 
-                dataEquipment = `
-                        <tr class="equipment" id-equipment="${val.id}">
-                            <td class="text-left"><p class="text-left">${val.name}</p></td>
-                            <td><div class="badge badge-pill badge-lg badge-info">${val.reference}</div></td>\`;
-                            <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>
-                            <td><div class="badge badge-pill badge-lg badge-warning">R$ ${val.value}</div></td>`;
-                dataEquipment += `
-                            <td class="text-right">
-                                <button type="button" class="badge badge-lg badge-pill badge-success">
-                                    <i class="fa fa-plus"></i>
-                                </button>
-                            </td>
-                        </tr>`;
+                    dataEquipment = `
+                            <tr class="equipment" id-equipment="${val.id}">
+                                <td class="text-left"><p class="text-left">${val.name}</p></td>
+                                <td><div class="badge badge-pill badge-lg badge-info">${val.reference}</div></td>\`;
+                                <td><div class="badge badge-pill badge-lg badge-${badgeStock}">${val.stock} un</div></td>
+                                <td><div class="badge badge-pill badge-lg badge-warning">R$ ${val.value}</div></td>`;
+                    dataEquipment += `
+                                <td class="text-right">
+                                    <button type="button" class="badge badge-lg badge-pill badge-success">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
 
-                $('table.list-equipment tbody').append(dataEquipment);
-            });
-        }, error: e => {
-            console.log(e);
-        },
-        complete: function(xhr) {
-            if (xhr.status === 403) {
-                Toast.fire({
-                    icon: 'error',
-                    title: 'Você não tem permissão para fazer essa operação!'
+                    $('table.list-equipment tbody').append(dataEquipment);
                 });
+            }, error: e => {
+                console.log(e);
+            },
+            complete: function(xhr) {
+                if (xhr.status === 403) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Você não tem permissão para fazer essa operação!'
+                    });
+                }
             }
+        });
+    });
+
+    $('#cleanSearchEquipment').on('click', function (){
+        $('#searchEquipment').val('').trigger('blur');
+    });
+
+    $(document).on('click', 'table.list-equipment .equipment', function(){
+        const idEquipment = $(this).attr('id-equipment');
+
+        setEquipmentRental(idEquipment);
+    });
+
+    $(document).on('click', '.remove-equipment i', function (){
+        $(this).closest('.card').slideUp(500);
+
+        if (parseInt($('#is_exchange').val()) === 1) {
+            $(`#headingEquipmentToExchange-${$(this).closest('[id-equipment]').data('equipment-to-exchange')} a`).attr('disabled', false);
+            $(`#headingEquipmentToExchange-${$(this).closest('[id-equipment]').data('equipment-to-exchange')}`).attr('disabled', false);
+        }
+
+        setTimeout(() => {
+            $(this).closest('.card').remove();
+            searchEquipmentOld = '';
+            $('#searchEquipment').trigger('blur');
+            showSeparatorEquipmentSelected();
+            if (!$('[href^="#collapseEquipment-"][is-cacamba="true"]').length){
+                $('.container-residues').slideUp('slow');
+            }
+        }, 550);
+    });
+
+    $(document).on('click', '.hideEquipment', function (){
+        $(`#${$(this).closest('.collapse.show').attr('id')}`).collapse('hide');
+    });
+
+    $(document).on('click', '.use_date_diff_equip', function (){
+        const elEquip = $(this).closest('[id-equipment]');
+        let date_delivery, date_withdrawal;
+        const rental_id = $('#' + elEquip.attr('aria-labelledby')).data('rental-id');
+
+        elEquip.find('input[name^="date_delivery_equipment_"]').attr('disabled', !$(this).is(':checked'));
+        if (!rental_id) {
+            elEquip.find('.not_use_date_withdrawal').attr('disabled', !$(this).is(':checked'));
+        }
+
+        if (!elEquip.find('.not_use_date_withdrawal').is(':checked')) {
+            elEquip.find('input[name^="date_withdrawal_equipment_"]').attr('disabled', !$(this).is(':checked'));
+        }
+
+        if (!elEquip.find('.not_use_date_withdrawal').is(':checked')) {
+            elEquip.find('.calendar_equipment:eq(1) a').attr('disabled', !$(this).is(':checked'));
+        }
+
+        elEquip.find('.calendar_equipment:eq(0) a').attr('disabled', !$(this).is(':checked'));
+
+        if (!$(this).is(':checked')) {
+            date_delivery = $('input[name="date_delivery"]').val();
+            date_withdrawal = $('input[name="date_withdrawal"]').val();
+
+            if (date_delivery) {
+                elEquip.find('input[name^="date_delivery_equipment_"]').val(date_delivery);
+            }
+            if (date_withdrawal) {
+                elEquip.find('input[name^="date_withdrawal_equipment_"]').val(date_withdrawal);
+            }
+
+            if (!rental_id && $('#not_use_date_withdrawal').is(':checked')) {
+                elEquip.find('.not_use_date_withdrawal').prop('checked', true);
+            } else if (!rental_id) {
+                elEquip.find('.not_use_date_withdrawal').prop('checked', false);
+            }
+
+            checkLabelAnimate();
+
+            elEquip.find('.use_date_diff_equip_show').slideUp('slow');
+        } else {
+            elEquip.find('.use_date_diff_equip_show').slideDown({
+                start: function () {
+                    $(this).css({
+                        display: "flex"
+                    })
+                }
+            });
         }
     });
-});
 
-$(document).on('click', '#cleanSearchEquipment', function (){
-    $('#searchEquipment').val('').trigger('blur');
-});
+    $(document).on('blur change', '[name^="stock_equipment_"]', function (){
+        const maxStock      = parseInt($(this).attr('max-stock'));
+        const stock         = parseInt($(this).val());
+        const idEquipment  = parseInt($(this).closest('.card').find('.card-header').attr('id-equipment'));
 
-$(document).on('click', 'table.list-equipment .equipment', function(){
-    const idEquipment = $(this).attr('id-equipment');
-
-    setEquipmentRental(idEquipment);
-});
-
-$(document).on('click', '.remove-equipment i', function (){
-    $(this).closest('.card').slideUp(500);
-
-    if (parseInt($('#is_exchange').val()) === 1) {
-        $(`#headingEquipmentToExchange-${$(this).closest('[id-equipment]').data('equipment-to-exchange')} a`).attr('disabled', false);
-        $(`#headingEquipmentToExchange-${$(this).closest('[id-equipment]').data('equipment-to-exchange')}`).attr('disabled', false);
-    }
-
-    setTimeout(() => {
-        $(this).closest('.card').remove();
-        searchEquipmentOld = '';
-        $('#searchEquipment').trigger('blur');
-        showSeparatorEquipmentSelected();
-        if (!$('[href^="#collapseEquipment-"][is-cacamba="true"]').length){
-            $('.container-residues').slideUp('slow');
+        if (stock > maxStock && !budget) {
+            Toast.fire({
+                icon: 'error',
+                title: `A quantidade não pode ser superior a ${maxStock} un.`
+            });
+            // $(this).val(maxStock);
+            setTimeout(() => {
+                $(`#collapseEquipment-${idEquipment}`).collapse('show');
+                $(this).focus();
+            }, 250);
         }
-    }, 550);
-});
+    });
 
-$(document).on('click', '.hideEquipment', function (){
-    $(`#${$(this).closest('.collapse.show').attr('id')}`).collapse('hide');
-});
+    $('#not_use_date_withdrawal').on('change', function (){
+        const elEquip = $(this).closest('.col-md-6');
 
-$(document).on('click', '.use_date_diff_equip', function (){
-    const elEquip = $(this).closest('[id-equipment]');
-    let date_delivery, date_withdrawal;
-    const rental_id = $('#' + elEquip.attr('aria-labelledby')).data('rental-id');
+        elEquip.find('input[name="date_withdrawal"]').attr('disabled', $(this).is(':checked'));
+        elEquip.find('.flatpickr a').attr('disabled', $(this).is(':checked'));
 
-    elEquip.find('input[name^="date_delivery_equipment_"]').attr('disabled', !$(this).is(':checked'));
-    if (!rental_id) {
-        elEquip.find('.not_use_date_withdrawal').attr('disabled', !$(this).is(':checked'));
-    }
+        elEquip.find('input[name="date_withdrawal"]').val('');
 
-    if (!elEquip.find('.not_use_date_withdrawal').is(':checked')) {
-        elEquip.find('input[name^="date_withdrawal_equipment_"]').attr('disabled', !$(this).is(':checked'));
-    }
-
-    if (!elEquip.find('.not_use_date_withdrawal').is(':checked')) {
-        elEquip.find('.calendar_equipment:eq(1) a').attr('disabled', !$(this).is(':checked'));
-    }
-
-    elEquip.find('.calendar_equipment:eq(0) a').attr('disabled', !$(this).is(':checked'));
-
-    if (!$(this).is(':checked')) {
-        date_delivery = $('input[name="date_delivery"]').val();
-        date_withdrawal = $('input[name="date_withdrawal"]').val();
-
-        if (date_delivery) {
-            elEquip.find('input[name^="date_delivery_equipment_"]').val(date_delivery);
+        if (!$(this).is(':checked')) {
+            elEquip.find('input[name="date_withdrawal"]').val(getTodayDateBr());
         }
-        if (date_withdrawal) {
-            elEquip.find('input[name^="date_withdrawal_equipment_"]').val(date_withdrawal);
-        }
+        checkLabelAnimate();
+    });
 
-        if (!rental_id && $('#not_use_date_withdrawal').is(':checked')) {
-            elEquip.find('.not_use_date_withdrawal').prop('checked', true);
-        } else if (!rental_id) {
-            elEquip.find('.not_use_date_withdrawal').prop('checked', false);
+    $(document).on('change', '.not_use_date_withdrawal', function (){
+        const elEquip = $(this).closest('.col-md-6');
+
+        elEquip.find('input[name^="date_withdrawal_equipment_"]').attr('disabled', $(this).is(':checked'));
+        elEquip.find('.flatpickr a').attr('disabled', $(this).is(':checked'));
+
+        elEquip.find('input[name^="date_withdrawal_equipment_"]').val('');
+
+        if (!$(this).is(':checked')) {
+            elEquip.find('input[name^="date_withdrawal_equipment_"]').val(transformDateForBr(sumMinutesDateNow(1, true, false)));
         }
 
         checkLabelAnimate();
-
-        elEquip.find('.use_date_diff_equip_show').slideUp('slow');
-    } else {
-        elEquip.find('.use_date_diff_equip_show').slideDown({
-            start: function () {
-                $(this).css({
-                    display: "flex"
-                })
-            }
-        });
-    }
-});
-
-$(document).on('blur change', '[name^="stock_equipment_"]', function (){
-    const maxStock      = parseInt($(this).attr('max-stock'));
-    const stock         = parseInt($(this).val());
-    const idEquipment  = parseInt($(this).closest('.card').find('.card-header').attr('id-equipment'));
-
-    if (stock > maxStock && !budget) {
-        Toast.fire({
-            icon: 'error',
-            title: `A quantidade não pode ser superior a ${maxStock} un.`
-        });
-        // $(this).val(maxStock);
-        setTimeout(() => {
-            $(`#collapseEquipment-${idEquipment}`).collapse('show');
-            $(this).focus();
-        }, 250);
-    }
-});
-
-$(document).on('change', '#not_use_date_withdrawal', function (){
-    const elEquip = $(this).closest('.col-md-6');
-
-    elEquip.find('input[name="date_withdrawal"]').attr('disabled', $(this).is(':checked'));
-    elEquip.find('.flatpickr a').attr('disabled', $(this).is(':checked'));
-
-    elEquip.find('input[name="date_withdrawal"]').val('');
-
-    if (!$(this).is(':checked')) {
-        elEquip.find('input[name="date_withdrawal"]').val(getTodayDateBr());
-    }
-    checkLabelAnimate();
-});
-
-$(document).on('change', '.not_use_date_withdrawal', function (){
-    const elEquip = $(this).closest('.col-md-6');
-
-    elEquip.find('input[name^="date_withdrawal_equipment_"]').attr('disabled', $(this).is(':checked'));
-    elEquip.find('.flatpickr a').attr('disabled', $(this).is(':checked'));
-
-    elEquip.find('input[name^="date_withdrawal_equipment_"]').val('');
-
-    if (!$(this).is(':checked')) {
-        elEquip.find('input[name^="date_withdrawal_equipment_"]').val(getTodayDateBr());
-    }
-
-    checkLabelAnimate();
-});
-
-$(document).on('keyup change', '#extra_value, #discount_value, #net_value', () => {
-    reloadTotalRental();
-})
-.on('blur', function(){
-    if ($(this).val() === '') {
-        $(this).val('0,00');
-    }
-});
-
-$(document).on('keyup', '#net_value', function() {
-    let netAmount   = realToNumber($(this).val());
-    let grossAmount = realToNumber($('#gross_value').text());
-    let discount    = $('#discount_value');
-    let extra       = $('#extra_value');
-
-    discount.val('0,00');
-    extra.val('0,00');
-
-    if (netAmount > grossAmount) {
-        extra.val(numberToReal(netAmount - grossAmount));
-    } else if (netAmount < grossAmount) {
-        discount.val(numberToReal(grossAmount - netAmount));
-    }
-});
-
-$(document).on('click', '.btn-view-price-period-equipment', function (){
-    const btn = $(this);
-    const idEquipment = $(this).attr('id-equipment');
-
-    btn.attr('disable', true);
-
-    let descPeriod = '';
-
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'POST',
-        url: $('#routeGetPriceStockPeriodEquipment').val(),
-        data: { idEquipment },
-        success: response => {
-            if (response.length) {
-                descPeriod += '<ol class="no-padding">';
-                $.each(response, function (key, val) {
-                    descPeriod += `<li><b>${val.day_start} dias</b> até <b>${val.day_end} dias</b> por <b>R$${numberToReal(val.value)}</b></li>`;
-                });
-                descPeriod += '</ol>';
-            } else
-                descPeriod += 'Equipamento não contém valor por período definido.';
-
-            btn.attr('disable', true);
-
-            Swal.fire({
-                icon: 'info',
-                title: 'Valores Por Período',
-                html: descPeriod
-            });
-        }, error: () => {
-            btn.attr('disable', true);
-            Swal.fire({
-                icon: 'info',
-                title: 'Valores Por Período',
-                html: 'Não foi possível localizar os valores do equipamento.'
-            });
-        }
     });
 
-    return false;
-});
-
-$(document).on('keyup change', '#parcels [name="due_day[]"]', function(){
-    let days = parseInt($(this).val());
-    const el = $(this).closest('.form-group');
-
-    el.find('[name="due_date[]"]').val(sumDaysDateNow(days));
-});
-
-$(document).on('blur', '#parcels [name="due_date[]"]', function(){
-    const dataVctoInput = $(this).val();
-    if (dataVctoInput === '') return false;
-
-    const diasVcto = calculateDays(getTodayDateEn(false), dataVctoInput);
-    const el = $(this).closest('.form-group');
-
-    el.find('[name="due_day[]"]').val(diasVcto);
-});
-
-$(document).on('click', '#add_parcel', function(){
-    const parcels = $('#parcels .parcel').length;
-
-    if (parcels === 24) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Atenção',
-            html: '<ol><li>É permitido adicionar até 24 vencimentos.</li></ol>'
-        });
-        return false;
-    }
-
-    $('#parcels').show().append(
-        createParcel(parcels)
-    ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true}).closest('.payment-item').find('.remove-payment').tooltip();
-
-    recalculeParcels();
-});
-
-$(document).on('click', '.remove-payment', function(){
-    const parcels = $('#parcels .parcel').length;
-
-    if (parcels === 1) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Atenção',
-            html: '<ol><li>Deve conter no mínimo uma linha de pagamento.</li></ol>'
-        });
-        return;
-    }
-
-    $('#parcels').find('.remove-payment').tooltip('dispose');
-
-    $(this).closest('.parcel').remove();
-
-    $('#parcels').find('.remove-payment').tooltip();
-
-    recalculeParcels();
-});
-
-$(document).on('change', '#automatic_parcel_distribution', function(){
-    const check = $(this).is(':checked');
-
-    if (check) {
-        $('#parcels .parcel [name="value_parcel[]"]').attr('disabled', true);
-        recalculeParcels();
-    } else
-        $('#parcels .parcel [name="value_parcel[]"]').attr('disabled', false);
-
-});
-
-$(document).on('change', '[name^="vehicle_"]', function (){
-    const vehicle_id = $(this).val();
-    if (vehicle_id == '0') return false;
-
-    const el = $(this).closest('.card-body');
-    const driver_actual = parseInt(el.find('[name^="driver_"]').val());
-
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        type: 'GET',
-        data: { vehicle_id },
-        url: $('#routeGetVehicle').val(),
-        async: true,
-        success: response => {
-            if (response.driver_id && el.find('[name^="driver_"]').val() === '0') {
-                el.find('[name^="driver_"]').val(response.driver_id)
-            } else if(response.driver_id && driver_actual !== parseInt(response.driver_id)) {
-                Swal.fire({
-                    title: 'Alteração de Motorista',
-                    html: `O veículo selecionado contém relacionado o motorista <b>${response.driver_name}</b>. <br>Deseja atualizar?`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#19d895',
-                    cancelButtonColor: '#bbb',
-                    confirmButtonText: 'Sim, atualizar',
-                    cancelButtonText: 'Não atualizar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        el.find('[name^="driver_"]').val(response.driver_id)
-                    }
-                })
-            }
-        }
-    });
-});
-
-$(document).on('change', '#calculate_net_amount_automatic', function(){
-    if ($(this).is(':checked')) {
-        $('#discount_value').attr('disabled', false).val('0,00');
-        $('#extra_value').attr('disabled', false).val('0,00');
-        $('#net_value').attr('disabled', true);
+    $('#extra_value, #discount_value, #net_value').on('keyup', () => {
         reloadTotalRental();
-    } else {
-        $('#net_value').attr('disabled', false);
-        $('#discount_value').attr('disabled', true);
-        $('#extra_value').attr('disabled', true);
-    }
-});
-
-$(document).on("hidden.bs.modal", "#createRental", function () {
-    window.location.reload();
-});
-
-$('[name="type_rental"]').on('ifChanged', function() {
-    if (parseInt($(this).val()) === 0) {
-        if (!$('#parcels .parcel').length && $('[name="rental_id"]').length) {
-            $('#add_parcel').trigger('click');
+    })
+    .on('blur', function(){
+        if ($(this).val() === '') {
+            $(this).val('0,00');
         }
-    }
-});
+    });
 
+    $(document).on('keyup', '#net_value', function() {
+        let netAmount   = realToNumber($(this).val());
+        let grossAmount = realToNumber($('#gross_value').text());
+        let discount    = $('#discount_value');
+        let extra       = $('#extra_value');
+
+        discount.val('0,00');
+        extra.val('0,00');
+
+        if (netAmount > grossAmount) {
+            extra.val(numberToReal(netAmount - grossAmount));
+        } else if (netAmount < grossAmount) {
+            discount.val(numberToReal(grossAmount - netAmount));
+        }
+    });
+
+    $(document).on('click', '.btn-view-price-period-equipment', function (){
+        const btn = $(this);
+        const idEquipment = $(this).attr('id-equipment');
+
+        btn.attr('disable', true);
+
+        let descPeriod = '';
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'POST',
+            url: $('#routeGetPriceStockPeriodEquipment').val(),
+            data: { idEquipment },
+            success: response => {
+                if (response.length) {
+                    descPeriod += '<ol class="no-padding">';
+                    $.each(response, function (key, val) {
+                        descPeriod += `<li><b>${val.day_start} dias</b> até <b>${val.day_end} dias</b> por <b>R$${numberToReal(val.value)}</b></li>`;
+                    });
+                    descPeriod += '</ol>';
+                } else {
+                    descPeriod += 'Equipamento não contém valor por período definido.';
+                }
+
+                btn.attr('disable', true);
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Valores Por Período',
+                    html: descPeriod
+                });
+            }, error: () => {
+                btn.attr('disable', true);
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Valores Por Período',
+                    html: 'Não foi possível localizar os valores do equipamento.'
+                });
+            }
+        });
+
+        return false;
+    });
+
+    $(document).on('keyup change', '#parcels [name="due_day[]"]', function(){
+        let days = parseInt($(this).val());
+        const el = $(this).closest('.form-group');
+
+        el.find('[name="due_date[]"]').val(sumDaysDateNow(days));
+    });
+
+    $(document).on('blur', '#parcels [name="due_date[]"]', function(){
+        const dataVctoInput = $(this).val();
+        if (dataVctoInput === '') {
+            return false;
+        }
+
+        const diasVcto = calculateDays(getTodayDateEn(false), dataVctoInput);
+        const el = $(this).closest('.form-group');
+
+        el.find('[name="due_day[]"]').val(diasVcto);
+    });
+
+    $('#add_parcel').on('click', function(){
+        const parcels = $('#parcels .parcel').length;
+
+        if (parcels === 24) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção',
+                html: '<ol><li>É permitido adicionar até 24 vencimentos.</li></ol>'
+            });
+            return false;
+        }
+
+        $('#parcels').show().append(
+            createParcel(parcels)
+        ).find('.form-group').slideDown(500).find('[name="value_parcel[]"]').maskMoney({thousands: '.', decimal: ',', allowZero: true}).closest('.payment-item').find('.remove-payment').tooltip();
+
+        recalculeParcels();
+    });
+
+    $(document).on('click', '.remove-payment', function(){
+        const parcels = $('#parcels .parcel').length;
+
+        if (parcels === 1) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção',
+                html: '<ol><li>Deve conter no mínimo uma linha de pagamento.</li></ol>'
+            });
+            return;
+        }
+
+        $('#parcels').find('.remove-payment').tooltip('dispose');
+
+        $(this).closest('.parcel').remove();
+
+        $('#parcels').find('.remove-payment').tooltip();
+
+        recalculeParcels();
+    });
+
+    $('#automatic_parcel_distribution').on('change', function(){
+        const check = $(this).is(':checked');
+
+        if (check) {
+            $('#parcels .parcel [name="value_parcel[]"]').attr('disabled', true);
+            recalculeParcels();
+        } else
+            $('#parcels .parcel [name="value_parcel[]"]').attr('disabled', false);
+
+    });
+
+    $(document).on('change', '[name^="vehicle_"]', function (){
+        const vehicle_id = $(this).val();
+        if (vehicle_id == '0') {
+            return false;
+        }
+
+        const el = $(this).closest('.card-body');
+        const driver_actual = parseInt(el.find('[name^="driver_"]').val());
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'GET',
+            data: { vehicle_id },
+            url: $('#routeGetVehicle').val() + `/${vehicle_id}`,
+            async: true,
+            success: response => {
+                if (response.driver_id && el.find('[name^="driver_"]').val() === '0') {
+                    el.find('[name^="driver_"]').val(response.driver_id)
+                } else if (response.driver_id && driver_actual !== parseInt(response.driver_id)) {
+                    Swal.fire({
+                        title: 'Alteração de Motorista',
+                        html: `O veículo selecionado contém relacionado o motorista <b>${response.driver_name}</b>. <br>Deseja atualizar?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#19d895',
+                        cancelButtonColor: '#bbb',
+                        confirmButtonText: 'Sim, atualizar',
+                        cancelButtonText: 'Não atualizar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            el.find('[name^="driver_"]').val(response.driver_id)
+                        }
+                    })
+                }
+            }
+        });
+    });
+
+    $('#calculate_net_amount_automatic').on('change', function(){
+        if ($(this).is(':checked')) {
+            $('#discount_value').attr('disabled', false).val('0,00');
+            $('#extra_value').attr('disabled', false).val('0,00');
+            $('#net_value').attr('disabled', true);
+            reloadTotalRental();
+        } else {
+            $('#net_value').attr('disabled', false);
+            $('#discount_value').attr('disabled', true);
+            $('#extra_value').attr('disabled', true);
+        }
+    });
+
+    $("#createRental").on("hidden.bs.modal", function () {
+        window.location.reload();
+    });
+
+    $('[name="type_rental"]').on('ifChanged', function() {
+        if (parseInt($(this).val()) === 0) {
+            if (!$('#parcels .parcel').length && $('[name="rental_id"]').length) {
+                $('#add_parcel').trigger('click');
+            }
+        }
+    });
+});
 const setErrorStepWrong = step => {
 
     setTimeout(() => {
         $('#formRental .steps ul li').removeClass('error');
-        for (let i = 0; i < step; i++)
+        for (let i = 0; i < step; i++) {
             $(`#formRental .steps ul li:eq(${i})`).removeClass('current').addClass('done');
+        }
 
         $(`#formRental .steps ul li:eq(${step})`).addClass('error').find('a').trigger('click');
     }, 150);
@@ -483,7 +490,9 @@ const recalculeParcels = () => {
 
         for (let count = 0; count < parcels; count++) {
 
-            if((count + 1) === parcels) valueParcel = netValue - valueSumParcel;
+            if ((count + 1) === parcels) {
+                valueParcel = netValue - valueSumParcel;
+            }
 
             valueSumParcel += parseFloat((netValue / parcels).toFixed(2));
             $(`#parcels .parcel [name="value_parcel[]"]:eq(${count})`).val(numberToReal(valueParcel));
@@ -508,18 +517,18 @@ const createParcel = (due, due_day = null, due_date = null, due_value = null, vi
     const disabledValue = $('#automatic_parcel_distribution').is(':checked') ? 'disabled' : '';
     const delete_button = view_btn_delete ? `<div class="input-group-prepend stock-Equipment-payment col-md-1 no-padding"><button type="button" class="btn btn-danger btn-flat w-100 remove-payment" title="Excluir Pagamento"><i class="fa fa-trash"></i></button></div>` : '';
     return `<div class="form-group mt-1 parcel">
-            <div class="d-flex align-items-center justify-content-between payment-item">
-                <div class="input-group col-md-12 no-padding">
-                    <input type="text" class="form-control col-md-3 text-center" name="due_day[]" value="${due_day}">
-                    <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${due_date}">
-                    <div class="input-group-prepend col-md-1 no-padding">
-                        <span class="input-group-text pl-3 pr-3 col-md-12"><strong>R$</strong></span>
-                    </div>
-                    <input type="text" class="form-control col-md-3 no-border-radius text-center" name="value_parcel[]" value="${due_value}" ${disabledValue}>
-                    ${delete_button}
+        <div class="d-flex align-items-center justify-content-between payment-item">
+            <div class="input-group col-md-12 no-padding">
+                <input type="text" class="form-control col-md-3 text-center" name="due_day[]" value="${due_day}">
+                <input type="date" class="form-control col-md-4 text-center" name="due_date[]" value="${due_date}">
+                <div class="input-group-prepend col-md-1 no-padding">
+                    <span class="input-group-text pl-3 pr-3 col-md-12"><strong>R$</strong></span>
                 </div>
+                <input type="text" class="form-control col-md-3 no-border-radius text-center" name="value_parcel[]" value="${due_value}" ${disabledValue}>
+                ${delete_button}
             </div>
-        </div>`
+        </div>
+    </div>`
 }
 
 const equipmentMessageDefault = message => {
@@ -538,11 +547,6 @@ const showSeparatorEquipmentSelected = () => {
 }
 
 const fixEquipmentDates = () => {
-    /*if (budget) {
-        checkLabelAnimate();
-        return false;
-    }*/
-
     let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
     let dateDelivery = $('input[name="date_delivery"]').val();
     let dateWithdrawal = $('input[name="date_withdrawal"]').val();
@@ -567,20 +571,18 @@ const changeStepPosUnset = () => {
 }
 
 const getStockEquipment = async idEquipment => {
-    let stockReal = await $.ajax({
+    return await $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
         url: $('#routeGetStockEquipment').val(),
-        data: { idEquipment },
+        data: {idEquipment},
         async: true,
         success: response => {
             return response;
         }
     });
-
-    return stockReal;
 }
 
 const getPriceEquipment = async idEquipment => {
@@ -595,20 +597,20 @@ const getPriceEquipment = async idEquipment => {
         diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
     }
 
-    let price = await $.ajax({
+    return await $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
         url: $('#routeGetPriceEquipment').val(),
-        data: { idEquipment, diffDays },
+        data: {idEquipment, diffDays},
         async: true,
         success: response => {
             return response;
-        }, error: e => { console.log(e) }
+        }, error: e => {
+            console.log(e)
+        }
     });
-
-    return price;
 }
 
 const getEquipment = async equipment => {
@@ -631,9 +633,9 @@ const getEquipment = async equipment => {
 
 const createEquipmentPayment = async (equipment, priceStock = null, unity_price = null, total_price = null, quantity = null) => {
 
-    let dataEquipment        = await getEquipment(equipment);
-    let stockEquipment       = quantity === null ? $(`#collapseEquipment-${equipment} input[name^="stock_equipment_"]`).val() : quantity;
-    const priceEquipment     = unity_price === null ? (priceStock === null ? await getPriceEquipment(equipment) : priceStock.price) : unity_price;
+    let dataEquipment   = await getEquipment(equipment);
+    let stockEquipment  = quantity === null ? $(`#collapseEquipment-${equipment} input[name^="stock_equipment_"]`).val() : quantity;
+    const priceEquipment    = unity_price === null ? (priceStock === null ? await getPriceEquipment(equipment) : priceStock.price) : unity_price;
     let priceEquipmentFormat = numberToReal(priceEquipment);
     let priceEquipmentTotal  = numberToReal(total_price === null ? (priceEquipment * stockEquipment) : total_price);
 
@@ -756,20 +758,20 @@ const getPriceStockEquipments = async idEquipment => {
         return false;
     }
 
-    let priceStock = await $.ajax({
+    return await $.ajax({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         type: 'POST',
         url: $('#routeGetPriceStockEquipments').val(),
-        data: { arrEquipments, arrDiffDays },
+        data: {arrEquipments, arrDiffDays},
         async: true,
         success: response => {
             return response;
-        }, error: e => { console.log(e) }
+        }, error: e => {
+            console.log(e)
+        }
     });
-
-    return priceStock;
 }
 
 const setEquipmentRental = (
@@ -784,7 +786,10 @@ const setEquipmentRental = (
     is_exchange = false,
     rentalEquipmentId = '',
 ) => {
-    $(`.equipment[id-equipment="${idEquipment}"]`).empty().toggleClass('equipment load-equipment').append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
+    $(`.equipment[id-equipment="${idEquipment}"]`)
+        .empty()
+        .toggleClass('equipment load-equipment')
+        .append('<td colspan="4" class="text-center"><i class="fa fa-spinner fa-spin"></i> Carregando ...</td>')
 
     $.ajax({
         headers: {
@@ -897,6 +902,7 @@ const setEquipmentRental = (
                 date_withdrawal = transformDateForBr(sumMinutesDateNow(1, true, false));
                 hide_use_date_diff_equip = 'd-none';
                 equipment_use_date_diff_equip_date = '';
+                equipment_not_use_date_withdrawal = '';
             }
 
             let regEquipment = `

@@ -75,7 +75,7 @@ Route::group(['middleware' => 'auth'], function (){
 
     });
 
-    // Motoristas
+    // Veículo
     Route::group(['prefix' => '/veiculo', 'as' => 'vehicle.'], function () {
 
         Route::get('/', [App\Http\Controllers\VehicleController::class, 'index'])->name('index');
@@ -217,7 +217,7 @@ Route::group(['middleware' => 'auth'], function (){
             Route::post('/delete', [App\Http\Controllers\VehicleController::class, 'delete'])->name('delete');
             Route::post('/novo-veiculo', [App\Http\Controllers\VehicleController::class, 'insert'])->name('new-vehicle');
             Route::get('/visualizar-veiculos', [App\Http\Controllers\VehicleController::class, 'getVehicles'])->name('get-vehicles');
-            Route::get('/visualizar-veiculo', [App\Http\Controllers\VehicleController::class, 'getVehicle'])->name('get-vehicle');
+            Route::get('/visualizar-veiculo/{id?}', [App\Http\Controllers\VehicleController::class, 'getVehicle'])->name('get-vehicle');
         });
         Route::group(['prefix' => '/residuo', 'as' => 'residue.'], function () {
             Route::get('/visualizar-residuos', [App\Http\Controllers\ResidueController::class, 'getResidues'])->name('get-residues');

@@ -145,7 +145,8 @@
                     nameEquipment,
                     stockMax,
                     dateDeliveryTime,
-                    dateWithdrawalTime;
+                    dateWithdrawalTime,
+                    use_date_diff_equip;
 
                 $('#equipments-selected div.card').each(function() {
                     idEquipment        = parseInt($('.card-header', this).attr('id-equipment'));
@@ -154,20 +155,21 @@
                     stockMax            = parseInt($('[name^="stock_equipment_"]', this).attr('max-stock'));
 
                     if (isNaN(stockEquipment) || stockEquipment === 0) {
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) deve ser informado uma quantidade.`);
+                        arrErrors.push(`O equipamento<br><strong>${nameEquipment}</strong><br>deve ser informado uma quantidade.`);
                     } else if (stockEquipment > stockMax && !budget) {
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
+                        arrErrors.push(`O equipamento<br><strong>${nameEquipment}</strong><br>não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
                     }
 
                     notUseDateWithdrawal = $('.not_use_date_withdrawal', this).is(':checked');
+                    use_date_diff_equip = $('.use_date_diff_equip', this).is(':checked');
 
                     dateDeliveryTime = new Date(transformDateForEn($('input[name^="date_delivery_equipment_"]', this).val())).getTime();
                     dateWithdrawalTime = new Date(transformDateForEn($('input[name^="date_withdrawal_equipment_"]', this).val())).getTime();
 
-                    if ((dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0))) {
-                        arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento ( <strong>${nameEquipment}</strong> ) deve ser informada corretamente.`);
-                    } else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) {
-                        arrErrors.push(`A data prevista de entrega do equipamento ( <strong>${nameEquipment}</strong> ) não pode ser maior ou igual que a data prevista de retirada.`);
+                    if (use_date_diff_equip && (dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0))) {
+                        arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento<br><strong>${nameEquipment}</strong><br>deve ser informada corretamente.`);
+                    } else if (use_date_diff_equip && !notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) {
+                        arrErrors.push(`A data prevista de entrega do equipamento<br><strong>${nameEquipment}</strong><br>não pode ser maior ou igual que a data prevista de retirada.`);
                     }
                 });
 
@@ -296,7 +298,6 @@
             changeStepPosUnset();
             let arrErrors = [];
             let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
-            let time0,time1,time2,time3,time4,time5,time6,time7,time8 = 0;
 
             if (priorIndex === getIndexStep(0)) { // tipo de cobrança
 
@@ -315,95 +316,14 @@
                     $(`#${rental_t}`).html(`<span class="number">${numberIndex}.</span> Resumo Equipamento`);
                 }
             }
-            let date = new Date();
-            time0 = date.getTime();
 
             if (priorIndex <= getIndexStep(3) && currentIndex >= getIndexStep(4)) { // equipamento
-                let pricesAndStocks;
-                let dataEquipments = [];
-                let dataEquipmentsPayCheck = [];
-                let newPricesUpdate = [];
-                let newPricesUpdateNames = [];
-                let idEquipments = [];
-                let priceEquipment = 0;
-                let idEquipment,stockEquipment,nameEquipment;
-                date = new Date();
-                time1 = date.getTime();
-                await $('#equipments-selected div.card').each(async function() {
-                    idEquipment        = parseInt($('.card-header', this).attr('id-equipment'));
-                    stockEquipment     = parseInt($('[name^="stock_equipment_"]', this).val());
-                    nameEquipment      = $('.card-header a:eq(0)', this).text();
-                    dataEquipments.push([idEquipment, stockEquipment, nameEquipment]);
-                    idEquipments.push(idEquipment);
-                });
-                date = new Date();
-                time2 = date.getTime();
 
-                $('.list-equipments-payment-load').show();
-                $('.list-equipments-payment').hide();
-                $('#gross_value').html('<i class="fa fa-spin fa-spinner"></i>&nbsp;&nbsp;Calculando');
-                if ($('#calculate_net_amount_automatic').is(':checked')) {
-                    $('#net_value').val('Calculando...');
-                }
+                const result_validation = await updateDataEquipmentToPayment();
 
-                date = new Date();
-                time3 = date.getTime();
-                pricesAndStocks = await getPriceStockEquipments(idEquipments);
-                date = new Date();
-                time4 = date.getTime();
-                if (pricesAndStocks) {
-                    await Promise.all(dataEquipments.map(async equipment => {
-                        dataEquipmentsPayCheck.push(equipment[0]);
-                        if (equipment[1] > pricesAndStocks[equipment[0]].stock && !budget) {
-                            $(`#collapseEquipment-${equipment[0]}`).find('input[name^="stock_equipment_"]').attr('max-stock', pricesAndStocks[equipment[0]].stock).val(pricesAndStocks[equipment[0]].stock);
-                            $(`#collapseEquipment-${equipment[0]}`).find('.stock_available').text('Disponível: ' + pricesAndStocks[equipment[0]].stock);
-                            arrErrors.push(`O equipamento ( <strong>${equipment[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipment[0]].stock} un</strong>`);
-                        }
-
-                        if (!$(`.list-equipments-payment li[id-equipment="${equipment[0]}"]`).length) {
-                            await createEquipmentPayment(equipment[0], pricesAndStocks[equipment[0]]);
-                        } else {
-                            priceEquipment = pricesAndStocks[equipment[0]].price;
-
-                            date = new Date();
-                            time5 = date.getTime();
-                            $(`#price-un-equipment-${equipment[0]}`).val(numberToReal(priceEquipment));
-                            $(`.list-equipments-payment li[id-equipment="${equipment[0]}"] .stock-equipment-payment strong`).text(equipment[1] + 'un');
-
-                            if (numberToReal(priceEquipment * equipment[1]) !== $(`#price-total-equipment-${equipment[0]}`).val()) {
-                                newPricesUpdate.push({
-                                    el: $(`#price-total-equipment-${equipment[0]}`),
-                                    price: numberToReal(priceEquipment * equipment[1])
-                                });
-                                newPricesUpdateNames.push(equipment[2] + ' | R$' + $(`#price-total-equipment-${equipment[0]}`).val() + ' <i class="fas fa-long-arrow-alt-right"></i> R$' + numberToReal(priceEquipment * equipment[1]));
-                            }
-                            date = new Date();
-                            time6 = date.getTime();
-                        }
-                    }));
-                }
-                date = new Date();
-                time7 = date.getTime();
-
-                await $('.list-equipments-payment li').each(async function() {
-                    idEquipment = parseInt($(this).attr('id-equipment'));
-                    if (!dataEquipmentsPayCheck.includes(idEquipment)) {
-                        $(`.list-equipments-payment li[id-equipment="${idEquipment}"]`).remove();
-                    }
-                });
-                date = new Date();
-                time8 = date.getTime();
-
-                /*console.log({
-                    0: time1-time0,
-                    1: time2-time1,
-                    2: time3-time2,
-                    'check-equip': time4-time3,
-                    3: time5-time4,
-                    4: time6-time5,
-                    5: time7-time6,
-                    6: time8-time7,
-                })*/
+                arrErrors = result_validation.arrErrors;
+                const newPricesUpdate = result_validation.newPricesUpdate;
+                const newPricesUpdateNames = result_validation.newPricesUpdateNames;
 
                 if (arrErrors.length) {
                     Swal.fire({
@@ -613,3 +533,72 @@ $(function() {
         $('#add_parcel').trigger('click');
     }
 });
+
+const updateDataEquipmentToPayment = async () => {
+    let arrErrors = [];
+    let pricesAndStocks;
+    let dataEquipments = [];
+    let dataEquipmentsPayCheck = [];
+    let newPricesUpdate = [];
+    let newPricesUpdateNames = [];
+    let idEquipments = [];
+    let priceEquipment = 0;
+    let idEquipment,stockEquipment,nameEquipment;
+    await $('#equipments-selected div.card').each(async function() {
+        idEquipment        = parseInt($('.card-header', this).attr('id-equipment'));
+        stockEquipment     = parseInt($('[name^="stock_equipment_"]', this).val());
+        nameEquipment      = $('.card-header a:eq(0)', this).text();
+
+        dataEquipments.push([idEquipment, stockEquipment, nameEquipment]);
+        idEquipments.push(idEquipment);
+    });
+
+    $('.list-equipments-payment-load').show();
+    $('.list-equipments-payment').hide();
+    $('#gross_value').html('<i class="fa fa-spin fa-spinner"></i>&nbsp;&nbsp;Calculando');
+    if ($('#calculate_net_amount_automatic').is(':checked')) {
+        $('#net_value').val('Calculando...');
+    }
+
+    pricesAndStocks = await getPriceStockEquipments(idEquipments);
+    if (pricesAndStocks) {
+        await Promise.all(dataEquipments.map(async equipment => {
+            dataEquipmentsPayCheck.push(equipment[0]);
+            if (equipment[1] > pricesAndStocks[equipment[0]].stock && !budget) {
+                $(`#collapseEquipment-${equipment[0]}`).find('input[name^="stock_equipment_"]').attr('max-stock', pricesAndStocks[equipment[0]].stock).val(pricesAndStocks[equipment[0]].stock);
+                $(`#collapseEquipment-${equipment[0]}`).find('.stock_available').text('Disponível: ' + pricesAndStocks[equipment[0]].stock);
+                arrErrors.push(`O equipamento<br><strong>${equipment[2]}</strong><br>não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipment[0]].stock} un</strong>`);
+            }
+
+            if (!$(`.list-equipments-payment li[id-equipment="${equipment[0]}"]`).length) {
+                await createEquipmentPayment(equipment[0], pricesAndStocks[equipment[0]]);
+            } else {
+                priceEquipment = pricesAndStocks[equipment[0]].price;
+
+                $(`#price-un-equipment-${equipment[0]}`).val(numberToReal(priceEquipment));
+                $(`.list-equipments-payment li[id-equipment="${equipment[0]}"] .stock-equipment-payment strong`).text(equipment[1] + 'un');
+
+                if (numberToReal(priceEquipment * equipment[1]) !== $(`#price-total-equipment-${equipment[0]}`).val()) {
+                    newPricesUpdate.push({
+                        el: $(`#price-total-equipment-${equipment[0]}`),
+                        price: numberToReal(priceEquipment * equipment[1])
+                    });
+                    newPricesUpdateNames.push(equipment[2] + ' | R$' + $(`#price-total-equipment-${equipment[0]}`).val() + ' <i class="fas fa-long-arrow-alt-right"></i> R$' + numberToReal(priceEquipment * equipment[1]));
+                }
+            }
+        }));
+    }
+
+    await $('.list-equipments-payment li').each(async function() {
+        idEquipment = parseInt($(this).attr('id-equipment'));
+        if (!dataEquipmentsPayCheck.includes(idEquipment)) {
+            $(`.list-equipments-payment li[id-equipment="${idEquipment}"]`).remove();
+        }
+    });
+
+    return {
+        "newPricesUpdate": newPricesUpdate,
+        "newPricesUpdateNames": newPricesUpdateNames,
+        "arrErrors": arrErrors
+    }
+}

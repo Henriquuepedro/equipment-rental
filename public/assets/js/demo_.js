@@ -206,11 +206,15 @@ const inArray = (needle, haystack) => {
 
 // Formata data yyyy-mm-dd -> dd/mm/yyyy
 const transformDateForBr = date => {
-    if(date == null) return false;
+    if (date == null) {
+        return false;
+    }
 
     const length = date.length;
 
-    if (length !== 10 && length !== 16 && length !== 19) return false;
+    if (length !== 10 && length !== 16 && length !== 19) {
+        return false;
+    }
 
     if (length === 16 || length === 19) {
         if (!moment(date, FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS).isValid()) {
@@ -219,39 +223,49 @@ const transformDateForBr = date => {
         return moment(date, FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS).format(FORMAT_DATETIME_BRAZIL_NO_SECONDS);
     }
 
-    if (!moment(date, FORMAT_DATE_INTERNATIONAL).isValid()) return false;
+    if (!moment(date, FORMAT_DATE_INTERNATIONAL).isValid()) {
+        return false;
+    }
     return moment(date, FORMAT_DATE_INTERNATIONAL).format(FORMAT_DATE_BRAZIL);
 }
 // Formata data dd/mm/yyyy -> yyyy-mm-dd
 const transformDateForEn = date => {
-    if(date == null) return false;
+    if (date == null) {
+        return false;
+    }
 
     const length = date.length;
 
-    if (length !== 10 && length !== 16 && length !== 19) return false;
+    if (length !== 10 && length !== 16 && length !== 19) {
+        return false;
+    }
 
     if (length === 16 || length === 19) {
-        if (!moment(date, FORMAT_DATETIME_BRAZIL_NO_SECONDS).isValid()) return false;
+        if (!moment(date, FORMAT_DATETIME_BRAZIL_NO_SECONDS).isValid()) {
+            return false;
+        }
         return moment(date, FORMAT_DATETIME_BRAZIL_NO_SECONDS).format(FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS);
     }
 
-    if (!moment(date, FORMAT_DATE_BRAZIL).isValid()) return false;
+    if (!moment(date, FORMAT_DATE_BRAZIL).isValid()) {
+        return false;
+    }
     return moment(date, FORMAT_DATE_BRAZIL).format(FORMAT_DATE_INTERNATIONAL);
 }
 
-const getTodayDateBr = (returnTime = true, seconds = true) => {
-    if (returnTime && seconds) {
+const getTodayDateBr = (returnTime = true, returnSeconds = true) => {
+    if (returnTime && returnSeconds) {
         return moment().format(FORMAT_DATETIME_BRAZIL);
-    } else if (returnTime && !seconds) {
+    } else if (returnTime && !returnSeconds) {
         return moment().format(FORMAT_DATETIME_BRAZIL_NO_SECONDS);
     }
     return moment().format(FORMAT_DATE_BRAZIL);
 }
 
-const getTodayDateEn = (returnTime = true, seconds = true) => {
-    if (returnTime && seconds) {
+const getTodayDateEn = (returnTime = true, returnSeconds = true) => {
+    if (returnTime && returnSeconds) {
         return moment().format(FORMAT_DATETIME_INTERNATIONAL);
-    } else if (returnTime && !seconds) {
+    } else if (returnTime && !returnSeconds) {
         return moment().format(FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS);
     }
 
@@ -279,15 +293,15 @@ const sumDaysDateNow = days => {
 }
 
 // Soma minutos de acordo com a data de hoje.
-const sumMinutesDateNow = (days, returnTime = true, seconds = true) => {
+const sumMinutesDateNow = (minutes, returnTime = true, returnSeconds = true) => {
     let format = FORMAT_DATE_INTERNATIONAL;
-    if (returnTime && seconds) {
+    if (returnTime && returnSeconds) {
         format = FORMAT_DATETIME_INTERNATIONAL;
-    } else if (returnTime && !seconds) {
+    } else if (returnTime && !returnSeconds) {
         format = FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS;
     }
 
-    return moment().add(days, 'm').format(format);
+    return moment().add(minutes, 'm').format(format);
 }
 
 const calculateDays = (date1, date2) => {

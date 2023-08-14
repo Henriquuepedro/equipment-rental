@@ -47,9 +47,9 @@
                     stockMax            = parseInt($('[name^="stock_equipment_"]', this).attr('max-stock'));
 
                     if (isNaN(stockEquipment) || stockEquipment === 0) {
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) deve ser informado uma quantidade.`);
+                        arrErrors.push(`O equipamento<br><strong>${nameEquipment}</strong><br>deve ser informado uma quantidade.`);
                     } else if (stockEquipment > stockMax && !budget) {
-                        arrErrors.push(`O equipamento ( <strong>${nameEquipment}</strong> ) não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
+                        arrErrors.push(`O equipamento<br><strong>${nameEquipment}</strong><br>não tem estoque suficiente. <strong>Disponível: ${stockMax} un</strong>`);
                     }
 
                     notUseDateWithdrawal = $('.not_use_date_withdrawal', this).is(':checked');
@@ -58,9 +58,9 @@
                     dateWithdrawalTime = new Date(transformDateForEn($('input[name^="date_withdrawal_equipment_"]', this).val())).getTime();
 
                     if ((dateDeliveryTime === 0 || (!notUseDateWithdrawal && dateWithdrawalTime === 0))) {
-                        arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento ( <strong>${nameEquipment}</strong> ) deve ser informada corretamente.`);
+                        arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento<br><strong>${nameEquipment}</strong><br>deve ser informada corretamente.`);
                     } else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) {
-                        arrErrors.push(`A data prevista de entrega do equipamento ( <strong>${nameEquipment}</strong> ) não pode ser maior ou igual que a data prevista de retirada.`);
+                        arrErrors.push(`A data prevista de entrega do equipamento<br><strong>${nameEquipment}</strong><br>não pode ser maior ou igual que a data prevista de retirada.`);
                     }
                 });
 
@@ -137,7 +137,7 @@
                         if (equipment[1] > pricesAndStocks[equipment[0]].stock && !budget) {
                             $(`#collapseEquipment-${equipment[0]}`).find('input[name^="stock_equipment_"]').attr('max-stock', pricesAndStocks[equipment[0]].stock).val(pricesAndStocks[equipment[0]].stock);
                             $(`#collapseEquipment-${equipment[0]}`).find('.stock_available').text('Disponível: ' + pricesAndStocks[equipment[0]].stock);
-                            arrErrors.push(`O equipamento ( <strong>${equipment[2]}</strong> ) não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipment[0]].stock} un</strong>`);
+                            arrErrors.push(`O equipamento<br><strong>${equipment[2]}</strong><br>não tem estoque suficiente. <strong>Disponível: ${pricesAndStocks[equipment[0]].stock} un</strong>`);
                         }
 
                         if (!$(`.list-equipments-payment li[id-equipment="${equipment[0]}"]`).length) {

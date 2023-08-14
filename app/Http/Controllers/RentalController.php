@@ -137,8 +137,19 @@ class RentalController extends Controller
                     $btn_class = 'btnWithdraw';
                     $btn_text = 'Retirada'; // ou coleta?
                 }
+
                 $buttons .="<button class='dropdown-item $btn_class' data-rental-id='{$value['id']}'><i class='fas fa-check'></i> Confirmar $btn_text</button>";
-                $buttons .="<a href='".route('rental.update', ['id' => $value['id']])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Locação</a>";
+
+                $exist_equipment_exchanged = false;
+                foreach ($this->rental_equipment->getEquipments($company_id, $value['id']) as $equipment) {
+                    if ($equipment['exchanged']) {
+                        $exist_equipment_exchanged = true;
+                    }
+                }
+
+                if (!$exist_equipment_exchanged) {
+                    $buttons .="<a href='".route('rental.update', ['id' => $value['id']])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Locação</a>";
+                }
 
                 if ($typeRental === 'withdraw' && count($this->rental_equipment->getEquipmentToExchange($company_id, $value['id']))) {
                     $buttons .="<a href='".route('rental.exchange', ['id' => $value['id']])."' class='dropdown-item'><i class='fa fa fa-arrow-right-arrow-left'></i> Trocar Equipamento</a>";
@@ -148,12 +159,7 @@ class RentalController extends Controller
             $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
             $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
 
-            $buttons = "<div class='row'><div class='col-12'><div class='dropdown dropleft'>
-                            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsRental-{$value['id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                              <i class='fa fa-cog'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropActionsRental-{$value['id']}'>$buttons</div</div>
-                        </div>";
+            $buttons = dropdownButtonsDataList($buttons, $value['id']);
 
             $expectedDeliveryDate   = null;
             $expectedWithdrawalDate = null;
@@ -355,7 +361,9 @@ class RentalController extends Controller
         $discountValue = transformMoneyBr_En($request->input('discount_value'));
         $response->grossValue = 0;
         if (!$noCharged) {
-            $response->grossValue += $total_rental_no_paid + $total_rental_paid + $discountValue - $extraValue;
+            if ($request->input('is_exchange')) {
+                $response->grossValue += $total_rental_no_paid + $total_rental_paid + $discountValue - $extraValue;
+            }
         }
 
         $equipments = $this->equipment->getEquipments_In($company_id, $request->equipment_id);

@@ -55,21 +55,19 @@
             const is_budget = $('#budget').val() == true;
             const rental_id = $('[name="rental_id"]').val();
 
-            setTimeout(async () => {
-                $('.show-address').each(function () {
-                    $(this).find('input').each(function () {
-                        $(this).val($(this).attr('value'));
-                    });
+            //setTimeout(async () => {
+                $('.show-address input').each(function () {
+                    // $(this).val($(this).attr('value'));
                 });
 
-                checkLabelAnimate();
+                await checkLabelAnimate();
 
                 if ($('[name="residues"]').val().split(',').length) {
                     $('.container-residues').show();
                     $('[name="residues[]"]').val($('[name="residues"]').val().split(',')).select2('destroy').select2();
                 }
 
-                getEquipmentsRental(rental_id, is_budget, async function(response){
+                await getEquipmentsRental(rental_id, is_budget, async function(response){
                     $(response).each(async function (k, equipment) {
                         equipment_id             = equipment.equipment_id;
                         quantity                 = equipment.quantity;
@@ -121,16 +119,17 @@
                         }).closest('.payment-item').find('[name="due_date[]"]').trigger('blur').closest('.payment-item').find('.remove-payment').tooltip();
                     });
                 });
-            }, 500);
+            //}, 500);
 
-                setTimeout(() => {getEquipmentsRental(rental_id, is_budget, async function(response){
+            //setTimeout(async () => {
+                await getEquipmentsRental(rental_id, is_budget, async function(response){
                     $(response).each(async function (k, equipment) {
                         equipment_id             = equipment.equipment_id;
                         quantity                 = equipment.quantity;
                         total_value              = equipment.total_value;
                         unitary_value            = equipment.unitary_value;
 
-                        createEquipmentPayment(equipment_id, null, unitary_value, total_value, quantity);
+                        await createEquipmentPayment(equipment_id, null, unitary_value, total_value, quantity);
                     });
                 });
 
@@ -138,19 +137,20 @@
                 $('.list-equipments-payment').slideDown('slow');
 
                 $('li.disabled[aria-disabled="true"]').removeClass('disabled').addClass('done').prop('aria-disabled', false);
-                $('#net_value').val($('#net_value').attr('value'));
+
+                //setTimeout(async () => {
+                    await updateDataEquipmentToPayment();
+                    await reloadTotalRental();
+                //}, 250);
 
                 if ($('#calculate_net_amount_automatic').is(':checked')) {
                     $('#net_value').attr('disabled', true);
-                    setTimeout(() => {
-                        reloadTotalRental();
-                    }, 100)
                 } else {
                     $('#net_value').attr('disabled', false);
                     $('#discount_value').attr('disabled', true);
                     $('#extra_value').attr('disabled', true);
                 }
-            }, 750)
+            //}, 750)
 
             if ($('[name="address_state"]').length) {
                 address_state = $('[name="address_state"]').val();
@@ -163,7 +163,7 @@
                 await loadCities($('[name="city"]'), address_state, address_city);
             }
 
-            $('input[name="type_rental"]').on('ifChanged', function(){
+            await $('input[name="type_rental"]').on('ifChanged', function(){
                 console.log($('input[name="type_rental"]').val());
 
                 if (parseInt($('input[name="type_rental"]:checked').val()) === 1 && $('#parcels div').length) {
