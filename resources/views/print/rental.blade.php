@@ -202,7 +202,7 @@
             @foreach($equipments as $equipment)
                 <tr>
                     <td class='info' style='width: {{ $budget ? 69 : 35 }}%'>
-                        <span>Equipamento</span>
+                        <span>Equipamento {!! $equipment->exchange_rental_equipment_id ? '<b>(exchanged)</b>' : '' !!}</span>
                         <p class='dadosLocacao'>{{ $equipment->name ?? 'Caçamba '.$equipment->volume.'m³' }} - {{ $equipment->reference }}</p>
                     </td>
                     <td class='info' style='width: 10%'>
@@ -215,17 +215,17 @@
                     </td>
                     @if(!$budget)
                     <td class='info' style='width: 17%'>
-                        <span>Data Entrega</span>
-                        <p class='dadosLocacao'>{{ date('d/m/Y H:i', strtotime($equipment->expected_delivery_date)) }}</p>
+                        <span>Data Entrega{{ $equipment->actual_delivery_date ? '' : '*' }}</span>
+                        <p class='dadosLocacao'>{{ date('d/m/Y H:i', strtotime($equipment->actual_delivery_date ?? $equipment->expected_delivery_date)) }}</p>
                     </td>
                     <td class='info' style='width: 17%'>
-                        <span>Data Retirada</span>
-                        <p class='dadosLocacao'>{!! $equipment->expected_withdrawal_date ? date('d/m/Y H:i', strtotime($equipment->expected_withdrawal_date)) : '&nbsp;' !!}</p>
+                        <span>Data Retirada{{ $equipment->actual_withdrawal_date ? '' : '*' }}</span>
+                        <p class='dadosLocacao'>{!! dateInternationalToDateBrazil($equipment->actual_withdrawal_date ?? $equipment->expected_withdrawal_date, DATETIME_BRAZIL_NO_SECONDS) ?? '&nbsp;' !!}</p>
                     </td>
                     @endif
                     <td class='info' style='width: 10%'>
                         <span>Situação</span>
-                        <p class='dadosLocacao'>Criado</p>
+                        <p class='dadosLocacao'>{{ $equipment->actual_withdrawal_date ? 'Retirado' : ($equipment->actual_delivery_date ? 'Entregue' : 'Criado') }}</p>
                     </td>
                 </tr>
             @endforeach

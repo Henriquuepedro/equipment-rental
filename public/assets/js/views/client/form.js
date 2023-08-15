@@ -78,12 +78,12 @@ async function deniedLocation(){
     const recusouLocalizacao = true;
     const rsLocation = await $.getJSON('...',{ recusouLocalizacao }); // obter endereço empresa
     if(rsLocation != null){
-        let endereco = rsLocation[0].CENDERECO;
-        endereco += ` - ${rsLocation[0].NCEP}`;
-        endereco += ` - ${rsLocation[0].CBAIRRO}`;
-        endereco += ` - ${rsLocation[0].CCIDADE}`;
-        endereco += ` - ${rsLocation[0].CESTADO}`;
-        return endereco;
+        let address = rsLocation[0].address;
+        address += ` - ${rsLocation[0].zipcode}`;
+        address += ` - ${rsLocation[0].neighood}`;
+        address += ` - ${rsLocation[0].city}`;
+        address += ` - ${rsLocation[0].state}`;
+        return address;
     }
     if(rsLocation == null){
         Swal.fire(
@@ -115,18 +115,23 @@ const startMarker = latLng => {
     }, 1000);
 }
 const updateLocation = (findDiv) => {
-    const endereco  = findDiv.find('[name="address[]"], #address_new').val();
-    const numero    = findDiv.find('[name="number[]"], #number_new').val();
-    const cep       = findDiv.find('[name="cep[]"], #cep_new').val().replace(/[^0-9]/g, "");
-    const bairro    = findDiv.find('[name="neigh[]"], #neigh_new').val();
-    const cidade    = findDiv.find('[name="city[]"], #city_new').val();
-    const estado    = findDiv.find('[name="state[]"], #state_new').val();
+    const address   = findDiv.find('[name="address[]"], #address_new').val();
+    const number    = findDiv.find('[name="number[]"], #number_new').val();
+    const zipcode   = findDiv.find('[name="cep[]"], #cep_new').val().replace(/[^0-9]/g, "");
+    const neigh     = findDiv.find('[name="neigh[]"], #neigh_new').val();
+    const city      = findDiv.find('[name="city[]"], #city_new').val();
+    const state     = findDiv.find('[name="state[]"], #state_new').val();
 
-    loadAddressMap(`${endereco},${numero}-${cep}-${bairro}-${cidade}-${estado}`, findDiv);
+    loadAddressMap(`${address},${number}-${zipcode}-${neigh}-${city}-${state}`, findDiv);
 }
-// Atualiza mapa com a nota localização
+// Atualiza mapa com a nota localização.
 const locationLatLng = (lat, lng) => {
     const newLatLng = new L.LatLng(lat, lng);
+
+    if (typeof marker === "undefined") {
+        startMarker(newLatLng);
+    }
+
     marker.setLatLng(newLatLng);
     map.setView(newLatLng, 15);
     map.invalidateSize();
@@ -189,22 +194,22 @@ $('[name="type_person"]').on('change', function(){
 });
 
 $(document).on('blur', '[name="cep[]"], [name="cep"], #cep_new', function (){
-    const cep = $(this).val().replace(/\D/g, '');
+    const zipcode = $(this).val().replace(/\D/g, '');
     let el;
     if ($(this).closest('#new-addressses').length)
         el = $(this).closest('.box, td');
     else
         el = $(this).closest('.card-body, td');
 
-    if (cep.length === 0) return false;
-    if (cep.length !== 8) {
+    if (zipcode.length === 0) return false;
+    if (zipcode.length !== 8) {
         Toast.fire({
             icon: 'error',
             title: 'CEP não encontrado'
         });
         return false;
     }
-    $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/", function(dados) {
+    $.getJSON("https://viacep.com.br/ws/"+ zipcode +"/json/", function(dados) {
 
         if (!("erro" in dados)) {
             if(dados.logradouro !== '') {
@@ -375,7 +380,7 @@ $(document).on('click', '.save-address, .edit-address', function(event){
 
 
     const name_control = el.find('[name="name_address[]"]').val();
-    const cep = el.find('[name="cep[]"]').val();
+    const zipcode = el.find('[name="cep[]"]').val();
     const address = el.find('[name="address[]"]').val();
     const number = el.find('[name="number[]"]').val();
     const neigh = el.find('[name="neigh[]"]').val();
@@ -384,7 +389,7 @@ $(document).on('click', '.save-address, .edit-address', function(event){
 
     el = el.prev(); // volta a linha da tabela
     el.find('td:eq(0)').text(name_control);
-    el.find('td:eq(1)').text(cep);
+    el.find('td:eq(1)').text(zipcode);
     el.find('td:eq(2)').text(`${address}, ${number} - ${neigh}`);
     el.find('td:eq(3)').text(`${city} - ${state}`);
 });
@@ -404,7 +409,7 @@ $(document).on('click', '.save-new-address', function(event){
 
 
     const name_control = el.find('#name_address_new').val();
-    const cep = el.find('#cep_new').val();
+    const zipcode = el.find('#cep_new').val();
     const address = el.find('#address_new').val();
     const number = el.find('#number_new').val();
     const complement = el.find('#complement_new').val();
@@ -415,7 +420,7 @@ $(document).on('click', '.save-new-address', function(event){
     const lat = el.find('#lat_new').val();
     const lng = el.find('#lng_new').val();
 
-    createNewAddress(name_control, cep, address, number, complement, reference, neigh, city, state, lat, lng);
+    createNewAddress(name_control, zipcode, address, number, complement, reference, neigh, city, state, lat, lng);
     el.find('.remove-new-address').trigger('click');
 
     checkLabelAnimate();
@@ -534,11 +539,11 @@ const cleanBorderAddress = () => {
     $('[name="state[]"], #state_new').removeAttr('style');
 }
 
-const createNewAddress = (name_address, cep, address, number, complement, reference, neigh, city, state, lat, lng) => {
+const createNewAddress = (name_address, zipcode, address, number, complement, reference, neigh, city, state, lat, lng) => {
     $('#tableAddressClient tbody').append(`
     <tr>
         <td>${name_address}</td>
-        <td>${cep}</td>
+        <td>${zipcode}</td>
         <td>${address}, ${number} - ${neigh}</td>
         <td>${city} - ${state}</td>
         <td>
@@ -558,7 +563,7 @@ const createNewAddress = (name_address, cep, address, number, complement, refere
                 <div class="row">
                     <div class="form-group col-md-3">
                         <label>CEP</label>
-                        <input type="text" class="form-control" name="cep[]" autocomplete="nope" value="${cep}">
+                        <input type="text" class="form-control" name="cep[]" autocomplete="nope" value="${zipcode}">
                     </div>
                     <div class="form-group col-md-6">
                         <label>Endereço</label>

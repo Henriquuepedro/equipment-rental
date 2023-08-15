@@ -255,8 +255,8 @@
                                             <div class="col-md-12 payment-hidden">
                                                 <div class="form-group">
                                                     <div class="alert alert-animate alert-primary">
-                                                        Será necessário reorganizar o pagamento para incluir o valor do novo(s) equipamento(s).<br>
-                                                        Você poderá gerar uma nova parcela para o(s) novo(s) equipamento(s) ou distribuir o valor entre as parcelas, caso exista.
+                                                        Será necessário reorganizar o pagamento para incluir o valor do novos equipamentos.<br>
+                                                        Você poderá gerar uma nova parcela para os novos equipamentos ou distribuir o valor entre as parcelas, caso exista.
                                                     </div>
                                                 </div>
                                             </div>
@@ -291,7 +291,7 @@
                                 <input type="hidden" name="rental_id" value="{{ $rental->id }}">
                                 <input type="hidden" name="date_delivery" value="{{ $rental->expected_delivery_date ? dateInternationalToDateBrazil($rental->expected_delivery_date, DATETIME_BRAZIL_NO_SECONDS) : '' }}">
                                 <input type="hidden" name="date_withdrawal" value="{{ $rental->expected_withdrawal_date ? dateInternationalToDateBrazil($rental->expected_withdrawal_date, DATETIME_BRAZIL_NO_SECONDS) : '' }}">
-                                <input type="hidden" id="is_exchange" value="1">
+                                <input type="hidden" name="is_exchange" id="is_exchange" value="1">
                                 <input type="hidden" name="total_rental_paid" value="0">
                                 <input type="hidden" name="total_rental_no_paid" value="0">
 

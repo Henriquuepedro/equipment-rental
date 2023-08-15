@@ -1,7 +1,7 @@
 (function ($) {
     'use strict';
-    var form = $("#formRental");
-    var budget = $('#budget').val() ? true : false;
+    const form = $("#formRental");
+    const budget = !!$('#budget').val();
     form.steps({
         headerTag: "h3",
         bodyTag: "div.stepRental",
@@ -14,15 +14,15 @@
             let notUseDateWithdrawal = $('#not_use_date_withdrawal').is(':checked');
             let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
 
-            if (newIndex === getIndexStep(1)) {
+            if (newIndex === 1) {
                 setTimeout(() => {
                     $('[name="client"]').select2();
                     $('[name="state"]').select2('destroy').select2();
                     $('[name="city"]').select2('destroy').select2();
-                }, 200);
+                }, 250);
             }
 
-            if (currentIndex === getIndexStep(0)) {// tipo locacao
+            if (currentIndex === 0) {// tipo locacão.
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
@@ -36,7 +36,7 @@
                     return false;
                 }
             }
-            if (currentIndex <= getIndexStep(1) && newIndex > getIndexStep(1)) { // cliente e endereo
+            if (currentIndex <= 1 && newIndex > 1) { // cliente e endereo
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
@@ -69,8 +69,8 @@
 
                 if (arrErrors.length) {
 
-                    if (currentIndex !== getIndexStep(1)) {
-                        setErrorStepWrong(getIndexStep(1));
+                    if (currentIndex !== 1) {
+                        setErrorStepWrong(1);
                     }
 
                     Swal.fire({
@@ -82,7 +82,7 @@
                     return false;
                 }
             }
-            if (currentIndex <= getIndexStep(2) && newIndex > getIndexStep(2)) { // datas
+            if (currentIndex <= 2 && newIndex > 2) { // datas
                 if (debug) {
                     changeStepPosAbsolute();
                     fixEquipmentDates();
@@ -107,8 +107,8 @@
                 }
 
                 if (arrErrors.length) {
-                    if (currentIndex < getIndexStep(2)) {
-                        setErrorStepWrong(getIndexStep(2));
+                    if (currentIndex < 2) {
+                        setErrorStepWrong(2);
                     }
 
                     Swal.fire({
@@ -121,15 +121,15 @@
 
                 fixEquipmentDates();
             }
-            if (currentIndex <= getIndexStep(3) && newIndex > getIndexStep(3)) { // equipamento
+            if (currentIndex <= 3 && newIndex > 3) { // equipamento
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
                 }
 
                 if ($('#equipments-selected div').length === 0) {
-                    if (currentIndex < getIndexStep(3)) {
-                        setErrorStepWrong(getIndexStep(3));
+                    if (currentIndex < 3) {
+                        setErrorStepWrong(3);
                     }
 
                     Swal.fire({
@@ -175,8 +175,8 @@
 
                 if (arrErrors.length) {
 
-                    if (currentIndex < getIndexStep(3)) {
-                        setErrorStepWrong(getIndexStep(3));
+                    if (currentIndex < 3) {
+                        setErrorStepWrong(3);
                     }
 
                     Swal.fire({
@@ -189,7 +189,7 @@
 
                 $('div[id^=collapseEquipment-]').collapse('hide');
             }
-            if (currentIndex <= getIndexStep(4) && newIndex > getIndexStep(4)) { // pagamento
+            if (currentIndex <= 4 && newIndex > 4) { // pagamento
 
                 if (debug) {
                     changeStepPosAbsolute();
@@ -200,8 +200,8 @@
 
                 if (netValue < 0) {
 
-                    if (currentIndex < getIndexStep(4)) {
-                        setErrorStepWrong(getIndexStep(4));
+                    if (currentIndex < 4) {
+                        setErrorStepWrong(4);
                     }
 
                     Swal.fire({
@@ -212,7 +212,7 @@
                     return false;
                 }
 
-                if (typeLocation == 0) {
+                if (typeLocation === 0) {
 
                     const grossValue    = realToNumber($('#gross_value').text());
                     const netValue      = realToNumber($('#net_value').val());
@@ -221,8 +221,8 @@
 
                     if (netValue == 0) {
 
-                        if (currentIndex < getIndexStep(4)) {
-                            setErrorStepWrong(getIndexStep(4));
+                        if (currentIndex < 4) {
+                            setErrorStepWrong(4);
                         }
 
                         Swal.fire({
@@ -235,8 +235,8 @@
 
                     // valores divergente
                     if (netValue != (grossValue - discountValue + extraValue)) {
-                        if (currentIndex < getIndexStep(4)) {
-                            setErrorStepWrong(getIndexStep(4));
+                        if (currentIndex < 4) {
+                            setErrorStepWrong(4);
                         }
 
                         Swal.fire({
@@ -257,8 +257,8 @@
 
                     if (haveError[0]) { // encontrou erro nas datas de vencimento
 
-                        if (currentIndex < getIndexStep(4)) {
-                            setErrorStepWrong(getIndexStep(4));
+                        if (currentIndex < 4) {
+                            setErrorStepWrong(4);
                         }
 
                         Swal.fire({
@@ -273,8 +273,8 @@
                         if ($('#automatic_parcel_distribution').is(':checked')) {
                             recalculeParcels();
                         } else {
-                            if (currentIndex < getIndexStep(4)) {
-                                setErrorStepWrong(getIndexStep(4));
+                            if (currentIndex < 4) {
+                                setErrorStepWrong(4);
                             }
 
                             Swal.fire({
@@ -299,7 +299,7 @@
             let arrErrors = [];
             let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
 
-            if (priorIndex === getIndexStep(0)) { // tipo de cobrança
+            if (priorIndex === 0) { // tipo de cobrança
 
                 const rental_p = 'formRental-p-4';
                 const rental_t = 'formRental-t-4';
@@ -317,7 +317,7 @@
                 }
             }
 
-            if (priorIndex <= getIndexStep(3) && currentIndex >= getIndexStep(4)) { // equipamento
+            if (priorIndex <= 3 && currentIndex >= 4) { // equipamento
 
                 const result_validation = await updateDataEquipmentToPayment();
 
@@ -342,7 +342,7 @@
                     });
                     $('#formRental .steps ul li.current').addClass('error');
                 } else {
-                    if (!$('[name="rental_id"]').length && typeLocation == 0 && newPricesUpdate.length) {
+                    if (!$('[name="rental_id"]').length && typeLocation === 0 && newPricesUpdate.length) {
                         await Swal.fire({
                             title: newPricesUpdate.length === 1 ? 'Valor de equipamento atualizado.' : 'Valores de equipamentos atualizados.',
                             html: newPricesUpdate.length === 1 ? `O valor do equipamento abaixo foi alterado: <br><br><ol><li><b>${newPricesUpdateNames[0]}</b></li></ol><h4>Deseja atualizar?</h4>` : "Os valores dos equipamentos abaixo foram alterados: <br><br><ol><li><b>" + newPricesUpdateNames.join('</b></li><li><b>') + '</b></li></ol><h4>Deseja atualizar?</h4>',
@@ -364,7 +364,7 @@
                             $('.list-equipments-payment-load').hide();
                             $('.list-equipments-payment').slideDown('slow');
                         })
-                    } else if (!$('[name="rental_id"]').length && typeLocation == 1 && newPricesUpdate.length) {
+                    } else if (!$('[name="rental_id"]').length && typeLocation === 1 && newPricesUpdate.length) {
 
                         $.each(newPricesUpdate, function (key, val) {
                             val.el.val(val.price);

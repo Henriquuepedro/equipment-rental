@@ -152,7 +152,7 @@
         $('#newDriverModal [name="observation"]').val('');
     }
 
-    const loadDrivers = (driver_id = null, el = null) => {
+    const loadDrivers = (driver_id = null, el = null, use_last_id = true) => {
 
         $(el ?? '.driver-load [name="driver"]').attr('disabled', true).empty().append('<option>Carregando ...</option>');
 
@@ -164,9 +164,8 @@
             url: '{{ route('ajax.driver.get-drivers') }}',
             dataType: 'json',
             success: response => {
-
                 let selected;
-                let driver_id_selected = driver_id ?? response.lastId;
+                let driver_id_selected = driver_id ?? (use_last_id ? response.lastId : 0);
 
                 $(el ?? '.driver-load [name="driver"]').empty().append('<option value="0">Selecione ...</option>');
                 $.each(response.data, function( index, value ) {

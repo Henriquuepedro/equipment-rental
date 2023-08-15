@@ -56,9 +56,6 @@
             const rental_id = $('[name="rental_id"]').val();
 
             //setTimeout(async () => {
-                $('.show-address input').each(function () {
-                    // $(this).val($(this).attr('value'));
-                });
 
                 await checkLabelAnimate();
 
@@ -138,11 +135,6 @@
 
                 $('li.disabled[aria-disabled="true"]').removeClass('disabled').addClass('done').prop('aria-disabled', false);
 
-                //setTimeout(async () => {
-                    await updateDataEquipmentToPayment();
-                    await reloadTotalRental();
-                //}, 250);
-
                 if ($('#calculate_net_amount_automatic').is(':checked')) {
                     $('#net_value').attr('disabled', true);
                 } else {
@@ -162,6 +154,10 @@
                 address_city = $('[name="address_city"]').val();
                 await loadCities($('[name="city"]'), address_state, address_city);
             }
+
+                await $('.show-address input').each(function () {
+                    $(this).val($(this).attr('value'));
+                });
 
             await $('input[name="type_rental"]').on('ifChanged', function(){
                 console.log($('input[name="type_rental"]').val());
@@ -184,6 +180,8 @@
                     })
                 }
             });
+
+            $('[name="first_load_page"]').val(0);
         });
     </script>
     <script src="{{ asset('assets/js/views/rental/form.js') }}" type="application/javascript"></script>
@@ -519,13 +517,12 @@
     <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
     <input type="hidden" id="budget" value="{{ $budget }}">
 
-
     <input type="hidden" name="rental_id" value="{{ $rental->id }}">
     <input type="hidden" name="client_id" value="{{ $rental->client_id }}">
     <input type="hidden" name="address" value="{{ $rental->client_id }}">
-
     <input type="hidden" name="address_city" value="{{ $rental->address_city }}">
     <input type="hidden" name="address_state" value="{{ $rental->address_state }}">
+    <input type="hidden" name="first_load_page" value="1">
 
     <input type="hidden" name="residues" value="{{ implode(',', array_map(function($residue) { return $residue['id']; }, $rental_residue->toArray())) }}">
 @stop

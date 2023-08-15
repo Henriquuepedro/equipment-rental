@@ -14,15 +14,15 @@
             let notUseDateWithdrawal = $('#not_use_date_withdrawal').val();
             let typeLocation = parseInt($('input[name="type_rental"]').val());
 
-            if (currentIndex === getIndexStep(0)) {
+            if (currentIndex === 0) {
                 if (debug) {
                     changeStepPosAbsolute();
                     return true;
                 }
 
                 if ($('#equipments-selected div').length === 0) {
-                    if (currentIndex < getIndexStep(0)) {
-                        setErrorStepWrong(getIndexStep(0));
+                    if (currentIndex < 0) {
+                        setErrorStepWrong(0);
                     }
 
                     Swal.fire({
@@ -66,8 +66,8 @@
 
                 if (arrErrors.length) {
 
-                    if (currentIndex < getIndexStep(0)) {
-                        setErrorStepWrong(getIndexStep(0));
+                    if (currentIndex < 0) {
+                        setErrorStepWrong(0);
                     }
 
                     Swal.fire({
@@ -106,7 +106,7 @@
             const payment  = $(`#${rental_p} #payment`);
             typeLocation === 0 ? payment.removeClass('payment-no').addClass('payment-yes') : payment.removeClass('payment-yes').addClass('payment-no');
 
-            if (priorIndex <= getIndexStep(0) && currentIndex >= getIndexStep(1)) { // equipamento
+            if (priorIndex <= 0 && currentIndex >= 1) { // equipamento
                 let pricesAndStocks;
                 let dataEquipments = [];
                 let dataEquipmentsPayCheck = [];
@@ -242,8 +242,8 @@
 
             if (netValue < 0) {
 
-                if (currentIndex < getIndexStep(1)) {
-                    setErrorStepWrong(getIndexStep(1));
+                if (currentIndex < 1) {
+                    setErrorStepWrong(1);
                 }
 
                 Swal.fire({
@@ -260,8 +260,8 @@
 
                 if (netValue == 0) {
 
-                    if (currentIndex < getIndexStep(1)) {
-                        setErrorStepWrong(getIndexStep(1));
+                    if (currentIndex < 1) {
+                        setErrorStepWrong(1);
                     }
 
                     Swal.fire({
@@ -282,8 +282,8 @@
 
                 if (haveError[0]) { // encontrou erro nas datas de vencimento
 
-                    if (currentIndex < getIndexStep(1)) {
-                        setErrorStepWrong(getIndexStep(1));
+                    if (currentIndex < 1) {
+                        setErrorStepWrong(1);
                     }
 
                     Swal.fire({
@@ -299,8 +299,8 @@
                     if ($('#automatic_parcel_distribution').is(':checked')) {
                         recalculeParcels();
                     } else {
-                        if (currentIndex < getIndexStep(1)) {
-                            setErrorStepWrong(getIndexStep(1));
+                        if (currentIndex < 1) {
+                            setErrorStepWrong(1);
                         }
 
                         Swal.fire({

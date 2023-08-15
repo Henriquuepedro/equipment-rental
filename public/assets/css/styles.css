@@ -3,6 +3,13 @@ select[readonly] {
     touch-action: none;
 }
 
+.wizard > .actions .disabled a {
+    color: #000 !important;
+    background-color: #b1b2b3 !important;
+    border-color: #acadae !important;
+    box-shadow: unset !important;
+}
+
 .no-border{
     border: 0 !important;
 }

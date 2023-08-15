@@ -271,11 +271,9 @@
                         $(modal_id).modal();
                     }
 
-                    console.log(response.data);
-
                     $.each(response.data, function( index, value ) {
-                        loadVehicles(value.vehicle_suggestion, `${modal_id} .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="vechicles[]"]`)
-                        loadDrivers(value.driver_suggestion, `${modal_id} .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="drivers[]"]`)
+                        loadVehicles(value.vehicle_suggestion, `${modal_id} .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="vechicles[]"]`, false)
+                        loadDrivers(value.driver_suggestion, `${modal_id} .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="drivers[]"]`, false)
                     });
 
                     $(`${modal_id} [type="checkbox"]`).iCheck({

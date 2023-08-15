@@ -21,7 +21,7 @@
         getLocationRental();
     });
 
-    $('select[name="client"]').on('change', function() {
+    $(document).on('change', 'select[name="client"]', function() {
         let client_id = $(this).val();
 
         if (client_id == 0) {
@@ -34,7 +34,7 @@
         loadAddresses(client_id);
     });
 
-    $('select[name="name_address"]').on('change', function() {
+    $(document).on('change', 'select[name="name_address"]', function() {
         let address_id = $(this).val();
         let client_id = $('select[name="client"]').val();
 
@@ -46,8 +46,8 @@
         loadAddress(address_id, client_id);
     });
 
-    $('#confirmAddressMap').on('click', function (){
-        let verifyAddress = verifyAddressCompletRental();
+    $(document).on('click', '#confirmAddressMap', function (){
+        let verifyAddress = verifyAddressCompleteRental();
         if (!verifyAddress[0]) {
             Toast.fire({
                 icon: 'warning',
@@ -69,13 +69,17 @@
         $('#confirmAddressRental').modal();
     });
 
-    $('#updateLocationMapRental').click(function (){
+    $(document).on('click', '#updateLocationMapRental', function (){
         updateLocationRental($('#formRental'));
     });
 
     $("#confirmAddressRental").on("hidden.bs.modal", function () {
         if ($('[name="lat"]').val() !== '' && $('[name="lng"]').val() !== '')
             $('.alert-mark-map').slideUp('slow');
+    });
+
+    $(document).on('change', 'select[name="state"]', function(){
+        loadCities($('select[name="city"]'), $(this).val());
     });
 
     const loadAddresses = (client_id = null) => {
@@ -137,7 +141,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             type: 'GET',
-            url: '{{ route('ajax.address.get-address') }}' + `${client_id}/${address_id}`,
+            url: '{{ route('ajax.address.get-address') }}' + `/${client_id}/${address_id}`,
             dataType: 'json',
             success: response => {
 
@@ -187,8 +191,10 @@
 
     const disabledFieldAddress = () => {
         $('select[name="name_address"], select[name="client"]').attr('disabled', true);
-        $('.show-address input').each(function (){
-            $(this).val('').attr('disabled', true).parent().removeClass('label-animate').find('label').html('Aguarde... <i class="fa fa-spinner fa-spin"></i>');
+        $('.show-address input').each(function () {
+            if (!$('[name="first_load_page"]').val()) {
+                $(this).val('').attr('disabled', true).parent().removeClass('label-animate').find('label').html('Aguarde... <i class="fa fa-spinner fa-spin"></i>');
+            }
         });
         $('.alert-mark-map').slideUp('slow');
     }
@@ -206,17 +212,16 @@
         $('.show-address select[name="state"]').attr('disabled', false).parent().find('label').html('Estado <sup>*</sup>');
     }
 
-    // VERIFICAR SE HAVERÁ ALGUM ERRO
     const getLocationRental = () => {
         mapRental.on('locationfound', onLocationFoundRental);
         mapRental.on('locationerror', onLocationErrorRental);
         mapRental.locate({setView: true, maxZoom: 12});
     }
-    // Callback success getLocation
+
     const onLocationFoundRental = e => {
         startMarkerRental(e.latlng);
     }
-    // Callback error getLocation
+
     async function onLocationErrorRental(e){
         if(e.code == 1){
             const address = await deniedLocationRental();
@@ -234,18 +239,18 @@
             }
         }
     }
-    // MOSTRAR MAP APÓS NAVEGAÇÃO DO BROWSER
+
     async function deniedLocationRental(){
         return false;
         const recusouLocalizacao = true;
         const rsLocation = await $.getJSON('...',{ recusouLocalizacao }); // obter endereço empresa
         if(rsLocation != null){
-            let endereco = rsLocation[0].CENDERECO;
-            endereco += ` - ${rsLocation[0].NCEP}`;
-            endereco += ` - ${rsLocation[0].CBAIRRO}`;
-            endereco += ` - ${rsLocation[0].CCIDADE}`;
-            endereco += ` - ${rsLocation[0].CESTADO}`;
-            return endereco;
+            let address = rsLocation[0].address;
+            address += ` - ${rsLocation[0].zipcode}`;
+            address += ` - ${rsLocation[0].neigh}`;
+            address += ` - ${rsLocation[0].city}`;
+            address += ` - ${rsLocation[0].state}`;
+            return address;
         }
         if(rsLocation == null){
             Swal.fire(
@@ -277,7 +282,7 @@
         }, 1000);
     }
 
-    const verifyAddressCompletRental = () => {
+    const verifyAddressCompleteRental = () => {
         cleanBorderAddressRental();
 
         let existError = false;
@@ -316,14 +321,14 @@
     }
 
     const updateLocationRental = (findDiv) => {
-        const endereco  = findDiv.find('[name="address"]').val();
-        const numero    = findDiv.find('[name="number"]').val();
-        const cep       = findDiv.find('[name="cep"]').val().replace(/[^0-9]/g, "");
-        const bairro    = findDiv.find('[name="neigh"]').val();
-        const cidade    = findDiv.find('[name="city"]').val();
-        const estado    = findDiv.find('[name="state"]').val();
+        const address   = findDiv.find('[name="address"]').val();
+        const number    = findDiv.find('[name="number"]').val();
+        const zipcode   = findDiv.find('[name="cep"]').val().replace(/[^0-9]/g, "");
+        const neigh     = findDiv.find('[name="neigh"]').val();
+        const city      = findDiv.find('[name="city"]').val();
+        const state     = findDiv.find('[name="state"]').val();
 
-        loadAddressMapRental(`${endereco},${numero}-${cep}-${bairro}-${cidade}-${estado}`, findDiv);
+        loadAddressMapRental(`${address},${number}-${zipcode}-${neigh}-${city}-${state}`, findDiv);
     }
 
     // CONSULTA LAT E LNG PELO ENDEREÇO E DEPOIS JOGA O ENDEREÇO CORRETO NO MAPA
@@ -346,17 +351,12 @@
         });
     }
 
-    // Atualiza mapa com a nota localização
+    // Atualiza mapa com a nota localização.
     const locationLatLngRental = (lat, lng) => {
         const newLatLng = new L.LatLng(lat, lng);
         markerRental.setLatLng(newLatLng);
         mapRental.setView(newLatLng, 15);
         mapRental.invalidateSize();
     }
-
-
-    $(document).on('change', 'select[name="state"]', function(){
-        loadCities($('select[name="city"]'), $(this).val());
-    });
 
 </script>

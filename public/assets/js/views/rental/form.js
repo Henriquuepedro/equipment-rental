@@ -32,13 +32,13 @@ $("#formRental").validate({
         $.each(validator.errorMap, function (key, val) {
             arrErrors.push(val);
         });
-        setTimeout(() => {
+        //setTimeout(() => {
             Swal.fire({
                 icon: 'warning',
                 title: 'Atenção',
                 html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
             });
-        }, 150);
+        //}, 150);
     },
     submitHandler: function(form) {
         $('#formRental [type="submit"]').attr('disabled', true);
@@ -667,7 +667,7 @@ const createEquipmentPayment = async (equipment, priceStock = null, unity_price 
 
     $('.list-equipments-payment').append(paymentEquipment);
 
-    setTimeout(() => {
+    //setTimeout(() => {
         $(`#price-un-equipment-${equipment}, #price-total-equipment-${equipment}`).maskMoney({thousands: '.', decimal: ',', allowZero: true});
         if ($('.list-equipments-payment li').length === 1) {
             $('.list-equipments-payment li').addClass('one-li-list-equipments-payment');
@@ -682,10 +682,10 @@ const createEquipmentPayment = async (equipment, priceStock = null, unity_price 
                 $(this).val('0,00')
             }
         });
-    }, 250);
+    //}, 250);
 }
 
-const reloadTotalRental = () => {
+const reloadTotalRental = async () => {
 
     let grossValue          = 0;
     let priceEquipment      = 0;
@@ -725,8 +725,9 @@ const reloadTotalRental = () => {
         }
     }
 
-    if ($('#automatic_parcel_distribution').is(':checked'))
-        recalculeParcels();
+    if ($('#automatic_parcel_distribution').is(':checked')) {
+        await recalculeParcels();
+    }
 
     return grossValue - discount + extra;
 }
@@ -997,7 +998,7 @@ const setEquipmentRental = (
             $(`.load-equipment[id-equipment="${idEquipment}"]`).hide(300);
             showSeparatorEquipmentSelected();
             $('#cleanSearchEquipment').trigger('click')
-            setTimeout(() => {
+            //setTimeout(() => {
                 $(`.load-equipment[id-equipment="${idEquipment}"]`).remove();
 
                 if (!$(`.list-equipment tbody tr`).length) {
@@ -1050,7 +1051,7 @@ const setEquipmentRental = (
                     $(`#not_use_date_withdrawal_${idEquipment}`).trigger('change');
                 }
 
-            }, 350);
+            //}, 350);
         }, error: e => {
             console.log(e);
         },

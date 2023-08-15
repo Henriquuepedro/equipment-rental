@@ -99,6 +99,13 @@ class RentalEquipmentController extends Controller
                 continue;
             }
 
+            if (empty($drivers[$count]) || empty($vechicles[$count])) {
+                return response()->json(array(
+                    'success' => false,
+                    'message' => "Informe o veículo e motorista de todos os equipamentos para realizar a entrega."
+                ));
+            }
+
             $date_deliver_equipment = DateTime::createFromFormat('d/m/Y H:i', $date_deliver[$count]);
 
             $datas_update[] = array(
@@ -177,6 +184,13 @@ class RentalEquipmentController extends Controller
         for ($count = 0; $count < count($date_withdraw); $count++) {
             if (!in_array((string)$count, $checked)) {
                 continue;
+            }
+
+            if (empty($drivers[$count]) || empty($vechicles[$count])) {
+                return response()->json(array(
+                    'success' => false,
+                    'message' => "Informe o veículo e motorista de todos os equipamentos para realizar a retirada."
+                ));
             }
 
             $date_withdraw_equipment = DateTime::createFromFormat('d/m/Y H:i', $date_withdraw[$count]);
