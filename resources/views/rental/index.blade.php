@@ -271,11 +271,9 @@
                         $(modal_id).modal();
                     }
 
-                    console.log(response.data);
-
                     $.each(response.data, function( index, value ) {
-                        loadVehicles(value.vehicle_suggestion, `${modal_id} .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="vechicles[]"]`)
-                        loadDrivers(value.driver_suggestion, `${modal_id} .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="drivers[]"]`)
+                        loadVehicles(value.vehicle_suggestion, `${modal_id} .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="vechicles[]"]`, false)
+                        loadDrivers(value.driver_suggestion, `${modal_id} .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="drivers[]"]`, false)
                     });
 
                     $(`${modal_id} [type="checkbox"]`).iCheck({
@@ -419,8 +417,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: 'GET',
-                data: { vehicle_id },
-                url: "{{ route('ajax.vehicle.get-vehicle') }}",
+                url: "{{ route('ajax.vehicle.get-vehicle') }}" + `/${vehicle_id}`,
                 async: true,
                 success: response => {
                     console.log(response);
@@ -566,10 +563,10 @@
     <div class="row profile-page">
         <div class="col-md-12 grid-margin">
             @if(session('success'))
-                <div class="alert-animate alert-success"><i class="fa fa-check-circle"></i> {{session('success')}}</div>
+                <div class="alert alert-animate alert-success"><i class="fa fa-check-circle"></i> {{session('success')}}</div>
             @endif
             @if(session('warning'))
-                <div class="alert-animate alert-danger mt-2">{{session('warning')}}</div>
+                <div class="alert alert-animate alert-danger mt-2">{{session('warning')}}</div>
             @endif
             <div class="card">
                 <div class="card-body">

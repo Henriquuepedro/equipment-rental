@@ -31,7 +31,7 @@ jQuery.validator.addMethod("name_valid", function(value, element) {
     value = jQuery.trim(value);
     return value !== "";
 
-}, 'Informe um nome para o Equipmento');
+}, 'Informe um nome para o equipamento');
 
 jQuery.validator.addMethod("volume", function(value, element) {
     value = jQuery.trim(value);

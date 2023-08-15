@@ -99,6 +99,13 @@ class RentalEquipmentController extends Controller
                 continue;
             }
 
+            if (empty($drivers[$count]) || empty($vechicles[$count])) {
+                return response()->json(array(
+                    'success' => false,
+                    'message' => "Informe o veículo e motorista de todos os equipamentos para realizar a entrega."
+                ));
+            }
+
             $date_deliver_equipment = DateTime::createFromFormat('d/m/Y H:i', $date_deliver[$count]);
 
             $datas_update[] = array(
@@ -131,7 +138,7 @@ class RentalEquipmentController extends Controller
             }
         }
 
-        $rental_updated = $this->rental->checkAllEquipmentsDelivered($rental_id, $company_id);
+        $rental_updated = $this->rental->checkAllEquipmentsDelivered($company_id, $rental_id);
 
         DB::commit();
 
@@ -179,6 +186,13 @@ class RentalEquipmentController extends Controller
                 continue;
             }
 
+            if (empty($drivers[$count]) || empty($vechicles[$count])) {
+                return response()->json(array(
+                    'success' => false,
+                    'message' => "Informe o veículo e motorista de todos os equipamentos para realizar a retirada."
+                ));
+            }
+
             $date_withdraw_equipment = DateTime::createFromFormat('d/m/Y H:i', $date_withdraw[$count]);
 
             $datas_update[] = array(
@@ -212,7 +226,7 @@ class RentalEquipmentController extends Controller
             }
         }
 
-        $rental_updated = $this->rental->checkAllEquipmentsWithdrawal($rental_id, $company_id);
+        $rental_updated = $this->rental->checkAllEquipmentsWithdrawal($company_id, $rental_id);
 
         DB::commit();
 

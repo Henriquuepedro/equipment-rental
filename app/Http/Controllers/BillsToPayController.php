@@ -59,10 +59,6 @@ class BillsToPayController extends Controller
 
     public function fetchBills(Request $request): JsonResponse
     {
-        if (!hasPermission('BillsToPayView')) {
-            return response()->json();
-        }
-
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
@@ -76,6 +72,15 @@ class BillsToPayController extends Controller
         $start_date = $request->input('start_date');
         $end_date   = $request->input('end_date');
 
+        if (!hasPermission('BillsToPayView')) {
+            return response()->json(array(
+                "draw" => $draw,
+                "recordsTotal" => 0,
+                "recordsFiltered" => 0,
+                "data" => array()
+            ));
+        }
+
         // Filtro fornecedor
         $provider = $request->input('provider') ?? (int)$request->input('provider');
         if (empty($provider)) {
@@ -86,7 +91,7 @@ class BillsToPayController extends Controller
         $filters['end_date']    = $end_date;
 
         $search = $request->input('search');
-        if ($search['value']) {
+        if ($search && $search['value']) {
             $searchUser = $search['value'];
         }
 
@@ -121,12 +126,7 @@ class BillsToPayController extends Controller
                 $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
             }
 
-            $buttons = "<div class='row'><div class='col-12'><div class='dropdown dropleft'>
-                            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsBill-{$value['bill_payment_id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                              <i class='fa fa-cog'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropActionsBill-{$value['bill_payment_id']}'>$buttons</div</div>
-                        </div>";
+            $buttons = dropdownButtonsDataList($buttons, $value['bill_payment_id']);
 
             $result[$key] = array(
                 $bill_code,
@@ -278,7 +278,6 @@ class BillsToPayController extends Controller
         $automaticParcelDistribution = (bool)$request->input('automatic_parcel_distribution');
 
         // existe parcelamento
-        $daysTemp = null;
         $priceTemp = 0;
 
         $valueSumParcel = 0;
@@ -293,15 +292,6 @@ class BillsToPayController extends Controller
                 $valueSumParcel += $valueParcel;
             } else {
                 $valueParcel = transformMoneyBr_En($request->input('value_parcel')[$parcel]);
-            }
-
-            if ($daysTemp === null) {
-                $daysTemp = $request->input('due_day')[$parcel];
-            } elseif ($daysTemp >= $request->input('due_day')[$parcel]) {
-                $response->error = 'A ordem dos vencimentos devem ser informados em ordem crescente.';
-                return $response;
-            } else {
-                $daysTemp = $request->input('due_day')[$parcel];
             }
 
             $priceTemp += $valueParcel;

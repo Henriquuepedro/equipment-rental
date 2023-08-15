@@ -57,10 +57,16 @@
 .wizard > .content > .body {
     position: unset;
 }
-.accordion .card .card-header a{
+.accordion .card .card-header a:not([disabled="disabled"]){
     background: #2196f3 !important;
 }
-.remove-equipment i {
+div[id^="headingEquipmentToExchange-"] a[disabled="disabled"] {
+    background: #fb9678 !important;
+}
+div[id^="headingEquipmentToExchange-"][disabled="disabled"] {
+    cursor: not-allowed;
+}
+.remove-equipment i, .exchange-equipment i {
     cursor: pointer;
 }
 .accordion.accordion-multiple-filled .card .card-header a:last-child {
@@ -141,4 +147,7 @@ i.fa.input-group-text.text-white {
 }
 ul[id^="select2-residues"] li[aria-selected="true"] {
     display: none;
+}
+.accordion.accordion-multiple-filled .card {
+    border-bottom: 1px solid #383e5d !important;
 }

@@ -18,6 +18,13 @@ var Toast = Swal.mixin({
         toast.addEventListener('mouseleave', Swal.resumeTimer)
     }
 });
+var FORMAT_DATETIME_INTERNATIONAL = 'YYYY-MM-DD HH:mm:ss';
+var FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS = 'YYYY-MM-DD HH:mm';
+var FORMAT_DATE_INTERNATIONAL = 'YYYY-MM-DD';
+var FORMAT_DATETIME_BRAZIL = 'DD/MM/YYYY HH:mm:ss';
+var FORMAT_DATETIME_BRAZIL_NO_SECONDS = 'DD/MM/YYYY HH:mm';
+var FORMAT_DATE_BRAZIL = 'DD/MM/YYYY';
+
 (function ($) {
     'use strict';
     $(function () {
@@ -199,46 +206,70 @@ const inArray = (needle, haystack) => {
 
 // Formata data yyyy-mm-dd -> dd/mm/yyyy
 const transformDateForBr = date => {
-    if(date == null) return false;
+    if (date == null) {
+        return false;
+    }
 
     const length = date.length;
 
-    if (length !== 10 && length !== 16 && length !== 19) return false;
-
-    if (length === 16 || length === 19) {
-        if (!moment(date, "YYYY-MM-DD HH:mm").isValid()) return false;
-        return moment(date, "YYYY-MM-DD HH:mm").format("DD/MM/YYYY HH:mm");
+    if (length !== 10 && length !== 16 && length !== 19) {
+        return false;
     }
 
-    if (!moment(date, "YYYY-MM-DD").isValid()) return false;
-    return moment(date, "YYYY-MM-DD").format("DD/MM/YYYY");
+    if (length === 16 || length === 19) {
+        if (!moment(date, FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS).isValid()) {
+            return false;
+        }
+        return moment(date, FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS).format(FORMAT_DATETIME_BRAZIL_NO_SECONDS);
+    }
+
+    if (!moment(date, FORMAT_DATE_INTERNATIONAL).isValid()) {
+        return false;
+    }
+    return moment(date, FORMAT_DATE_INTERNATIONAL).format(FORMAT_DATE_BRAZIL);
 }
 // Formata data dd/mm/yyyy -> yyyy-mm-dd
 const transformDateForEn = date => {
-    if(date == null) return false;
+    if (date == null) {
+        return false;
+    }
 
     const length = date.length;
 
-    if (length !== 10 && length !== 16 && length !== 19) return false;
-
-    if (length === 16 || length === 19) {
-        if (!moment(date, "DD/MM/YYYY HH:mm").isValid()) return false;
-        return moment(date, "DD/MM/YYYY HH:mm").format("YYYY-MM-DD HH:mm");
+    if (length !== 10 && length !== 16 && length !== 19) {
+        return false;
     }
 
-    if (!moment(date, "DD/MM/YYYY").isValid()) return false;
-    return moment(date, "DD/MM/YYYY").format("YYYY-MM-DD");
+    if (length === 16 || length === 19) {
+        if (!moment(date, FORMAT_DATETIME_BRAZIL_NO_SECONDS).isValid()) {
+            return false;
+        }
+        return moment(date, FORMAT_DATETIME_BRAZIL_NO_SECONDS).format(FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS);
+    }
+
+    if (!moment(date, FORMAT_DATE_BRAZIL).isValid()) {
+        return false;
+    }
+    return moment(date, FORMAT_DATE_BRAZIL).format(FORMAT_DATE_INTERNATIONAL);
 }
 
-const getTodayDateBr = (returnTime = true, seconds = true) => {
-    if (returnTime && seconds) return moment().format("DD/MM/YYYY HH:mm:ss");
-    else if (returnTime && !seconds) return moment().format("DD/MM/YYYY HH:mm");
-    return moment().format("DD/MM/YYYY");
+const getTodayDateBr = (returnTime = true, returnSeconds = true) => {
+    if (returnTime && returnSeconds) {
+        return moment().format(FORMAT_DATETIME_BRAZIL);
+    } else if (returnTime && !returnSeconds) {
+        return moment().format(FORMAT_DATETIME_BRAZIL_NO_SECONDS);
+    }
+    return moment().format(FORMAT_DATE_BRAZIL);
 }
 
-const getTodayDateEn = (returnTime = true) => {
-    if (returnTime) return moment().format("YYYY-MM-DD HH:mm:ss");
-    return moment().format("YYYY-MM-DD");
+const getTodayDateEn = (returnTime = true, returnSeconds = true) => {
+    if (returnTime && returnSeconds) {
+        return moment().format(FORMAT_DATETIME_INTERNATIONAL);
+    } else if (returnTime && !returnSeconds) {
+        return moment().format(FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS);
+    }
+
+    return moment().format(FORMAT_DATE_INTERNATIONAL);
 }
 
 // converte valor de Float -> R$
@@ -258,18 +289,30 @@ const realToNumber = numero => {
 }
 // Soma dias de acordo com a data de hoje
 const sumDaysDateNow = days => {
-    return moment().add(days, 'd').format("YYYY-MM-DD");
+    return moment().add(days, 'd').format(FORMAT_DATE_INTERNATIONAL);
+}
+
+// Soma minutos de acordo com a data de hoje.
+const sumMinutesDateNow = (minutes, returnTime = true, returnSeconds = true) => {
+    let format = FORMAT_DATE_INTERNATIONAL;
+    if (returnTime && returnSeconds) {
+        format = FORMAT_DATETIME_INTERNATIONAL;
+    } else if (returnTime && !returnSeconds) {
+        format = FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS;
+    }
+
+    return moment().add(minutes, 'm').format(format);
 }
 
 const calculateDays = (date1, date2) => {
     moment.locale('pt-br');
-    const data1 = moment(date1,'YYYY-MM-DD');
-    const data2 = moment(date2,'YYYY-MM-DD');
+    const data1 = moment(date1,FORMAT_DATE_INTERNATIONAL);
+    const data2 = moment(date2,FORMAT_DATE_INTERNATIONAL);
     return data2.diff(data1, 'days');
 }
 
 const sumMonthsDateNow = months => {
-    return moment().add(months, 'M').format("YYYY-MM-DD");
+    return moment().add(months, 'M').format(FORMAT_DATE_INTERNATIONAL);
 }
 
 String.prototype.capitalize = function() {
@@ -371,7 +414,7 @@ const availableStock = (el, id = null) => {
 const loadDaterangePickerInput = (el, event) => {
     el.daterangepicker({
         locale: {
-            format: 'DD/MM/YYYY',
+            format: FORMAT_DATE_BRAZIL,
             separator: " - ",
             applyLabel: "Aplicar",
             cancelLabel: "Cancelar",

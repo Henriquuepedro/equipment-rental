@@ -65,7 +65,7 @@ class Rental extends Model
         return $this->create($data);
     }
 
-    public function updateByRentalAndCompany(int $rental_id, int $company_id, array $data)
+    public function updateByRentalAndCompany(int $company_id, int $rental_id, array $data)
     {
         return $this->where(array('id' => $rental_id, 'company_id' => $company_id))->update($data);
     }
@@ -201,7 +201,7 @@ class Rental extends Model
         return $this->where(['id' => $rental_id, 'company_id' => $company_id])->first();
     }
 
-    public function remove(int $rental_id, int $company_id)
+    public function remove(int $company_id, int $rental_id)
     {
         return $this->where(['id' => $rental_id, 'company_id' => $company_id])->delete();
     }
@@ -246,7 +246,7 @@ class Rental extends Model
         return $data;
     }
 
-    public function checkAllEquipmentsDelivered(int $rental_id, int $company_id): bool
+    public function checkAllEquipmentsDelivered(int $company_id, int $rental_id): bool
     {
         $rental_dont_delivered = $this->select('rental_id', 'id')
             ->from('rental_equipments')
@@ -265,7 +265,7 @@ class Rental extends Model
                     ['actual_delivery_date',  '!=', null]
                 ])->first();
 
-            $this->updateByRentalAndCompany($rental_id, $company_id, array('actual_delivery_date' => $rental_delivered->actual_delivery_date));
+            $this->updateByRentalAndCompany($company_id, $rental_id, array('actual_delivery_date' => $rental_delivered->actual_delivery_date));
 
             return true;
         }
@@ -273,7 +273,7 @@ class Rental extends Model
         return false;
     }
 
-    public function checkAllEquipmentsWithdrawal(int $rental_id, int $company_id): bool
+    public function checkAllEquipmentsWithdrawal(int $company_id, int $rental_id): bool
     {
         $rental_dont_withdrawal = $this->select('rental_id', 'id')
             ->from('rental_equipments')
@@ -292,7 +292,7 @@ class Rental extends Model
                     ['actual_withdrawal_date', '!=', null]
                 ])->first();
 
-            $this->updateByRentalAndCompany($rental_id, $company_id, array('actual_withdrawal_date' => $rental_withdrawal->actual_withdrawal_date));
+            $this->updateByRentalAndCompany($company_id, $rental_id, array('actual_withdrawal_date' => $rental_withdrawal->actual_withdrawal_date));
 
             return true;
         }

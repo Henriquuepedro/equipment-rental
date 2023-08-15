@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -26,6 +27,7 @@ class UserSeeder extends Seeder
                 'name'          => 'Administrador',
                 'username'      => 'admin',
                 'email'         => 'admin@admin.com',
+                'phone'         => Str::random(10),
                 'password'      => Hash::make('123'),
                 'company_id'    => 1,
                 'active'        => 1,

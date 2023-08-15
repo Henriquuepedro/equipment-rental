@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BudgetCreatePost;
 use App\Http\Requests\BudgetDeletePost;
-use App\Http\Requests\RentalCreatePost;
 use App\Models\Budget;
 use App\Models\BudgetEquipment;
 use App\Models\BudgetPayment;
@@ -13,7 +12,6 @@ use App\Models\Rental;
 use App\Models\RentalEquipment;
 use App\Models\RentalPayment;
 use App\Models\RentalResidue;
-use App\Models\Client;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -29,7 +27,6 @@ class BudgetController extends Controller
 {
     private Budget $budget;
     private RentalController $rentalController;
-    private Client $client;
     private BudgetEquipment $budget_equipment;
     private BudgetResidue $budget_residue;
     private BudgetPayment $budget_payment;
@@ -41,7 +38,6 @@ class BudgetController extends Controller
     public function __construct()
     {
         $this->rentalController = new RentalController();
-        $this->client = new Client();
         $this->budget = new Budget();
         $this->budget_equipment = new BudgetEquipment();
         $this->budget_residue = new BudgetResidue();
@@ -64,28 +60,38 @@ class BudgetController extends Controller
 
     public function fetchBudgets(Request $request): JsonResponse
     {
-        if (!hasPermission('BudgetView')) {
-            return response()->json();
-        }
-
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
 
-        $ini        = $request->start;
-        $draw       = $request->draw;
-        $length     = $request->length;
+        $ini        = $request->input('start');
+        $draw       = $request->input('draw');
+        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        $search = $request->search;
-        if ($search['value']) $searchUser = $search['value'];
+        if (!hasPermission('BudgetView')) {
+            return response()->json(array(
+                "draw" => $draw,
+                "recordsTotal" => 0,
+                "recordsFiltered" => 0,
+                "data" => $result
+            ));
+        }
 
-        if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+        $search = $request->input('search');
+        if ($search && $search['value']) {
+            $searchUser = $search['value'];
+        }
+
+        if ($request->input('order')) {
+            if ($request->input('order')[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('budgets.code','clients.name','budgets.created_at', '');
-            $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
+            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
                 $orderBy['order'] = $direction;
@@ -103,12 +109,7 @@ class BudgetController extends Controller
             $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveBudget' budget-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Orçamento</button>" : '';
             $buttons .= "<a href='".route('print.budget', ['budget' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Orçamento</a>";
 
-            $buttons = "<div class='row'><div class='col-12'><div class='dropdown dropleft'>
-                            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsBudget-{$value['id']}' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                              <i class='fa fa-cog'></i>
-                            </button>
-                            <div class='dropdown-menu' aria-labelledby='dropActionsBudget-{$value['id']}'>$buttons</div</div>
-                        </div>";
+            $buttons = dropdownButtonsDataList($buttons, $value['id']);
 
             $result[$key] = array(
                 formatCodeRental($value['code']),

@@ -19,7 +19,7 @@ class ConfigSeeder extends Seeder
             Config::create([
                 'id'                            => 1,
                 'company_id'                    => 1,
-                'view_obervation_client_rental' => 1,
+                'view_observation_client_rental' => 1,
                 'user_update'                   => 1
             ]);
         }

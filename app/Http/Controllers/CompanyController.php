@@ -83,7 +83,7 @@ class CompanyController extends Controller
         $configCompany       = new \StdClass();
 
         $fromToNameConfig    = [
-            'view_obervation_client_rental' => 'Visualizar Observação Do Cliente Na Locação'
+            'view_observation_client_rental' => 'Visualizar Observação Do Cliente Na Locação'
         ];
 
         foreach ($configCompanyColumn as $configIndex) {

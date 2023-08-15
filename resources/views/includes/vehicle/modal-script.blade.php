@@ -59,7 +59,7 @@
                     $('#newVehicleModal').modal('hide');
                     cleanFormVehicleModal();
                     checkLabelAnimate();
-                    @if(\Request::route()->getName() == 'rental.create')
+                    @if(\Request::route()->getName() == 'rental.create' || \Request::route()->getName() == 'rental.exchange' || \Request::route()->getName() == 'rental.update')
                         loadVehicles(response.vehicle_id, "div[id^='collapseEquipment-'].collapse.show [name^='vehicle_']");
 
                         $('#equipments-selected [id^=collapseEquipment-]').each(function(){
@@ -102,7 +102,7 @@
         $('#newVehicleModal [name="observation"]').val('');
     }
 
-    const loadVehicles = (vehicle_id = null, el = null) => {
+    const loadVehicles = (vehicle_id = null, el = null, use_last_id = true) => {
 
         $(el).attr('disabled', true).empty().append('<option>Carregando ...</option>');
 
@@ -114,9 +114,8 @@
             url: '{{ route('ajax.vehicle.get-vehicles') }}',
             dataType: 'json',
             success: response => {
-
                 let selected;
-                let vehicle_id_selected = vehicle_id ?? response.lastId;
+                let vehicle_id_selected = vehicle_id ?? (use_last_id ? response.lastId : 0);
 
                 $(el).empty().append('<option value="0">Selecione ...</option>');
                 $.each(response.data, function( index, value ) {

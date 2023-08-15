@@ -19,7 +19,7 @@
         },
         messages: {
             reference: {
-                required: "Informe uma referência/código/numeração para seu Equipmento"
+                required: "Informe uma referência/código/numeração para seu equipamento"
             }
         },
         invalidHandler: function(event, validator) {

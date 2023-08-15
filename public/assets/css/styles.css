@@ -3,6 +3,13 @@ select[readonly] {
     touch-action: none;
 }
 
+.wizard > .actions .disabled a {
+    color: #000 !important;
+    background-color: #b1b2b3 !important;
+    border-color: #acadae !important;
+    box-shadow: unset !important;
+}
+
 .no-border{
     border: 0 !important;
 }
@@ -900,4 +907,11 @@ a[disabled] {
 }
 #payment .list-equipments-payment li[id-equipment] small.text-muted {
     font-size: 0.7em;
+}
+.swal-wide{
+    width: 850px !important;
+}
+.swal-wide .swal2-content{
+    width: 100% !important;
+    text-align: left;
 }

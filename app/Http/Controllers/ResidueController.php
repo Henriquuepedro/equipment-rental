@@ -5,20 +5,24 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ResidueCreatePost;
 use App\Http\Requests\ResidueDeletePost;
 use App\Http\Requests\ResidueUpdatePost;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\Residue;
 
 class ResidueController extends Controller
 {
-    public $residue;
+    public Residue $residue;
 
-    public function __construct(Residue $residue)
+    public function __construct()
     {
-        $this->residue = $residue;
+        $this->residue = new Residue();
     }
 
-    public function index()
+    public function index(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('ResidueView')) {
             return redirect()->route('dashboard')
@@ -30,27 +34,38 @@ class ResidueController extends Controller
 
     public function fetchResidues(Request $request): JsonResponse
     {
-        if (!hasPermission('ResidueView'))
-            return response()->json([]);
-
         $orderBy    = array();
         $result     = array();
         $searchUser = null;
 
-        $ini        = $request->start;
-        $draw       = $request->draw;
-        $length     = $request->length;
+        $ini        = $request->input('start');
+        $draw       = $request->input('draw');
+        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        $search = $request->search;
-        if ($search['value']) $searchUser = $search['value'];
+        if (!hasPermission('ResidueView')) {
+            return response()->json(array(
+                "draw" => $draw,
+                "recordsTotal" => 0,
+                "recordsFiltered" => 0,
+                "data" => array()
+            ));
+        }
 
-        if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") $direction = "asc";
-            else $direction = "desc";
+        $search = $request->input('search');
+        if ($search && $search['value']) {
+            $searchUser = $search['value'];
+        }
+
+        if ($request->input('order')) {
+            if ($request->input('order')[0]['dir'] == "asc") {
+                $direction = "asc";
+            } else {
+                $direction = "desc";
+            }
 
             $fieldsOrder = array('name', '');
-            $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
+            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
             if ($fieldOrder != "") {
                 $orderBy['field'] = $fieldOrder;
                 $orderBy['order'] = $direction;
@@ -58,9 +73,6 @@ class ResidueController extends Controller
         }
 
         $data = $this->residue->getFetchResidues($company_id, $ini, $length, $searchUser, $orderBy);
-
-        // get string query
-        // DB::getQueryLog();
 
         $permissionUpdate = hasPermission('ResidueUpdatePost');
         $permissionDelete = hasPermission('ResidueDeletePost');
@@ -87,16 +99,16 @@ class ResidueController extends Controller
         return response()->json($output);
     }
 
-    public function update(ResidueUpdatePost $request)
+    public function update(ResidueUpdatePost $request): JsonResponse|RedirectResponse
     {
         // data residue
         $dataResidue = $this->formatDataResidue($request);
         $isAjax = isAjax();
 
         if (!$this->residue->getResidue($dataResidue->company_id, $dataResidue->residue_id)) {
-
-            if ($isAjax)
+            if ($isAjax) {
                 return response()->json(['success' => false, 'message' => 'Não foi possível localizar o resíduo para atualizar!']);
+            }
 
             return redirect()->back()
                 ->withErrors(['Não foi possível localizar o resíduo para atualizar!'])
@@ -111,23 +123,25 @@ class ResidueController extends Controller
             $dataResidue->residue_id
         );
 
-        if($updateResidue) {
-            if ($isAjax)
+        if ($updateResidue) {
+            if ($isAjax) {
                 return response()->json(['success' => true, 'message' => 'Resíduo atualizado com sucesso!']);
+            }
 
             return redirect()->route('equipment.index')
                 ->with('success', "Resíduo atualizado com sucesso!");
         }
 
-        if ($isAjax)
+        if ($isAjax) {
             return response()->json(['success' => false, 'message' => 'Não foi possível alterar o resíduo, tente novamente!']);
+        }
 
         return redirect()->back()
             ->withErrors(['Não foi possível alterar o resíduo, tente novamente!'])
             ->withInput();
     }
 
-    public function getResidues(Request $request)
+    public function getResidues(Request $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
         $residueData = array();
@@ -136,14 +150,16 @@ class ResidueController extends Controller
         $residues = $this->residue->getResidues($company_id);
 
         foreach ($residues as $residue) {
-            array_push($residueData, ['id' => $residue->id, 'name' => $residue->name]);
-            if ($residue->id > $lastId) $lastId = $residue->id;
+            $residueData[] = ['id' => $residue->id, 'name' => $residue->name];
+            if ($residue->id > $lastId) {
+                $lastId = $residue->id;
+            }
         }
 
         return response()->json(['data' => $residueData, 'lastId' => $lastId]);
     }
 
-    private function formatDataResidue($request)
+    private function formatDataResidue($request): \stdClass
     {
         $obj = new \stdClass;
 
@@ -155,7 +171,7 @@ class ResidueController extends Controller
         return $obj;
     }
 
-    public function insert(ResidueCreatePost $request)
+    public function insert(ResidueCreatePost $request): JsonResponse|RedirectResponse
     {
         // data residue
         $dataResidue = $this->formatDataResidue($request);
@@ -170,32 +186,35 @@ class ResidueController extends Controller
         $residueId = $createResidue->id;
 
         if($createResidue) {
-
-            if ($isAjax)
+            if ($isAjax) {
                 return response()->json(['success' => true, 'message' => 'Resíduo cadastrado com sucesso.', 'residue_id' => $residueId]);
+            }
 
             return redirect()->route('residue.index')
                 ->with('success', "Resíduo com o código {$residueId}, cadastrado com sucesso!");
         }
 
-        if ($isAjax)
+        if ($isAjax) {
             return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o resíduo, tente novamente!']);
+        }
 
         return redirect()->back()
             ->withErrors(['Não foi possível cadastrar o resíduo, tente novamente!'])
             ->withInput();
     }
 
-    public function delete(ResidueDeletePost $request)
+    public function delete(ResidueDeletePost $request): JsonResponse
     {
         $company_id = $request->user()->company_id;
-        $residue_id = $request->residue_id;
+        $residue_id = $request->input('residue_id');
 
-        if (!$this->residue->getResidue($company_id, $residue_id))
+        if (!$this->residue->getResidue($company_id, $residue_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível localizar o resíduo!']);
+        }
 
-        if (!$this->residue->remove($company_id, $residue_id))
+        if (!$this->residue->remove($company_id, $residue_id)) {
             return response()->json(['success' => false, 'message' => 'Não foi possível excluir o resíduo!']);
+        }
 
         return response()->json(['success' => true, 'message' => 'Resíduo excluído com sucesso!']);
     }

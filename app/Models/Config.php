@@ -15,7 +15,7 @@ class Config extends Model
      * @var array
      */
     protected $fillable = [
-        'view_obervation_client_rental', 'user_update'
+        'view_observation_client_rental', 'user_update'
     ];
 
     /**
