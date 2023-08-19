@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\FormPayment;
 use App\Models\RentalPayment;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -67,94 +68,136 @@ class BillsToReceiveController extends Controller
 
     public function fetchRentals(Request $request): JsonResponse
     {
-        $orderBy    = array();
-        $result     = array();
-        $searchUser = null;
+        $result         = array();
+        $draw           = $request->input('draw');
+        $company_id     = $request->user()->company_id;
+        $type_rental    = $request->input('type');
+        $filters        = array();
+        $filter_default = array();
 
-        $filters    = [];
-        $ini        = $request->input('start');
-        $draw       = $request->input('draw');
-        $length     = $request->input('length');
-        $company_id = $request->user()->company_id;
-        $typeRental = $request->input('type');
-        $start_date = $request->input('start_date');
-        $end_date   = $request->input('end_date');
+        try {
+            // Filtro datas
+            $filters_date['dateStart']   = $request->input('start_date');
+            $filters_date['dateFinish']  = $request->input('end_date');
 
-        if (!hasPermission('BillsToReceiveView')) {
+            // Filtro cliente
+            $client = $request->input('client');
+
+            $filter_default[]['where']['rentals.company_id'] = $company_id;
+            $filter_default[]['whereBetween']['rental_payments.due_date'] = [$filters_date['dateStart'], $filters_date['dateFinish']];
+
+            if (!empty($client)) {
+                $filters[]['where']['rentals.client_id'] = $client;
+            }
+
+            $fields_order   = array(
+                'rentals.code',
+                [
+                    'clients.name',
+                    'rentals.address_name',
+                    'rentals.address_name',
+                    'rentals.address_number',
+                    'rentals.address_zipcode',
+                    'rentals.address_neigh',
+                    'rentals.address_city',
+                    'rentals.address_state'
+                ],
+                'rental_payments.due_value',
+                'rental_payments.due_date',
+                ''
+            );
+
+            switch ($type_rental) {
+                case 'late':
+                    $filter_default[]['where']['rental_payments.due_date <'] = date(DATE_INTERNATIONAL);
+                    $filter_default[]['where']['rental_payments.payday'] = null;
+                    break;
+                case 'without_pay':
+                    $filter_default[]['where']['rental_payments.due_date >='] = date(DATE_INTERNATIONAL);
+                    $filter_default[]['where']['rental_payments.payday'] = null;
+                    break;
+                case 'paid':
+                    $filter_default[]['where']['rental_payments.payday <>'] = null;
+                    break;
+            }
+
+            $query = array();
+            $query['select'] = [
+                'rentals.id',
+                'rentals.code',
+                'clients.name as client_name',
+                'rentals.address_name',
+                'rentals.address_number',
+                'rentals.address_zipcode',
+                'rentals.address_complement',
+                'rentals.address_neigh',
+                'rentals.address_city',
+                'rentals.address_state',
+                'rentals.created_at',
+                'rental_payments.due_date',
+                'rental_payments.due_value',
+                'rental_payments.id as rental_payment_id',
+                'rental_payments.payment_id',
+                'rental_payments.payday',
+            ];
+            $query['from'] = 'rental_payments';
+            $query['join'][] = ['rentals','rental_payments.rental_id','=','rentals.id'];
+            $query['join'][] = ['clients','clients.id','=','rentals.client_id'];
+
+            $data = fetchDataTable(
+                $query,
+                array('rentals.code', 'asc'),
+                null,
+                ['BillsToReceiveView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
             return response()->json(array(
-                "draw" => $draw,
-                "recordsTotal" => 0,
-                "recordsFiltered" => 0,
-                "data" => array()
-            ));
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
+                )
+            );
         }
-
-
-        // Filtro cliente
-        $client = $request->input('client') ?? (int)$request->input('client');
-        if (empty($client)) {
-            $client = null;
-        }
-
-        $filters['client']      = $client;
-        $filters['start_date']  = $start_date;
-        $filters['end_date']    = $end_date;
-
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
-        }
-
-        if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
-            }
-
-            $fieldsOrder = array('rentals.code','clients.name','rental_payments.due_value', 'rental_payments.due_date', '');
-            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
-            if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
-            }
-        }
-
-        $data = $this->rental_payment->getRentals($company_id, $filters, $ini, $length, $searchUser, $orderBy, $typeRental);
 
         $permissionUpdate = hasPermission('BillsToReceiveUpdatePost');
         $permissionDelete = hasPermission('BillsToReceiveDeletePost');
 
-        foreach ($data as $key => $value) {
-            $rental_code = formatCodeRental($value['code']);
-            $data_prop_button = "data-rental-payment-id='{$value['rental_payment_id']}' data-rental-code='$rental_code' data-name-client='{$value['client_name']}' data-date-rental='" . date('d/m/Y H:i', strtotime($value['created_at'])) . "' data-due-date='" . date('d/m/Y', strtotime($value['due_date'])) . "' data-payment-id='{$value['payment_id']}' data-payday='" . date('d/m/Y', strtotime($value['payday'])) . "' data-due-value='" . number_format($value['due_value'], 2, ',', '.') . "'";
+        foreach ($data['data'] as $value) {
+            $rental_code = formatCodeRental($value->code);
+            $data_prop_button = "data-rental-payment-id='$value->rental_payment_id' data-rental-code='$rental_code' data-name-client='$value->client_name' data-date-rental='" . date('d/m/Y H:i', strtotime($value->created_at)) . "' data-due-date='" . date('d/m/Y', strtotime($value->due_date)) . "' data-payment-id='$value->payment_id' data-payday='" . date('d/m/Y', strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "'";
 
-            $txt_btn_paid = $typeRental == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
+            $txt_btn_paid = $type_rental == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
             $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";
 
-            if ($permissionUpdate && in_array($typeRental, array('late', 'without_pay'))) {
+            if ($permissionUpdate && in_array($type_rental, array('late', 'without_pay'))) {
                 $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
             }
 
-            $buttons = dropdownButtonsDataList($buttons, $value['rental_payment_id']);
+            $buttons = dropdownButtonsDataList($buttons, $value->rental_payment_id);
 
-            $result[$key] = array(
+            $result[] = array(
                 $rental_code,
                 "<div class='d-flex flex-wrap'>
-                    <span class='font-weight-bold w-100'>{$value['client_name']}</span>
-                    <span class='mt-1 w-100'>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}</span>
+                    <span class='font-weight-bold w-100'>$value->client_name</span>
+                    <span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span>
                 </div>",
-                'R$ ' . number_format($value['due_value'], 2, ',', '.'),
-                date('d/m/Y', strtotime($value['due_date'])),
+                'R$ ' . number_format($value->due_value, 2, ',', '.'),
+                date('d/m/Y', strtotime($value->due_date)),
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->rental_payment->getRentals($company_id, $filters, null, null, null, array(), $typeRental, true),
-            "recordsFiltered" => $this->rental_payment->getRentals($company_id, $filters, null, null, $searchUser, array(), $typeRental, true),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);

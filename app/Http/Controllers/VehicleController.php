@@ -7,6 +7,7 @@ use App\Http\Requests\VehicleDeletePost;
 use App\Http\Requests\VehicleUpdatePost;
 use App\Models\Driver;
 use App\Models\Vehicle;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -40,69 +41,65 @@ class VehicleController extends Controller
 
     public function fetchVehicles(Request $request): JsonResponse
     {
-        $orderBy    = array();
         $result     = array();
-        $searchUser = null;
-
-        $ini        = $request->input('start');
         $draw       = $request->input('draw');
-        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        if (!hasPermission('VehicleView')) {
+        try {
+            $filters        = array();
+            $filter_default = array();
+            $fields_order   = array('id','name','brand','model','reference', '');
+
+            $filter_default[]['where']['company_id'] = $company_id;
+
+            $query = array(
+                'from' => 'vehicles'
+            );
+
+            $data = fetchDataTable(
+                $query,
+                array('name', 'asc'),
+                null,
+                ['VehicleView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
             return response()->json(array(
-                "draw" => $draw,
-                "recordsTotal" => 0,
-                "recordsFiltered" => 0,
-                "data" => $result
-            ));
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
+                )
+            );
         }
-
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
-        }
-
-        if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
-            }
-
-            $fieldsOrder = array('id','name','brand','model','reference', '');
-            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
-            if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
-            }
-        }
-
-        $data = $this->vehicle->getVehicles($company_id, $ini, $length, $searchUser, $orderBy);
 
         $permissionUpdate = hasPermission('VehicleUpdatePost');
         $permissionDelete = hasPermission('VehicleDeletePost');
 
-        foreach ($data as $key => $value) {
-            $buttons = "<a href='".route('vehicle.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
+        foreach ($data['data'] as $value) {
+            $buttons = "<a href='".route('vehicle.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
             $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveVehicle btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' vehicle-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveVehicle btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' vehicle-id='{$value->id}'><i class='fas fa-times'></i></button>" : '';
 
-            $result[$key] = array(
-                $value['id'],
-                $value['name'],
-                $value['brand'],
-                $value['model'],
-                $value['reference'],
+            $result[] = array(
+                $value->id,
+                $value->name,
+                $value->brand,
+                $value->model,
+                $value->reference,
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->vehicle->getCountVehicles($company_id),
-            "recordsFiltered" => $this->vehicle->getCountVehicles($company_id, $searchUser),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);
