@@ -7,6 +7,7 @@ use App\Http\Requests\ProviderDeletePost;
 use App\Http\Requests\ProviderUpdatePost;
 use App\Models\Config;
 use App\Models\Provider;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -47,7 +48,7 @@ class ProviderController extends Controller
         return view('provider.create');
     }
 
-    private function formatDataToCreateAndUpdate($request, bool $create = true)
+    private function formatDataToCreateAndUpdate($request, bool $create = true): array
     {
         // data provider
         $company_id     = $request->user()->company_id;
@@ -120,7 +121,7 @@ class ProviderController extends Controller
         );
     }
 
-    public function insert(ProviderCreatePost $request)
+    public function insert(ProviderCreatePost $request): JsonResponse|RedirectResponse
     {
         $isAjax = isAjax();
 
@@ -201,59 +202,64 @@ class ProviderController extends Controller
 
     public function fetchProviders(Request $request): JsonResponse
     {
-        $orderBy    = array();
         $result     = array();
-        $searchUser = null;
-
-        $ini        = $request->input('start');
         $draw       = $request->input('draw');
-        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
+        try {
+            $filters        = array();
+            $filter_default = array();
+            $fields_order   = array('id','name','email','phone_1', '');
+
+            $filter_default[]['where']['company_id'] = $company_id;
+
+            $query = array(
+                'from' => 'providers'
+            );
+
+            $data = fetchDataTable(
+                $query,
+                array('name', 'asc'),
+                null,
+                ['DriverView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
+            return response()->json(array(
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
+                )
+            );
         }
-
-        if (isset($request->order)) {
-            if ($request->order[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
-            }
-
-            $fieldsOrder = array('id','name','email','phone_1', '');
-            $fieldOrder =  $fieldsOrder[$request->order[0]['column']];
-            if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
-            }
-        }
-
-        $data = $this->provider->getProviders($company_id, $ini, $length, $searchUser, $orderBy);
 
         $permissionUpdate = hasPermission('ProviderUpdatePost');
         $permissionDelete = hasPermission('ProviderDeletePost');
 
-        foreach ($data as $key => $value) {
-            $buttons = "<a href='".route('provider.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
+        foreach ($data['data'] as $value) {
+            $buttons = "<a href='".route('provider.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
             $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveProvider btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' provider-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveProvider btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' provider-id='$value->id'><i class='fas fa-times'></i></button>" : '';
 
-            $result[$key] = array(
-                $value['id'],
-                $value['name'],
-                $value['email'],
-                $value['phone_1'],
+            $result[] = array(
+                $value->id,
+                $value->name,
+                $value->email,
+                $value->phone_1,
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->provider->getCountProviders($company_id),
-            "recordsFiltered" => $this->provider->getCountProviders($company_id, $searchUser),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);

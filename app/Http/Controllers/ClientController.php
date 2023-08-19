@@ -6,6 +6,7 @@ use App\Http\Requests\ClientCreatePost;
 use App\Http\Requests\ClientDeletePost;
 use App\Http\Requests\ClientUpdatePost;
 use App\Models\Config;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -52,6 +53,11 @@ class ClientController extends Controller
 
     public function insert(ClientCreatePost $request): JsonResponse|RedirectResponse
     {
+        if (!hasPermission('ClientCreatePost')) {
+            return redirect()->route('client.index')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         // data client
         $company_id     = $request->user()->company_id;
         $user_id        = $request->user()->id;
@@ -182,6 +188,11 @@ class ClientController extends Controller
 
     public function edit($id): View|Factory|RedirectResponse|Application
     {
+        if (!hasPermission('ClientUpdatePost')) {
+            return redirect()->route('client.index')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         $company_id = Auth::user()->__get('company_id');
 
         $client = $this->client->getClient($id, $company_id);
@@ -340,59 +351,64 @@ class ClientController extends Controller
 
     public function fetchClients(Request $request): JsonResponse
     {
-        $order_by   = array();
         $result     = array();
-        $searchUser = null;
-
-        $ini        = $request->input('start');
         $draw       = $request->input('draw');
-        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
+        try {
+            $filters        = array();
+            $filter_default = array();
+            $fields_order   = array('id','name','email','phone_1', '');
+
+            $filter_default[]['where']['company_id'] = $company_id;
+
+            $query = array(
+                'from' => 'clients'
+            );
+
+            $data = fetchDataTable(
+                $query,
+                array('name', 'asc'),
+                null,
+                ['ClientView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
+            return response()->json(array(
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
+                )
+            );
         }
-
-        if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
-            }
-
-            $fieldsOrder = array('id','name','email','phone_1', '');
-            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
-            if ($fieldOrder != "") {
-                $order_by['field'] = $fieldOrder;
-                $order_by['order'] = $direction;
-            }
-        }
-
-        $data = $this->client->getClients($company_id, $ini, $length, $searchUser, $order_by);
 
         $permissionUpdate = hasPermission('ClientUpdatePost');
         $permissionDelete = hasPermission('ClientDeletePost');
 
-        foreach ($data as $key => $value) {
-            $buttons = "<a href='".route('client.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
+        foreach ($data['data'] as $value) {
+            $buttons = "<a href='".route('client.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
             $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' data-client-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' data-client-id='{$value->id}'><i class='fas fa-times'></i></button>" : '';
 
-            $result[$key] = array(
-                $value['id'],
-                $value['name'],
-                $value['email'],
-                $value['phone_1'],
+            $result[] = array(
+                $value->id,
+                $value->name,
+                $value->email,
+                $value->phone_1,
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->client->getCountClients($company_id),
-            "recordsFiltered" => $this->client->getCountClients($company_id, $searchUser),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);
@@ -400,6 +416,10 @@ class ClientController extends Controller
 
     public function getClients(Request $request): JsonResponse
     {
+        if (!hasPermission('ClientView')) {
+            return response()->json(['success' => false, 'message' => "Você não tem permissão para acessar essa página!"]);
+        }
+
         $company_id = $request->user()->company_id;
         $clientData = [];
         $lastId = 0;
@@ -418,6 +438,10 @@ class ClientController extends Controller
 
     public function getClient(int $client_id = null): JsonResponse
     {
+        if (!hasPermission('ClientView')) {
+            return response()->json(['success' => false, 'message' => "Você não tem permissão para acessar essa página!"]);
+        }
+
         if (is_null($client_id)) {
             return response()->json();
         }

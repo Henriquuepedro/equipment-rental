@@ -60,70 +60,94 @@ class BudgetController extends Controller
 
     public function fetchBudgets(Request $request): JsonResponse
     {
-        $orderBy    = array();
         $result     = array();
-        $searchUser = null;
-
-        $ini        = $request->input('start');
         $draw       = $request->input('draw');
-        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        if (!hasPermission('BudgetView')) {
+        try {
+            $filters        = array();
+            $filter_default = array();
+            $fields_order   = array(
+                'budgets.id',
+                'budgets.code',
+                [
+                    'clients.name',
+                    'budgets.address_name',
+                    'budgets.address_name',
+                    'budgets.address_number',
+                    'budgets.address_zipcode',
+                    'budgets.address_neigh',
+                    'budgets.address_city',
+                    'budgets.address_state'
+                ],
+                'budgets.created_at',
+                ''
+            );
+
+            $filter_default[]['where']['budgets.company_id'] = $company_id;
+
+            $query = array();
+            $query['select'] = [
+                'budgets.id',
+                'budgets.code',
+                'clients.name as client_name',
+                'budgets.address_name',
+                'budgets.address_number',
+                'budgets.address_zipcode',
+                'budgets.address_complement',
+                'budgets.address_neigh',
+                'budgets.address_city',
+                'budgets.address_state',
+                'budgets.created_at'
+            ];
+            $query['from'] = 'budgets';
+            $query['join'][] = ['clients','clients.id','=','budgets.client_id'];
+
+            $data = fetchDataTable(
+                $query,
+                array('budgets.code', 'asc'),
+                null,
+                ['BudgetView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
             return response()->json(array(
-                "draw" => $draw,
-                "recordsTotal" => 0,
-                "recordsFiltered" => 0,
-                "data" => $result
-            ));
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
+                )
+            );
         }
-
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
-        }
-
-        if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
-            }
-
-            $fieldsOrder = array('budgets.code','clients.name','budgets.created_at', '');
-            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
-            if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
-            }
-        }
-
-        $data = $this->budget->getBudgets($company_id, $ini, $length, $searchUser, $orderBy);
 
         $permissionUpdate = hasPermission('BudgetUpdatePost');
         $permissionDelete = hasPermission('BudgetDeletePost');
 
-        foreach ($data as $key => $value) {
-            $buttons = "<button class='dropdown-item btnApproveBudget' budget-id='{$value['id']}'><i class='fas fa-check'></i> Aprovar Orçamento</button>";
-            $buttons .= $permissionUpdate ? "<a href='".route('budget.update', ['id' => $value['id']])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Orçamento</a>" : '';
-            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveBudget' budget-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Orçamento</button>" : '';
-            $buttons .= "<a href='".route('print.budget', ['budget' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Orçamento</a>";
+        foreach ($data['data'] as $value) {
+            $buttons = "<button class='dropdown-item btnApproveBudget' budget-id='$value->id'><i class='fas fa-check'></i> Aprovar Orçamento</button>";
+            $buttons .= $permissionUpdate ? "<a href='".route('budget.update', ['id' => $value->id])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Orçamento</a>" : '';
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveBudget' budget-id='$value->id'><i class='fas fa-trash'></i> Excluir Orçamento</button>" : '';
+            $buttons .= "<a href='".route('print.budget', ['budget' => $value->id])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Orçamento</a>";
 
-            $buttons = dropdownButtonsDataList($buttons, $value['id']);
+            $buttons = dropdownButtonsDataList($buttons, $value->id);
 
-            $result[$key] = array(
-                formatCodeRental($value['code']),
-                "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>{$value['client_name']}</span><span class='mt-1 w-100'>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}</span></div>",
-                date('d/m/Y H:i', strtotime($value['created_at'])),
+            $result[] = array(
+                formatCodeRental($value->code),
+                "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>$value->client_name</span><span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span></div>",
+                date('d/m/Y H:i', strtotime($value->created_at)),
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->budget->getCountBudgets($company_id),
-            "recordsFiltered" => $this->budget->getCountBudgets($company_id, $searchUser),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DriverCreatePost;
 use App\Http\Requests\DriverDeletePost;
 use App\Http\Requests\DriverUpdatePost;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -36,70 +37,64 @@ class DriverController extends Controller
 
     public function fetchDrivers(Request $request): JsonResponse
     {
-        $orderBy    = array();
         $result     = array();
-        $searchUser = null;
-
-        $ini        = $request->input('start');
         $draw       = $request->input('draw');
-        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        if (!hasPermission('DriverView')) {
-            return response()->json(
-                array(
-                    "draw" => $draw,
-                    "recordsTotal" => 0,
-                    "recordsFiltered" => 0,
-                    "data" => array()
+        try {
+            $filters        = array();
+            $filter_default = array();
+            $fields_order   = array('id','name','cpf','phone', '');
+
+            $filter_default[]['where']['company_id'] = $company_id;
+
+            $query = array(
+                'from' => 'drivers'
+            );
+
+            $data = fetchDataTable(
+                $query,
+                array('name', 'asc'),
+                null,
+                ['DriverView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
+            return response()->json(array(
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
                 )
             );
         }
 
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
-        }
-
-        if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
-            }
-
-            $fieldsOrder = array('id','name','cpf','phone', '');
-            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
-            if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
-            }
-        }
-
-        $data = $this->driver->getDrivers($company_id, $ini, $length, $searchUser, $orderBy);
-
         $permissionUpdate = hasPermission('DriverUpdatePost');
         $permissionDelete = hasPermission('DriverDeletePost');
 
-        foreach ($data as $key => $value) {
-            $buttons = "<a href='".route('driver.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
+        foreach ($data['data'] as $value) {
+            $buttons = "<a href='".route('driver.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
             $buttons .= $permissionUpdate ? "title='Editar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveDriver btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' driver-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveDriver btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' driver-id='{$value->id}'><i class='fas fa-times'></i></button>" : '';
 
-            $result[$key] = array(
-                $value['id'],
-                $value['name'],
-                $value['cpf'] ? mask($value['cpf'], '###.###.###-##') : '',
-                $value['phone'] ? mask($value['phone'], strlen($value['phone']) === 10 ? '(##) ####-####' : '(##) #####-####') : '',
+            $result[] = array(
+                $value->id,
+                $value->name,
+                $value->cpf ? mask($value->cpf, '###.###.###-##') : '',
+                $value->phone ? mask($value->phone, strlen($value->phone) === 10 ? '(##) ####-####' : '(##) #####-####') : '',
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->driver->getCountDrivers($company_id),
-            "recordsFiltered" => $this->driver->getCountDrivers($company_id, $searchUser),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);

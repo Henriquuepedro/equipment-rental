@@ -6,6 +6,7 @@ use App\Models\BillToPay;
 use App\Models\BillToPayPayment;
 use App\Models\FormPayment;
 use App\Models\Provider;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -59,89 +60,111 @@ class BillsToPayController extends Controller
 
     public function fetchBills(Request $request): JsonResponse
     {
-        $orderBy    = array();
-        $result     = array();
-        $searchUser = null;
+        $result         = array();
+        $draw           = $request->input('draw');
+        $company_id     = $request->user()->company_id;
+        $type_bill      = $request->input('type');
+        $filters        = array();
+        $filter_default = array();
 
-        $filters    = [];
-        $ini        = $request->input('start');
-        $draw       = $request->input('draw');
-        $length     = $request->input('length');
-        $company_id = $request->user()->company_id;
-        $typeBill   = $request->input('type');
-        $start_date = $request->input('start_date');
-        $end_date   = $request->input('end_date');
+        try {
+            // Filtro datas
+            $filters_date['dateStart']   = $request->input('start_date');
+            $filters_date['dateFinish']  = $request->input('end_date');
 
-        if (!hasPermission('BillsToPayView')) {
+            // Filtro fornecedor
+            $provider = $request->input('provider');
+
+            $filter_default[]['where']['bill_to_pays.company_id'] = $company_id;
+            $filter_default[]['whereBetween']['bill_to_pay_payments.due_date'] = [$filters_date['dateStart'], $filters_date['dateFinish']];
+
+            if (!empty($provider)) {
+                $filters[]['where']['bill_to_pays.provider_id'] = $provider;
+            }
+
+            $fields_order = array('bill_to_pays.code','providers.name','bill_to_pay_payments.due_value','bill_to_pay_payments.due_date', '');
+
+            switch ($type_bill) {
+                case 'late':
+                    $filter_default[]['where']['bill_to_pay_payments.due_date <'] = date(DATE_INTERNATIONAL);
+                    $filter_default[]['where']['bill_to_pay_payments.payday'] = null;
+                    break;
+                case 'without_pay':
+                    $filter_default[]['where']['bill_to_pay_payments.due_date >='] = date(DATE_INTERNATIONAL);
+                    $filter_default[]['where']['bill_to_pay_payments.payday'] = null;
+                    break;
+                case 'paid':
+                    $filter_default[]['where']['bill_to_pay_payments.payday <>'] = null;
+                    break;
+            }
+
+            $query = array();
+            $query['select'] = [
+                'bill_to_pays.id',
+                'bill_to_pays.code',
+                'providers.name as provider_name',
+                'bill_to_pays.created_at',
+                'bill_to_pay_payments.due_date',
+                'bill_to_pay_payments.due_value',
+                'bill_to_pay_payments.id as bill_payment_id',
+                'bill_to_pay_payments.payment_id',
+                'bill_to_pay_payments.payday'
+            ];
+            $query['from'] = 'bill_to_pays';
+            $query['join'][] = ['bill_to_pay_payments','bill_to_pay_payments.bill_to_pay_id','=','bill_to_pays.id'];
+            $query['join'][] = ['providers','providers.id','=','bill_to_pays.provider_id'];
+
+            $data = fetchDataTable(
+                $query,
+                array('bill_to_pays.code', 'asc'),
+                null,
+                ['BillsToPayView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
             return response()->json(array(
-                "draw" => $draw,
-                "recordsTotal" => 0,
-                "recordsFiltered" => 0,
-                "data" => array()
-            ));
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
+                )
+            );
         }
-
-        // Filtro fornecedor
-        $provider = $request->input('provider') ?? (int)$request->input('provider');
-        if (empty($provider)) {
-            $provider = null;
-        }
-        $filters['provider']    = $provider;
-        $filters['start_date']  = $start_date;
-        $filters['end_date']    = $end_date;
-
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
-        }
-
-        if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
-            }
-
-            $fieldsOrder = array('bill_to_pays.code','providers.name','bill_to_pay_payments.due_value','bill_to_pay_payments.due_date', '');
-            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
-            if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
-            }
-        }
-
-        $data = $this->bill_to_pay->getBills($company_id, $filters, $ini, $length, $searchUser, $orderBy, $typeBill);
 
         $permissionUpdate = hasPermission('BillsToPayUpdatePost');
         $permissionDelete = hasPermission('BillsToPayDeletePost');
 
-        foreach ($data as $key => $value) {
-            $bill_code = formatCodeRental($value['code']);
-            $data_prop_button = "data-bill-payment-id='{$value['bill_payment_id']}' data-bill-code='$bill_code' data-name-provider='{$value['provider_name']}' data-date-bill='" . date('d/m/Y H:i', strtotime($value['created_at'])) . "' data-due-date='" . date('d/m/Y', strtotime($value['due_date'])) . "' data-payment-id='{$value['payment_id']}' data-payday='" . date('d/m/Y', strtotime($value['payday'])) . "' data-due-value='" . number_format($value['due_value'], 2, ',', '.') . "'";
+        foreach ($data['data'] as $value) {
+            $bill_code = formatCodeRental($value->code);
+            $data_prop_button = "data-bill-payment-id='$value->bill_payment_id' data-bill-code='$bill_code' data-name-provider='$value->provider_name' data-date-bill='" . date('d/m/Y H:i', strtotime($value->created_at)) . "' data-due-date='" . date('d/m/Y', strtotime($value->due_date)) . "' data-payment-id='{$value->payment_id}' data-payday='" . date('d/m/Y', strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "'";
 
-            $txt_btn_paid = $typeBill == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
+            $txt_btn_paid = $type_bill == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
             $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";
 
-            if ($permissionUpdate && in_array($typeBill, array('late', 'without_pay'))) {
+            if ($permissionUpdate && in_array($type_bill, array('late', 'without_pay'))) {
                 $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
             }
 
-            $buttons = dropdownButtonsDataList($buttons, $value['bill_payment_id']);
+            $buttons = dropdownButtonsDataList($buttons, $value->bill_payment_id);
 
-            $result[$key] = array(
+            $result[] = array(
                 $bill_code,
-                "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>{$value['provider_name']}</span></div>",
-                'R$ ' . number_format($value['due_value'], 2, ',', '.'),
-                date('d/m/Y', strtotime($value['due_date'])),
+                "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>$value->provider_name</span></div>",
+                'R$ ' . number_format($value->due_value, 2, ',', '.'),
+                date('d/m/Y', strtotime($value->due_date)),
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->bill_to_pay->getBills($company_id, $filters, null, null, null, array(), $typeBill, true),
-            "recordsFiltered" => $this->bill_to_pay->getBills($company_id, $filters, null, null, $searchUser, array(), $typeBill, true),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);

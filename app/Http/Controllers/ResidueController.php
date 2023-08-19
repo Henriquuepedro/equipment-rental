@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ResidueCreatePost;
 use App\Http\Requests\ResidueDeletePost;
 use App\Http\Requests\ResidueUpdatePost;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -34,66 +35,61 @@ class ResidueController extends Controller
 
     public function fetchResidues(Request $request): JsonResponse
     {
-        $orderBy    = array();
         $result     = array();
-        $searchUser = null;
-
-        $ini        = $request->input('start');
         $draw       = $request->input('draw');
-        $length     = $request->input('length');
         $company_id = $request->user()->company_id;
 
-        if (!hasPermission('ResidueView')) {
+        try {
+            $filters        = array();
+            $filter_default = array();
+            $fields_order   = array('name', 'created_at', '');
+
+            $filter_default[]['where']['company_id'] = $company_id;
+
+            $query = array(
+                'from' => 'residues'
+            );
+
+            $data = fetchDataTable(
+                $query,
+                array('name', 'asc'),
+                null,
+                ['ResidueView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
             return response()->json(array(
-                "draw" => $draw,
-                "recordsTotal" => 0,
-                "recordsFiltered" => 0,
-                "data" => array()
-            ));
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
+                )
+            );
         }
-
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
-        }
-
-        if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
-            }
-
-            $fieldsOrder = array('name', '');
-            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
-            if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
-            }
-        }
-
-        $data = $this->residue->getFetchResidues($company_id, $ini, $length, $searchUser, $orderBy);
 
         $permissionUpdate = hasPermission('ResidueUpdatePost');
         $permissionDelete = hasPermission('ResidueDeletePost');
 
-        foreach ($data as $key => $value) {
-            $buttons  = '';
-            $buttons .= $permissionUpdate ? "<button class='btn btn-primary btn-sm btn-rounded btn-action editResidueModal' data-toggle='tooltip' title='Editar' residue-id='{$value['id']}'><i class='fas fa-edit'></i></button>" : '';
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveResidue btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' residue-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+        foreach ($data['data'] as $value) {
+            $buttons = $permissionUpdate ? "<button class='btn btn-primary btn-sm btn-rounded btn-action editResidueModal' data-toggle='tooltip' title='Editar' residue-id='$value->id'><i class='fas fa-edit'></i></button>" : '';
+            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveResidue btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' residue-id='$value->id'><i class='fas fa-times'></i></button>" : '';
 
-            $result[$key] = array(
-                $value['name'],
-                date('d/m/Y H:i', strtotime($value['created_at'])),
+            $result[] = array(
+                $value->name,
+                date('d/m/Y H:i', strtotime($value->created_at)),
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->residue->getCountFetchResidues($company_id),
-            "recordsFiltered" => $this->residue->getCountFetchResidues($company_id, $searchUser),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);

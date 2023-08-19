@@ -166,6 +166,11 @@ class EquipmentController extends Controller
 
     public function edit($id): View|Factory|RedirectResponse|Application
     {
+        if (!hasPermission('EquipmentUpdatePost')) {
+            return redirect()->route('equipment.index')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         $company_id = Auth::user()->__get('company_id');
 
         $equipment = $this->equipment->getEquipment($id, $company_id);
@@ -415,6 +420,10 @@ class EquipmentController extends Controller
 
     public function getEquipments(Request $request): JsonResponse
     {
+        if (!hasPermission('EquipmentView')) {
+            return response()->json();
+        }
+
         //DB::enableQueryLog();
         $company_id         = $request->user()->company_id;
         $searchEquipment    = str_replace('*','', filter_var($request->input('searchEquipment'), FILTER_DEFAULT));
@@ -443,6 +452,10 @@ class EquipmentController extends Controller
 
     public function getEquipment(int $id, bool $validStock = true): JsonResponse
     {
+        if (!hasPermission('EquipmentView')) {
+            return response()->json(['success' => false, 'data' => 'Você não tem permissão para acessar essa página!']);
+        }
+
         $company_id = Auth::user()->__get('company_id');
 
         $equipment = $this->equipment->getEquipment($id, $company_id);
@@ -473,6 +486,10 @@ class EquipmentController extends Controller
 
     public function getStockEquipment(Request $request): JsonResponse
     {
+        if (!hasPermission('EquipmentView')) {
+            return response()->json();
+        }
+
         $company_id     = $request->user()->company_id;
         $equipment_id   = $request->input('idEquipment');
 
@@ -483,6 +500,10 @@ class EquipmentController extends Controller
 
     public function getPriceEquipment(Request $request): JsonResponse|int
     {
+        if (!hasPermission('EquipmentView')) {
+            return 0;
+        }
+
         $company_id     = $request->user()->company_id;
         $equipment_id   = $request->input('idEquipment');
         $diff_days      = $request->input('diffDays');
@@ -510,6 +531,10 @@ class EquipmentController extends Controller
 
     public function getPriceStockEquipment(Request $request): JsonResponse
     {
+        if (!hasPermission('EquipmentView')) {
+            return response()->json(['price' => 0, 'stock' => 0]);
+        }
+
         $company_id     = $request->user()->company_id;
         $equipment_id   = $request->input('idEquipment');
         $diff_days      = $request->input('diffDays');
@@ -537,6 +562,10 @@ class EquipmentController extends Controller
 
     public function getPricePerPeriod(Request $request): JsonResponse
     {
+        if (!hasPermission('EquipmentView')) {
+            return response()->json();
+        }
+
         $company_id     = $request->user()->company_id;
         $equipment_id   = $request->input('idEquipment');
 
@@ -547,7 +576,10 @@ class EquipmentController extends Controller
 
     public function getCheckPriceStockEquipment(Request $request): JsonResponse
     {
-        //DB::enableQueryLog();
+        if (!hasPermission('EquipmentView')) {
+            return response()->json([0 => ['price' => 0, 'stock' => 0]]);
+        }
+
         $rsEquipment   = [];
         $company_id     = $request->user()->company_id;
         $equipmentsId  = $request->input('arrEquipments');

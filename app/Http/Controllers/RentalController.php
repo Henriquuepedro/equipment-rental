@@ -79,91 +79,137 @@ class RentalController extends Controller
 
     public function fetchRentals(Request $request): JsonResponse
     {
-        if (!hasPermission('RentalView')) {
-            return response()->json();
-        }
-
-        $orderBy    = array();
-        $result     = array();
-        $searchUser = null;
-
-        $filters        = [];
-        $ini            = $request->input('start');
         $draw           = $request->input('draw');
-        $length         = $request->input('length');
         $company_id     = $request->user()->company_id;
-        $typeRental     = $request->input('type');
-        // Filtro datas
-        $filters['dateStart']   = $request->input('start_date');
-        $filters['dateFinish']  = $request->input('end_date');
-        // Filtro cliente
-        $client = $request->input('client');
-        if (empty($client)) {
-            $client = null;
-        }
-        $filters['client'] = $client;
+        $type_rental    = $request->input('type');
+        $result         = array();
 
-        $search = $request->input('search');
-        if ($search && $search['value']) {
-            $searchUser = $search['value'];
-        }
+        try {
+            // Filtro datas
+            $filters_date['dateStart']   = $request->input('start_date');
+            $filters_date['dateFinish']  = $request->input('end_date');
 
-        if ($request->input('order')) {
-            if ($request->input('order')[0]['dir'] == "asc") {
-                $direction = "asc";
-            } else {
-                $direction = "desc";
+            // Filtro cliente
+            $client = $request->input('client');
+
+            $filters        = array();
+            $filter_default = array();
+
+            $filter_default[]['where']['rentals.company_id'] = $company_id;
+            $filter_default[]['whereBetween']['rentals.created_at'] = ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
+
+            switch ($type_rental) {
+                case 'deliver':
+                    $filter_default[]['where']['rental_equipments.actual_delivery_date'] = null;
+                    break;
+                case 'withdraw':
+                    $filter_default[]['where']['rental_equipments.actual_delivery_date <>'] = null;
+                    $filter_default[]['where']['rental_equipments.actual_withdrawal_date'] = null;
+                    break;
+                case 'finished':
+                    $filter_default[]['where']['rentals.actual_delivery_date <>'] = null;
+                    $filter_default[]['where']['rentals.actual_withdrawal_date <>'] = null;
+                    break;
             }
 
-            $fieldsOrder = array('rentals.code','clients.name','rentals.created_at', '');
-            $fieldOrder =  $fieldsOrder[$request->input('order')[0]['column']];
-            if ($fieldOrder != "") {
-                $orderBy['field'] = $fieldOrder;
-                $orderBy['order'] = $direction;
+            if (!empty($client)) {
+                $filters[]['where']['rentals.client_id'] = $client;
             }
-        }
 
-        $data = $this->rental->getRentals($company_id, $filters, $ini, $length, $searchUser, $orderBy, $typeRental);
+            $fields_order = array(
+                'rentals.code',
+                [
+                    'clients.name',
+                    'rentals.address_name',
+                    'rentals.address_name',
+                    'rentals.address_number',
+                    'rentals.address_zipcode',
+                    'rentals.address_neigh',
+                    'rentals.address_city',
+                    'rentals.address_state'
+                ],
+                'rentals.created_at',
+                ''
+            );
+
+            $query = array();
+            $query['select'] = [
+                'rentals.id',
+                'rentals.code',
+                'clients.name as client_name',
+                'rentals.address_name',
+                'rentals.address_number',
+                'rentals.address_zipcode',
+                'rentals.address_complement',
+                'rentals.address_neigh',
+                'rentals.address_city',
+                'rentals.address_state',
+                'rentals.created_at'
+            ];
+            $query['from'] = 'rentals';
+            $query['join'][] = ['clients','clients.id','=','rentals.client_id'];
+            $query['join'][] = ['rental_equipments','rental_equipments.rental_id','=','rentals.id'];
+
+            $data = fetchDataTable(
+                $query,
+                array('rentals.code', 'asc'),
+                $type_rental === 'finished' ? 'rentals.id' : 'rental_equipments.rental_id',
+                ['RentalView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
+            return response()->json(array(
+                    "draw"              => $draw,
+                    "recordsTotal"      => 0,
+                    "recordsFiltered"   => 0,
+                    "data"              => $result,
+                    "message"           => $exception->getMessage()
+                )
+            );
+        }
 
         $permissionUpdate = hasPermission('RentalUpdatePost');
         $permissionDelete = hasPermission('RentalDeletePost');
 
-        foreach ($data as $key => $value) {
+        foreach ($data['data'] as $value) {
             $buttons = '';
 
-            if ($permissionUpdate && in_array($typeRental, array('deliver', 'withdraw'))) {
+            if ($permissionUpdate && in_array($type_rental, array('deliver', 'withdraw'))) {
                 $btn_class = $btn_text = '';
-                if ($typeRental === 'deliver') {
+                if ($type_rental === 'deliver') {
                     $btn_class = 'btnDeliver';
                     $btn_text = 'Entrega';
                 }
-                else if ($typeRental === 'withdraw') {
+                else if ($type_rental === 'withdraw') {
                     $btn_class = 'btnWithdraw';
                     $btn_text = 'Retirada'; // ou coleta?
                 }
 
-                $buttons .="<button class='dropdown-item $btn_class' data-rental-id='{$value['id']}'><i class='fas fa-check'></i> Confirmar $btn_text</button>";
+                $buttons .= "<button class='dropdown-item $btn_class' data-rental-id='{$value->id}'><i class='fas fa-check'></i> Confirmar $btn_text</button>";
 
                 $exist_equipment_exchanged = false;
-                foreach ($this->rental_equipment->getEquipments($company_id, $value['id']) as $equipment) {
+                foreach ($this->rental_equipment->getEquipments($company_id, $value->id) as $equipment) {
                     if ($equipment['exchanged']) {
                         $exist_equipment_exchanged = true;
                     }
                 }
 
                 if (!$exist_equipment_exchanged) {
-                    $buttons .="<a href='".route('rental.update', ['id' => $value['id']])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Locação</a>";
+                    $buttons .="<a href='".route('rental.update', ['id' => $value->id])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Locação</a>";
                 }
 
-                if ($typeRental === 'withdraw' && count($this->rental_equipment->getEquipmentToExchange($company_id, $value['id']))) {
-                    $buttons .="<a href='".route('rental.exchange', ['id' => $value['id']])."' class='dropdown-item'><i class='fa fa fa-arrow-right-arrow-left'></i> Trocar Equipamento</a>";
+                if ($type_rental === 'withdraw' && count($this->rental_equipment->getEquipmentToExchange($company_id, $value->id))) {
+                    $buttons .="<a href='".route('rental.exchange', ['id' => $value->id])."' class='dropdown-item'><i class='fa fa fa-arrow-right-arrow-left'></i> Trocar Equipamento</a>";
                 }
             }
 
-            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='{$value['id']}'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
-            $buttons .= "<a href='".route('print.rental', ['rental' => $value['id']])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='{$value->id}'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
+            $buttons .= "<a href='".route('print.rental', ['rental' => $value->id])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
 
-            $buttons = dropdownButtonsDataList($buttons, $value['id']);
+            $buttons = dropdownButtonsDataList($buttons, $value->id);
 
             $expectedDeliveryDate   = null;
             $expectedWithdrawalDate = null;
@@ -234,34 +280,34 @@ class RentalController extends Controller
             $strWithdrawalDate  = "<div class='badge badge-pill badge-lg badge-$colorBadgeWithdrawalDate'>$labelBadgeWithdrawalDate: $strDateWithdraw</div>";
 
             // Se for para listar somente os "para entregar", não precisa mostrar os dados de retirada.
-            if ($typeRental === 'deliver') {
+            if ($type_rental === 'deliver') {
                 $strWithdrawalDate = '';
             }
             // Se for para listar somente os "para retirar", não precisa mostrar os dados de entrega.
-            if ($typeRental === 'withdraw') {
+            if ($type_rental === 'withdraw') {
                 $strDeliveryDate = '';
             }
 
-            $result[$key] = array(
-                formatCodeRental($value['code']),
+            $result[] = array(
+                formatCodeRental($value->code),
                 "<div class='d-flex flex-wrap'>
                     <div class='w-100 mb-2'>
                         $strDeliveryDate
                         $strWithdrawalDate
                     </div>
-                    <span class='font-weight-bold w-100'>{$value['client_name']}</span>
-                    <span class='mt-1 w-100'>{$value['address_name']}, {$value['address_number']} - {$value['address_zipcode']} - {$value['address_neigh']} - {$value['address_city']}/{$value['address_state']}</span>
+                    <span class='font-weight-bold w-100'>$value->client_name</span>
+                    <span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span>
                 </div>",
-                date('d/m/Y H:i', strtotime($value['created_at'])),
+                date('d/m/Y H:i', strtotime($value->created_at)),
                 $buttons
             );
         }
 
         $output = array(
-            "draw" => $draw,
-            "recordsTotal" => $this->rental->getCountRentals($company_id, $filters, null, $typeRental),
-            "recordsFiltered" => $this->rental->getCountRentals($company_id, $filters, $searchUser, $typeRental),
-            "data" => $result
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
         );
 
         return response()->json($output);
