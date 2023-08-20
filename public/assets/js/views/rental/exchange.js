@@ -74,7 +74,7 @@
                         vehicle_withdrawal_equipment = parseInt($('[name^="withdrawal_equipment_actual_vehicle_"]', this).val());
 
                         if (date_withdrawal_equipment === 0 || driver_withdrawal_equipment === 0 || vehicle_withdrawal_equipment === 0) {
-                            arrErrors.push(`Devem ser informado todos os campos para retirar o equipamento atual para o equipamento<br><strong>${nameEquipment}</strong>`);
+                            arrErrors.push(`Devem ser informados todos os campos para retirar o equipamento atual<br><strong>${nameEquipment}</strong>`);
                         }
                     }
                 });
