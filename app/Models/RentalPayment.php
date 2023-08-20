@@ -80,6 +80,11 @@ class RentalPayment extends Model
         return $this->where(['id' => $payment_id, 'company_id' => $company_id])->first();
     }
 
+    public function getPaymentByRentalAndDate($company_id, $rental_id, string $due_date)
+    {
+        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id, 'due_date' => $due_date])->first();
+    }
+
     public function getCountTypePayments(int $company_id, int $client, string $start_date, string $end_date): array
     {
         $data = array();

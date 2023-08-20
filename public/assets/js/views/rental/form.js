@@ -401,14 +401,17 @@ $(function(){
 
     });
 
-    $(document).on('change', '[name^="vehicle_"]', function (){
+    $(document).on('change', '[name^="vehicle_"], [name^="withdrawal_equipment_actual_vehicle_"]', function (){
+
+        const el_driver = $(this).closest('.row').find('[name^="driver_"], [name^="withdrawal_equipment_actual_driver_"]');
+
         const vehicle_id = $(this).val();
         if (vehicle_id == '0') {
             return false;
         }
 
         const el = $(this).closest('.card-body');
-        const driver_actual = parseInt(el.find('[name^="driver_"]').val());
+        const driver_actual = parseInt(el_driver.val());
 
         $.ajax({
             headers: {
@@ -419,8 +422,8 @@ $(function(){
             url: $('#routeGetVehicle').val() + `/${vehicle_id}`,
             async: true,
             success: response => {
-                if (response.driver_id && el.find('[name^="driver_"]').val() === '0') {
-                    el.find('[name^="driver_"]').val(response.driver_id)
+                if (response.driver_id && el_driver.val() === '0') {
+                    el_driver.val(response.driver_id)
                 } else if (response.driver_id && driver_actual !== parseInt(response.driver_id)) {
                     Swal.fire({
                         title: 'Alteração de Motorista',
@@ -434,7 +437,7 @@ $(function(){
                         reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            el.find('[name^="driver_"]').val(response.driver_id)
+                            el_driver.val(response.driver_id)
                         }
                     })
                 }
@@ -465,6 +468,23 @@ $(function(){
                 $('#add_parcel').trigger('click');
             }
         }
+    });
+
+    $(document).on('change', '.withdrawal_equipment_actual', function(){
+        const content = $(this).closest('.card-body');
+
+        if ($(this).is(':checked')) {
+            content.find('.content_input_withdrawal_equipment_actual, .content_driver_vehicle_withdrawal_equipment_actual').css('display', 'flex');
+        } else {
+            content.find('.content_input_withdrawal_equipment_actual, .content_driver_vehicle_withdrawal_equipment_actual').css('display', 'none');
+        }
+    });
+
+    $(document).on("click", '#equipments-selected [data-target="#newVehicleModal"], #equipments-selected [data-target="#newDriverModal"]', function () {
+        const modal = $(this).data('target');
+        const select_name = $(this).closest('.input-group').find('select').prop('name');
+
+        $(`${modal} [name="element_to_load"]`).val(select_name);
     });
 });
 const setErrorStepWrong = step => {
@@ -863,7 +883,7 @@ const setEquipmentRental = (
 
             const document_is_exchange = parseInt($('#is_exchange').val());
             const sizeButtonWithBtnOption = is_exchange ? 'col-md-12' : 'col-md-9' ;
-            const btnActionEquipment = is_exchange ? `<a class="exchange-equipment pull-right" title="Trocar Equipamento"><i class="fa fa fa-arrow-right-arrow-left"></i></a>` : `<a class="remove-equipment pull-right"><i class="fa fa-trash"></i></a>`;
+            const btnActionEquipment = is_exchange ? `<a class="exchange-equipment pull-right" data-toggle="tooltip" title="Trocar Equipamento"><i class="fa fa fa-arrow-right-arrow-left"></i></a>` : `<a class="remove-equipment pull-right" data-toggle="tooltip" title="Remover"><i class="fa fa-trash"></i></a>`;
             const btnViewValuePerPeriod = is_exchange ? '' : `<div class="input-button-calendar col-md-3 no-padding"><button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipment" data-toggle="tootip" title="Visualizar valor por período" id-equipment="${response.id}" ${disabledFields}><i class="fas fa-file-invoice-dollar"></i></button></div>`;
             const classViewValuePerPeriod = is_exchange ? '' : 'flatpickr-input bbr-r-0 btr-r-0';
             const btnNewVehicle = is_exchange ? '' : `<div class="input-group-addon input-group-append"><button type="button" class="btn btn-success" data-toggle="modal" data-target="#newVehicleModal" title="Novo Veículo" ${disabledVehicle} ${disabledFields}><i class="fas fa-plus-circle"></i></button></div>`;
@@ -877,6 +897,7 @@ const setEquipmentRental = (
             let prefix_field = '';
             let input_actual_equipment = '';
             let hide_use_date_diff_equip = '';
+            let content_withdrawal_equipment_at_exchange = '';
             if (is_exchange) {
                 content_equipments = '#equipments-selected-to-exchange';
                 heading_equipments = 'headingEquipmentToExchange';
@@ -902,6 +923,49 @@ const setEquipmentRental = (
                 hide_use_date_diff_equip = 'd-none';
                 equipment_use_date_diff_equip_date = '';
                 equipment_not_use_date_withdrawal = '';
+                content_withdrawal_equipment_at_exchange = `
+                <div class="row mt-4">
+                    <div class="form-group col-md-6">
+                        <div class="switch pt-1">
+                            <input type="checkbox" class="check-style check-xs withdrawal_equipment_actual" name="withdrawal_equipment_actual_${response.id}" id="withdrawal_equipment_actual_${response.id}">
+                            <label for="withdrawal_equipment_actual_${response.id}" class="check-style check-xs"></label> Retirar o equipamento atual
+                        </div>
+                    </div>
+                    <div class="form-group flatpickr col-md-6 content_input_withdrawal_equipment_actual display-none">
+                        <label class="label-date-btns">Data Prevista de Retirada</label>
+                        <input type="text" name="date_withdrawal_equipment_actual_${response.id}" class="form-control" value="${getTodayDateBr(true, false)}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                        <div class="input-button-calendar col-md-3 no-padding calendar_equipment">
+                            <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
+                                <i class="fa fa-calendar text-white"></i>
+                            </a>
+                            <a class="input-button pull-right btn-primary" title="clear" data-clear>
+                                <i class="fa fa-times text-white"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="content_driver_vehicle_withdrawal_equipment_actual display-none col-md-12 no-padding">
+                        <div class="form-group col-md-6 label-animate">
+                            <label>Veículo</label>
+                            <div class="input-group label-animate">
+                                <select class="form-control" name="withdrawal_equipment_actual_vehicle_${response.id}" disabled>
+                                    <option>Carregando ...</option>
+                                </select>
+                                ${btnNewVehicle}
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 label-animate">
+                            <label>Motorista</label>
+                            <div class="input-group label-animate">
+                                <select class="form-control" name="withdrawal_equipment_actual_driver_${response.id}" disabled>
+                                    <option>Carregando ...</option>
+                                </select>
+                                ${btnNewDriver}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
             }
 
             let regEquipment = `
@@ -984,8 +1048,9 @@ const setEquipmentRental = (
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
+                        </div>`;
+            regEquipment += content_withdrawal_equipment_at_exchange;
+            regEquipment += `<div class="row">
                             <div class="form-group col-md-12 mt-2">
                                 <button type="button" class="btn btn-primary pull-right hideEquipment" id-equipment="${response.id}"><i class="fa fa-angle-up"></i> Ocultar</button>
                             </div>
@@ -1036,8 +1101,8 @@ const setEquipmentRental = (
                     $('.container-residues').slideDown('slow');
                 }
 
-                loadVehicles(equipment_vehicle,`#${collapse_equipments}-${idEquipment} select[name^="vehicle_"]`);
-                loadDrivers(equipment_driver, `#${collapse_equipments}-${idEquipment} select[name^="driver_"]`);
+                loadVehicles(equipment_vehicle,`#${collapse_equipments}-${idEquipment} select[name^="vehicle_"], #${collapse_equipments}-${idEquipment} select[name^="withdrawal_equipment_actual_vehicle_"]`);
+                loadDrivers(equipment_driver, `#${collapse_equipments}-${idEquipment} select[name^="driver_"], #${collapse_equipments}-${idEquipment} select[name^="withdrawal_equipment_actual_driver_"]`);
 
                 if (document_is_exchange === 1) {
                     const equipment_actual_to_exchange = $('#exchangeEquipment [name="equipment-to-exchange"]').val();
@@ -1045,10 +1110,14 @@ const setEquipmentRental = (
                         $('#exchangeEquipment').modal('hide');
                         $(`#headingEquipmentToExchange-${equipment_actual_to_exchange} a`).attr('disabled', true);
                         $(`#headingEquipmentToExchange-${equipment_actual_to_exchange}`).attr('disabled', true);
-                        updateCardEquipment(equipment_actual_to_exchange)
+                        $(`#${heading_equipments}-${equipment_actual_to_exchange} [data-toggle="tooltip"]`).tooltip();
+                        updateCardEquipment(equipment_actual_to_exchange);
+                    } else {
+                        $(`#${heading_equipments}-${idEquipment} [data-toggle="tooltip"]`).tooltip();
                     }
                 } else {
                     $(`#not_use_date_withdrawal_${idEquipment}`).trigger('change');
+                    $(`#${heading_equipments}-${idEquipment} [data-toggle="tooltip"]`).tooltip();
                 }
 
             //}, 350);

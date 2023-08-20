@@ -38,13 +38,18 @@
                     nameEquipment,
                     stockMax,
                     dateDeliveryTime,
-                    dateWithdrawalTime;
+                    dateWithdrawalTime,
+                    withdrawal_equipment,
+                    date_withdrawal_equipment,
+                    driver_withdrawal_equipment,
+                    vehicle_withdrawal_equipment;
 
                 $('#equipments-selected div.card').each(function() {
-                    idEquipment        = parseInt($('.card-header', this).attr('id-equipment'));
-                    stockEquipment     = parseInt($('[name^="stock_equipment_"]', this).val());
-                    nameEquipment      = $('.card-header a:eq(0)', this).text();
-                    stockMax            = parseInt($('[name^="stock_equipment_"]', this).attr('max-stock'));
+                    idEquipment             = parseInt($('.card-header', this).attr('id-equipment'));
+                    stockEquipment          = parseInt($('[name^="stock_equipment_"]', this).val());
+                    nameEquipment           = $('.card-header a:eq(0)', this).html();
+                    stockMax                = parseInt($('[name^="stock_equipment_"]', this).attr('max-stock'));
+                    withdrawal_equipment    = $('.withdrawal_equipment_actual', this).is(':checked');
 
                     if (isNaN(stockEquipment) || stockEquipment === 0) {
                         arrErrors.push(`O equipamento<br><strong>${nameEquipment}</strong><br>deve ser informado uma quantidade.`);
@@ -61,6 +66,16 @@
                         arrErrors.push(`A data prevista de entrega e data prevista de retirada do equipamento<br><strong>${nameEquipment}</strong><br>deve ser informada corretamente.`);
                     } else if (!notUseDateWithdrawal && dateDeliveryTime >= dateWithdrawalTime) {
                         arrErrors.push(`A data prevista de entrega do equipamento<br><strong>${nameEquipment}</strong><br>não pode ser maior ou igual que a data prevista de retirada.`);
+                    }
+
+                    if (withdrawal_equipment) {
+                        date_withdrawal_equipment    = new Date(transformDateForEn($('[name^="date_withdrawal_equipment_actual_"]', this).val())).getTime();
+                        driver_withdrawal_equipment  = parseInt($('[name^="withdrawal_equipment_actual_driver_"]', this).val());
+                        vehicle_withdrawal_equipment = parseInt($('[name^="withdrawal_equipment_actual_vehicle_"]', this).val());
+
+                        if (date_withdrawal_equipment === 0 || driver_withdrawal_equipment === 0 || vehicle_withdrawal_equipment === 0) {
+                            arrErrors.push(`Devem ser informado todos os campos para retirar o equipamento atual para o equipamento<br><strong>${nameEquipment}</strong>`);
+                        }
                     }
                 });
 

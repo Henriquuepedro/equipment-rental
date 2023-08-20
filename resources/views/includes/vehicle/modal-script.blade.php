@@ -57,19 +57,42 @@
                     });
 
                     $('#newVehicleModal').modal('hide');
+
+                    const el_select_el = $('#newVehicleModal [name="element_to_load"]').val();
+
                     cleanFormVehicleModal();
                     checkLabelAnimate();
-                    @if(\Request::route()->getName() == 'rental.create' || \Request::route()->getName() == 'rental.exchange' || \Request::route()->getName() == 'rental.update')
-                        loadVehicles(response.vehicle_id, "div[id^='collapseEquipment-'].collapse.show [name^='vehicle_']");
 
-                        $('#equipments-selected [id^=collapseEquipment-]').each(function(){
-                            if ($("div[id^='collapseEquipment-'].collapse.show").attr('id-equipment') !== $(this).attr('id-equipment')) {
-                                loadVehicles($('[name^="vehicle_"]', this).val(), `#collapseEquipment-${$(this).attr('id-equipment')} [name^="vehicle_"]`);
+                    if (el_select_el) {
+                        loadVehicles(response.vehicle_id, `[name='${el_select_el}']`);
+                        $('#equipments-selected [id^=collapseEquipment-] [name^="vehicle_"]').each(function () {
+                            if (el_select_el != $(this).prop('name')) {
+                                loadVehicles($(this).val(), `[id^="collapseEquipment-"] [name^="vehicle_"]`);
                             }
                         });
-                    @else
-                        loadVehicles(response.vehicle_id, null);
-                    @endif
+
+                        $('#equipments-selected [name^=withdrawal_equipment_actual_vehicle_]').each(function () {
+                            if (el_select_el != $(this).prop('name')) {
+                                loadVehicles($(this).val(), `[name="${$(this).prop('name')}"]`);
+                            }
+                        });
+                    } else {
+                        @if(\Request::route()->getName() == 'rental.create' || \Request::route()->getName() == 'rental.exchange' || \Request::route()->getName() == 'rental.update')
+                            loadVehicles(response.vehicle_id, "div[id^='collapseEquipment-'].collapse.show [name^='vehicle_']");
+
+                            $('#equipments-selected [id^=collapseEquipment-]').each(function () {
+                                if ($("div[id^='collapseEquipment-'].collapse.show").attr('id-equipment') !== $(this).attr('id-equipment')) {
+                                    loadVehicles($('[name^="vehicle_"]', this).val(), `#collapseEquipment-${$(this).attr('id-equipment')} [name^="vehicle_"]`);
+                                }
+                            });
+
+                            $('#equipments-selected [name^=withdrawal_equipment_actual_vehicle_]').each(function () {
+                                loadVehicles($(this).val(), `[name="${$(this).prop('name')}"]`);
+                            });
+                        @else
+                            loadVehicles(response.vehicle_id, null);
+                        @endif
+                    }
 
                 }, error: e => {
                     getForm.find('button[type="submit"]').attr('disabled', false);

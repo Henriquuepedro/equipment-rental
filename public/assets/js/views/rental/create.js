@@ -442,6 +442,16 @@
                             $('#createRental').modal();
                             $('#createRental h3.code_rental strong').text(response.code);
                             $('#createRental a.rental_print').attr('href', response.urlPrint);
+
+                            console.log(response.payment_today);
+                            if (response.payment_today) {
+                                $('#createRental .content-payment-today').show();
+                                $('#createRental [name="due_date"]').val(transformDateForBr(response.payment_today.due_date));
+                                $('#createRental [name="due_value"]').val(numberToReal(response.payment_today.due_value));
+                                $('#createRental [name="payment_id"]').val(response.payment_today.id);
+                                checkLabelAnimate();
+                                getOptionsForm('form-of-payment', $('#createRental [name="form_payment"]'));
+                            }
                         }
 
                     } else {
@@ -532,6 +542,73 @@ $(function() {
     if (!$('#parcels .parcel').length && !$('[name="rental_id"]').length) {
         $('#add_parcel').trigger('click');
     }
+
+    $('#do_payment_today').on('change', function(){
+        if ($(this).is(':checked')) {
+            $('.display-payment-today').css('display', 'flex');
+        } else {
+            $('.display-payment-today').css('display', 'none');
+        }
+    });
+
+    $('#confirm_payment_today').on('click', function (){
+        const payment_id    = parseInt($('#createRental [name="payment_id"]').val());
+        const form_payment  = $('#createRental [name="form_payment"]').val();
+        const date_payment  = $('#createRental [name="date_payment"]').val();
+        const btn           = $(this);
+
+        if (isNaN(payment_id) || payment_id === 0 || form_payment === '' || date_payment === '') {
+            Toast.fire({
+                icon: 'warning',
+                title: 'Preencha todos os campos para continuar'
+            });
+            return false;
+        }
+
+        btn.attr('disabled', true);
+
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type: 'POST',
+            url: $('[name="base_url"]').val() + `/ajax/contas-a-receber/confirmar-pagamento`,
+            data: {
+                payment_id,
+                form_payment,
+                date_payment
+            },
+            dataType: 'json',
+            success: response => {
+                Toast.fire({
+                    icon: response.success ? 'success' : 'warning',
+                    title: response.message
+                });
+
+                if (response.success) {
+                    $('#createRental .content-payment-today, #createRental .display-payment-today').remove();
+                }
+            }, error: e => {
+                let arrErrors = [];
+
+                $.each(e.responseJSON.errors, function( index, value ) {
+                    arrErrors.push(value);
+                });
+
+                if (!arrErrors.length && e.responseJSON.message !== undefined) {
+                    arrErrors.push('Você não tem permissão para fazer essa operação!');
+                }
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atenção',
+                    html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                });
+            }, always: () => {
+                btn.attr('disabled', false);
+            }
+        });
+    });
 });
 
 const updateDataEquipmentToPayment = async () => {

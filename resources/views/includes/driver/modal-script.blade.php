@@ -97,21 +97,44 @@
                         title: response.message
                     });
 
+                    const el_select_el = $('#newDriverModal').is(':visible') && $('#newVehicleModal').is(':visible') ? null : $('#newDriverModal [name="element_to_load"]').val();
+
                     $('#newDriverModal').modal('hide');
+
                     cleanFormDriverModal();
                     checkLabelAnimate();
-                    @if(\Request::route()->getName() == 'rental.create' || \Request::route()->getName() == 'rental.exchange' || \Request::route()->getName() == 'rental.update')
-                        loadDrivers($('#newVehicleModal').is(':visible') ? 0 : response.driver_id, "div[id^='collapseEquipment-'].collapse.show [name^='driver_']");
-                        loadDrivers($('#newVehicleModal').is(':visible') ? response.driver_id : 0, '#newVehicleModal [name="driver"]');
 
-                        $('#equipments-selected [id^=collapseEquipment-]').each(function(){
-                            if ($("div[id^='collapseEquipment-'].collapse.show").attr('id-equipment') !== $(this).attr('id-equipment')) {
-                                loadDrivers($('[name^="driver_"]', this).val(), `#collapseEquipment-${$(this).attr('id-equipment')} [name^="driver_"]`);
+                    if (el_select_el) {
+                        loadDrivers(response.driver_id, `[name='${el_select_el}']`);
+                        $('#equipments-selected [id^=collapseEquipment-] [name^="driver_"]').each(function(){
+                            if (el_select_el != $(this).prop('name')) {
+                                loadDrivers($(this).val(), `[id^="collapseEquipment-"] [name^="driver_"]`);
                             }
                         });
-                    @else
-                        loadDrivers(response.driver_id, null);
-                    @endif
+
+                        $('#equipments-selected [name^=withdrawal_equipment_actual_driver_]').each(function(){
+                            if (el_select_el != $(this).prop('name')) {
+                                loadDrivers($(this).val(), `[name="${$(this).prop('name')}"]`);
+                            }
+                        });
+                    } else {
+                        @if(\Request::route()->getName() == 'rental.create' || \Request::route()->getName() == 'rental.exchange' || \Request::route()->getName() == 'rental.update')
+                            loadDrivers($('#newVehicleModal').is(':visible') ? 0 : response.driver_id, "div[id^='collapseEquipment-'].collapse.show [name^='driver_']");
+                            loadDrivers($('#newVehicleModal').is(':visible') ? response.driver_id : 0, '#newVehicleModal [name="driver"]');
+
+                            $('#equipments-selected [id^=collapseEquipment-]').each(function () {
+                                if ($("div[id^='collapseEquipment-'].collapse.show").attr('id-equipment') !== $(this).attr('id-equipment')) {
+                                    loadDrivers($('[name^="driver_"]', this).val(), `#collapseEquipment-${$(this).attr('id-equipment')} [name^="driver_"]`);
+                                }
+                            });
+
+                            $('#equipments-selected [name^=withdrawal_equipment_actual_driver_]').each(function () {
+                                loadDrivers($(this).val(), `[name="${$(this).prop('name')}"]`);
+                            });
+                        @else
+                            loadDrivers(response.driver_id, null);
+                        @endif
+                    }
 
                 }, error: e => {
                     getForm.find('button[type="submit"]').attr('disabled', false);

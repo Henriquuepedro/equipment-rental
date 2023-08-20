@@ -219,7 +219,7 @@ class BillsToReceiveController extends Controller
         $data_form_payment = $this->form_payment->getById($form_payment_id);
 
         if (!$data_form_payment) {
-            return response()->json(array('success' => false, 'message' => "Forma de pagamento nnão encontrado."));
+            return response()->json(array('success' => false, 'message' => "Forma de pagamento não encontrado."));
         }
 
         $this->rental_payment->updateById(array(

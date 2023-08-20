@@ -55,4 +55,5 @@
             </form>
         </div>
     </div>
+    <input type="hidden" name="element_to_load">
 </div>

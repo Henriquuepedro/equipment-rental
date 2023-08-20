@@ -217,7 +217,7 @@
             e.preventDefault();
             const payment_id    = $('[name="payment_id"]', this).val();
             const form_payment  = $('[name="form_payment"]', this).val();
-            const date_payment  = $('[name="date_payment"]', this).val()
+            const date_payment  = $('[name="date_payment"]', this).val();
             const endpoint      = $(this).attr('action');
             const btn           = $(this).find('[type="submit"]');
 
