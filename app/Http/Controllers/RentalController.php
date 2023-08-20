@@ -376,6 +376,7 @@ class RentalController extends Controller
         $arrEquipment   = $this->addRentalIdArray($arrEquipment, $insertRental->id);
         $arrResidue     = $this->addRentalIdArray($arrResidue, $insertRental->id);
         $arrPayment     = $this->addRentalIdArray($arrPayment, $insertRental->id);
+        $payment_today  = null;
 
         $this->rental_equipment->inserts($arrEquipment);
         $this->rental_residue->inserts($arrResidue);
@@ -385,7 +386,15 @@ class RentalController extends Controller
 
         if ($insertRental) {
             DB::commit();
-            return response()->json(['success' => true, 'urlPrint' => route('print.rental', ['rental' => $insertRental->id]), 'code' => $insertRental->code]);
+
+            foreach ($arrPayment as $payment) {
+                if (strtotime($payment['due_date']) === strtotime(dateNowInternational(null, DATE_INTERNATIONAL))) {
+                    $payment_today = $this->rental_payment->getPaymentByRentalAndDate($request->user()->company_id, $insertRental->id, $payment['due_date']);
+                    break;
+                }
+            }
+
+            return response()->json(['success' => true, 'urlPrint' => route('print.rental', ['rental' => $insertRental->id]), 'code' => $insertRental->code, 'payment_today' => $payment_today]);
         }
 
         DB::rollBack();
@@ -423,18 +432,22 @@ class RentalController extends Controller
         }
 
         foreach ($equipments as $equipmentId) {
-            $stockRequest               = (int)$request->{"stock_equipment_$equipmentId->id"};
-            $stockDb                    = (int)$equipmentId->stock;
-            $reference                  = $request->{"reference_equipment_$equipmentId->id"};
-            $useDateDiff                = !$budget && $request->{"use_date_diff_equip_$equipmentId->id"};
-            $notUseDateWithdrawalEquip  = !$budget && $request->{"not_use_date_withdrawal_equip_$equipmentId->id"};
-            $dateDeliveryEquip          = $request->{"date_delivery_equipment_$equipmentId->id"};
-            $dateWithdrawalEquip        = $request->{"date_withdrawal_equipment_$equipmentId->id"};
-            $driverEquip                = (int)$request->{"driver_$equipmentId->id"};
-            $vehicleEquip               = (int)$request->{"vehicle_$equipmentId->id"};
-            $priceTotalEquip            = !$noCharged ? transformMoneyBr_En($request->{"priceTotalEquipment_$equipmentId->id"}) : 0;
-            $unitaryValue               = !$noCharged ? (float)$equipmentId->value : 0;
-            $response->grossValue       += $priceTotalEquip;
+            $stockRequest                       = (int)$request->{"stock_equipment_$equipmentId->id"};
+            $stockDb                            = (int)$equipmentId->stock;
+            $reference                          = $request->{"reference_equipment_$equipmentId->id"};
+            $useDateDiff                        = !$budget && $request->{"use_date_diff_equip_$equipmentId->id"};
+            $notUseDateWithdrawalEquip          = !$budget && $request->{"not_use_date_withdrawal_equip_$equipmentId->id"};
+            $dateDeliveryEquip                  = $request->{"date_delivery_equipment_$equipmentId->id"};
+            $dateWithdrawalEquip                = $request->{"date_withdrawal_equipment_$equipmentId->id"};
+            $driverEquip                        = (int)$request->{"driver_$equipmentId->id"};
+            $vehicleEquip                       = (int)$request->{"vehicle_$equipmentId->id"};
+            $priceTotalEquip                    = !$noCharged ? transformMoneyBr_En($request->{"priceTotalEquipment_$equipmentId->id"}) : 0;
+            $unitaryValue                       = !$noCharged ? (float)$equipmentId->value : 0;
+            $response->grossValue               += $priceTotalEquip;
+            $dateWithdrawalEquipmentActual      = $request->{"date_withdrawal_equipment_actual_$equipmentId->id"} ?? null;
+            $withdrawalEquipmentActual          = $request->{"withdrawal_equipment_actual_$equipmentId->id"} ?? null;
+            $withdrawalEquipmentActualVehicle   = $request->{"withdrawal_equipment_actual_vehicle_$equipmentId->id"} ?? null;
+            $withdrawalEquipmentActualDriver    = $request->{"withdrawal_equipment_actual_driver_$equipmentId->id"} ?? null;
 
             $dateDeliveryEquip = $dateDeliveryEquip ? DateTime::createFromFormat('d/m/Y H:i', $dateDeliveryEquip) : null;
             $dateWithdrawalEquip = $dateWithdrawalEquip ? DateTime::createFromFormat('d/m/Y H:i', $dateWithdrawalEquip) : null;
@@ -505,18 +518,22 @@ class RentalController extends Controller
             }
 
             $arrEquipment = array(
-                'company_id'            => $company_id,
-                $nameFieldID            => $rental_id ?: 0,
-                'equipment_id'          => $equipmentId->id,
-                'reference'             => $equipmentId->reference,
-                'name'                  => $equipmentId->name,
-                'volume'                => $equipmentId->volume,
-                'quantity'              => $stockRequest,
-                'unitary_value'         => $unitaryValue,
-                'total_value'           => $priceTotalEquip,
-                'vehicle_suggestion'    => empty($vehicleEquip) ? null : $vehicleEquip,
-                'driver_suggestion'     => empty($driverEquip) ? null : $driverEquip,
-                'user_insert'           => $request->user()->id
+                'company_id'                        => $company_id,
+                $nameFieldID                        => $rental_id ?: 0,
+                'equipment_id'                      => $equipmentId->id,
+                'reference'                         => $equipmentId->reference,
+                'name'                              => $equipmentId->name,
+                'volume'                            => $equipmentId->volume,
+                'quantity'                          => $stockRequest,
+                'unitary_value'                     => $unitaryValue,
+                'total_value'                       => $priceTotalEquip,
+                'vehicle_suggestion'                => empty($vehicleEquip) ? null : $vehicleEquip,
+                'driver_suggestion'                 => empty($driverEquip) ? null : $driverEquip,
+                'withdrawalEquipmentActual'         => $withdrawalEquipmentActual,
+                'dateWithdrawalEquipmentActual'     => $dateWithdrawalEquipmentActual,
+                'withdrawalEquipmentActualVehicle'  => $withdrawalEquipmentActualVehicle,
+                'withdrawalEquipmentActualDriver'   => $withdrawalEquipmentActualDriver,
+                'user_insert'                       => $request->user()->id
             );
 
             if ($exchange_equipment_id) {
@@ -875,7 +892,8 @@ class RentalController extends Controller
         $arrPayment      = $data_validation['arrPayment'];
 
         $arrRental = [
-            'actual_delivery_date' => null
+            'actual_delivery_date'   => null,
+            'actual_withdrawal_date' => null
         ];
 
         // Com cobrança.
@@ -901,6 +919,35 @@ class RentalController extends Controller
 
         // Coloca todos os equipamentos como já trocados.
         foreach ($arrEquipment as $equipment) {
+            $withdrawalEquipmentActual = $equipment['withdrawalEquipmentActual'] ?? null;
+            $dateWithdrawalEquipmentActual = $equipment['dateWithdrawalEquipmentActual'] ?? null;
+            $withdrawalEquipmentActualVehicle = $equipment['withdrawalEquipmentActualVehicle'] ?? null;
+            $withdrawalEquipmentActualDriver = $equipment['withdrawalEquipmentActualDriver'] ?? null;
+
+            // remove os campos que não podem ir para a criação.
+            unset($equipment['withdrawalEquipmentActual']);
+            unset($equipment['dateWithdrawalEquipmentActual']);
+            unset($equipment['withdrawalEquipmentActualVehicle']);
+            unset($equipment['withdrawalEquipmentActualDriver']);
+
+            if ($withdrawalEquipmentActual && $dateWithdrawalEquipmentActual && ($equipment['exchange_rental_equipment_id'] ?? false)) {
+                $equipment_actual = $equipment['exchange_rental_equipment_id'];
+
+                $updateWithdrawal = array(
+                    'actual_withdrawal_date'    => dateBrazilToDateInternational($dateWithdrawalEquipmentActual),
+                    'actual_driver_withdrawal'  => $withdrawalEquipmentActualDriver,
+                    'actual_vehicle_withdrawal' => $withdrawalEquipmentActualVehicle
+                );
+
+                if (!$this->rental_equipment->updateByRentalAndRentalEquipmentId($id, $equipment_actual, $updateWithdrawal)) {
+                    DB::rollBack();
+                    return response()->json(array(
+                        'success' => false,
+                        'message' => "Não foi atualizar o equipamento atual para retirado."
+                    ));
+                }
+            }
+
             $this->rental_equipment->updateByRentalAndRentalEquipmentId($id, $equipment['exchange_rental_equipment_id'], array('exchanged' => true));
         }
 

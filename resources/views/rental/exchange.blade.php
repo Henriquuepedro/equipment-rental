@@ -76,6 +76,8 @@
                             );
                         }
                     });
+
+                    $('#load-equipment-to-exchange').hide();
                 });
 
                 await getPaymentsRental(rental_id, false, function(response){
@@ -154,15 +156,18 @@
                             <form action="{{ route('ajax.rental.exchange-rental', ['id' => $rental->id]) }}" method="POST" enctype="multipart/form-data" id="formRental" class="pb-2">
                                 <h3>Equipamentos</h3>
                                 <div class="stepRental">
-                                    <h6 class="title-step">Equipamentos</h6>
+                                    <h6 class="title-step">Equipamentos disponíveis para troca</h6>
                                     <div class="row">
+                                        <div class="text-center col-md-12" id="load-equipment-to-exchange">
+                                            <h4><i class="fa fa-spin fa-spinner"></i> Carregando</h4>
+                                        </div>
                                         <div class="form-group col-md-12 mt-2 equipments-selected-to-exchange">
                                             <div class="accordion accordion-multiple-filled" id="equipments-selected-to-exchange" role="tablist">
                                             </div>
                                             <hr class="separator-dashed mt-4 display-none">
                                         </div>
                                     </div>
-                                    <h6 class="title-step">Equipamentos Para Trocar</h6>
+                                    <h6 class="title-step mt-4">Equipamentos selecionados para trocar</h6>
                                     <div class="row">
                                         <div class="form-group col-md-12 mt-2 equipments-selected">
                                             <div class="accordion accordion-multiple-filled" id="equipments-selected" role="tablist">

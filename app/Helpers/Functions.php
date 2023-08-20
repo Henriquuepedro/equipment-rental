@@ -88,9 +88,9 @@ if (! function_exists('likeText')) {
     /**
      * Consulta uma palavra dentro de um texto.
      *
-     * @param   string  $needle     Valor a ser procurado
-     * @param   string  $haystack   Valor real para comparação
-     * @return  bool                Retorna o status da consulta
+     * @param   string      $needle     Valor a ser procurado
+     * @param   string|null $haystack   Valor real para comparação
+     * @return  bool                    Retorna o status da consulta
      */
     function likeText(string $needle, string $haystack = null): bool
     {
@@ -142,7 +142,7 @@ if (! function_exists('formatPhone')) {
         if ($value === '' || $value === null) {
             return $defaultEmpty;
         }
-        // Número não padrão telefónico.
+        // Número não padrão telefônico.
         if (strlen($value) !== 10 && strlen($value) !== 11) {
             return $value;
         }
@@ -212,7 +212,7 @@ if (! function_exists('dateBrazilToDateInternational')) {
             return null;
         }
 
-        if (strlen($date) !== 10 && strlen($date) !== 19 && strlen($date) !== 27) {
+        if (strlen($date) !== 10 && strlen($date) !== 16 && strlen($date) !== 19 && strlen($date) !== 27) {
             return null;
         }
 
@@ -224,7 +224,10 @@ if (! function_exists('dateBrazilToDateInternational')) {
         $format_in  = DATE_BRAZIL;
         $format_out = DATE_INTERNATIONAL;
 
-        if (strlen($date) === 19) {
+        if (strlen($date) === 16) {
+            $format_in  .= ' H:i';
+            $format_out .= ' H:i';
+        } elseif (strlen($date) === 19) {
             $format_in  .= ' H:i:s';
             $format_out .= ' H:i:s';
         }
@@ -250,7 +253,7 @@ if (! function_exists('dateInternationalToDateBrazil')) {
             return null;
         }
 
-        if (strlen($date) !== 10 && strlen($date) !== 19 && strlen($date) !== 27) {
+        if (strlen($date) !== 10 && strlen($date) !== 16 && strlen($date) !== 19 && strlen($date) !== 27) {
             return null;
         }
 
@@ -262,7 +265,10 @@ if (! function_exists('dateInternationalToDateBrazil')) {
         $format_in  = DATE_INTERNATIONAL;
         $format_out = DATE_BRAZIL;
 
-        if (strlen($date) === 19) {
+        if (strlen($date) === 16) {
+            $format_in  .= ' H:i';
+            $format_out .= ' H:i';
+        } elseif (strlen($date) === 19) {
             $format_in  .= ' H:i:s';
             $format_out .= ' H:i:s';
         }

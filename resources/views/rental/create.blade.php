@@ -338,6 +338,43 @@
                             <a href="" target="_blank" class="col-md-4 btn btn-primary rental_print"> <i class="fa fa-print"></i> Imprimir Recibo</a>
                         </div>
                     </div>
+                    @if (!$budget)
+                    <div class="row content-payment-today display-none">
+                        <div class="form-group col-md-12 mt-5 text-center">
+                            <h4>Foi identificado pagamento para hoje, deseja realizar o pagamento?</h4>
+                        </div>
+                        <div class="form-group col-md-12 text-center">
+                            <div class="switch pt-1 d-flex justify-content-center">
+                                <input type="checkbox" class="check-style check-xs" name="do_payment_today" id="do_payment_today" value="1">
+                                <label for="do_payment_today" class="check-style check-xs"></label>&nbsp;Sim, fazer o pagamento hoje
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row display-payment-today display-none">
+                        <div class="form-group col-md-3">
+                            <label>Data de Vencimento</label>
+                            <input type="text" class="form-control" name="due_date" value="" disabled>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Valor</label>
+                            <input type="text" class="form-control" name="due_value" value="" disabled>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Forma de Pagamento</label>
+                            <select class="form-control" name="form_payment"></select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>Data de Pagamento</label>
+                            <input type="date" class="form-control" name="date_payment" value="{{ dateNowInternational(null, DATE_INTERNATIONAL) }}">
+                        </div>
+                        <input type="hidden" class="form-control" name="payment_id">
+                    </div>
+                    <div class="row mt-2 display-payment-today display-none">
+                        <div class="form-group col-md-12 d-flex justify-content-center">
+                            <button class="btn btn-success col-md-3" id="confirm_payment_today">Realizar pagamento</button>
+                        </div>
+                    </div>
+                    @endif
                     <div class="row">
                         <div class="col-md-12 d-flex justify-content-around flex-wrap mt-5">
                             <a href="{{ route($budget ? 'budget.index' : 'rental.index') }}" class="btn btn-primary col-md-4">Listagem de {{ $budget ? 'Orçamentos' : 'Locações' }}</a>
