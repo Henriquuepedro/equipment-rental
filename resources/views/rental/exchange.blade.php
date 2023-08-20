@@ -260,7 +260,7 @@
                                             <div class="col-md-12 payment-hidden">
                                                 <div class="form-group">
                                                     <div class="alert alert-animate alert-primary">
-                                                        Será necessário reorganizar o pagamento para incluir o valor do novos equipamentos.<br>
+                                                        Será necessário reorganizar o pagamento para incluir o valor dos novos equipamentos.<br>
                                                         Você poderá gerar uma nova parcela para os novos equipamentos ou distribuir o valor entre as parcelas, caso exista.
                                                     </div>
                                                 </div>
