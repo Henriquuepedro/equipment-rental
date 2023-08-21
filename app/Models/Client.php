@@ -15,7 +15,24 @@ class Client extends Model
      * @var array
      */
     protected $fillable = [
-        'company_id', 'type', 'name', 'fantasy', 'email', 'phone_1', 'phone_2', 'cpf_cnpj', 'rg_ie', 'contact', 'sex', 'birth_date', 'nationality', 'marital_status', 'observation', 'user_insert', 'user_update'
+        'company_id',
+        'type',
+        'name',
+        'fantasy',
+        'email',
+        'phone_1',
+        'phone_2',
+        'cpf_cnpj',
+        'rg_ie',
+        'contact',
+        'sex',
+        'birth_date',
+        'nationality',
+        'marital_status',
+        'active',
+        'observation',
+        'user_insert',
+        'user_update'
     ];
 
     /**
@@ -49,7 +66,10 @@ class Client extends Model
 
     public function getClients($company_id, $init = null, $length = null, $searchUser = null, $orderBy = array(), $select = '*')
     {
-        $client = $this->select($select)->where('company_id', $company_id);
+        $client = $this->select($select)->where(array(
+            'company_id'    => $company_id,
+            'active'        => true
+        ));
         if ($searchUser) {
             $client->where(function ($query) use ($searchUser) {
                 $query->where('name', 'like', "%{$searchUser}%")

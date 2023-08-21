@@ -74,6 +74,7 @@ class ClientController extends Controller
         $birth_date     = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $nationality    = filter_var($request->input('nationality'));
         $marital_status = filter_var($request->input('marital_status'));
+        $active         = (bool)$request->input('active');
         $observation    = filter_var($request->input('observation'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $isAjax         = isAjax();
 
@@ -110,6 +111,7 @@ class ClientController extends Controller
             'birth_date'    => $birth_date,
             'nationality'   => $nationality,
             'marital_status'=> $marital_status,
+            'active'        => $active,
             'observation'   => $observation,
             'user_insert'   => $user_id
         ));
@@ -233,6 +235,7 @@ class ClientController extends Controller
         $birth_date     = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $nationality    = filter_var($request->input('nationality'));
         $marital_status = filter_var($request->input('marital_status'));
+        $active         = (bool)$request->input('active');
 
         if (empty($nationality)) {
             $nationality = null;
@@ -266,6 +269,7 @@ class ClientController extends Controller
             'birth_date'    => $birth_date,
             'nationality'   => $nationality,
             'marital_status'=> $marital_status,
+            'active'        => $active,
             'observation'   => $observation,
             'user_update'   => $user_id
         ), $client_id);
@@ -356,11 +360,18 @@ class ClientController extends Controller
         $company_id = $request->user()->company_id;
 
         try {
+            // Filtro status
+            $active = $request->input('active');
+
             $filters        = array();
             $filter_default = array();
-            $fields_order   = array('id','name','email','phone_1', '');
+            $fields_order   = array('id','name','email','phone_1','active', '');
 
             $filter_default[]['where']['company_id'] = $company_id;
+
+            if (!is_null($active) && $active !== 'all') {
+                $filters[]['where']['active'] = $active;
+            }
 
             $query = array(
                 'from' => 'clients'
@@ -400,6 +411,7 @@ class ClientController extends Controller
                 $value->name,
                 $value->email,
                 $value->phone_1,
+                $value->active ? '<div class="badge badge-pill badge-lg badge-success">Ativo</div>' : '<div class="badge badge-pill badge-lg badge-danger">Inativo</div>',
                 $buttons
             );
         }

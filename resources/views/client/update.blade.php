@@ -95,12 +95,12 @@
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">
                                     <label class="form-check-label">
-                                        <input {{ $disabled }} type="radio" class="form-check-input" name="type_person" value="pf" {{ old() ? (old('type_person') === 'pf' ? 'checked' : '') : ($client->type === 'pf' ? 'checked' : '') }}> Pessoa Física <i class="input-helper"></i>
+                                        <input {{ $disabled }} type="radio" class="form-check-input" name="type_person" value="pf" {{ old('type_person', $client->type) === 'pf' ? 'checked' : '' }}> Pessoa Física <i class="input-helper"></i>
                                     </label>
                                 </div>
                                 <div class="form-radio form-radio-flat">
                                     <label class="form-check-label">
-                                        <input {{ $disabled }} type="radio" class="form-check-input" name="type_person" value="pj" {{ old() ? (old('type_person') === 'pj' ? 'checked' : '') : ($client->type === 'pj' ? 'checked' : '') }}> Pessoa Jurídica <i class="input-helper"></i>
+                                        <input {{ $disabled }} type="radio" class="form-check-input" name="type_person" value="pj" {{ old('type_person', $client->type) === 'pj' ? 'checked' : '' }}> Pessoa Jurídica <i class="input-helper"></i>
                                     </label>
                                 </div>
                             </div>
@@ -112,53 +112,59 @@
                                     <p class="card-description"> {{ $btns ? 'Altere' : 'Visualize'}} o formulário abaixo com as informações do cliente </p>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-12">
+                                    <div class="form-group col-md-10">
                                         <label for="name_client">Nome do Cliente <sup>*</sup></label>
-                                        <input {{ $disabled }} type="text" class="form-control" id="name_client" name="name_client" autocomplete="nope" value="{{ old('name_client') ?? $client->name }}" required>
+                                        <input {{ $disabled }} type="text" class="form-control" id="name_client" name="name_client" autocomplete="nope" value="{{ old('name_client', $client->name) }}" required>
                                     </div>
-                                    <div class="form-group col-md-6 d-none">
+                                    <div class="form-group col-md-5 d-none">
                                         <label for="fantasy_client">Fantasia</label>
-                                        <input  {{ $disabled }}type="text" class="form-control" id="fantasy_client" name="fantasy_client" autocomplete="nope" value="{{ old('fantasy_client') ?? $client->fantasy }}">
+                                        <input  {{ $disabled }}type="text" class="form-control" id="fantasy_client" name="fantasy_client" autocomplete="nope" value="{{ old('fantasy_client', $client->fantasy) }}">
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <div class="switch d-flex mt-4">
+                                            <input {{ $disabled }} type="checkbox" class="check-style check-xs" name="active" id="active" {{ old('active', $client->active) ? 'checked' : '' }}>
+                                            <label for="active" class="check-style check-xs"></label>&nbsp;Ativo
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-4">
                                         <label for="cpf_cnpj">CPF</label>
-                                        <input {{ $disabled }} type="tel" class="form-control" id="cpf_cnpj" name="cpf_cnpj" autocomplete="nope" value="{{ old('cpf_cnpj') ?? $client->cpf_cnpj }}">
+                                        <input {{ $disabled }} type="tel" class="form-control" id="cpf_cnpj" name="cpf_cnpj" autocomplete="nope" value="{{ old('cpf_cnpj', $client->cpf_cnpj) }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="rg_ie">RG</label>
-                                        <input {{ $disabled }} type="tel" class="form-control" id="rg_ie" name="rg_ie" autocomplete="nope" value="{{ old('rg_ie') ?? $client->rg_ie }}">
+                                        <input {{ $disabled }} type="tel" class="form-control" id="rg_ie" name="rg_ie" autocomplete="nope" value="{{ old('rg_ie', $client->rg_ie) }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="phone_1">Telefone Principal</label>
-                                        <input {{ $disabled }} type="tel" class="form-control" id="phone_1" name="phone_1" autocomplete="nope" value="{{ old('phone_1') ?? $client->phone_1 }}">
+                                        <input {{ $disabled }} type="tel" class="form-control" id="phone_1" name="phone_1" autocomplete="nope" value="{{ old('phone_1', $client->phone_1) }}">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-4">
                                         <label for="contact">Contato</label>
-                                        <input {{ $disabled }} type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact') ?? $client->contact }}">
+                                        <input {{ $disabled }} type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact', $client->contact) }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="phone_2">Telefone Secundário</label>
-                                        <input {{ $disabled }} type="tel" class="form-control" id="phone_2" name="phone_2" autocomplete="nope" value="{{ old('phone_2') ?? $client->phone_2 }}">
+                                        <input {{ $disabled }} type="tel" class="form-control" id="phone_2" name="phone_2" autocomplete="nope" value="{{ old('phone_2', $client->phone_2) }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="email">Endereço de E-mail</label>
-                                        <input {{ $disabled }} type="email" class="form-control" id="email" name="email" autocomplete="nope" value="{{ old('email') ?? $client->email }}">
+                                        <input {{ $disabled }} type="email" class="form-control" id="email" name="email" autocomplete="nope" value="{{ old('email', $client->email) }}">
                                     </div>
                                 </div>
                                 <div class="row personal_data">
                                     <div class="form-group col-md-4">
                                         <label for="sex" style="top: 15px; left: 0;">Sexo</label><br>
-                                        <input {{ $disabled }} type="radio" id="sex_1" name="sex" value="1" style="position: relative; top: 15px;" {{ old('sex') ?? $client->sex == '1' ? 'checked' : '' }}> <label for="sex_1" style="top: 17px; left: 0; pointer-events: none;">Masculino</label>
-                                        <input {{ $disabled }} type="radio" id="sex_2" name="sex" value="2" style="position: relative; top: 15px;" {{ old('sex') ?? $client->sex == '2' ? 'checked' : '' }}> <label for="sex_2" style="top: 17px; left: 0; pointer-events: none;">Feminino</label>
-                                        <input {{ $disabled }} type="radio" id="sex_3" name="sex" value="3" style="position: relative; top: 15px;" {{ old('sex') ?? $client->sex == '3' ? 'checked' : '' }}> <label for="sex_3" style="top: 17px; left: 0; pointer-events: none;">Outro</label>
+                                        <input {{ $disabled }} type="radio" id="sex_1" name="sex" value="1" style="position: relative; top: 15px;" {{ old('sex', $client->sex) == '1' ? 'checked' : '' }}> <label for="sex_1" style="top: 17px; left: 0; pointer-events: none;">Masculino</label>
+                                        <input {{ $disabled }} type="radio" id="sex_2" name="sex" value="2" style="position: relative; top: 15px;" {{ old('sex', $client->sex) == '2' ? 'checked' : '' }}> <label for="sex_2" style="top: 17px; left: 0; pointer-events: none;">Feminino</label>
+                                        <input {{ $disabled }} type="radio" id="sex_3" name="sex" value="3" style="position: relative; top: 15px;" {{ old('sex', $client->sex) == '3' ? 'checked' : '' }}> <label for="sex_3" style="top: 17px; left: 0; pointer-events: none;">Outro</label>
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label for="birth_date">Data de Nascimento</label>
-                                        <input {{ $disabled }} type="date" class="form-control" id="birth_date" name="birth_date" autocomplete="nope" value="{{ old('birth_date') ?? $client->birth_date }}">
+                                        <input {{ $disabled }} type="date" class="form-control" id="birth_date" name="birth_date" autocomplete="nope" value="{{ old('birth_date', $client->birth_date) }}">
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label for="nationality">Nacionalidade</label>
@@ -172,7 +178,7 @@
                                 <div class="row">
                                     <div class="form-group col-md-12">
                                         <label for="observation">Observação</label>
-                                        <textarea {{ $disabled }} class="form-control" id="observation" name="observation" rows="3">{{ old('observation') ?? $client->observation }}</textarea>
+                                        <textarea {{ $disabled }} class="form-control" id="observation" name="observation" rows="3">{{ old('observation', $client->observation) }}</textarea>
                                     </div>
                                 </div>
                             </div>

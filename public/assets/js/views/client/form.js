@@ -167,7 +167,7 @@ $('[name="type_person"]').on('change', function(){
 
     if (type === 'pf') {
         form.find('label[for="name_client"]').html('Nome do Cliente <sup>*</sup>');
-        form.find('#name_client').closest('.form-group').removeClass('col-md-6').addClass('col-md-12');
+        form.find('#name_client').closest('.form-group').removeClass('col-md-5').addClass('col-md-10');
         form.find('label[for="cpf_cnpj"]').text('CPF');
         form.find('label[for="rg_ie"]').text('RG');
         form.find('#fantasy_client').val('').closest('.form-group').addClass('d-none');
@@ -176,7 +176,7 @@ $('[name="type_person"]').on('change', function(){
     }
     else if (type === 'pj') {
         form.find('label[for="name_client"]').html('Razão Social <sup>*</sup>');
-        form.find('#name_client').closest('.form-group').removeClass('col-md-12').addClass('col-md-6');
+        form.find('#name_client').closest('.form-group').removeClass('col-md-10').addClass('col-md-5');
         form.find('label[for="cpf_cnpj"]').text('CNPJ');
         form.find('label[for="rg_ie"]').text('IE');
         form.find('#fantasy_client').closest('.form-group').removeClass('d-none');
