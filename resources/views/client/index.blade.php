@@ -17,6 +17,9 @@
         });
 
         const getTable = (stateSave = true) => {
+
+            const active = $('#active').val();
+
             return $("#tableClients").DataTable({
                 "responsive": true,
                 "processing": true,
@@ -31,7 +34,7 @@
                     url: '{{ route('ajax.client.fetch') }}',
                     pages: 2,
                     type: 'POST',
-                    data: { "_token": $('meta[name="csrf-token"]').attr('content') },
+                    data: { "_token": $('meta[name="csrf-token"]').attr('content'), active },
                     error: function(jqXHR, ajaxOptions, thrownError) {
                         console.log(jqXHR, ajaxOptions, thrownError);
                     }
@@ -111,6 +114,12 @@
                     });
                 }
             })
+        });
+
+        $('#active').on('change', function(){
+            tableClient.destroy();
+            $("#tableClients tbody").empty();
+            tableClient = getTable();
         })
     </script>
 @stop
@@ -132,6 +141,16 @@
                         <a href="{{ route('client.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
                         @endif
                     </div>
+                    <div class="row mb-3">
+                        <div class="col-md-3 form-group">
+                            <label>Situação</label>
+                            <select class="form-control" id="active">
+                                <option value="1">Ativo</option>
+                                <option value="0">Inativo</option>
+                                <option value="all">Todos</option>
+                            </select>
+                        </div>
+                    </div>
                     <table id="tableClients" class="table table-bordered">
                         <thead>
                         <tr>
@@ -139,6 +158,7 @@
                             <th>Nome</th>
                             <th>Email</th>
                             <th>Telefone</th>
+                            <th>Situação</th>
                             <th>Ação</th>
                         </tr>
                         </thead>
@@ -150,6 +170,7 @@
                                 <th>Nome</th>
                                 <th>Email</th>
                                 <th>Telefone</th>
+                                <th>Situação</th>
                                 <th>Ação</th>
                             </tr>
                         </tfoot>

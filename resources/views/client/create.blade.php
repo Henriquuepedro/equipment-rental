@@ -108,13 +108,19 @@
                                     <p class="card-description"> Preencha o formulário abaixo com as informações do novo cliente </p>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-12">
+                                    <div class="form-group col-md-10">
                                         <label for="name_client">Nome do Cliente <sup>*</sup></label>
                                         <input type="text" class="form-control" id="name_client" name="name_client" autocomplete="nope" value="{{ old('name_client') }}" required>
                                     </div>
-                                    <div class="form-group col-md-6 d-none">
+                                    <div class="form-group col-md-5 d-none">
                                         <label for="fantasy_client">Fantasia</label>
                                         <input type="text" class="form-control" id="fantasy_client" name="fantasy_client" autocomplete="nope" value="{{ old('fantasy_client') }}">
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <div class="switch d-flex mt-4">
+                                            <input type="checkbox" class="check-style check-xs" name="active" id="active" {{ old('active') ? 'checked' : '' }}>
+                                            <label for="active" class="check-style check-xs"></label>&nbsp;Ativo
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
