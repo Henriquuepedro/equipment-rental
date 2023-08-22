@@ -69,12 +69,12 @@ class BillToPay extends Model
         $data = array();
 
         foreach (array(
-             'late' => array(
-                 ['due_date', '<', date(DATE_INTERNATIONAL)],
-                 ['payday', '=', NULL]
-             ),
+//             'late' => array(
+//                 ['due_date', '<', date(DATE_INTERNATIONAL)],
+//                 ['payday', '=', NULL]
+//             ),
              'without_pay' => array(
-                 ['due_date', '>=', date(DATE_INTERNATIONAL)],
+//                 ['due_date', '>=', date(DATE_INTERNATIONAL)],
                  ['payday', '=', NULL]
              ),
              'paid' => array(
@@ -139,15 +139,15 @@ class BillToPay extends Model
 
         if ($type_bill) {
             switch ($type_bill) {
-                case 'late':
-                    $bill->where(array(
-                        ['bill_to_pay_payments.due_date', '<', date(DATE_INTERNATIONAL)],
-                        ['bill_to_pay_payments.payday', '=', NULL]
-                    ));
-                    break;
+//                case 'late':
+//                    $bill->where(array(
+//                        ['bill_to_pay_payments.due_date', '<', date(DATE_INTERNATIONAL)],
+//                        ['bill_to_pay_payments.payday', '=', NULL]
+//                    ));
+//                    break;
                 case 'without_pay':
                     $bill->where(array(
-                        ['bill_to_pay_payments.due_date', '>=', date(DATE_INTERNATIONAL)],
+//                        ['bill_to_pay_payments.due_date', '>=', date(DATE_INTERNATIONAL)],
                         ['bill_to_pay_payments.payday', '=', NULL]
                     ));
                     break;

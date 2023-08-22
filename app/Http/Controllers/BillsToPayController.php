@@ -50,7 +50,7 @@ class BillsToPayController extends Controller
         $typesQuery = $this->bill_to_pay->getCountTypePayments($company_id, $provider, $start_date, $end_date);
 
         $arrTypes = array(
-            'late'          => $typesQuery['late'],
+            //'late'          => $typesQuery['late'],
             'without_pay'   => $typesQuery['without_pay'],
             'paid'          => $typesQuery['paid']
         );
@@ -85,12 +85,12 @@ class BillsToPayController extends Controller
             $fields_order = array('bill_to_pays.code','providers.name','bill_to_pay_payments.due_value','bill_to_pay_payments.due_date', '');
 
             switch ($type_bill) {
-                case 'late':
-                    $filter_default[]['where']['bill_to_pay_payments.due_date <'] = date(DATE_INTERNATIONAL);
-                    $filter_default[]['where']['bill_to_pay_payments.payday'] = null;
-                    break;
+//                case 'late':
+//                    $filter_default[]['where']['bill_to_pay_payments.due_date <'] = date(DATE_INTERNATIONAL);
+//                    $filter_default[]['where']['bill_to_pay_payments.payday'] = null;
+//                    break;
                 case 'without_pay':
-                    $filter_default[]['where']['bill_to_pay_payments.due_date >='] = date(DATE_INTERNATIONAL);
+                    //$filter_default[]['where']['bill_to_pay_payments.due_date >='] = date(DATE_INTERNATIONAL);
                     $filter_default[]['where']['bill_to_pay_payments.payday'] = null;
                     break;
                 case 'paid':
@@ -151,11 +151,24 @@ class BillsToPayController extends Controller
 
             $buttons = dropdownButtonsDataList($buttons, $value->bill_payment_id);
 
+            $due_date = date('d/m/Y', strtotime($value->due_date));
+
+            $color_badge = 'success';
+            if (in_array($type_bill, array('late', 'without_pay'))) {
+                if (strtotime($value->due_date) === strtotime(dateNowInternational(null, DATE_INTERNATIONAL))) {
+                    $color_badge = 'warning';
+                } elseif (strtotime($value->due_date) < strtotime(dateNowInternational(null, DATE_INTERNATIONAL))) {
+                    $color_badge = 'danger';
+                }
+            }
+
+            $due_date = "<div class='badge badge-pill badge-lg badge-$color_badge'>$due_date</div>";
+
             $result[] = array(
                 $bill_code,
                 "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>$value->provider_name</span></div>",
                 'R$ ' . number_format($value->due_value, 2, ',', '.'),
-                date('d/m/Y', strtotime($value->due_date)),
+                $due_date,
                 $buttons
             );
         }

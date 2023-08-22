@@ -118,7 +118,7 @@
                                     </div>
                                     <div class="form-group col-md-2">
                                         <div class="switch d-flex mt-4">
-                                            <input type="checkbox" class="check-style check-xs" name="active" id="active" {{ old('active') ? 'checked' : '' }}>
+                                            <input type="checkbox" class="check-style check-xs" name="active" id="active" {{ old('active', true) ? 'checked' : '' }}>
                                             <label for="active" class="check-style check-xs"></label>&nbsp;Ativo
                                         </div>
                                     </div>

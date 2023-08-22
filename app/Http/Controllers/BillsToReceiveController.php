@@ -44,7 +44,7 @@ class BillsToReceiveController extends Controller
     {
         if (!hasPermission('BillsToReceiveView')) {
             return response()->json(array(
-                'late'          => 0,
+                //'late'          => 0,
                 'without_pay'   => 0,
                 'paid'          => 0
             ));
@@ -58,7 +58,7 @@ class BillsToReceiveController extends Controller
         $typesQuery = $this->rental_payment->getCountTypePayments($company_id, $client, $start_date, $end_date);
 
         $arrTypes = array(
-            'late'          => $typesQuery['late'],
+            //'late'          => $typesQuery['late'],
             'without_pay'   => $typesQuery['without_pay'],
             'paid'          => $typesQuery['paid']
         );
@@ -108,12 +108,12 @@ class BillsToReceiveController extends Controller
             );
 
             switch ($type_rental) {
-                case 'late':
-                    $filter_default[]['where']['rental_payments.due_date <'] = date(DATE_INTERNATIONAL);
-                    $filter_default[]['where']['rental_payments.payday'] = null;
-                    break;
+//                case 'late':
+//                    $filter_default[]['where']['rental_payments.due_date <'] = date(DATE_INTERNATIONAL);
+//                    $filter_default[]['where']['rental_payments.payday'] = null;
+//                    break;
                 case 'without_pay':
-                    $filter_default[]['where']['rental_payments.due_date >='] = date(DATE_INTERNATIONAL);
+                    //$filter_default[]['where']['rental_payments.due_date >='] = date(DATE_INTERNATIONAL);
                     $filter_default[]['where']['rental_payments.payday'] = null;
                     break;
                 case 'paid':
@@ -181,6 +181,19 @@ class BillsToReceiveController extends Controller
 
             $buttons = dropdownButtonsDataList($buttons, $value->rental_payment_id);
 
+            $due_date = date('d/m/Y', strtotime($value->due_date));
+
+            $color_badge = 'success';
+            if (in_array($type_rental, array('late', 'without_pay'))) {
+                if (strtotime($value->due_date) === strtotime(dateNowInternational(null, DATE_INTERNATIONAL))) {
+                    $color_badge = 'warning';
+                } elseif (strtotime($value->due_date) < strtotime(dateNowInternational(null, DATE_INTERNATIONAL))) {
+                    $color_badge = 'danger';
+                }
+            }
+
+            $due_date = "<div class='badge badge-pill badge-lg badge-$color_badge'>$due_date</div>";
+
             $result[] = array(
                 $rental_code,
                 "<div class='d-flex flex-wrap'>
@@ -188,7 +201,7 @@ class BillsToReceiveController extends Controller
                     <span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span>
                 </div>",
                 'R$ ' . number_format($value->due_value, 2, ',', '.'),
-                date('d/m/Y', strtotime($value->due_date)),
+                $due_date,
                 $buttons
             );
         }
