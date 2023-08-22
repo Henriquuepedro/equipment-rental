@@ -35,11 +35,10 @@
     });
 
     $(document).on('change', 'select[name="name_address"]', function() {
-        let address_id = $(this).val();
-        let client_id = $('select[name="client"]').val();
+        let address_id  = parseInt($(this).val());
+        let client_id   = parseInt($('select[name="client"]').val());
 
         if (!address_id || !client_id) {
-            //$('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
             return false;
         }
 

@@ -90,16 +90,16 @@ class RentalPayment extends Model
         $data = array();
 
         foreach (array(
-             'late' => array(
-                 ['due_date', '<', date(DATE_INTERNATIONAL)],
-                 ['payday', '=', NULL]
-             ),
+//             'late' => array(
+//                 ['rental_payments.due_date', '<', date(DATE_INTERNATIONAL)],
+//                 ['rental_payments.payday', '=', NULL]
+//             ),
              'without_pay' => array(
-                 ['due_date', '>=', date(DATE_INTERNATIONAL)],
-                 ['payday', '=', NULL]
+                 //['rental_payments.due_date', '>=', date(DATE_INTERNATIONAL)],
+                 ['rental_payments.payday', '=', NULL]
              ),
              'paid' => array(
-                 ['payday', '<>', NULL]
+                 ['rental_payments.payday', '<>', NULL]
              )
         ) as $type => $where) {
             $where = array_merge(array(['rentals.company_id', '=', $company_id]), $where);
@@ -153,15 +153,15 @@ class RentalPayment extends Model
 
         if ($type_rental) {
             switch ($type_rental) {
-                 case 'late':
-                    $rental->where(array(
-                        ['rental_payments.due_date', '<', date(DATE_INTERNATIONAL)],
-                        ['rental_payments.payday', '=', NULL]
-                    ));
-                    break;
+//                 case 'late':
+//                    $rental->where(array(
+//                        ['rental_payments.due_date', '<', date(DATE_INTERNATIONAL)],
+//                        ['rental_payments.payday', '=', NULL]
+//                    ));
+//                    break;
                  case 'without_pay':
                      $rental->where(array(
-                        ['rental_payments.due_date', '>=', date(DATE_INTERNATIONAL)],
+                        //['rental_payments.due_date', '>=', date(DATE_INTERNATIONAL)],
                         ['rental_payments.payday', '=', NULL]
                     ));
                     break;

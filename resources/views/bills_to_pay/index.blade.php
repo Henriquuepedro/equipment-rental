@@ -33,7 +33,7 @@
         const setTabBill = () => {
             const url = window.location.href;
             const splitUrl = url.split('#');
-            let tab = 'late';
+            let tab = 'without_pay';
 
             if (splitUrl.length === 2) {
                 tab = splitUrl[1];
@@ -312,12 +312,12 @@
                         </div>
                     </div>
                     <div class="nav-scroller mt-3">
-                        <ul class="nav nav-tabs tickets-tab-switch" role="tablist">
+                        <ul class="nav nav-tabs tickets-tab-switch justify-content-center" role="tablist">
+{{--                            <li class="nav-item">--}}
+{{--                                <a class="nav-link" id="late-tab" data-toggle="tab" href="#late" role="tab" aria-controls="late" aria-selected="true">Atrasado<div class="badge">13</div></a>--}}
+{{--                            </li>--}}
                             <li class="nav-item">
-                                <a class="nav-link active" id="late-tab" data-toggle="tab" href="#late" role="tab" aria-controls="late" aria-selected="true">Atrasado<div class="badge">13</div></a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="without_pay-tab" data-toggle="tab" href="#without_pay" role="tab" aria-controls="without_pay" aria-selected="false">Não Pago<div class="badge">50 </div></a>
+                                <a class="nav-link active" id="without_pay-tab" data-toggle="tab" href="#without_pay" role="tab" aria-controls="without_pay" aria-selected="false">Não Pago<div class="badge">50 </div></a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="paid-tab" data-toggle="tab" href="#paid" role="tab" aria-controls="paid" aria-selected="false">Pago<div class="badge">29 </div>
@@ -326,10 +326,10 @@
                         </ul>
                     </div>
                     <div class="tab-content tab-content-basic">
-                        <div class="tab-pane fade show active" id="late" role="tabpanel" aria-labelledby="late">
+{{--                        <div class="tab-pane fade" id="late" role="tabpanel" aria-labelledby="late">--}}
 
-                        </div>
-                        <div class="tab-pane fade" id="without_pay" role="tabpanel" aria-labelledby="without_pay">
+{{--                        </div>--}}
+                        <div class="tab-pane fade show active" id="without_pay" role="tabpanel" aria-labelledby="without_pay">
 
                         </div>
                         <div class="tab-pane fade" id="paid" role="tabpanel" aria-labelledby="paid">

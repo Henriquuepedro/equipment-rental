@@ -253,8 +253,14 @@ $(function(){
 
         elEquip.find('input[name^="date_withdrawal_equipment_"]').val('');
 
+        let date_withdrawal = $('input[name="date_withdrawal"]').val();
+
         if (!$(this).is(':checked')) {
-            elEquip.find('input[name^="date_withdrawal_equipment_"]').val(transformDateForBr(sumMinutesDateNow(1, true, false)));
+            if (!date_withdrawal || parseInt($('#is_exchange').val() ?? 0) === 1) {
+                date_withdrawal = transformDateForBr(sumMinutesDateNow(1, true, false));
+            }
+
+            elEquip.find('input[name^="date_withdrawal_equipment_"]').val(date_withdrawal);
         }
 
         checkLabelAnimate();
@@ -881,7 +887,7 @@ const setEquipmentRental = (
                 equipment_disabled_not_use_date_withdrawal_equip = 'disabled';
             }
 
-            const document_is_exchange = parseInt($('#is_exchange').val());
+            const document_is_exchange = parseInt($('#is_exchange').val() ?? 0);
             const sizeButtonWithBtnOption = is_exchange ? 'col-md-12' : 'col-md-9' ;
             const btnActionEquipment = is_exchange ? `<a class="exchange-equipment pull-right" data-toggle="tooltip" title="Trocar Equipamento"><i class="fa fa fa-arrow-right-arrow-left"></i></a>` : `<a class="remove-equipment pull-right" data-toggle="tooltip" title="Remover"><i class="fa fa-trash"></i></a>`;
             const btnViewValuePerPeriod = is_exchange ? '' : `<div class="input-button-calendar col-md-3 no-padding"><button class="input-button pull-right btn-primary w-100 btn-view-price-period-equipment" data-toggle="tootip" title="Visualizar valor por período" id-equipment="${response.id}" ${disabledFields}><i class="fas fa-file-invoice-dollar"></i></button></div>`;
