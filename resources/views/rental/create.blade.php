@@ -393,5 +393,6 @@
     <input type="hidden" id="routeGetPriceStockPeriodEquipment" value="{{ route('ajax.equipment.get-price-per-period') }}">
     <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
     <input type="hidden" id="budget" value="{{ $budget }}">
+    <input type="hidden" id="back_to_list" value="{{ route($budget ? 'budget.index' : 'rental.index') }}">
 
 @stop

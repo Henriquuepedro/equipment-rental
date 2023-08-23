@@ -252,7 +252,7 @@ class RentalController extends Controller
                     $expectedDeliveryDate = $equipment->expected_delivery_date;
                 }
                 // se não foi retirado e existe data de retirada prevista, faz a comparação da data para pegar sempre a data mais antiga
-                if ($equipment->actual_withdrawal_date === null && $expectedWithdrawalDate !== null && $equipment->expected_withdrawal_date !== null && strtotime($expectedWithdrawalDate) > strtotime($equipment->expected_withdrawal_date)) {
+                if ($equipment->actual_delivery_date !== null && $equipment->actual_withdrawal_date === null && $expectedWithdrawalDate !== null && $equipment->expected_withdrawal_date !== null && strtotime($expectedWithdrawalDate) > strtotime($equipment->expected_withdrawal_date)) {
                     $expectedWithdrawalDate = $equipment->expected_withdrawal_date;
                 }
 
