@@ -915,3 +915,19 @@ a[disabled] {
     width: 100% !important;
     text-align: left;
 }
+.wizard > .actions a.btn-danger {
+    color: #fff !important;
+    background-color: #ff6258 !important;
+    border-color: #ff6258 !important;
+}
+
+.wizard > .actions a.btn-danger:hover {
+    color: #fff !important;
+    background-color: #ff3e32 !important;
+    border-color: #ff3225 !important;
+}
+
+.wizard > .actions a.btn-danger:focus {
+    -webkit-box-shadow: 0 0 0 0.2rem rgba(255, 122, 113, 0.5) !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 122, 113, 0.5) !important;
+}

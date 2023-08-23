@@ -47,6 +47,7 @@ $("#formRental").validate({
 });
 
 $(function(){
+    $('#formRental.wizard .actions a[href="#previous"]').attr('href', '#cancel').html('<i class="fa fa-times"></i> Cancelar').addClass('btn-danger').closest('li').removeClass('disabled');
     $('#searchEquipment').on('blur keyup', function (e){
         if(e.keyCode !== 13 && e.type === 'keyup') {
             return false;

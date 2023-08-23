@@ -516,6 +516,7 @@
     <input type="hidden" id="routeGetPriceStockPeriodEquipment" value="{{ route('ajax.equipment.get-price-per-period') }}">
     <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
     <input type="hidden" id="budget" value="{{ $budget }}">
+    <input type="hidden" id="back_to_list" value="{{ route($budget ? 'budget.index' : 'rental.index') }}">
 
     <input type="hidden" name="rental_id" value="{{ $rental->id }}">
     <input type="hidden" name="client_id" value="{{ $rental->client_id }}">

@@ -295,6 +295,12 @@
         },
         onStepChanged: async function (event, currentIndex, priorIndex)
         {
+            if (currentIndex === 0) {
+                $('#formRental.wizard .actions a[href="#previous"]').attr('href', '#cancel').html('<i class="fa fa-times"></i> Cancelar').addClass('btn-danger').closest('li').removeClass('disabled');
+            } else {
+                $('#formRental.wizard .actions a[href="#cancel"]').attr('href', '#previous').html('<i class="fa fa-arrow-left"></i> Anterior').removeClass('btn-danger');
+            }
+
             changeStepPosUnset();
             let arrErrors = [];
             let typeLocation = parseInt($('input[name="type_rental"]:checked').val());
@@ -490,6 +496,25 @@
                             title: 'Você não tem permissão para fazer essa operação!'
                         });
                     }
+                }
+            });
+        },
+
+        //enableCancelButton: true,
+        onCanceled: function (event) {
+            Swal.fire({
+                title: 'Voltar para a listagem',
+                html: 'Deseja realmente sair da página? Caso tenha alterado algum campo, será perdido.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#19d895',
+                cancelButtonColor: '#bbb',
+                confirmButtonText: 'Sim, desejo sair',
+                cancelButtonText: 'Não, continuar na página',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = $('#back_to_list').val();
                 }
             });
         }

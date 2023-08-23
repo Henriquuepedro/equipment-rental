@@ -217,10 +217,9 @@
                     let date_operation = '';
 
                     $.each(response.data, function( index, value ) {
-
                         if (type === 'deliver') {
                             date_operation = value.expected_delivery_date;
-                        } else if (type === 'deliver') {
+                        } else if (type === 'withdraw') {
                             date_operation = value.expected_withdrawal_date;
                         }
 
@@ -523,11 +522,11 @@
                             title: response.message
                         });
 
-                        if (response.rental_updated) {
+                        // if (response.rental_updated) {
                             $(modal_id).modal('hide');
-                        } else {
-                            showModalEquipment(name_operation, $('[name="rental_id[]"]').val());
-                        }
+                        // } else {
+                        //     showModalEquipment(name_operation, $('[name="rental_id[]"]').val());
+                        // }
 
                         loadCountsTabRental();
                         getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false);
