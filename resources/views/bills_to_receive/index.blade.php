@@ -10,10 +10,15 @@
     <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <style>
         .tickets-tab-switch .nav-item .nav-link.active .badge {
             background: #fff;
             color: #2196f3;
+        }
+
+        #tableBillsToReceive_wrapper .dataTables_scroll .dataTables_scrollBody {
+            overflow-x: hidden !important;
         }
     </style>
 @stop
@@ -21,13 +26,22 @@
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
     <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
     <script>
         let tableBillsToReceive;
+        let rows_selected = [];
 
         $(function () {
             loadDaterangePickerInput($('input[name="intervalDates"]'), function () { getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false); });
             setTabRental();
             getOptionsForm('form-of-payment', $('#modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
+
+            tableBillsToReceive.on('click', 'tbody tr', function (e) {
+                e.currentTarget.classList.toggle('selected');
+
+                $('.values .price').text('R$ ' + numberToReal(tableBillsToReceive.rows('.selected').data().pluck(2).reduce((accumulator,object) => accumulator + realToNumber(object.replace('R$ ', '')) ,0)));
+                $('.values .quantity').text(tableBillsToReceive.rows('.selected').data().length);
+            });
         });
 
         const setTabRental = () => {
@@ -122,9 +136,19 @@
                 "stateSave": stateSave,
                 "serverMethod": "post",
                 "order": [[ 3, 'asc' ]],
+                lengthMenu:[
+                    [10, 25, 50, -1],
+                    [10, 25, 50, 'All']
+                ],
+                paging: false,
+                scrollCollapse: false,
+                scrollY: '50vh',
+                "bLengthChange": false,
+                "pageLength": -1,
+                info: false,
                 "ajax": {
                     url: '{{ route('ajax.bills_to_receive.fetch') }}',
-                    pages: 2,
+                    //pages: 2,
                     type: 'POST',
                     data: {
                         "_token": $('meta[name="csrf-token"]').attr('content'),
@@ -141,12 +165,36 @@
                 },
                 "initComplete": function( settings, json ) {
                     enabledLoadData();
+                    $('#tableBillsToReceive_wrapper .dt-buttons button.dt-button').removeClass('dt-button');
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json"
-                }
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        className: 'btn btn-primary',
+                        text: '<i class="fa-regular fa-square-check"></i> Selecionado todos',
+                        // action: function ( e, dt, node, config ) {
+                        //     alert( 'Button activated' );
+                        // }
+                    }
+                ],
             });
         }
+
+        // $('#tableBillsToReceive tbody').on('click', 'tr', function () {
+        //     var id = parseInt(this.id);
+        //     var index = $.inArray(id, rows_selected);
+        //
+        //     if ( index === -1 ) {
+        //         rows_selected.push( id );
+        //     } else {
+        //         rows_selected.splice( index, 1 );
+        //     }
+        //
+        //     $(this).toggleClass('selected');
+        // } );
 
         $(document).on('ifChanged', '#modalConfirmPayment .equipment, #modalWithdraw .equipment', function() {
 
@@ -366,6 +414,10 @@
                                 </tr>
                                 </tfoot>
                             </table>
+                        </div>
+                        <div class="col-md-12 values d-flex justify-content-end flex-wrap text-right">
+                            <span class="col-md-12">Valores Selecionados <b class="price">R$ 0,00</b></span>
+                            <span class="col-md-12">Pagamentos Selecionados <b class="quantity">0</b></span>
                         </div>
                     </div>
                 </div>

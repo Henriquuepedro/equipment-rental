@@ -147,6 +147,11 @@ if (!function_exists('fetchDataTable')) {
             $length = 200;
         }
 
+        if ($length == -1) {
+            $length = null;
+            $start = null;
+        }
+
         if (!empty($search) && isset($search['value'])) {
             $search_text = trim($search['value']);
         } else {

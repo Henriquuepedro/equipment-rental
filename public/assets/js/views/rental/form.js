@@ -401,10 +401,10 @@ $(function(){
         const check = $(this).is(':checked');
 
         if (check) {
-            $('#parcels .parcel [name="value_parcel[]"]').attr('disabled', true);
+            $('#parcels .parcel [name="value_parcel[]"]').attr('readonly', true);
             recalculeParcels();
         } else
-            $('#parcels .parcel [name="value_parcel[]"]').attr('disabled', false);
+            $('#parcels .parcel [name="value_parcel[]"]').attr('readonly', false);
 
     });
 
@@ -541,7 +541,7 @@ const createParcel = (due, due_day = null, due_date = null, due_value = null, vi
     due_date = due_date === null ? sumDaysDateNow(last_day) : due_date;
     due_value = due_value === null ? '0,00' : numberToReal(due_value);
 
-    const disabledValue = $('#automatic_parcel_distribution').is(':checked') ? 'disabled' : '';
+    const disabledValue = $('#automatic_parcel_distribution').is(':checked') ? 'readonly' : '';
     const delete_button = view_btn_delete ? `<div class="input-group-prepend stock-Equipment-payment col-md-1 no-padding"><button type="button" class="btn btn-danger btn-flat w-100 remove-payment" title="Excluir Pagamento"><i class="fa fa-trash"></i></button></div>` : '';
     return `<div class="form-group mt-1 parcel">
         <div class="d-flex align-items-center justify-content-between payment-item">

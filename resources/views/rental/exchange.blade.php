@@ -391,5 +391,5 @@
     <input type="hidden" id="routeGetEquipments" value="{{ route('ajax.equipment.get-equipments') }}">
     <input type="hidden" id="routeGetPriceStockPeriodEquipment" value="{{ route('ajax.equipment.get-price-per-period') }}">
     <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
-    <input type="hidden" id="back_to_list" value="{{ 'rental.index' }}">
+    <input type="hidden" id="back_to_list" value="{{ route('rental.index') }}">
 @stop

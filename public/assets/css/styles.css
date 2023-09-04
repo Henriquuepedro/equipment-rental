@@ -931,3 +931,7 @@ a[disabled] {
     -webkit-box-shadow: 0 0 0 0.2rem rgba(255, 122, 113, 0.5) !important;
     box-shadow: 0 0 0 0.2rem rgba(255, 122, 113, 0.5) !important;
 }
+
+.dataTables_wrapper .dataTable tbody tr.selected {
+    background: #216b9e;
+}
