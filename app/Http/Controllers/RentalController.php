@@ -597,7 +597,7 @@ class RentalController extends Controller
         foreach ($request->input('due_date') as $parcel => $_) {
             if ($automaticParcelDistribution) {
                 if (($parcel + 1) === $qtyParcel) {
-                    $valueParcel = (float)number_format($netValue - $valueSumParcel,2,'.','');
+                    $valueParcel = (float)number_format(($netValue - $total_rental_paid) - $valueSumParcel,2,'.','');
                 }
                 $valueSumParcel += $valueParcel;
             } else {

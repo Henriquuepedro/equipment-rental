@@ -202,7 +202,8 @@ class BillsToReceiveController extends Controller
                 </div>",
                 'R$ ' . number_format($value->due_value, 2, ',', '.'),
                 $due_date,
-                $buttons
+                $buttons,
+                "payment_id" => $value->rental_payment_id
             );
         }
 
