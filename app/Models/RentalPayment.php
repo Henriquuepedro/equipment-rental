@@ -77,7 +77,12 @@ class RentalPayment extends Model
 
     public function getPayment($company_id, $payment_id)
     {
-        return $this->where(['id' => $payment_id, 'company_id' => $company_id])->first();
+        if (is_numeric($payment_id)) {
+            return $this->where(['id' => $payment_id, 'company_id' => $company_id])->first();
+        } elseif (is_array($payment_id)) {
+            return $this->whereIn('id', $payment_id)->where('company_id', $company_id)->get();
+        }
+        return [];
     }
 
     public function getPaymentByRentalAndDate($company_id, $rental_id, string $due_date)
