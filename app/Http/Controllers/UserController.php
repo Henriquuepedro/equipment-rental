@@ -33,6 +33,16 @@ class UserController extends Controller
         return view('profile.index', compact('user'));
     }
 
+    public function expiredPlan()
+    {
+        $user_id    = Auth::user()->id;
+        $company_id = Auth::user()->__get('company_id');
+
+        $user = $this->user->getUser($user_id, $company_id);
+
+        return view('profile.expired_plan', compact('user'));
+    }
+
     public function update(ProfileUpdatePost $request)
     {
         $user_id        = $request->user()->id;
@@ -63,7 +73,7 @@ class UserController extends Controller
 
         // verifica senha atual
         if($request->password) {
-            if(!Hash::check($request->password_current, auth()->user()->password)) {
+            if(!Hash::check($request->password_current, auth()->user()->__get('password'))) {
                 if ($isAjax)
                     return response()->json(['success' => false, 'data' => 'Senha informada não corresponde com a senha atual!']);
 

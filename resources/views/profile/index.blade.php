@@ -207,7 +207,7 @@
                                     </div>
                                 </div>
                                 <div class="wrapper pl-sm-4">
-                                    <h5 class="profile-user-name text-center text-sm-left">{{ auth()->user()->name }}</h5>
+                                    <h5 class="profile-user-name text-center text-sm-left">{{ auth()->user()->__get('name') }}</h5>
                                     <div class="wrapper d-flex align-items-center justify-content-start flex-wrap">
                                         <p class="profile-user-designation text-center text-md-left my-2 my-md-0 text-uppercase">{{ $settings['name_company'] }}</p>
                                     </div>
