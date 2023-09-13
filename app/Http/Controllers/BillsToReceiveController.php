@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\FormPayment;
+use App\Models\Rental;
 use App\Models\RentalPayment;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -18,12 +19,14 @@ class BillsToReceiveController extends Controller
 {
     private Client $client;
     private RentalPayment $rental_payment;
+    private Rental $rental;
     private FormPayment $form_payment;
 
     public function __construct()
     {
         $this->client = new Client();
         $this->rental_payment = new RentalPayment();
+        $this->rental = new Rental();
         $this->form_payment = new FormPayment();
     }
 
@@ -219,15 +222,37 @@ class BillsToReceiveController extends Controller
 
     public function confirmPayment(Request $request): JsonResponse
     {
-        $payment_id     = $request->input('payment_id');
+        if (!hasPermission('BillsToReceiveUpdatePost')) {
+            return response()->json(null, 400);
+        }
+
+        $payment_id     = explode('-',$request->input('payment_id'));
         $form_payment_id= $request->input('form_payment');
         $date_payment   = $request->input('date_payment');
         $company_id     = $request->user()->company_id;
+        $payments       = $this->rental_payment->getPayment($company_id, $payment_id);
 
-        if (!$this->rental_payment->getPayment($company_id, $payment_id)) {
-            if (!hasPermission('BillsToReceiveUpdatePost')) {
-                return response()->json(null, 400);
+        if (!count($payments)) {
+            return response()->json(array('success' => false, 'message' => "Pagamento não encontrado."));
+        }
+
+        $rental_read = array();
+        $client_id = null;
+        foreach ($payments as $payment) {
+            $rental = $this->rental->getRental($company_id, $payment->rental_id);
+
+            // Locação não encontrada ou já lida.
+            if (!$rental || in_array($rental->id, $rental_read)) {
+                continue;
             }
+
+            if (is_null($client_id)) {
+                $client_id = $rental->client_id;
+            } elseif ($client_id != $rental->client_id) {
+                return response()->json(array('success' => false, 'message' => "Selecione um cliente para efetuar múltiplos pagamentos"));
+            }
+
+            $rental_read[] = $rental->id;
         }
 
         $data_form_payment = $this->form_payment->getById($form_payment_id);
@@ -236,11 +261,13 @@ class BillsToReceiveController extends Controller
             return response()->json(array('success' => false, 'message' => "Forma de pagamento não encontrado."));
         }
 
-        $this->rental_payment->updateById(array(
-            'payday'        => $date_payment,
-            'payment_name'  => $data_form_payment->name,
-            'payment_id'    => $data_form_payment->id
-        ), $payment_id);
+        foreach ($payments as $payment) {
+            $this->rental_payment->updateById(array(
+                'payday'        => $date_payment,
+                'payment_name'  => $data_form_payment->name,
+                'payment_id'    => $data_form_payment->id
+            ), $payment->id);
+        }
 
         return response()->json(array('success' => true, 'message' => "Pagamento confirmado!"));
     }

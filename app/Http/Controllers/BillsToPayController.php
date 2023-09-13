@@ -169,7 +169,8 @@ class BillsToPayController extends Controller
                 "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>$value->provider_name</span></div>",
                 'R$ ' . number_format($value->due_value, 2, ',', '.'),
                 $due_date,
-                $buttons
+                $buttons,
+                "payment_id" => $value->bill_payment_id
             );
         }
 
@@ -185,28 +186,52 @@ class BillsToPayController extends Controller
 
     public function confirmPayment(Request $request): JsonResponse
     {
-        $payment_id     = $request->input('payment_id');
+        if (!hasPermission('BillsToPayUpdatePost')) {
+            return response()->json(null, 400);
+        }
+
+        $payment_id     = explode('-',$request->input('payment_id'));
         $form_payment_id= $request->input('form_payment');
         $date_payment   = $request->input('date_payment');
         $company_id     = $request->user()->company_id;
+        $payments       = $this->bill_to_pay->getBill($company_id, $payment_id);
 
-        if (!$this->bill_to_pay->getBill($company_id, $payment_id)) {
-            if (!hasPermission('BillsToPayUpdatePost')) {
-                return response()->json(null, 400);
+        if (!count($payments)) {
+            return response()->json(array('success' => false, 'message' => "Pagamento não encontrado."));
+        }
+
+        $bill_to_pay_read = array();
+        $provider_id = null;
+        foreach ($payments as $payment) {
+            $bill_to_pay = $this->bill_to_pay->getBill($company_id, $payment->bill_to_pay_id);
+
+            // Conta não encontrada ou já lida.
+            if (!$bill_to_pay || in_array($bill_to_pay->id, $bill_to_pay_read)) {
+                continue;
             }
+
+            if (is_null($provider_id)) {
+                $provider_id = $bill_to_pay->provider_id;
+            } elseif ($provider_id != $bill_to_pay->provider_id) {
+                return response()->json(array('success' => false, 'message' => "Selecione uma loja para efetuar múltiplos pagamentos"));
+            }
+
+            $bill_to_pay_read[] = $bill_to_pay->id;
         }
 
         $data_form_payment = $this->form_payment->getById($form_payment_id);
 
         if (!$data_form_payment) {
-            return response()->json(array('success' => false, 'message' => "Forma de pagamento nnão encontrado."));
+            return response()->json(array('success' => false, 'message' => "Forma de pagamento não encontrado."));
         }
 
-        $this->bill_to_pay->updateById(array(
-            'payday'        => $date_payment,
-            'payment_name'  => $data_form_payment->name,
-            'payment_id'    => $data_form_payment->id
-        ), $payment_id);
+        foreach ($payments as $payment) {
+            $this->bill_to_pay->updateById(array(
+                'payday'        => $date_payment,
+                'payment_name'  => $data_form_payment->name,
+                'payment_id'    => $data_form_payment->id
+            ), $payment->id);
+        }
 
         return response()->json(array('success' => true, 'message' => "Pagamento confirmado!"));
     }

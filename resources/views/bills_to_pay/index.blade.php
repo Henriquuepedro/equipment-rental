@@ -10,10 +10,19 @@
     <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <style>
         .tickets-tab-switch .nav-item .nav-link.active .badge {
             background: #fff;
             color: #2196f3;
+        }
+
+        #tableBillsToReceive_wrapper .dataTables_scroll .dataTables_scrollBody {
+            overflow-x: hidden !important;
+        }
+
+        #tableBillsToReceive tbody tr {
+            cursor: pointer;
         }
     </style>
 @stop
@@ -21,14 +30,35 @@
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
     <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
     <script>
         let tableBillsToReceive;
+        let rows_selected = [];
 
         $(function () {
             loadDaterangePickerInput($('input[name="intervalDates"]'), function () { getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false); });
             setTabBill();
             getOptionsForm('form-of-payment', $('#modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
+
+            tableBillsToReceive.on('click', 'tbody tr', function (e) {
+                const tag_name = $(e.target).prop("tagName");
+                if (inArray(tag_name, ['I', 'BUTTON'])) {
+                    return;
+                }
+
+                if (parseInt($('[name="providers"]').val()) === 0 || $('#paid-tab').hasClass('active')) {
+                    return;
+                }
+
+                e.currentTarget.classList.toggle('selected');
+                recalculateTotals();
+            });
         });
+
+        const recalculateTotals = () => {
+            $('.values .price').text('R$ ' + numberToReal(tableBillsToReceive.rows('.selected').data().pluck(2).reduce((accumulator,object) => accumulator + realToNumber(object.replace('R$ ', '')) ,0)));
+            $('.values .quantity').text(tableBillsToReceive.rows('.selected').data().length);
+        }
 
         const setTabBill = () => {
             const url = window.location.href;
@@ -122,9 +152,13 @@
                 "stateSave": stateSave,
                 "serverMethod": "post",
                 "order": [[ 3, 'asc' ]],
+                paging: false,
+                scrollCollapse: true,
+                scrollY: '50vh',
+                "bLengthChange": false,
+                info: false,
                 "ajax": {
                     url: '{{ route('ajax.bills_to_pay.fetch') }}',
-                    pages: 2,
                     type: 'POST',
                     data: {
                         "_token": $('meta[name="csrf-token"]').attr('content'),
@@ -141,10 +175,75 @@
                 },
                 "initComplete": function( settings, json ) {
                     enabledLoadData();
+                    $('#tableBillsToReceive_wrapper .dt-buttons button.dt-button').removeClass('dt-button');
+                    $('[data-toggle="tooltip"]').tooltip();
+                    recalculateTotals();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json"
-                }
+                },
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        className: typeBills === 'without_pay' ? 'btn btn-primary' : 'd-none',
+                        text: '<i class="fa-solid fa-list-check"></i> Selecionado todos',
+                        enabled: parseInt($('[name="providers"]').val()) !== 0 && typeBills === 'without_pay',
+                        attr:  {
+                            title: parseInt($('[name="providers"]').val()) === 0 ? 'Selecione um fornecedor para efetuar múltiplos pagamentos' : '',
+                            "data-toggle": "tooltip"
+                        },
+                        action: function ( e, dt, node, config ) {
+                            tableBillsToReceive.rows().every(function(rowIdx, tableLoop, rowLoop){
+                                $(tableBillsToReceive.row(rowIdx).node()).addClass('selected');
+                            });
+                            recalculateTotals();
+                        }
+                    },
+                    {
+                        className: typeBills === 'without_pay' ? 'btn btn-primary' : 'd-none',
+                        text: '<i class="fa-solid fa-check"></i> Pagar selecionados',
+                        enabled: parseInt($('[name="providers"]').val()) !== 0 && typeBills === 'without_pay',
+                        attr:  {
+                            id: 'pay_all_parcels',
+                            title: parseInt($('[name="providers"]').val()) === 0 ? 'Selecione um fornecedor para efetuar múltiplos pagamentos' : '',
+                            "data-toggle": "tooltip"
+                        },
+                        action: function ( e, dt, node, config ) {
+                            if (parseInt($('[name="providers"]').val()) === 0) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Atenção',
+                                    html: 'Selecione um fornecedor para efetuar múltiplos pagamentos'
+                                });
+                                return false;
+                            }
+                            if (tableBillsToReceive.rows('.selected').data().length === 0) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Atenção',
+                                    html: 'Nenhum pagamento selecionado'
+                                });
+                                return false;
+                            }
+
+                            const payment_ids = tableBillsToReceive.rows('.selected').data().pluck('payment_id').join('-');
+                            const name_client   = $(`select[name="providers"] option[value="${$('[name="providers"]').val()}"]`).text();
+                            const due_value     = 'R$ ' + numberToReal(tableBillsToReceive.rows('.selected').data().pluck(2).reduce((accumulator,object) => accumulator + realToNumber(object.replace('R$ ', '')) ,0));
+
+                            $('#modalConfirmPayment').find('[name="bill_code"]').closest('.form-group').hide();
+                            $('#modalConfirmPayment').find('[name="provider"]').val(name_client);
+                            $('#modalConfirmPayment').find('[name="date_bill"]').closest('.form-group').hide();
+                            $('#modalConfirmPayment').find('[name="due_date"]').closest('.form-group').hide();
+                            $('#modalConfirmPayment').find('[name="due_value"]').val(due_value);
+                            $('#modalConfirmPayment').find('[name="payment_id"]').val(payment_ids);
+                            $('#modalConfirmPayment').find('[name="date_payment"]').val((new Date()).toJSON().slice(0, 10));
+                            $('#modalConfirmPayment').find('[name="form_payment"]').val("");
+                            $('#modalConfirmPayment').find('[type="submit"]').attr('disabled', false);
+                            $('#modalConfirmPayment').modal()
+                            checkLabelAnimate();
+                        }
+                    }
+                ]
             });
         }
 
@@ -191,10 +290,10 @@
             const due_date      = $(this).data('due-date');
             const due_value     = 'R$ ' + $(this).data('due-value');
 
-            $('#modalConfirmPayment').find('[name="bill_code"]').val(bill_code);
+            $('#modalConfirmPayment').find('[name="bill_code"]').val(bill_code).closest('.form-group').show();
             $('#modalConfirmPayment').find('[name="provider"]').val(name_provider);
-            $('#modalConfirmPayment').find('[name="date_bill"]').val(date_bill);
-            $('#modalConfirmPayment').find('[name="due_date"]').val(due_date);
+            $('#modalConfirmPayment').find('[name="date_bill"]').val(date_bill).closest('.form-group').show();
+            $('#modalConfirmPayment').find('[name="due_date"]').val(due_date).closest('.form-group').show();
             $('#modalConfirmPayment').find('[name="due_value"]').val(due_value);
             $('#modalConfirmPayment').find('[name="payment_id"]').val(payment_id);
             $('#modalConfirmPayment').find('[name="date_payment"]').val((new Date()).toJSON().slice(0, 10));
@@ -360,6 +459,10 @@
                                 </tr>
                                 </tfoot>
                             </table>
+                        </div>
+                        <div class="col-md-12 values d-flex justify-content-end flex-wrap text-right">
+                            <span class="col-md-12">Valores Selecionados <b class="price">R$ 0,00</b></span>
+                            <span class="col-md-12">Pagamentos Selecionados <b class="quantity">0</b></span>
                         </div>
                     </div>
                 </div>

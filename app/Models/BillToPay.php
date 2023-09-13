@@ -186,7 +186,12 @@ class BillToPay extends Model
 
     public function getBill($company_id, $bill_to_pay_id)
     {
-        return $this->from('bill_to_pay_payments')->where(['id' => $bill_to_pay_id, 'company_id' => $company_id])->first();
+        if (is_numeric($bill_to_pay_id)) {
+            return $this->from('bill_to_pay_payments')->where(['id' => $bill_to_pay_id, 'company_id' => $company_id])->first();
+        } elseif (is_array($bill_to_pay_id)) {
+            return $this->from('bill_to_pay_payments')->whereIn('id', $bill_to_pay_id)->where('company_id', $company_id)->get();
+        }
+        return [];
     }
 
     public function updateById(array $data, int $id)
