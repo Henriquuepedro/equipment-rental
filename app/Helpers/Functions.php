@@ -18,7 +18,7 @@ if (! function_exists('hasPermission')) {
             return true;
         }
 
-        $permissions = empty(auth()->user()->permission) ? [] : json_decode(auth()->user()->permission);
+        $permissions = empty(auth()->user()->__get('permission')) ? [] : json_decode(auth()->user()->__get('permission'));
         $permission = Permission::query()->where('name', $permission)->first();
         $permission = $permission ? $permission->id : 0;
 
@@ -32,7 +32,7 @@ if (! function_exists('hasAdmin')) {
         // 0 = user
         // 1 = admin
         // 2 = master
-        return auth()->user()->type_user === 1 || hasAdminMaster();
+        return auth()->user()->__get('type_user') === 1 || hasAdminMaster();
     }
 }
 
@@ -42,7 +42,7 @@ if (! function_exists('hasAdminMaster')) {
         // 0 = user
         // 1 = admin
         // 2 = master
-        return auth()->user()->type_user === 2;
+        return auth()->user()->__get('type_user') === 2;
     }
 }
 

@@ -40,15 +40,17 @@ class AppServiceProvider extends ServiceProvider
             if (auth()->user()) {
 
                 $company = new Company();
-                $dataCompany = $company->getCompany(auth()->user()->company_id);
-                $dataPlan = $company->getPlanCompany(auth()->user()->company_id);
+                $dataCompany = $company->getCompany(auth()->user()->__get('company_id'));
+                $dataPlan = $company->getPlanCompany(auth()->user()->__get('company_id'));
 
-                $settings['img_profile'] = asset(auth()->user()->profile ? "assets/images/profile/" . auth()->user()->id . "/" . auth()->user()->profile : "assets/images/profile/profile.png");
+                $settings['img_profile'] = asset(auth()->user()->__get('profile') ? "assets/images/profile/" . auth()->user()->__get('id') . "/" . auth()->user()->__get('profile') : "assets/images/profile/profile.png");
                 $settings['img_company'] = asset($dataCompany->logo ? "assets/images/company/$dataCompany->id/$dataCompany->logo" : "assets/images/company/company.png");
                 $settings['name_company'] = $dataCompany->name;
-                $settings['type_user'] = auth()->user()->type_user;
+                $settings['type_user'] = auth()->user()->__get('type_user');
                 $settings['name_plan'] = $dataPlan ? $dataPlan->description : 'Sem plano';
-                $settings['style_template'] = auth()->user()->style_template;
+                $settings['style_template'] = auth()->user()->__get('style_template');
+                $settings['company_id'] = str_pad($dataCompany->id, 5, 0, STR_PAD_LEFT);
+                $settings['plan_expiration_date'] = date('d/m/Y H:i', strtotime($dataCompany->plan_expiration_date));
 
                 $months = 2;
                 $settings['intervalDates'] = [
@@ -58,12 +60,12 @@ class AppServiceProvider extends ServiceProvider
 
                 // permissões
                 $arrNamesPermissions = [];
-                if (auth()->user()->type_user == 1 || auth()->user()->type_user == 2) { // administrador permissão total
+                if (auth()->user()->__get('type_user') == 1 || auth()->user()->__get('type_user') == 2) { // administrador permissão total
                     foreach (Permission::query()->get() as $permission) {
                         $arrNamesPermissions[] = $permission->name;
                     }
                 } else { // permissão por usuário
-                    $permissions = empty(auth()->user()->permission) ? [] : json_decode(auth()->user()->permission);
+                    $permissions = empty(auth()->user()->__get('permission')) ? [] : json_decode(auth()->user()->__get('permission'));
                     foreach ($permissions as $permission) {
                         $arrNamesPermissions[] = Permission::query()->where('id', $permission)->first()->name;
                     }

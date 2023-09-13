@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckPlan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,10 +22,11 @@ Auth::routes();
 //})->name('home')->middleware('auth');
 
 /** ROTAS AUTENTICADO */
-Route::group(['middleware' => 'auth'], function (){
+Route::group(['middleware' => ['auth', CheckPlan::class]], function (){
 
     Route::get('', [App\Http\Controllers\DashboardController::class, 'dashboard']);
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/plano_expirado', [App\Http\Controllers\UserController::class, 'expiredPlan'])->name('expired_plan');
 
     // Configuração
     Route::group(['prefix' => '/configurar', 'as' => 'config.'], function () {

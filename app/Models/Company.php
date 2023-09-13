@@ -34,6 +34,7 @@ class Company extends Model
         'state',
         'plan_id',
         'status',
+        'plan_expiration_date',
         'user_update'
     ];
 

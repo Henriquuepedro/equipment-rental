@@ -4,19 +4,19 @@ Illuminate\Foundation\Http\FormRequest
 -------------------------------------------
 public function hasPermission($permission)
 {
-    $permissions = empty(auth()->user()->permission) ? [] : json_decode(auth()->user()->permission);
+    $permissions = empty(auth()->user()->__get('permission')) ? [] : json_decode(auth()->user()->__get('permission'));
     $permission = Permission::query()->where('name', $permission)->first()->id;
     return in_array($permission, $permissions) || $this->hasAdmin();
 }
 
 public function hasAdmin()
 {
-    return auth()->user()->type_user === 1 || auth()->user()->type_user === 2;
+    return auth()->user()->__get('type_user') === 1 || auth()->user()->__get('type_user') === 2;
 }
 
 public function hasAdminMaster()
 {
-    return auth()->user()->type_user === 2;
+    return auth()->user()->__get('type_user') === 2;
 }
 
 public function isAjax(){
