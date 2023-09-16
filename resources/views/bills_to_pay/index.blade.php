@@ -17,12 +17,16 @@
             color: #2196f3;
         }
 
-        #tableBillsToReceive_wrapper .dataTables_scroll .dataTables_scrollBody {
+        #tableBillsToPay_wrapper .dataTables_scroll .dataTables_scrollBody {
             overflow-x: hidden !important;
         }
 
-        #tableBillsToReceive tbody tr {
+        #tableBillsToPay tbody tr {
             cursor: pointer;
+        }
+
+        #tableBillsToPay_processing {
+            z-index: 1;
         }
     </style>
 @stop
@@ -32,7 +36,7 @@
     <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
     <script>
-        let tableBillsToReceive;
+        let tableBillsToPay;
         let rows_selected = [];
 
         $(function () {
@@ -40,7 +44,7 @@
             setTabBill();
             getOptionsForm('form-of-payment', $('#modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
 
-            tableBillsToReceive.on('click', 'tbody tr', function (e) {
+            tableBillsToPay.on('click', 'tbody tr', function (e) {
                 const tag_name = $(e.target).prop("tagName");
                 if (inArray(tag_name, ['I', 'BUTTON'])) {
                     return;
@@ -56,8 +60,8 @@
         });
 
         const recalculateTotals = () => {
-            $('.values .price').text('R$ ' + numberToReal(tableBillsToReceive.rows('.selected').data().pluck(2).reduce((accumulator,object) => accumulator + realToNumber(object.replace('R$ ', '')) ,0)));
-            $('.values .quantity').text(tableBillsToReceive.rows('.selected').data().length);
+            $('.values .price').text('R$ ' + numberToReal(tableBillsToPay.rows('.selected').data().pluck(2).reduce((accumulator,object) => accumulator + realToNumber(object.replace('R$ ', '')) ,0)));
+            $('.values .quantity').text(tableBillsToPay.rows('.selected').data().length);
         }
 
         const setTabBill = () => {
@@ -81,6 +85,7 @@
 
         const disabledLoadData = () => {
             $('a[data-toggle="tab"], select[name="providers"]').prop('disabled', true);
+            $('.table.dataTable thead tr th[aria-controls="tableBillsToPay"]:eq(3), .dataTables_scrollFoot .table.dataTable tfoot tr th:eq(3)').html('<div class="col-md-12"><i class="fa fa-spin fa-spinner text-center"></i></div>');
         }
 
         const enabledLoadData = () => {
@@ -131,10 +136,10 @@
 
             $('[data-toggle="tooltip"]').tooltip('dispose');
 
-            if (typeof tableBillsToReceive !== 'undefined') {
-                tableBillsToReceive.destroy();
+            if (typeof tableBillsToPay !== 'undefined') {
+                tableBillsToPay.destroy();
 
-                $("#tableBillsToReceive tbody").empty();
+                $("#tableBillsToPay tbody").empty();
             }
 
             getCountsTabBills();
@@ -142,7 +147,7 @@
             const start_date = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
             const end_date   = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
 
-            tableBillsToReceive = $("#tableBillsToReceive").DataTable({
+            tableBillsToPay = $("#tableBillsToPay").DataTable({
                 "responsive": true,
                 "processing": true,
                 "autoWidth": false,
@@ -175,8 +180,9 @@
                 },
                 "initComplete": function( settings, json ) {
                     enabledLoadData();
-                    $('#tableBillsToReceive_wrapper .dt-buttons button.dt-button').removeClass('dt-button');
+                    $('#tableBillsToPay_wrapper .dt-buttons button.dt-button').removeClass('dt-button');
                     $('[data-toggle="tooltip"]').tooltip();
+                    $('.table.dataTable thead tr th[aria-controls="tableBillsToPay"]:eq(3), .dataTables_scrollFoot .table.dataTable tfoot tr th:eq(3)').text(typeBills === 'paid' ? 'Pagamento' : 'Vencimento');
                     recalculateTotals();
                 },
                 "language": {
@@ -193,8 +199,8 @@
                             "data-toggle": "tooltip"
                         },
                         action: function ( e, dt, node, config ) {
-                            tableBillsToReceive.rows().every(function(rowIdx, tableLoop, rowLoop){
-                                $(tableBillsToReceive.row(rowIdx).node()).addClass('selected');
+                            tableBillsToPay.rows().every(function(rowIdx, tableLoop, rowLoop){
+                                $(tableBillsToPay.row(rowIdx).node()).addClass('selected');
                             });
                             recalculateTotals();
                         }
@@ -217,7 +223,7 @@
                                 });
                                 return false;
                             }
-                            if (tableBillsToReceive.rows('.selected').data().length === 0) {
+                            if (tableBillsToPay.rows('.selected').data().length === 0) {
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Atenção',
@@ -226,9 +232,9 @@
                                 return false;
                             }
 
-                            const payment_ids = tableBillsToReceive.rows('.selected').data().pluck('payment_id').join('-');
+                            const payment_ids = tableBillsToPay.rows('.selected').data().pluck('payment_id').join('-');
                             const name_client   = $(`select[name="providers"] option[value="${$('[name="providers"]').val()}"]`).text();
-                            const due_value     = 'R$ ' + numberToReal(tableBillsToReceive.rows('.selected').data().pluck(2).reduce((accumulator,object) => accumulator + realToNumber(object.replace('R$ ', '')) ,0));
+                            const due_value     = 'R$ ' + numberToReal(tableBillsToPay.rows('.selected').data().pluck(2).reduce((accumulator,object) => accumulator + realToNumber(object.replace('R$ ', '')) ,0));
 
                             $('#modalConfirmPayment').find('[name="bill_code"]').closest('.form-group').hide();
                             $('#modalConfirmPayment').find('[name="provider"]').val(name_client);
@@ -438,7 +444,7 @@
 
                     <div class="row mt-3">
                         <div class="col-md-12">
-                            <table id="tableBillsToReceive" class="table table-bordered mt-2">
+                            <table id="tableBillsToPay" class="table table-bordered mt-2">
                                 <thead>
                                 <tr>
                                     <th>#</th>

@@ -24,6 +24,10 @@
         #tableBillsToReceive tbody tr {
             cursor: pointer;
         }
+
+        #tableBillsToReceive_processing {
+            z-index: 1;
+        }
     </style>
 @stop
 
@@ -81,6 +85,7 @@
 
         const disabledLoadData = () => {
             $('a[data-toggle="tab"], select[name="clients"]').prop('disabled', true);
+            $('.table.dataTable thead tr th[aria-controls="tableBillsToReceive"]:eq(3), .dataTables_scrollFoot .table.dataTable tfoot tr th:eq(3)').html('<div class="col-md-12"><i class="fa fa-spin fa-spinner text-center"></i></div>');
         }
 
         const enabledLoadData = () => {
@@ -177,6 +182,7 @@
                     enabledLoadData();
                     $('#tableBillsToReceive_wrapper .dt-buttons button.dt-button').removeClass('dt-button');
                     $('[data-toggle="tooltip"]').tooltip();
+                    $('.table.dataTable thead tr th[aria-controls="tableBillsToReceive"]:eq(3), .dataTables_scrollFoot .table.dataTable tfoot tr th:eq(3)').text(typeRentals === 'paid' ? 'Pagamento' : 'Vencimento');
                     recalculateTotals();
                 },
                 "language": {
