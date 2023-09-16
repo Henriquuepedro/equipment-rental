@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 
 class Rental extends Model
@@ -60,6 +62,38 @@ class Rental extends Model
      */
     protected $casts = [];
 
+    /**
+     * Get the phone associated with the rental_payment.
+     */
+    public function rental_payment(): HasMany
+    {
+        return $this->hasMany(RentalPayment::class);
+    }
+
+    /**
+     * Get the phone associated with the rental_equipment.
+     */
+    public function rental_equipment(): HasMany
+    {
+        return $this->hasMany(RentalEquipment::class);
+    }
+
+    /**
+     * Get the phone associated with the client.
+     */
+    public function client(): HasOne
+    {
+        return $this->HasOne(Client::class, 'id', 'client_id');
+    }
+
+    /**
+     * Get the phone associated with the rental_residue.
+     */
+    public function rental_residue(): HasMany
+    {
+        return $this->HasMany(RentalResidue::class);
+    }
+
     public function insert(array $data)
     {
         return $this->create($data);
@@ -85,6 +119,18 @@ class Rental extends Model
         return 1;
     }
 
+    /**
+     * @deprecated Não está mais em uso.
+     *
+     * @param int $company_id
+     * @param array $filters
+     * @param int|null $init
+     * @param int|null $length
+     * @param string|null $search_rental
+     * @param array $order_by
+     * @param string|null $type_rental
+     * @return mixed
+     */
     public function getRentals(int $company_id, array $filters, int $init = null, int $length = null, string $search_rental = null, array $order_by = array(), string $type_rental = null)
     {
         $rental = $this ->select(
@@ -151,6 +197,15 @@ class Rental extends Model
         return $rental->get();
     }
 
+    /**
+     * @deprecated Não está mais em uso.
+     *
+     * @param int $company_id
+     * @param array $filters
+     * @param string|null $search_rental
+     * @param string|null $type_rental
+     * @return mixed
+     */
     public function getCountRentals(int $company_id, array $filters, string $search_rental = null, string $type_rental = null)
     {
         $rental = $this ->join('clients','clients.id','=','rentals.client_id')
@@ -397,5 +452,17 @@ class Rental extends Model
         }
 
         return $rental->get();
+    }
+
+    public function getRentalFull(int $company_id, int $rental_id)
+    {
+        return $this->where(['id' => $rental_id, 'company_id' => $company_id])
+            ->with([
+                'rental_payment',
+                'rental_equipment',
+                'client',
+                'rental_residue'
+            ])
+            ->first();
     }
 }

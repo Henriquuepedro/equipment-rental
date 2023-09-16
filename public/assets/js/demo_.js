@@ -205,26 +205,26 @@ const inArray = (needle, haystack) => {
 }
 
 // Formata data yyyy-mm-dd -> dd/mm/yyyy
-const transformDateForBr = date => {
+const transformDateForBr = (date, message_default = false) => {
     if (date == null) {
-        return false;
+        return message_default;
     }
 
     const length = date.length;
 
     if (length !== 10 && length !== 16 && length !== 19) {
-        return false;
+        return message_default;
     }
 
     if (length === 16 || length === 19) {
         if (!moment(date, FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS).isValid()) {
-            return false;
+            return message_default;
         }
         return moment(date, FORMAT_DATETIME_INTERNATIONAL_NO_SECONDS).format(FORMAT_DATETIME_BRAZIL_NO_SECONDS);
     }
 
     if (!moment(date, FORMAT_DATE_INTERNATIONAL).isValid()) {
-        return false;
+        return message_default;
     }
     return moment(date, FORMAT_DATE_INTERNATIONAL).format(FORMAT_DATE_BRAZIL);
 }
@@ -493,3 +493,40 @@ const loadCities = async (el, state, id = null, name_value_default = 'Selecione 
     });
 }
 
+const getDataRegister = async (type, id) => {
+
+    const base_uri = $('[name="base_url"]').val() + '/ajax';
+    let endpoint = '';
+
+    switch (type) {
+        case 'client':
+            endpoint = `${base_uri}/cliente/visualizar-cliente/${id}`;
+            break;
+        case 'driver':
+            endpoint = `${base_uri}/motorista/visualizar-motorista/${id}`;
+            break;
+        case 'vehicle':
+            endpoint = `${base_uri}/veiculo/visualizar-veiculo/${id}`;
+            break;
+        case 'residue':
+            endpoint = `${base_uri}/residuo/visualizar-residuo/${id}`;
+            break;
+        default:
+            return [];
+    }
+
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+        return [];
+    }
+
+    return await response.json();
+}
+
+const formatDate = (date, format_out, message_default = null) => {
+    if (date == null || date === '') {
+        return message_default;
+    }
+
+    return moment(date).format(format_out);
+}

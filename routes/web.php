@@ -213,6 +213,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class]], function (){
             Route::post('/delete', [App\Http\Controllers\DriverController::class, 'delete'])->name('delete');
             Route::post('/novo-motorista', [App\Http\Controllers\DriverController::class, 'insert'])->name('new-driver');
             Route::get('/visualizar-motoristas', [App\Http\Controllers\DriverController::class, 'getDrivers'])->name('get-drivers');
+            Route::get('/visualizar-motorista/{id?}', [App\Http\Controllers\DriverController::class, 'get'])->name('get');
         });
         Route::group(['prefix' => '/veiculo', 'as' => 'vehicle.'], function () {
             Route::post('/buscar', [App\Http\Controllers\VehicleController::class, 'fetchVehicles'])->name('fetch');
@@ -227,6 +228,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class]], function (){
             Route::post('/atualizar-residuo', [App\Http\Controllers\ResidueController::class, 'update'])->name('edit-residue');
             Route::post('/buscar', [App\Http\Controllers\ResidueController::class, 'fetchResidues'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\ResidueController::class, 'delete'])->name('delete');
+            Route::get('/visualizar-residuo/{id?}', [App\Http\Controllers\ResidueController::class, 'get'])->name('get-residue');
         });
         Route::group(['prefix' => '/locacao', 'as' => 'rental.'], function () {
             Route::post('/nova-locacao', [App\Http\Controllers\RentalController::class, 'insert'])->name('new-rental');
@@ -242,6 +244,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class]], function (){
 
             Route::get('/equipamentos/{rental_id}', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRental'])->name('get_equipments_rental');
             Route::get('/pagamentos/{rental_id}', [App\Http\Controllers\BillsToReceiveController::class, 'getPaymentsRental'])->name('get_payments_rental');
+            Route::get('/full/{rental_id?}', [App\Http\Controllers\RentalController::class, 'getFull'])->name('get_full');
         });
         Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');

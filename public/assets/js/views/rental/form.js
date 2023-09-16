@@ -1066,6 +1066,7 @@ const setEquipmentRental = (
                     </div>
                 </div>
             </div>`;
+            console.log(regEquipment);
             $(`${content_equipments}`).append(regEquipment);
             $(`.load-equipment[id-equipment="${idEquipment}"]`).hide(300);
             showSeparatorEquipmentSelected();
