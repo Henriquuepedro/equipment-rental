@@ -151,7 +151,7 @@ class BillsToPayController extends Controller
 
             $buttons = dropdownButtonsDataList($buttons, $value->bill_payment_id);
 
-            $due_date = date('d/m/Y', strtotime($value->due_date));
+            $due_date = dateInternationalToDateBrazil($type_bill == 'paid' ? $value->payday : $value->due_date, DATE_BRAZIL);
 
             $color_badge = 'success';
             if (in_array($type_bill, array('late', 'without_pay'))) {
