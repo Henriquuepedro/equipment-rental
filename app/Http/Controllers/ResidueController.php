@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\Residue;
+use Illuminate\Support\Facades\Auth;
 
 class ResidueController extends Controller
 {
@@ -213,5 +214,15 @@ class ResidueController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Resíduo excluído com sucesso!']);
+    }
+
+    public function get(int $id): JsonResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+        $residues = $this->residue->getResidue($company_id, $id);
+
+        return response()->json(count($residues) ? array_map(function($residue) {
+            return $residue['name'];
+        }, $residues->toArray()): array());
     }
 }

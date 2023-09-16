@@ -251,4 +251,21 @@ class DriverController extends Controller
 
         return response()->json(['data' => $driverData, 'lastId' => $lastId]);
     }
+
+    public function get(int $id): JsonResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+        $driver = $this->driver->getDriver($id, $company_id);
+
+        return response()->json($driver ? array(
+            "name"          => $driver->name,
+            "cpf"           => $driver->cpf,
+            "rg"            => $driver->rg,
+            "cnh"           => $driver->cnh,
+            "cnh_exp"       => $driver->cnh_exp,
+            "email"         => $driver->email,
+            "phone"         => $driver->phone,
+            "observation"   => $driver->observation,
+        ): array());
+    }
 }

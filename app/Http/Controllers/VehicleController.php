@@ -289,4 +289,11 @@ class VehicleController extends Controller
             'driver_name'   => $driver->name ?? null
         ));
     }
+
+    public function get(int $id): JsonResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+
+        return response()->json($this->vehicle->getVehicle($id, $company_id));
+    }
 }

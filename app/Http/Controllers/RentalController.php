@@ -175,7 +175,7 @@ class RentalController extends Controller
         $permissionDelete = hasPermission('RentalDeletePost');
 
         foreach ($data['data'] as $value) {
-            $buttons = '';
+            $buttons = "<button class='dropdown-item btnViewRental' data-rental-id='$value->id'><i class='fas fa-eye'></i> Visualizar Locação</button>";
 
             if ($permissionUpdate && in_array($type_rental, array('deliver', 'withdraw'))) {
                 $btn_class = $btn_text = '';
@@ -188,7 +188,7 @@ class RentalController extends Controller
                     $btn_text = 'Retirada'; // ou coleta?
                 }
 
-                $buttons .= "<button class='dropdown-item $btn_class' data-rental-id='{$value->id}'><i class='fas fa-check'></i> Confirmar $btn_text</button>";
+                $buttons .= "<button class='dropdown-item $btn_class' data-rental-id='$value->id'><i class='fas fa-check'></i> Confirmar $btn_text</button>";
 
                 $exist_equipment_exchanged = false;
                 foreach ($this->rental_equipment->getEquipments($company_id, $value->id) as $equipment) {
@@ -206,7 +206,7 @@ class RentalController extends Controller
                 }
             }
 
-            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='{$value->id}'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='$value->id'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
             $buttons .= "<a href='".route('print.rental', ['rental' => $value->id])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
 
             $buttons = dropdownButtonsDataList($buttons, $value->id);
@@ -959,5 +959,12 @@ class RentalController extends Controller
         DB::rollBack();
 
         return response()->json(['success' => false, 'message' => 'Não foi possível gravar a locação, recarregue a página e tente novamente.']);
+    }
+
+    public function getFull(int $rental_id): JsonResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+
+        return response()->json($this->rental->getRentalFull($company_id, $rental_id));
     }
 }

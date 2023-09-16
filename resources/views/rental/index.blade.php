@@ -10,6 +10,7 @@
     <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+    <link rel="stylesheet" href="//unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" type="text/css">
     <style>
         #tableRentals .badge.badge-lg {
             padding: 0.2rem 0.3rem;
@@ -48,12 +49,27 @@
         .equipmentsRentalTable tr.selected {
             background-color: rgba(27,255,0,.1);
         }
+        .equipments .card .card-header a:not([disabled="disabled"]){
+            background: #2196f3 !important;
+        }
+        div[id^="headingEquipmentToExchange-"] a[disabled="disabled"] {
+            background: #fb9678 !important;
+        }
+        div[id^="headingEquipmentToExchange-"][disabled="disabled"] {
+            cursor: not-allowed;
+        }
+        .equipments .card .card-header a:last-child {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            overflow: unset;
+        }
     </style>
 @stop
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
     <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
+    <script src="//unpkg.com/leaflet-gesture-handling"></script>
     <script>
         let tableRental;
 
@@ -62,6 +78,18 @@
             loadDaterangePickerInput($('input[name="intervalDates"]'), function () {});
 
             setTabRental();
+            $('#viewRental [name="state"]').select2();
+            $('#viewRental [name="city"]').select2();
+            $('#viewRental [name="residues[]"]').select2();
+            $('[name="type_rental"]').iCheck({
+                checkboxClass: 'icheckbox_square',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+            elementForm = $('#viewRental');
+            draggableMap = false;
+            gestureHandlingMap = true;
+            getLocationRental(true);
         });
 
         const setTabRental = () => {
@@ -556,6 +584,7 @@
 
     @include('includes.driver.modal-script')
     @include('includes.vehicle.modal-script')
+    @include('includes.rental.modal-script')
 @stop
 
 @section('content')
@@ -725,4 +754,5 @@
             </div>
         </div>
     </div>
+    @include('includes.rental.modal-view')
 @stop
