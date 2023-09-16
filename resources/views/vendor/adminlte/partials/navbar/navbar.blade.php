@@ -135,16 +135,11 @@
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                     <div class="dropdown-header text-center">
                         <img class="img-md rounded-circle" src="{{ $settings['img_profile'] }}" alt="Profile image">
-                        <p class="mb-1 mt-2 font-weight-semibold">Minha Conta: {{ $settings['company_id'] }}</p>
-                        <p class="mb-1 mt-2 font-weight-semibold text-uppercase">{{ $settings['name_company'] }}</p>
-                        <hr class="bg-white m-0">
-                        <p class="mb-1 mt-2 font-weight-semibold">{{ $settings['name_plan'] }}</p>
-                        <p class="mb-1 mt-2 font-weight-semibold">Plano expira em: {{ $settings['plan_expiration_date'] }}</p>
-                        <hr class="bg-white m-0">
+                        <p class="mb-1 mt-2 font-weight-semibold">Código Cliente: {{ $settings['company_id'] }}</p>
                         <p class="mb-1 mt-2 font-weight-semibold">{{ auth()->user()->__get('name') }}</p>
                         <p class="font-weight-light text-muted mb-0">{{ auth()->user()->__get('email') }}</p>
                     </div>
-                    <a class="dropdown-item d-flex justify-content-between" href="{{ route('profile.index') }}"><span><i class="dropdown-item-icon mdi mdi-account-outline text-primary"></i> Meu Perfil </span><span class="badge badge-pill badge-danger">3</span></a>
+                    <a class="dropdown-item d-flex justify-content-between" href="{{ route('profile.index') }}"><span><i class="dropdown-item-icon mdi mdi-account-outline text-primary"></i> Meu Perfil</a>
 {{--                    <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary"></i> Messages</a>--}}
 {{--                    <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i> Activity</a>--}}
                     @if ($settings['type_user'] == 2 || $settings['type_user'] == 1)<a class="dropdown-item" href="{{ route('config.index') }}"><i class="dropdown-item-icon mdi mdi-cogs text-primary"></i> Configuração</a>@endif
