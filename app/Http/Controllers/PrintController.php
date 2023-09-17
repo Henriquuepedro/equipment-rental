@@ -17,7 +17,9 @@ use App\Models\RentalEquipment;
 use App\Models\RentalPayment;
 use App\Models\Vehicle;
 use Barryvdh\DomPDF\PDF;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -247,7 +249,7 @@ class PrintController extends Controller
         return $pdf->stream();
     }
 
-    public function reportBill(Request $request)
+    public function reportBill(Request $request): Response|RedirectResponse
     {
         $company_id             = hasAdminMaster() ? $request->input('company') : $request->user()->company_id;
         $type_report            = $request->input('type_report');
@@ -257,6 +259,8 @@ class PrintController extends Controller
         $form_payment           = $request->input('form_payment');
         $date_filter            = $request->input('date_filter');
         $bill_status            = $request->input('bill_status');
+        $order_by_field         = $request->input('order_by_field');
+        $order_by_direction     = $request->input('order_by_direction');
         $interval_dates         = explode(' - ', $request->input('intervalDates'));
         $data_filter_view_pdf   = array();
 
@@ -281,6 +285,28 @@ class PrintController extends Controller
                 break;
             default:
                 $date_filter_str = '';
+        }
+
+        // Valida se foi enviado 'desc' ou 'asc' pelo usuário.
+        if (!in_array($order_by_direction, array('desc', 'asc'))) {
+            return redirect()->route('report.bill')
+                ->with('warning', "Ordenação do relatório incorreta.");
+        }
+
+        // Recupera o campo correspondente para ordenar.
+        switch ($order_by_field) {
+            case 'rental_bill_to_pay':
+                $order_by_field = $bill_type === 'receive' ? 'rentals.id' : 'bill_to_pays.id';
+                break;
+            case 'client_provider':
+                $order_by_field = $bill_type === 'receive' ? 'clients.name' : 'providers.name';
+                break;
+            case 'due_date':
+                $order_by_field = $bill_type === 'receive' ? 'rental_payments.due_date' : 'bill_to_pay_payments.due_date';
+                break;
+            default:
+                return redirect()->route('report.bill')
+                    ->with('warning', "Ordenação do relatório incorreta.");
         }
 
         $data_filter_view_pdf["Data de $date_filter_str"] = "de $interval_dates[0] até $interval_dates[1]";
@@ -311,9 +337,9 @@ class PrintController extends Controller
         }
 
         if ($bill_type === 'pay' && !empty($provider)) {
-            $privder_data = $this->provider->getProvider($provider, $company_id);
+            $provider_data = $this->provider->getProvider($provider, $company_id);
             $filters['bill_to_pays.provider_id'] = ['=', $provider];
-            $data_filter_view_pdf['Fornecedor'] = $privder_data->name;
+            $data_filter_view_pdf['Fornecedor'] = $provider_data->name;
         }
 
         if ($bill_status === 'paid' && !empty($form_payment)) {
@@ -325,9 +351,9 @@ class PrintController extends Controller
         }
 
         if ($bill_type === 'receive') {
-            $bills = $this->rental_payment->getBillsToReportWithFilters($company_id, $filters, $type_report === 'synthetic');
+            $bills = $this->rental_payment->getBillsToReportWithFilters($company_id, $filters, $type_report === 'synthetic', array($order_by_field, $order_by_direction));
         } else {
-            $bills = $this->bill_to_pay_payment->getBillsToReportWithFilters($company_id, $filters, $type_report === 'synthetic');
+            $bills = $this->bill_to_pay_payment->getBillsToReportWithFilters($company_id, $filters, $type_report === 'synthetic', array($order_by_field, $order_by_direction));
         }
 
         if (!$bills) {

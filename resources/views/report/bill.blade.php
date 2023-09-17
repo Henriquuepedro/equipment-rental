@@ -7,6 +7,16 @@
 @stop
 
 @section('css')
+    <style>
+        [aria-labelledby="select2-order_by_field-container"] {
+            border-bottom-right-radius: 0 !important;
+            border-top-right-radius: 0 !important;
+        }
+        [aria-labelledby="select2-order_by_direction-container"] {
+            border-bottom-left-radius: 0 !important;
+            border-top-left-radius: 0 !important;
+        }
+    </style>
 @stop
 
 @section('js')
@@ -25,10 +35,16 @@
         if (type === 'receive') {
             $('[name="client"]').closest('.form-group').show().find('select').val('0').select2();
             $('[name="provider"]').closest('.form-group').hide();
+            $('#order_by_field option[value="client_provider"]').text('Cliente');
+            $('#order_by_field option[value="rental_bill_to_pay"]').text('Locação');
         } else if (type === 'pay') {
             $('[name="client"]').closest('.form-group').hide();
             $('[name="provider"]').closest('.form-group').show().find('select').val('0').select2();
+            $('#order_by_field option[value="client_provider"]').text('Fornecedor');
+            $('#order_by_field option[value="rental_bill_to_pay"]').text('Conta a Pagar');
         }
+
+        $('#order_by_field').find('option[value="client_provider"], option[value="rental_bill_to_pay"]').closest('select').select2('destroy').select2();
     });
 
     $('#date_filter').on('change', function() {
@@ -129,6 +145,18 @@
                                     <div class="form-group col-md-3 display-none">
                                         <label for="form_payment">Forma de Pagamento</label>
                                         <select class="form-control select2" id="form_payment" name="form_payment" required></select>
+                                    </div>
+                                    <div class="form-group col-md-4 d-flex mt-4">
+                                        <label class="label-date-btns" for="order_by_field">Ordenar por</label>
+                                        <select class="form-control select2 col-md-7" id="order_by_field" name="order_by_field">
+                                            <option value="rental_bill_to_pay">Locação</option>
+                                            <option value="client_provider">Cliente</option>
+                                            <option value="due_date">Data de vencimento</option>
+                                        </select>
+                                        <select class="form-control select2 col-md-5" id="order_by_direction" name="order_by_direction">
+                                            <option value="desc">Decrescente</option>
+                                            <option value="asc">Crescente</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

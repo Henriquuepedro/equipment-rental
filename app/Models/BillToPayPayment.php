@@ -48,7 +48,7 @@ class BillToPayPayment extends Model
     }
 
 
-    public function getBillsToReportWithFilters(int $company_id, array $filters, bool $synthetic = true)
+    public function getBillsToReportWithFilters(int $company_id, array $filters, bool $synthetic = true, array $order_by = array())
     {
         $rental = $this ->select(
             'bill_to_pays.id',
@@ -93,7 +93,11 @@ class BillToPayPayment extends Model
         }
 
         // Ordena os registros.
-        $rental->orderBy('bill_to_pays.code', 'DESC');
+        if (!empty($order_by)) {
+            $rental->orderBy($order_by[0], $order_by[1]);
+        } else {
+            $rental->orderBy('bill_to_pays.code', 'DESC');
+        }
 
         // Agrupa os registros por locação.
         if ($synthetic) {
