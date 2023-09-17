@@ -203,7 +203,7 @@ class RentalPayment extends Model
         return $rental->get();
     }
 
-    public function getBillsToReportWithFilters(int $company_id, array $filters, bool $synthetic = true)
+    public function getBillsToReportWithFilters(int $company_id, array $filters, bool $synthetic = true, array $order_by = array())
     {
         $rental = $this ->select(
             'rentals.id',
@@ -248,7 +248,11 @@ class RentalPayment extends Model
         }
 
         // Ordena os registros.
-        $rental->orderBy('rentals.code', 'DESC');
+        if (!empty($order_by)) {
+            $rental->orderBy($order_by[0], $order_by[1]);
+        } else {
+            $rental->orderBy('rentals.code', 'DESC');
+        }
 
         // Agrupa os registros por locação.
         if ($synthetic) {

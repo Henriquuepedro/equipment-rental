@@ -2,34 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
 use App\Models\Company;
 use App\Models\Driver;
 use App\Models\Equipment;
 use App\Models\Vehicle;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReportController extends Controller
 {
-    private $client;
-    private $vehicle;
-    private $driver;
-    private $equipment;
-    private $company;
+    private Vehicle $vehicle;
+    private Driver $driver;
+    private Equipment $equipment;
+    private Company $company;
     public function __construct()
     {
-        $this->client    = new Client;
-        $this->driver    = new Driver;
-        $this->vehicle   = new Vehicle;
-        $this->equipment = new Equipment;
-        $this->company   = new Company;
+        $this->driver    = new Driver();
+        $this->vehicle   = new Vehicle();
+        $this->equipment = new Equipment();
+        $this->company   = new Company();
     }
 
-    public function rental()
+    public function rental(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('ReportView')) {
             return redirect()->route('dashboard')
@@ -50,7 +47,7 @@ class ReportController extends Controller
         return view('report.rental', compact('drivers', 'vehicles', 'equipments', 'companies'));
     }
 
-    public function bill()
+    public function bill(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('ReportView')) {
             return redirect()->route('dashboard')
@@ -65,7 +62,7 @@ class ReportController extends Controller
         return view('report.bill', compact('companies'));
     }
 
-    public function register()
+    public function register(): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('ReportView')) {
             return redirect()->route('dashboard')
