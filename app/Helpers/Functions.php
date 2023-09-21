@@ -2,11 +2,13 @@
 
 use App\Models\Permission;
 use Illuminate\Support\Facades\File;
+use Illuminate\Http\UploadedFile;
 
 const DATETIME_INTERNATIONAL = 'Y-m-d H:i:s';
 const DATE_INTERNATIONAL = 'Y-m-d';
 const DATETIME_BRAZIL = 'd/m/Y H:i:s';
 const DATETIME_BRAZIL_NO_SECONDS = 'd/m/Y H:i';
+const DATETIME_INTERNATIONAL_NO_SECONDS = 'd/m/Y H:i';
 const DATE_BRAZIL = 'd/m/Y';
 const DATETIME_INTERNATIONAL_TIMEZONE = 'Y-m-d H:i:sP';
 const TIMEZONE_DEFAULT = 'America/Fortaleza';
@@ -338,5 +340,137 @@ if (!function_exists('dropdownButtonsDataList')) {
             </button>
             <div class='dropdown-menu' aria-labelledby='dropActionsRental-$index'>$data_buttons</div</div>
         </div>";
+    }
+}
+
+if (!function_exists('uploadFile')) {
+    /**
+     * @param   string                                  $upload_path
+     * @param array|UploadedFile|UploadedFile[]|null    $file
+     * @param   string|null                             $name_file
+     * @param   array                                   $ext_accept
+     * @param   int|null                                $max_size
+     * @return  bool|string
+     * @throws  Exception
+     */
+    function uploadFile(string $upload_path, array|UploadedFile|null $file, ?string $name_file = null, array $ext_accept = [], ?int $max_size = null): bool|string
+    {
+        $extension      = $file->getClientOriginalExtension(); // Recupera extensão da imagem.
+        $nameOriginal   = $file->getClientOriginalName(); // Recupera nome da imagem.
+        $file_size      = $file->getSize() / 1000;
+
+        if (!empty($max_size) && $file_size > $max_size) {
+            throw new Exception("Tamanho superior ao permitido. Enviado {$file_size}KB, será aceito até {$max_size}KB.");
+        }
+
+        if (!empty($ext_accept)) {
+            $ext_accept = array_map(function($ext){ return strtolower($ext); }, $ext_accept);
+            if (!in_array(strtolower($extension), $ext_accept)) {
+                throw new Exception("Extensão $extension não aceita. São aceitas somente: " . implode(', ', $ext_accept));
+            }
+        }
+
+        if (!$name_file) {
+            $imageName = base64_encode($nameOriginal); // Gera um novo nome para a imagem.
+            $name_file = substr($imageName, 0, 15) . rand(0, 100) . ".$extension"; // Pega apenas o 15 primeiros e adiciona a extensão.
+        }
+
+        $uploaded = $file->move($upload_path, $name_file);
+
+        if (!$uploaded) {
+            throw new Exception("Não foi possível enviar o arquivo.");
+        }
+
+        return $name_file;
+    }
+}
+
+if (!function_exists('getFormPermission')) {
+    function getFormPermission($groupPermissions, $user_permission = null): string
+    {
+        $htmlPermissions = '';
+        $group_name = [];
+
+        foreach ($groupPermissions as $groupPermission) {
+            $group_name[$groupPermission->group_text][] = $groupPermission;
+        }
+
+        foreach ($group_name as $group => $permissions) {
+
+            $htmlPermissions .= '
+            <div class="col-md-4 grid-margin stretch-card permissions">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title text-uppercase">'.$group.'</h4>
+                    <div class="template-demo table-responsive">
+                      <table class="table mb-0">
+                        <tbody>';
+
+            $prefix_input = !is_null($user_permission) ? '' : 'newuser_';
+            $class_input = !is_null($user_permission) ? 'update-permission' : '';
+
+            foreach ($permissions as $permission) {
+                $checked = is_array($user_permission) && in_array($permission->id, $user_permission) ? 'checked' : '';
+
+                $htmlPermissions .= '
+                          <tr>
+                            <td class="pr-0 pl-0 pt-3 d-flex align-items-center">
+                              <div class="switch">
+                                <input type="checkbox" class="switch-input '.$class_input.'" name="permission[]" value="'.$permission->id.'" id="permission_'.$prefix_input.$permission->id.'" data-permission-id="'.$permission->id.'" data-auto-check="'.$permission->auto_check.'" '.$checked.'>
+                                <label for="permission_'.$prefix_input.$permission->id.'" class="switch-label"></label>
+                              </div>
+                              '.$permission->text.'
+                            </td>
+                          </tr>';
+            }
+
+            $htmlPermissions .= '
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>';
+        }
+
+        return $htmlPermissions;
+    }
+}
+
+if (!function_exists('sumDate')) {
+    function sumDate(string $date, int $year = null, int $month = null, int $day = null, int $hour = null, int $minute = null, int $second = null): string
+    {
+
+        $format = DATE_INTERNATIONAL;
+
+        if (strlen($date) === 16) {
+            $format = DATETIME_INTERNATIONAL_NO_SECONDS;
+        } elseif (strlen($date) === 19) {
+            $format = DATETIME_INTERNATIONAL;
+        }
+
+        $data = DateTime::createFromFormat($format, $date);
+
+        if (!is_null($year)) {
+            $data->add(new DateInterval("P{$year}Y"));
+        }
+        if (!is_null($month)) {
+            $data->add(new DateInterval("P{$month}M"));
+        }
+        if (!is_null($day)) {
+            $data->add(new DateInterval("P{$day}D"));
+        }
+        if (!is_null($hour)) {
+            $data->add(new DateInterval("PT{$hour}H"));
+        }
+        if (!is_null($minute)) {
+            $data->add(new DateInterval("PT{$minute}M"));
+        }
+        if (!is_null($second)) {
+            $data->add(new DateInterval("PT{$second}S"));
+        }
+
+        return $data->format($format);
+
     }
 }

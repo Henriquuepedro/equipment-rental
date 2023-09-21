@@ -5,6 +5,7 @@
     $controlActive = '';
     $reportActive = '';
     $dashboardActive = '';
+    $adminMaster = '';
 
     if ($route->getName() == 'dashboard') {
         $dashboardActive = 'active';
@@ -28,6 +29,10 @@
         likeText('report.%', $route->getName())
     ) {
         $reportActive = 'active';
+    } elseif (
+        likeText('master.%', $route->getName())
+    ) {
+        $adminMaster = 'active';
     }
 //    dd($route->getName(),strstr($route->getName(),'rental\.'), $reportActive);
 @endphp
@@ -36,6 +41,25 @@
     <!-- partial:partials/_sidebar.html -->
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
+        @can('admin-master')
+            <li class="nav-item {{ $adminMaster }} bg-primary">
+                <a class="nav-link" data-toggle="collapse" href="#report-dropdown" aria-expanded="false" aria-controls="report-dropdown">
+                    <i class="menu-icon typcn typcn-cog-outline"></i>
+                    <span class="menu-title">Administração</span>
+                    <i class="menu-arrow"></i>
+                </a>
+                <div class="collapse" id="report-dropdown">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('master.company.index') }}">Empresas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('master.user.index') }}">Usuários</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        @endif
         <li class="nav-item {{ $dashboardActive }}">
             <a class="nav-link" href="{{ route('dashboard') }}">
                 <i class="menu-icon typcn typcn-device-desktop"></i>

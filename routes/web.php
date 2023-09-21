@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Middleware\AdminMaster;
 use App\Http\Middleware\CheckPlan;
+use App\Http\Middleware\ControlUsers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,7 +24,7 @@ Auth::routes();
 //})->name('home')->middleware('auth');
 
 /** ROTAS AUTENTICADO */
-Route::group(['middleware' => ['auth', CheckPlan::class]], function (){
+Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], function (){
 
     Route::get('', [App\Http\Controllers\DashboardController::class, 'dashboard']);
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'dashboard'])->name('dashboard');
@@ -288,12 +290,48 @@ Route::group(['middleware' => ['auth', CheckPlan::class]], function (){
         Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
             Route::get('/fields/{option}', [App\Http\Controllers\ExportController::class, 'getFields'])->name('client_fields');
         });
+
+
+        // Admin Master
+        Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => [AdminMaster::class]], function () {
+
+            Route::group(['prefix' => '/empresas', 'as' => 'company.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\CompanyController::class, 'fetch'])->name('fetch');
+                Route::post('/adicionar-tempo-de-expiracao', [App\Http\Controllers\Master\CompanyController::class, 'addExpirationTime'])->name('add-expiration-time');
+            });
+
+            Route::group(['prefix' => '/usuarios', 'as' => 'user.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\UserController::class, 'fetch'])->name('fetch');
+            });
+
+        });
     });
 
     // Exportação
     Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
 
         Route::post('/cadastro', [App\Http\Controllers\ExportController::class, 'register'])->name('register');
+
+    });
+
+    // Admin Master
+    Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => [AdminMaster::class]], function () {
+
+        Route::group(['prefix' => '/empresas', 'as' => 'company.'], function () {
+            Route::get('/', [App\Http\Controllers\Master\CompanyController::class, 'index'])->name('index');
+            Route::get('/novo', [App\Http\Controllers\Master\CompanyController::class, 'create'])->name('create');
+            Route::post('/novo', [App\Http\Controllers\Master\CompanyController::class, 'insert'])->name('insert');
+            Route::get('/atualizar/{id}', [App\Http\Controllers\Master\CompanyController::class, 'edit'])->name('edit');
+            Route::post('/atualizar/{id}', [App\Http\Controllers\Master\CompanyController::class, 'update'])->name('update');
+        });
+
+        Route::group(['prefix' => '/usuarios', 'as' => 'user.'], function () {
+            Route::get('/', [App\Http\Controllers\Master\UserController::class, 'index'])->name('index');
+            Route::get('/novo', [App\Http\Controllers\Master\UserController::class, 'create'])->name('create');
+            Route::post('/novo', [App\Http\Controllers\Master\UserController::class, 'insert'])->name('insert');
+            Route::get('/atualizar/{id}', [App\Http\Controllers\Master\UserController::class, 'edit'])->name('edit');
+            Route::post('/atualizar/{id}', [App\Http\Controllers\Master\UserController::class, 'update'])->name('update');
+        });
 
     });
 });

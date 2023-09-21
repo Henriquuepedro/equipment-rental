@@ -28,7 +28,7 @@ class CreateUsersTable extends Migration
             $table->ipAddress('last_login_ip')->nullable();
             $table->dateTime('last_access_at')->nullable();
             $table->boolean('logout')->default(false);
-            $table->tinyInteger('type_user')->default(0);
+            $table->tinyInteger('type_user')->default(0)->comment('0=user|1=admin|2=master');
             $table->rememberToken();
             $table->timestamps();
 

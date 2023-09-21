@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->where(['id' => $user_id, 'company_id' => $company_id])->update($data);
     }
 
+    public function updateById($data, $user_id)
+    {
+        return $this->where('id', $user_id)->update($data);
+    }
+
     public function remove($user_id, $company_id)
     {
         return $this->where(['id' => $user_id, 'company_id' => $company_id])->delete();
@@ -71,6 +76,11 @@ class User extends Authenticatable
     public function getUser($user_id, $company_id)
     {
         return $this->where(['id' => $user_id, 'company_id' => $company_id])->first();
+    }
+
+    public function getUserById($user_id)
+    {
+        return $this->find($user_id);
     }
 
     public function getUsersCompany($company_id)

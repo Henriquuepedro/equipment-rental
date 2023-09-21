@@ -104,7 +104,7 @@
                                                     </div>
                                                     @if ($company->type_person == 'pj')
                                                     <div class="form-group col-md-6">
-                                                        <label for="fantasy">Telefone</label>
+                                                        <label for="fantasy">Fantasia</label>
                                                         <input type="text" class="form-control" name="fantasy" id="fantasy" value="{{ old('fantasy') ?? $company->fantasy }}">
                                                     </div>
                                                     @endif

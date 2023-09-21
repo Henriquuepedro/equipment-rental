@@ -1,9 +1,6 @@
 $(() => {
     $('[name="cep"]').mask('00.000-000');
-
-    if ($('#cpf_cnpj').val().length === 11) $('#cpf_cnpj').mask('000.000.000-00');
-    else $('#cpf_cnpj').mask('00.000.000/0000-00');
-
+    $('#cpf_cnpj').mask($('#cpf_cnpj').val().length === 11 ? '000.000.000-00' : '00.000.000/0000-00');
     $('[name="phone_1"],[name="phone_2"],[name="phone_modal"]').mask('(00) 000000000');
 
     setTimeout(() => {
@@ -94,7 +91,7 @@ $("#formUpdateCompany").validate({
             rangelength: "O campo telefone primário deve ser um telefone válido."
         },
         phone_2: {
-            rangelength: "O campo telefone secndário deve ser um telefone válido."
+            rangelength: "O campo telefone secundário deve ser um telefone válido."
         },
         email: {
             required: "Informe um e-mail comercial válido.",
@@ -457,22 +454,22 @@ $(document).on('click', '.inactivate-user', function (){
 });
 
 $(document).on('click', '#viewPermission .modal-body input[type="checkbox"], #newUserModal .modal-body input[type="checkbox"]', function(){
-    const permission_id = parseInt($(this).attr('permission-id'));
-    const auto_check    = JSON.parse($(this).attr('auto-check'));
+    const permission_id = parseInt($(this).data('permission-id'));
+    const auto_check    = $(this).data('auto-check');
     const parentEl      = $(this).hasClass('update-permission') ? '#viewPermission' : '#newUserModal';
     let input_auto_check;
 
     $(`${parentEl} input[type="checkbox"]:checked`).each(function(){
-        input_auto_check = JSON.parse($(this).attr('auto-check'));
+        input_auto_check = $(this).data('auto-check');
         if (input_auto_check.includes(permission_id)) {
-            $(`${parentEl} input[type="checkbox"][permission-id="${permission_id}"]`).prop('checked', true);
+            $(`${parentEl} input[type="checkbox"][data-permission-id="${permission_id}"]`).prop('checked', true);
             return false;
         }
     });
 
     if (auto_check.length) {
         auto_check.forEach(id => {
-            $(`${parentEl} input[type="checkbox"][permission-id="${id}"]`).prop('checked', true);
+            $(`${parentEl} input[type="checkbox"][data-permission-id="${id}"]`).prop('checked', true);
         })
     }
 });
@@ -630,13 +627,28 @@ const loadUsers = (openPermissions = false, user_id = false) => {
         url: $('#routeGetUsers').val(),
         dataType: 'json',
         success: response => {
+            $('#users-registred').empty();
 
             if (response.length === 0) {
                 $('#users-registred').empty().append('<h4 class="text-center">Não foram encontrados nenhum usuário</h4>');
                 return false;
             }
 
-            let colorBtnStatus,nameBtnStatus,userMaster,statusUser,identificationUser,viewPermission,viewChangeTypeUser,viewBtnDeleteUser,htmlUser,viewInativeUser,viewBtnConfig,userSession,viewUpdateUser,viewChangeTypeAdm;
+            let colorBtnStatus,
+                nameBtnStatus,
+                userMaster,
+                statusUser,
+                identificationUser,
+                viewPermission,
+                viewChangeTypeUser,
+                viewBtnDeleteUser,
+                htmlUser,
+                viewInativeUser,
+                viewBtnConfig,
+                userSession,
+                viewUpdateUser,
+                viewChangeTypeAdm;
+
             $.each(response, function( index, value ) {
 
                 userMaster          = value.type_user === 2;
@@ -689,19 +701,25 @@ const loadUsers = (openPermissions = false, user_id = false) => {
                                                         <i class="fa fa-cog"></i>
                                                     </button>
                                                     <div class="dropdown-menu" aria-labelledby="dropdownConfigUser">`;
-                if (viewPermission)
-                    htmlUser += `<button type="button" class="btn btn-sm btn-primary col-md-12 mb-1 viewPermission text-left" user-id="${ value.id }"><i class="fa fa-user-cog"></i> Permissões</button>`;
-                if (viewUpdateUser)
-                    htmlUser += `<button type="button" class="btn btn-sm btn-dark col-md-12 mb-1 updateUser text-left" user-id="${ value.id }"><i class="fa fa-user-edit"></i> Cadastro</button>`;
-                if (viewChangeTypeUser)
-                    htmlUser += `<button type="button" class="btn btn-sm btn-info col-md-12 mb-1 changeTypeUser text-left" user-id="${ value.id }" type-user="${ value.type_user }" user-name="${ value.name }"><i class="fa fa-user-shield"></i> Tornar Admin</button>`;
-                if (viewChangeTypeAdm)
-                    htmlUser += `<button type="button" class="btn btn-sm btn-info col-md-12 mb-1 changeTypeUser text-left" user-id="${ value.id }" type-user="${ value.type_user }" user-name="${ value.name }"><i class="fa fa-user-shield"></i> Tornar Usuário</button>`;
-                if (viewInativeUser)
-                    htmlUser += `<button type="button" class="btn btn-sm btn-${ colorBtnStatus } col-md-12 inactivate-user text-left" user-id="${ value.id }" user-name="${ value.name }">${nameBtnStatus}</button>`;
-                if (viewBtnDeleteUser && viewInativeUser)
+                if (viewPermission) {
+                    htmlUser += `<button type="button" class="btn btn-sm btn-primary col-md-12 mb-1 viewPermission text-left" user-id="${value.id}"><i class="fa fa-user-cog"></i> Permissões</button>`;
+                }
+                if (viewUpdateUser) {
+                    htmlUser += `<button type="button" class="btn btn-sm btn-dark col-md-12 mb-1 updateUser text-left" user-id="${value.id}"><i class="fa fa-user-edit"></i> Cadastro</button>`;
+                }
+                if (viewChangeTypeUser) {
+                    htmlUser += `<button type="button" class="btn btn-sm btn-info col-md-12 mb-1 changeTypeUser text-left" user-id="${value.id}" type-user="${value.type_user}" user-name="${value.name}"><i class="fa fa-user-shield"></i> Tornar Admin</button>`;
+                }
+                if (viewChangeTypeAdm) {
+                    htmlUser += `<button type="button" class="btn btn-sm btn-info col-md-12 mb-1 changeTypeUser text-left" user-id="${value.id}" type-user="${value.type_user}" user-name="${value.name}"><i class="fa fa-user-shield"></i> Tornar Usuário</button>`;
+                }
+                if (viewInativeUser) {
+                    htmlUser += `<button type="button" class="btn btn-sm btn-${colorBtnStatus} col-md-12 inactivate-user text-left" user-id="${value.id}" user-name="${value.name}">${nameBtnStatus}</button>`;
+                }
+                if (viewBtnDeleteUser && viewInativeUser) {
                     htmlUser += `<div class="dropdown-divider"></div>
-                                                        <button type="button" class="btn btn-sm btn-danger col-md-12 removeUser text-left" user-id="${ value.id }" user-name="${ value.name }"><i class="fa fa-user-times"></i> Excluir</button>`;
+                                    <button type="button" class="btn btn-sm btn-danger col-md-12 removeUser text-left" user-id="${value.id}" user-name="${value.name}"><i class="fa fa-user-times"></i> Excluir</button>`;
+                }
                 htmlUser += `</div>
                                                 </div>
                                             </div>
@@ -710,7 +728,7 @@ const loadUsers = (openPermissions = false, user_id = false) => {
                                 </div>
                             </div>
                         </div>`;
-                $('#users-registred').empty().append(htmlUser);
+                $('#users-registred').append(htmlUser);
             });
 
             if (openPermissions) {

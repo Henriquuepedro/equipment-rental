@@ -76,7 +76,7 @@ class ResidueController extends Controller
         $permissionDelete = hasPermission('ResidueDeletePost');
 
         foreach ($data['data'] as $value) {
-            $buttons = $permissionUpdate ? "<button class='btn btn-primary btn-sm btn-rounded btn-action editResidueModal' data-toggle='tooltip' title='Editar' residue-id='$value->id'><i class='fas fa-edit'></i></button>" : '';
+            $buttons = $permissionUpdate ? "<button class='btn btn-primary btn-sm btn-rounded btn-action editResidueModal' data-toggle='tooltip' title='Atualizar' residue-id='$value->id'><i class='fas fa-edit'></i></button>" : '';
             $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveResidue btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' residue-id='$value->id'><i class='fas fa-times'></i></button>" : '';
 
             $result[] = array(
