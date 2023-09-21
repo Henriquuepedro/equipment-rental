@@ -57,6 +57,15 @@ class Company extends Model
         return $this->find($id);
     }
 
+    public function getAllCompanies()
+    {
+        if (hasAdminMaster()) {
+            return $this->select('id', 'name', 'fantasy')->get();
+        }
+
+        return array();
+    }
+
     public function getAllCompaniesActive()
     {
         if (hasAdminMaster()) {
@@ -69,6 +78,11 @@ class Company extends Model
     public function edit($data, $id)
     {
         return $this->where('id', $id)->update($data);
+    }
+
+    public function insert(array $data)
+    {
+        return $this->create($data);
     }
 
     public function getPlanCompany(int $id)

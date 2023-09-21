@@ -40,42 +40,7 @@ class CompanyController extends Controller
         $company = $this->company->getCompany($company_id);
         $company->logo = asset($company->logo ? "assets/images/company/{$company_id}/{$company->logo}" : "assets/images/company/company.png");
 
-        $groupPermissions = $this->permission->getGroupPermissions();
-
-        $htmlPermissions = '';
-        foreach ($groupPermissions as $group) {
-            $permissions = $this->permission->getPermissionByGroup($group->group_name);
-
-            $htmlPermissions .= '
-            <div class="col-md-4 grid-margin stretch-card permissions">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title text-uppercase">'.$group->group_text.'</h4>
-                    <div class="template-demo table-responsive">
-                      <table class="table mb-0">
-                        <tbody>';
-
-            foreach ($permissions as $permission) {
-                $htmlPermissions .= '
-                          <tr>
-                            <td class="pr-0 pl-0 pt-3 d-flex align-items-center">
-                              <div class="switch">
-                                <input type="checkbox" class="switch-input" name="newuser_'.$permission->name.'" id="newuser_'.$permission->name.'" permission-id="'.$permission->id.'" auto-check="'.$permission->auto_check.'">
-                                <label for="newuser_'.$permission->name.'" class="switch-label"></label>
-                              </div>
-                              '.$permission->text.'
-                            </td>
-                          </tr>';
-            }
-
-            $htmlPermissions .= '
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>';
-        }
+        $htmlPermissions     = getFormPermission($this->permission->getAllPermissions());
 
         $dataConfigCompany   = $this->config->getConfigColumnAndValue($company_id);
         $configCompanyColumn = $dataConfigCompany['column'];

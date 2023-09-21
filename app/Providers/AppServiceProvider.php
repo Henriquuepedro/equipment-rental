@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Permission;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Contracts\View\View;
@@ -34,11 +35,9 @@ class AppServiceProvider extends ServiceProvider
         // Definir um array chamado settings contendo suas
         // respectivas possições para variaveis
         view()->composer('*',function( View $view ) {
-
             $settings = array('style_template' => 1);
 
             if (auth()->user()) {
-
                 $company = new Company();
                 $dataCompany = $company->getCompany(auth()->user()->__get('company_id'));
 
@@ -57,17 +56,17 @@ class AppServiceProvider extends ServiceProvider
                 ];
 
                 // permissões
-                $arrNamesPermissions = [];
                 if (auth()->user()->__get('type_user') == 1 || auth()->user()->__get('type_user') == 2) { // administrador permissão total
-                    foreach (Permission::query()->get() as $permission) {
-                        $arrNamesPermissions[] = $permission->name;
-                    }
+                    $permissions = Permission::query()->select('name')->get()->toArray();
                 } else { // permissão por usuário
-                    $permissions = empty(auth()->user()->__get('permission')) ? [] : json_decode(auth()->user()->__get('permission'));
-                    foreach ($permissions as $permission) {
-                        $arrNamesPermissions[] = Permission::query()->where('id', $permission)->first()->name;
-                    }
+                    $permissions = empty(auth()->user()->__get('permission')) ? [] : json_decode(auth()->user()->__get('permission'), true);
+                    $permissions = Permission::query()->select('name')->whereIn('id', $permissions)->get()->toArray();
                 }
+
+                $arrNamesPermissions = array_map(function ($permission) {
+                    return $permission['name'];
+                }, $permissions);
+
                 $view->with('permissions', $arrNamesPermissions);
             }
 

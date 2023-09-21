@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('companies', function (Blueprint $table) {
-            $table->dateTime('plan_expiration_date')->after('status')->default(date('Y-m-d H:i:s', strtotime('+1 month', time())));
+            $table->dateTime('plan_expiration_date')->after('status');
         });
     }
 

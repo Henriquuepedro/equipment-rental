@@ -530,3 +530,42 @@ const formatDate = (date, format_out, message_default = null) => {
 
     return moment(date).format(format_out);
 }
+
+const loadSearchZipcode = (selector, contentElement) => {
+    $(document).on('blur', selector, function (){
+        const cep = $(this).val().replace(/\D/g, '');
+
+        if (cep.length === 0) {
+            return false;
+        }
+        if (cep.length !== 8) {
+            Toast.fire({
+                icon: 'error',
+                title: 'CEP não encontrado'
+            });
+            return false;
+        }
+        $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function(dados) {
+            if (!("erro" in dados)) {
+                if(dados.logradouro !== '') {
+                    contentElement.find('[name="address"]').val(dados.logradouro).parent().addClass("label-animate");
+                }
+                if(dados.bairro !== '') {
+                    contentElement.find('[name="neigh"]').val(dados.bairro).parent().addClass("label-animate");
+                }
+                if(dados.localidade !== '') {
+                    contentElement.find('[name="city"]').val(dados.localidade).parent().addClass("label-animate");
+                }
+                if(dados.uf !== '') {
+                    contentElement.find('[name="state"]').val(dados.uf).parent().addClass("label-animate");
+                }
+            }
+            else {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'CEP não encontrado'
+                })
+            }
+        });
+    })
+}

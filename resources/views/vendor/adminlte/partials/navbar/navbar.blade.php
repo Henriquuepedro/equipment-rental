@@ -139,7 +139,7 @@
                         <p class="mb-1 mt-2 font-weight-semibold">{{ auth()->user()->__get('name') }}</p>
                         <p class="font-weight-light text-muted mb-0">{{ auth()->user()->__get('email') }}</p>
                     </div>
-                    <a class="dropdown-item d-flex justify-content-between" href="{{ route('profile.index') }}"><span><i class="dropdown-item-icon mdi mdi-account-outline text-primary"></i> Meu Perfil</a>
+                    <a class="dropdown-item d-flex justify-content-between" href="{{ route('profile.index') }}"><span><i class="dropdown-item-icon mdi mdi-account-outline text-primary"></i> Meu Perfil</span></a>
 {{--                    <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary"></i> Messages</a>--}}
 {{--                    <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i> Activity</a>--}}
                     @if ($settings['type_user'] == 2 || $settings['type_user'] == 1)<a class="dropdown-item" href="{{ route('config.index') }}"><i class="dropdown-item-icon mdi mdi-cogs text-primary"></i> Configuração</a>@endif
