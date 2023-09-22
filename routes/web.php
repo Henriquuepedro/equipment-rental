@@ -304,6 +304,10 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
                 Route::post('/buscar', [App\Http\Controllers\Master\UserController::class, 'fetch'])->name('fetch');
             });
 
+            Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\PlanController::class, 'fetch'])->name('fetch');
+            });
+
         });
     });
 
@@ -331,6 +335,12 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::post('/novo', [App\Http\Controllers\Master\UserController::class, 'insert'])->name('insert');
             Route::get('/atualizar/{id}', [App\Http\Controllers\Master\UserController::class, 'edit'])->name('edit');
             Route::post('/atualizar/{id}', [App\Http\Controllers\Master\UserController::class, 'update'])->name('update');
+        });
+
+        Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
+            Route::get('/', [App\Http\Controllers\Master\PlanController::class, 'index'])->name('index');
+            Route::get('/atualizar/{id}', [App\Http\Controllers\Master\PlanController::class, 'edit'])->name('edit');
+            Route::post('/atualizar/{id}', [App\Http\Controllers\Master\PlanController::class, 'update'])->name('update');
         });
 
     });
