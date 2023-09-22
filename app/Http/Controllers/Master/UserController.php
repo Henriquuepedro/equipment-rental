@@ -89,14 +89,7 @@ class UserController extends Controller
             );
 
         } catch (Exception $exception) {
-            return response()->json(array(
-                    "draw"              => $draw,
-                    "recordsTotal"      => 0,
-                    "recordsFiltered"   => 0,
-                    "data"              => $result,
-                    "message"           => $exception->getMessage()
-                )
-            );
+            return response()->json(getErrorDataTables($exception->getMessage(), $draw));
         }
 
         foreach ($data['data'] as $value) {

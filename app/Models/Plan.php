@@ -35,4 +35,14 @@ class Plan extends Model
      * @var array
      */
     protected $casts = [];
+
+    public function getById(int $id)
+    {
+        return $this->find($id);
+    }
+
+    public function updateById(array $data, int $id)
+    {
+        return $this->where('id', $id)->update($data);
+    }
 }

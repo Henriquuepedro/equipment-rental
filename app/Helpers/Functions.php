@@ -437,40 +437,16 @@ if (!function_exists('getFormPermission')) {
     }
 }
 
-if (!function_exists('sumDate')) {
-    function sumDate(string $date, int $year = null, int $month = null, int $day = null, int $hour = null, int $minute = null, int $second = null): string
+if (!function_exists('getErrorDataTables')) {
+    function getErrorDataTables(string $message, ?int $draw, $result = []): array
     {
-
-        $format = DATE_INTERNATIONAL;
-
-        if (strlen($date) === 16) {
-            $format = DATETIME_INTERNATIONAL_NO_SECONDS;
-        } elseif (strlen($date) === 19) {
-            $format = DATETIME_INTERNATIONAL;
-        }
-
-        $data = DateTime::createFromFormat($format, $date);
-
-        if (!is_null($year)) {
-            $data->add(new DateInterval("P{$year}Y"));
-        }
-        if (!is_null($month)) {
-            $data->add(new DateInterval("P{$month}M"));
-        }
-        if (!is_null($day)) {
-            $data->add(new DateInterval("P{$day}D"));
-        }
-        if (!is_null($hour)) {
-            $data->add(new DateInterval("PT{$hour}H"));
-        }
-        if (!is_null($minute)) {
-            $data->add(new DateInterval("PT{$minute}M"));
-        }
-        if (!is_null($second)) {
-            $data->add(new DateInterval("PT{$second}S"));
-        }
-
-        return $data->format($format);
-
+        return array(
+            "draw"              => $draw,
+            "recordsTotal"      => 0,
+            "recordsFiltered"   => 0,
+            "data"              => $result,
+            "message"           => $message
+        );
     }
 }
+
