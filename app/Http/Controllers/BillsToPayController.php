@@ -140,6 +140,8 @@ class BillsToPayController extends Controller
 
             if ($permissionUpdate && in_array($type_bill, array('late', 'without_pay'))) {
                 $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
+            } elseif ($permissionDelete) {
+                $buttons .= "<button class='dropdown-item btnReopenPayment' $data_prop_button><i class='fa-solid fa-rotate-left'></i> Reabrir Pagamento</button>";
             }
 
             $buttons = dropdownButtonsDataList($buttons, $value->bill_payment_id);
@@ -188,6 +190,7 @@ class BillsToPayController extends Controller
         $date_payment   = $request->input('date_payment');
         $company_id     = $request->user()->company_id;
         $payments       = $this->bill_to_pay->getBill($company_id, $payment_id);
+        $user_id        = $request->user()->id;
 
         if (!count($payments)) {
             return response()->json(array('success' => false, 'message' => "Pagamento não encontrado."));
@@ -222,7 +225,8 @@ class BillsToPayController extends Controller
             $this->bill_to_pay->updateById(array(
                 'payday'        => $date_payment,
                 'payment_name'  => $data_form_payment->name,
-                'payment_id'    => $data_form_payment->id
+                'payment_id'    => $data_form_payment->id,
+                'user_update'   => $user_id
             ), $payment->id);
         }
 
@@ -381,5 +385,32 @@ class BillsToPayController extends Controller
         }
 
         return $response;
+    }
+
+    public function reopenPayment(Request $request): JsonResponse
+    {
+        if (!hasPermission('BillsToPayDeletePost')) {
+            return response()->json(null, 400);
+        }
+
+        $payment_id = explode('-',$request->input('payment_id'));
+        $company_id = $request->user()->company_id;
+        $payments   = $this->bill_to_pay_payment->getPayment($company_id, $payment_id);
+        $user_id    = $request->user()->id;
+
+        if (!count($payments)) {
+            return response()->json(array('success' => false, 'message' => "Pagamento não encontrado."));
+        }
+
+        foreach ($payments as $payment) {
+            $this->bill_to_pay_payment->updateById(array(
+                'payday'        => null,
+                'payment_name'  => null,
+                'payment_id'    => null,
+                'user_update'   => $user_id
+            ), $payment->id);
+        }
+
+        return response()->json(array('success' => true, 'message' => "Pagamento reaberto!"));
     }
 }

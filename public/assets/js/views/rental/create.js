@@ -629,9 +629,9 @@ $(function() {
                     title: 'Atenção',
                     html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
                 });
-            }, always: () => {
-                btn.attr('disabled', false);
             }
+        }).always(() => {
+            btn.attr('disabled', false);
         });
     });
 });
