@@ -335,7 +335,7 @@ if (!function_exists('dropdownButtonsDataList')) {
     function dropdownButtonsDataList(string $data_buttons, int $index = 0, string $direction = 'left'): string
     {
         return "<div class='row'><div class='col-12'><div class='dropdown drop$direction'>
-            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsDataList-$index' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsDataList-$index' data-toggle='dropdown' data-boundary='window' aria-haspopup='true' aria-expanded='false'>
               <i class='fa fa-cog'></i>
             </button>
             <div class='dropdown-menu' aria-labelledby='dropActionsRental-$index'>$data_buttons</div</div>

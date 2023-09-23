@@ -54,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
                     'start' => date('d/m/Y', strtotime("-$months months", time())),
                     'finish' => date('d/m/Y')
                 ];
+                $settings['intervalBillDates'] = [
+                    'start' => date('d/m/Y', strtotime("-1 months", time())),
+                    'finish' => date('d/m/Y', strtotime("+1 months", time())),
+                ];
 
                 // permissões
                 if (auth()->user()->__get('type_user') == 1 || auth()->user()->__get('type_user') == 2) { // administrador permissão total

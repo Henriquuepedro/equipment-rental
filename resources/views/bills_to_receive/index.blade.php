@@ -42,7 +42,7 @@
         $(function () {
             loadDaterangePickerInput($('input[name="intervalDates"]'), function () { getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false); });
             setTabRental();
-            getOptionsForm('form-of-payment', $('#modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
+            getOptionsForm('form-of-payment', $('#modalReopenPayment [name="form_payment"], #modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
 
             tableBillsToReceive.on('click', 'tbody tr', function (e) {
                 const tag_name = $(e.target).prop("tagName");
@@ -266,35 +266,45 @@
             getTable(e.target.id.replace('-tab',''), false);
         });
 
-        $(document).on('click', '.btnViewPayment', function() {
-            const rental_code   = $(this).data('rental-code');
-            const name_client   = $(this).data('name-client');
-            const date_rental   = $(this).data('date-rental');
-            const due_date      = $(this).data('due-date');
-            const due_value     = 'R$ ' + $(this).data('due-value');
-            const payment_id    = $(this).data('payment-id');
-            const payday        = $(this).data('payday');
+        const setFieldsToPayment = (btn, modal) => {
+            const rental_code       = btn.data('rental-code');
+            const name_client       = btn.data('name-client');
+            const date_rental       = btn.data('date-rental');
+            const due_date          = btn.data('due-date');
+            const due_value         = 'R$ ' + btn.data('due-value');
+            const payment_id        = btn.data('payment-id');
+            const rental_payment_id = btn.data('rental-payment-id');
+            const payday            = btn.data('payday');
 
-            $('#modalViewPayment').find('[name="date_payment"]').closest('.form-group').show();
-            $('#modalViewPayment').find('[name="form_payment"]').closest('.form-group').show();
+            modal.find('[name="date_payment"]').closest('.form-group').show();
+            modal.find('[name="form_payment"]').closest('.form-group').show();
 
             if ($('#paid-tab.active').length) {
-                $('#modalViewPayment').find('[name="date_payment"]').val(payday);
-                $('#modalViewPayment').find('[name="form_payment"]').val(payment_id);
-                $('#modalViewPayment').find('.modal-title').text('Detalhes do Pagamento');
+                modal.find('[name="date_payment"]').val(payday);
+                modal.find('[name="form_payment"]').val(payment_id);
+                modal.find('.modal-title').text('Detalhes do Pagamento');
+                modal.find('[name="payment_id"]').val(rental_payment_id);
             } else {
-                $('#modalViewPayment').find('[name="date_payment"]').closest('.form-group').hide();
-                $('#modalViewPayment').find('[name="form_payment"]').closest('.form-group').hide();
-                $('#modalViewPayment').find('.modal-title').text('Detalhes do Lançamento');
+                modal.find('[name="date_payment"]').closest('.form-group').hide();
+                modal.find('[name="form_payment"]').closest('.form-group').hide();
+                modal.find('.modal-title').text('Detalhes do Lançamento');
             }
 
-            $('#modalViewPayment').find('[name="rental_code"]').val(rental_code);
-            $('#modalViewPayment').find('[name="client"]').val(name_client);
-            $('#modalViewPayment').find('[name="date_rental"]').val(date_rental);
-            $('#modalViewPayment').find('[name="due_date"]').val(due_date);
-            $('#modalViewPayment').find('[name="due_value"]').val(due_value);
+            modal.find('[name="rental_code"]').val(rental_code);
+            modal.find('[name="client"]').val(name_client);
+            modal.find('[name="date_rental"]').val(date_rental);
+            modal.find('[name="due_date"]').val(due_date);
+            modal.find('[name="due_value"]').val(due_value);
             checkLabelAnimate();
-            $('#modalViewPayment').modal();
+            modal.modal();
+        }
+
+        $(document).on('click', '.btnViewPayment', function() {
+            setFieldsToPayment($(this), $('#modalViewPayment'));
+        });
+
+        $(document).on('click', '.btnReopenPayment', function() {
+            setFieldsToPayment($(this), $('#modalReopenPayment'));
         });
 
         $(document).on('click', '.btnConfirmPayment', function() {
@@ -341,8 +351,6 @@
                 },
                 dataType: 'json',
                 success: response => {
-                    console.log(response);
-
                     if (!response.success) {
                         Swal.fire({
                             icon: 'warning',
@@ -377,11 +385,70 @@
                         title: 'Atenção',
                         html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
                     });
-                }, always: () => {
-                    btn.attr('disabled', false);
                 }
+            }).always(() => {
+                btn.attr('disabled', false);
             });
 
+        });
+
+        $('#formReopenPayment').on('submit', function(e) {
+            e.preventDefault();
+            const payment_id    = $('[name="payment_id"]', this).val();
+            const endpoint      = $(this).attr('action');
+            const btn           = $(this).find('[type="submit"]');
+
+            btn.attr('disabled', true);
+
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'POST',
+                url: endpoint,
+                data: {
+                    payment_id
+                },
+                dataType: 'json',
+                success: response => {
+                    if (!response.success) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atenção',
+                            html: '<ol><li>' + response.message + '</li></ol>'
+                        });
+                        return false;
+                    }
+
+                    $('#modalReopenPayment').modal('hide');
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: response.message
+                    });
+
+                    getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false);
+                }, error: e => {
+                    console.log(e);
+                    let arrErrors = [];
+
+                    $.each(e.responseJSON.errors, function( index, value ) {
+                        arrErrors.push(value);
+                    });
+
+                    if (!arrErrors.length && e.responseJSON.message !== undefined) {
+                        arrErrors.push('Você não tem permissão para fazer essa operação!');
+                    }
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                    });
+                }
+            }).always(function() {
+                btn.attr('disabled', false);
+            });
         });
 
         $('[name="clients"]').on('change', function(){
@@ -419,7 +486,7 @@
                         </div>
                         <div class="col-md-3 form-group">
                             <label>Data do Vencimento</label>
-                            <input type="text" name="intervalDates" class="form-control" value="{{ $settings['intervalDates']['start'] . ' - ' . $settings['intervalDates']['finish'] }}" />
+                            <input type="text" name="intervalDates" class="form-control" value="{{ $settings['intervalBillDates']['start'] . ' - ' . $settings['intervalBillDates']['finish'] }}" />
                         </div>
                     </div>
                     <div class="nav-scroller mt-3">
@@ -527,7 +594,7 @@
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
                         <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
-                        <button type="submit" class="btn btn-success col-md-4"><i class="fa fa-check"></i> Confirmar Pagamento</button>
+                        <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-check"></i> Confirmar Pagamento</button>
                     </div>
                     <input type="hidden" class="form-control" name="payment_id">
                 </form>
@@ -581,6 +648,60 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalReopenPayment" tabindex="-1" role="dialog" aria-labelledby="modalReopenPayment" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <form action="{{ route('ajax.bills_to_receive.reopen_payment') }}" method="POST" id="formReopenPayment">
+                    <div class="modal-header">
+                        <h5 class="modal-title"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label>Locação</label>
+                                <input type="text" class="form-control" name="rental_code" value="" disabled>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Cliente</label>
+                                <input type="text" class="form-control" name="client" value="" disabled>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Data da Locação</label>
+                                <input type="text" class="form-control" name="date_rental" value="" disabled>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label>Data de Vencimento</label>
+                                <input type="text" class="form-control" name="due_date" value="" disabled>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Valor</label>
+                                <input type="text" class="form-control" name="due_value" value="" disabled>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Forma de Pagamento</label>
+                                <select class="form-control" name="form_payment" disabled></select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Data de Pagamento</label>
+                                <input type="text" class="form-control" name="date_payment" value="" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-around">
+                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-success col-md-3"><i class="fa-solid fa-rotate-left"></i> Reabrir Pagamento</button>
+                    </div>
+                    <input type="hidden" class="form-control" name="payment_id">
+                </form>
             </div>
         </div>
     </div>

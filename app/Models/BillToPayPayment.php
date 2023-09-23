@@ -47,7 +47,6 @@ class BillToPayPayment extends Model
         return $this->create($data);
     }
 
-
     public function getBillsToReportWithFilters(int $company_id, array $filters, bool $synthetic = true, array $order_by = array())
     {
         $rental = $this ->select(
@@ -105,5 +104,20 @@ class BillToPayPayment extends Model
         }
 
         return $rental->get();
+    }
+
+    public function getPayment($company_id, $payment_id)
+    {
+        if (is_numeric($payment_id)) {
+            return $this->where(['id' => $payment_id, 'company_id' => $company_id])->first();
+        } elseif (is_array($payment_id)) {
+            return $this->whereIn('id', $payment_id)->where('company_id', $company_id)->get();
+        }
+        return [];
+    }
+
+    public function updateById(array $data, int $id)
+    {
+        return $this->where('id', $id)->update($data);
     }
 }

@@ -279,6 +279,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::post('/delete', [App\Http\Controllers\BillsToReceiveController::class, 'delete'])->name('delete');
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToReceiveController::class, 'getQtyTypeRentals'])->name('get-qty-type-rentals');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'confirmPayment'])->name('confirm_payment');
+            Route::post('/reabrir-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'reopenPayment'])->name('reopen_payment');
         });
         Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
             Route::post('/nova-locacao', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');
@@ -286,6 +287,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::post('/delete', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToPayController::class, 'getQtyTypeBills'])->name('get-qty-type-bills');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToPayController::class, 'confirmPayment'])->name('confirm_payment');
+            Route::post('/reabrir-pagamento', [App\Http\Controllers\BillsToPayController::class, 'reopenPayment'])->name('reopen_payment');
         });
         Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
             Route::get('/fields/{option}', [App\Http\Controllers\ExportController::class, 'getFields'])->name('client_fields');
