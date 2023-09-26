@@ -1,184 +1,189 @@
 @php
-    $route = Route::current();
+    $route_name = Route::current()->getName();
+    $route_exp = explode('.', $route_name);
 
-    $registerActive = '';
-    $controlActive = '';
-    $reportActive = '';
-    $dashboardActive = '';
-    $adminMaster = '';
-
-    if ($route->getName() == 'dashboard') {
-        $dashboardActive = 'active';
-    } elseif (
-        likeText('client.%', $route->getName())      !== false ||
-        likeText('equipment.%', $route->getName())   !== false ||
-        likeText('driver.%', $route->getName())      !== false ||
-        likeText('vehicle.%', $route->getName())     !== false ||
-        likeText('residue.%', $route->getName())     !== false ||
-        likeText('provider.%', $route->getName())    !== false
-    ) {
-        $registerActive = 'active';
-    } elseif (
-        likeText('rental.%', $route->getName()) !== false ||
-        likeText('budget.%', $route->getName()) !== false ||
-        likeText('bills_to_receive.%', $route->getName()) !== false ||
-        likeText('bills_to_pay.%', $route->getName()) !== false
-    ) {
-        $controlActive = 'active';
-    } elseif (
-        likeText('report.%', $route->getName())
-    ) {
-        $reportActive = 'active';
-    } elseif (
-        likeText('master.%', $route->getName())
-    ) {
-        $adminMaster = 'active';
-    }
-//    dd($route->getName(),strstr($route->getName(),'rental\.'), $reportActive);
+    $routes = array(
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => [],
+            'text'          => 'Administração',
+            'can'           => 'admin-master',
+            'class'         => 'bg-primary',
+            'list'          => [
+                [
+                    'route' => 'master.company.index',
+                    'text' => 'Empresas',
+                    'permissions'   => [],
+                ],
+                [
+                    'route' => 'master.user.index',
+                    'text' => 'Usuários',
+                    'permissions'   => [],
+                ],
+                [
+                    'route' => 'master.plan.index',
+                    'text' => 'Planos',
+                    'permissions'   => [],
+                ]
+            ]
+        ],
+        [
+            'type'          => 'single',
+            'route'         => 'dashboard',
+            'text'          => 'Dashboard',
+            'permissions'   => [],
+        ],
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => [],
+            'text'          => 'Cadastro',
+            'can'           => null,
+            'list'          => [
+                [
+                    'permissions' => [
+                        'ClientView'
+                    ],
+                    'route' => 'client.index',
+                    'text' => 'Cliente'
+                ],
+                [
+                    'permissions' => [
+                        'EquipmentView'
+                    ],
+                    'route' => 'equipment.index',
+                    'text' => 'Equipamento'
+                ],
+                [
+                    'permissions' => [
+                        'DriverView'
+                    ],
+                    'route' => 'driver.index',
+                    'text' => 'Motorista'
+                ],
+                [
+                    'permissions' => [
+                        'VehicleView'
+                    ],
+                    'route' => 'vehicle.index',
+                    'text' => 'Veículo'
+                ],
+                [
+                    'permissions' => [
+                        'ResidueView'
+                    ],
+                    'route' => 'residue.index',
+                    'text' => 'Resíduo'
+                ],
+                [
+                    'permissions' => [
+                        'ProviderView'
+                    ],
+                    'route' => 'provider.index',
+                    'text' => 'Fornecedor'
+                ]
+            ]
+        ],
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => [],
+            'text'          => 'Controle',
+            'can'           => null,
+            'list'          => [
+                [
+                    'permissions' => [
+                        'RentalView'
+                    ],
+                    'route' => 'rental.index',
+                    'text' => 'Locação',
+                ],
+                [
+                    'permissions' => [
+                        'BudgetView'
+                    ],
+                    'route' => 'budget.index',
+                    'text' => 'Orçamento',
+                ],
+                [
+                    'permissions' => [
+                        'BillsToReceiveView'
+                    ],
+                    'route' => 'bills_to_receive.index',
+                    'text' => 'Contas a Receber',
+                ],
+                [
+                    'permissions' => [
+                        'BillsToPayView'
+                    ],
+                    'route' => 'bills_to_pay.index',
+                    'text' => 'Contas a Pagar',
+                ],
+            ]
+        ],
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => ['ReportView'],
+            'text'          => 'Relatório',
+            'can'           => null,
+            'list'          => [
+                [
+                    'route' => 'report.rental',
+                    'text' => 'Locação'
+                ],
+                [
+                    'route' => 'report.bill',
+                    'text' => 'Financeiro'
+                ],
+                [
+                    'route' => 'report.register',
+                    'text' => 'Cadastro'
+                ]
+            ]
+       ]
+    );
 @endphp
 
-<!-- partial -->
-    <!-- partial:partials/_sidebar.html -->
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
-        @can('admin-master')
-            <li class="nav-item {{ $adminMaster }} bg-primary">
-                <a class="nav-link" data-toggle="collapse" href="#report-dropdown" aria-expanded="false" aria-controls="report-dropdown">
-                    <i class="menu-icon typcn typcn-cog-outline"></i>
-                    <span class="menu-title">Administração</span>
-                    <i class="menu-arrow"></i>
-                </a>
-                <div class="collapse" id="report-dropdown">
-                    <ul class="nav flex-column sub-menu">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('master.company.index') }}">Empresas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('master.user.index') }}">Usuários</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('master.plan.index') }}">Planos</a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+    @foreach($routes as $key => $route)
+        @php
+            $route_permissions = $route['permissions'] ?? array_map(function($r) { return $r['permissions']; }, $route['list'] ?? array());
+            $active = $route['type'] === 'single' ? $route_exp[0] == $route['route'] : in_array($route_exp[0], array_map(function ($r) { return explode('.', $r['route'])[0]; }, $route['list']))
+        @endphp
+        @if(empty($route_permissions) || count(array_diff($route_permissions, $permissions)) == 0)
+            @if (empty($route['can']) || Auth::user()->can($route['can']))
+                <li class="nav-item {{$route['class'] ?? ''}} {{ $active ? 'active' : '' }}">
+                    <a class="nav-link" @if($route['type'] === 'single') href="{{ route($route['route']) }}" @else data-toggle="collapse" href="#level{{$key}}-dropdown" aria-expanded="false" aria-controls="level{{$key}}-dropdown" @endif>
+                        <i class="menu-icon typcn typcn-device-desktop"></i>
+                        <span class="menu-title">{{ $route['text'] }}</span>
+                        @if($route['type'] === 'level') <i class="menu-arrow"></i> @endif
+                    </a>
+                    @if($route['type'] === 'level')
+                        <div class="collapse" id="level{{$key}}-dropdown">
+                            <ul class="nav flex-column sub-menu">
+                                @php
+                                    $route_exist = count(array_filter($route['list'], function($list) use ($route_name) { return $route_name == $list['route']; })) !== 0;
+                                @endphp
+                                @foreach($route['list'] as $list)
+                                    @if(empty($list['permissions']) || count(array_diff($list['permissions'], $permissions)) == 0)
+                                        @php
+
+                                            $active_level = ($route_exist && $route_name == $list['route']) || (!$route_exist && $route_exp[0] == explode('.', $list['route'])[0]);
+                                        @endphp
+                                        <li class="nav-item">
+                                            <a class="nav-link {{$active_level ? 'active' : ''}}" href="{{ route($list['route']) }}">{{ $list['text'] }}</a>
+                                        </li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                </li>
+            @endif
         @endif
-        <li class="nav-item {{ $dashboardActive }}">
-            <a class="nav-link" href="{{ route('dashboard') }}">
-                <i class="menu-icon typcn typcn-device-desktop"></i>
-                <span class="menu-title">Dashboard</span>
-            </a>
-        </li>
-        @if(
-            in_array('ClientView', $permissions) ||
-            in_array('EquipmentView', $permissions) ||
-            in_array('DriverView', $permissions) ||
-            in_array('VehicleView', $permissions) ||
-            in_array('ResidueView', $permissions)
-        )
-        <li class="nav-item {{ $registerActive }}">
-            <a class="nav-link" data-toggle="collapse" href="#register-dropdown" aria-expanded="false" aria-controls="register-dropdown">
-                <i class="menu-icon typcn typcn-plus-outline"></i>
-                <span class="menu-title">Cadastro</span>
-                <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="register-dropdown">
-                <ul class="nav flex-column sub-menu">
-                    @if(in_array('ClientView', $permissions))
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('client.index') }}">Cliente</a>
-                    </li>
-                    @endif
-                    @if(in_array('EquipmentView', $permissions))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('equipment.index') }}">Equipamento</a>
-                        </li>
-                    @endif
-                    @if(in_array('DriverView', $permissions))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('driver.index') }}">Motorista</a>
-                        </li>
-                    @endif
-                    @if(in_array('VehicleView', $permissions))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('vehicle.index') }}">Veículo</a>
-                        </li>
-                    @endif
-                    @if(in_array('ResidueView', $permissions))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('residue.index') }}">Resíduo</a>
-                        </li>
-                    @endif
-                    @if(in_array('ProviderView', $permissions))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('provider.index') }}">Fornecedor</a>
-                        </li>
-                    @endif
-                </ul>
-            </div>
-        </li>
-        @endif
-        @if(
-            in_array('RentalView', $permissions) ||
-            in_array('BudgetView', $permissions)
-        )
-            <li class="nav-item {{ $controlActive }}">
-                <a class="nav-link" data-toggle="collapse" href="#control-dropdown" aria-expanded="false" aria-controls="control-dropdown">
-                    <i class="menu-icon typcn typcn-cog-outline"></i>
-                    <span class="menu-title">Controle</span>
-                    <i class="menu-arrow"></i>
-                </a>
-                <div class="collapse" id="control-dropdown">
-                    <ul class="nav flex-column sub-menu">
-                        @if(in_array('RentalView', $permissions))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('rental.index') }}">Locação</a>
-                            </li>
-                        @endif
-                        @if(in_array('BudgetView', $permissions))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('budget.index') }}">Orçamento</a>
-                            </li>
-                        @endif
-                        @if(in_array('BillsToReceiveView', $permissions))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('bills_to_receive.index') }}">Contas a Receber</a>
-                            </li>
-                        @endif
-                        @if(in_array('BillsToPayView', $permissions))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('bills_to_pay.index') }}">Contas a Pagar</a>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
-            </li>
-        @endif
-        @if(
-            in_array('ReportView', $permissions)
-        )
-            <li class="nav-item {{ $reportActive }}">
-                <a class="nav-link" data-toggle="collapse" href="#report-dropdown" aria-expanded="false" aria-controls="report-dropdown">
-                    <i class="menu-icon typcn typcn-cog-outline"></i>
-                    <span class="menu-title">Relatório</span>
-                    <i class="menu-arrow"></i>
-                </a>
-                <div class="collapse" id="report-dropdown">
-                    <ul class="nav flex-column sub-menu">
-                        @if(in_array('ReportView', $permissions))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('report.rental') }}">Locação</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('report.bill') }}">Financeiro</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('report.register') }}">Cadastro</a>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
-            </li>
-        @endif
+    @endforeach
     </ul>
 </nav>
