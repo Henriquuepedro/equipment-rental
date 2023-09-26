@@ -450,3 +450,43 @@ if (!function_exists('getErrorDataTables')) {
     }
 }
 
+if (!function_exists('sumDate')) {
+    function sumDate(?string $date, int $year = null, int $month = null, int $day = null, int $hour = null, int $minute = null, int $second = null): ?string
+    {
+        if (is_null($date) || (strlen($date) !== 10 && strlen($date) !== 16 && strlen($date) !== 19 && strlen($date) !== 27)) {
+            return null;
+        }
+
+        $data = DateTime::createFromFormat(DATETIME_INTERNATIONAL, $date);
+
+        $format = DATE_INTERNATIONAL;
+
+        if (strlen($date) === 16) {
+            $format .= ' H:i';
+        } elseif (strlen($date) === 19) {
+            $format .= ' H:i:s';
+        }
+
+        if (!is_null($year)) {
+            $data->add(new DateInterval("P{$year}Y"));
+        }
+        if (!is_null($month)) {
+            $data->add(new DateInterval("P{$month}M"));
+        }
+        if (!is_null($day)) {
+            $data->add(new DateInterval("P{$day}D"));
+        }
+        if (!is_null($hour)) {
+            $data->add(new DateInterval("PT{$hour}H"));
+        }
+        if (!is_null($minute)) {
+            $data->add(new DateInterval("PT{$minute}M"));
+        }
+        if (!is_null($second)) {
+            $data->add(new DateInterval("PT{$second}S"));
+        }
+
+        return $data->format($format);
+    }
+}
+
