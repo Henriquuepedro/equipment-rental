@@ -107,8 +107,8 @@ class RentalController extends Controller
                     $filter_default[]['where']['rental_equipments.actual_withdrawal_date'] = null;
                     break;
                 case 'finished':
-                    $filter_default[]['where']['rentals.actual_delivery_date <>'] = null;
-                    $filter_default[]['where']['rentals.actual_withdrawal_date <>'] = null;
+                    $filter_default[]['where']['rental_equipments.actual_delivery_date <>'] = null;
+                    $filter_default[]['where']['rental_equipments.actual_withdrawal_date <>'] = null;
                     break;
             }
 

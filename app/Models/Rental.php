@@ -171,8 +171,8 @@ class Rental extends Model
                     break;
                 case 'finished':
                     $rental->where([
-                        ['rentals.actual_delivery_date', '<>', null],
-                        ['rentals.actual_withdrawal_date', '<>', null]
+                        ['rental_equipments.actual_delivery_date', '<>', null],
+                        ['rental_equipments.actual_withdrawal_date', '<>', null]
                     ]);
                     break;
             }
@@ -235,8 +235,8 @@ class Rental extends Model
                     break;
                 case 'finished':
                     $rental->where([
-                        ['rentals.actual_delivery_date', '<>', null],
-                        ['rentals.actual_withdrawal_date', '<>', null]
+                        ['rental_equipments.actual_delivery_date', '<>', null],
+                        ['rental_equipments.actual_withdrawal_date', '<>', null]
                     ]);
                     break;
             }
@@ -274,8 +274,8 @@ class Rental extends Model
                  ['rental_equipments.actual_withdrawal_date', '=', NULL]
              ),
              'finished' => array(
-                 ['rentals.actual_delivery_date', '<>', NULL],
-                 ['rentals.actual_withdrawal_date', '<>', NULL]
+                 ['rental_equipments.actual_delivery_date', '<>', NULL],
+                 ['rental_equipments.actual_withdrawal_date', '<>', NULL]
              )
         ) as $type => $where) {
             $where = array_merge(array(['rentals.company_id', '=', $company_id]), $where);
@@ -284,16 +284,13 @@ class Rental extends Model
                 $where = array_merge(array(['rentals.client_id', '=', $client]), $where);
             }
 
-            $query = $this->from($type === 'finished' ? 'rentals' : 'rental_equipments')
+            $query = $this->from('rental_equipments')
+                ->join('rentals', 'rental_equipments.rental_id', '=', 'rentals.id')
                 ->where($where)
                 ->whereBetween('rentals.created_at', ["$start_date 00:00:00", "$end_date 23:59:59"]);
 
-            if ($type !== 'finished') {
-                $query->join('rentals', 'rental_equipments.rental_id', '=', 'rentals.id');
-            }
-
             $data[$type] = $query
-                ->groupBy($type === 'finished' ? 'rentals.id' : 'rental_equipments.rental_id')
+                ->groupBy('rental_equipments.rental_id')
                 ->get()
                 ->count();
         }
