@@ -72,7 +72,10 @@ class RentalEquipment extends Model
 
     public function remove(int $company_id, int $rental_id)
     {
-        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->delete();
+        foreach ($this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->orderBy('id', 'DESC')->get() as $equipment) {
+            $this->where('id', $equipment->id)->delete();
+        }
+        return true;
     }
 
     public function getEquipments(int $company_id, int $rental_id)
