@@ -105,7 +105,7 @@ if ($('canvas').length) {
 
     //Add active class to nav-link based on url dynamically
     //Active class can be hard coded directly in html file also as required
-    if (!sidebar.hasClass("dynamic-active-class-disabled")) {
+    /*if (!sidebar.hasClass("dynamic-active-class-disabled")) {
       const current = base_url.val() + location.href.replace(base_url.val(), '');
       $('#sidebar >.nav > li:not(.not-navigation-link) a').each(function () {
         var $this = $(this);
@@ -133,7 +133,7 @@ if ($('canvas').length) {
           }
         }
       })
-    }
+    }*/
 
     // Themeswitch function
     function themeSwitch(url) {
