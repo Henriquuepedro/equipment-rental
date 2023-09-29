@@ -178,6 +178,8 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::get('/visualizar-clientes', [App\Http\Controllers\ClientController::class, 'getClients'])->name('get-clients');
             Route::get('/visualizar-cliente/{client_id?}', [App\Http\Controllers\ClientController::class, 'getClient'])->name('get-client');
             Route::post('/novo-cliente', [App\Http\Controllers\ClientController::class, 'insert'])->name('new-client');
+            Route::get('/novos-clientes-por-mes/{months}', [App\Http\Controllers\ClientController::class, 'getNewClientsForMonths'])->name('get-new-client-for-month');
+            Route::get('/top-clientes-mais-locam/{count}', [App\Http\Controllers\ClientController::class, 'getClientsTopRentals'])->name('get-clients-top-rentals');
         });
         Route::group(['prefix' => '/endereco', 'as' => 'address.'], function () {
             Route::get('/visualizar-enderecos/{client_id?}', [App\Http\Controllers\AddressController::class, 'getAddresses'])->name('get-addresses');
@@ -247,6 +249,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::get('/equipamentos/{rental_id}', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRental'])->name('get_equipments_rental');
             Route::get('/pagamentos/{rental_id}', [App\Http\Controllers\BillsToReceiveController::class, 'getPaymentsRental'])->name('get_payments_rental');
             Route::get('/full/{rental_id?}', [App\Http\Controllers\RentalController::class, 'getFull'])->name('get_full');
+            Route::get('/locacoes-por-mes/{months}', [App\Http\Controllers\RentalController::class, 'getRentalsForMonths'])->name('get-rentals-for-month');
         });
         Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');
@@ -280,6 +283,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToReceiveController::class, 'getQtyTypeRentals'])->name('get-qty-type-rentals');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'confirmPayment'])->name('confirm_payment');
             Route::post('/reabrir-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'reopenPayment'])->name('reopen_payment');
+            Route::get('/faturamento-por-mes/{months}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForMonths'])->name('get-bills-for-month');
         });
         Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
             Route::post('/nova-locacao', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');

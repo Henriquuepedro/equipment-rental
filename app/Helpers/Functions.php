@@ -12,6 +12,52 @@ const DATETIME_INTERNATIONAL_NO_SECONDS = 'd/m/Y H:i';
 const DATE_BRAZIL = 'd/m/Y';
 const DATETIME_INTERNATIONAL_TIMEZONE = 'Y-m-d H:i:sP';
 const TIMEZONE_DEFAULT = 'America/Fortaleza';
+const MONTH_NAME_PT = [
+    '01'    => 'Janeiro',
+    '02'    => 'Fevereiro',
+    '03'    => 'Março',
+    '04'    => 'Abril',
+    '05'    => 'Maio',
+    '06'    => 'Junho',
+    '07'    => 'Julho',
+    '08'    => 'Agosto',
+    '09'    => 'Setembro',
+    '1'     => 'Janeiro',
+    '2'     => 'Fevereiro',
+    '3'     => 'Março',
+    '4'     => 'Abril',
+    '5'     => 'Maio',
+    '6'     => 'Junho',
+    '7'     => 'Julho',
+    '8'     => 'Agosto',
+    '9'     => 'Setembro',
+    '10'    => 'Outubro',
+    '11'    => 'Novembro',
+    '12'    => 'Dezembro'
+];
+const SHORT_MONTH_NAME_PT = [
+    '01'    => 'Jan',
+    '02'    => 'Fev',
+    '03'    => 'Mar',
+    '04'    => 'Abr',
+    '05'    => 'Mai',
+    '06'    => 'Jun',
+    '07'    => 'Jul',
+    '08'    => 'Ago',
+    '09'    => 'Set',
+    '1'     => 'Jan',
+    '2'     => 'Fev',
+    '3'     => 'Mar',
+    '4'     => 'Abr',
+    '5'     => 'Mai',
+    '6'     => 'Jun',
+    '7'     => 'Jul',
+    '8'     => 'Ago',
+    '9'     => 'Set',
+    '10'    => 'Out',
+    '11'    => 'Nov',
+    '12'    => 'Dez'
+];
 
 if (! function_exists('hasPermission')) {
     function hasPermission(string $permission): bool
@@ -484,6 +530,46 @@ if (!function_exists('sumDate')) {
         }
         if (!is_null($second)) {
             $data->add(new DateInterval("PT{$second}S"));
+        }
+
+        return $data->format($format);
+    }
+}
+
+if (!function_exists('subDate')) {
+    function subDate(?string $date, int $year = null, int $month = null, int $day = null, int $hour = null, int $minute = null, int $second = null): ?string
+    {
+        if (is_null($date) || (strlen($date) !== 10 && strlen($date) !== 16 && strlen($date) !== 19 && strlen($date) !== 27)) {
+            return null;
+        }
+
+        $data = DateTime::createFromFormat(DATETIME_INTERNATIONAL, $date);
+
+        $format = DATE_INTERNATIONAL;
+
+        if (strlen($date) === 16) {
+            $format .= ' H:i';
+        } elseif (strlen($date) === 19) {
+            $format .= ' H:i:s';
+        }
+
+        if (!is_null($year)) {
+            $data->sub(new DateInterval("P{$year}Y"));
+        }
+        if (!is_null($month)) {
+            $data->sub(new DateInterval("P{$month}M"));
+        }
+        if (!is_null($day)) {
+            $data->sub(new DateInterval("P{$day}D"));
+        }
+        if (!is_null($hour)) {
+            $data->sub(new DateInterval("PT{$hour}H"));
+        }
+        if (!is_null($minute)) {
+            $data->sub(new DateInterval("PT{$minute}M"));
+        }
+        if (!is_null($second)) {
+            $data->sub(new DateInterval("PT{$second}S"));
         }
 
         return $data->format($format);

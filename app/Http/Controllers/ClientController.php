@@ -461,4 +461,34 @@ class ClientController extends Controller
             'observation' => $config_obs ? $client->observation : null
         ]);
     }
+
+    public function getNewClientsForMonths(int $months): JsonResponse
+    {
+        if (!hasPermission('ClientView')) {
+            return response()->json();
+        }
+
+        $response_months = array();
+        $company_id = Auth::user()->__get('company_id');
+
+        for ($month = $months; $month > 0; $month--) {
+            $year_month = date('Y-m', strtotime(subDate(dateNowInternational(), null, ($month - 1))));
+            $exp_year_month = explode('-', $year_month);
+
+            $response_months[SHORT_MONTH_NAME_PT[$exp_year_month[1]] . '/' . substr($exp_year_month[0], 2, 4)] = $this->client->getNewClientForMonth($company_id, $exp_year_month[0], $exp_year_month[1]);
+        }
+
+        return response()->json($response_months);
+    }
+
+    public function getClientsTopRentals(int $count): JsonResponse
+    {
+        if (!hasPermission('ClientView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        return response()->json($this->client->getClientTopRentals($company_id, $count)->toArray());
+    }
 }
