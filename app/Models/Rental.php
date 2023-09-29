@@ -198,57 +198,12 @@ class Rental extends Model
     }
 
     /**
-     * @deprecated Não está mais em uso.
-     *
      * @param int $company_id
-     * @param array $filters
-     * @param string|null $search_rental
-     * @param string|null $type_rental
-     * @return mixed
+     * @return int
      */
-    public function getCountRentals(int $company_id, array $filters, string $search_rental = null, string $type_rental = null)
+    public function getCountRentals(int $company_id): int
     {
-        $rental = $this ->join('clients','clients.id','=','rentals.client_id')
-            ->join('rental_equipments','rental_equipments.rental_id','=','rentals.id')
-            ->where('rentals.company_id', $company_id)
-            ->whereBetween('rentals.created_at', ["{$filters['dateStart']} 00:00:00", "{$filters['dateFinish']} 23:59:59"]);
-
-        if ($search_rental) {
-            $rental->where(function ($query) use ($search_rental) {
-                $query->where('rentals.code', 'like', "%".(int)onlyNumbers($search_rental)."%")
-                    ->orWhere('clients.name', 'like', "%$search_rental%")
-                    ->orWhere('rentals.address_name', 'like', "%$search_rental%")
-                    ->orWhere('rentals.created_at', 'like', "%$search_rental%");
-            });
-        }
-
-        if ($type_rental) {
-            switch ($type_rental) {
-                case 'deliver':
-                    $rental->where('rental_equipments.actual_delivery_date', null);
-                    break;
-                case 'withdraw':
-                    $rental->where([
-                        ['rental_equipments.actual_delivery_date', '<>', null],
-                        ['rental_equipments.actual_withdrawal_date', '=', null]
-                    ]);
-                    break;
-                case 'finished':
-                    $rental->where([
-                        ['rental_equipments.actual_delivery_date', '<>', null],
-                        ['rental_equipments.actual_withdrawal_date', '<>', null]
-                    ]);
-                    break;
-            }
-        }
-
-        if ($filters['client'] !== null) {
-            $rental->where('rentals.client_id', $filters['client']);
-        }
-
-        $rental->groupBy($type_rental === 'finished' ? 'rentals.id' : 'rental_equipments.rental_id');
-
-        return $rental->get()->count();
+        return $this->where('company_id', $company_id)->count();
     }
 
     public function getRental(int $company_id, int $rental_id)
@@ -461,5 +416,10 @@ class Rental extends Model
                 'rental_residue'
             ])
             ->first();
+    }
+
+    public function getRentalsForMonth(int $company_id, $year, $month)
+    {
+        return $this->where('company_id', $company_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->count();
     }
 }

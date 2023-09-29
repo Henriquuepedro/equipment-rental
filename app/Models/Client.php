@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Client extends Model
 {
@@ -91,21 +92,30 @@ class Client extends Model
         return $client->get();
     }
 
-    public function getCountClients($company_id, $searchUser = null)
-    {
-        $client = $this->where('company_id', $company_id);
-        if ($searchUser)
-                $client->where(function($query) use ($searchUser) {
-                    $query->where('name', 'like', "%{$searchUser}%")
-                        ->orWhere('email', 'like', "%{$searchUser}%")
-                        ->orWhere('phone_1', 'like', "%{$searchUser}%");
-                });
-
-        return $client->count();
-    }
-
     public function getClient($client_id, $company_id)
     {
         return $this->where(['id' => $client_id, 'company_id' => $company_id])->first();
+    }
+
+    public function getNewClientForMonth(int $company_id, $year, $month)
+    {
+        return $this->where('company_id', $company_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->count();
+    }
+
+    public function getClientTopRentals(int $company_id, int $count)
+    {
+        return $this->select(DB::raw('rentals.client_id, clients.name, clients.email, COUNT(*) as total'))
+            ->join('rentals', 'rentals.client_id', '=', 'clients.id')
+            ->where('rentals.company_id', $company_id)
+            ->groupBy('rentals.client_id')
+            ->having(DB::raw('total'), '>', 0)
+            ->orderBy('total', 'Desc')
+            ->limit($count)
+            ->get();
+    }
+
+    public function getCountClientsActive($company_id)
+    {
+        return $this->where(['company_id' => $company_id, 'active' => true])->count();
     }
 }

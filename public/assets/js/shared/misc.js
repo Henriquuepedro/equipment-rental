@@ -15,7 +15,7 @@ if ($('body').hasClass("dark-theme")) {
   var chartFontcolor = '#6c757d';
   var chartGridLineColor = 'rgba(0,0,0,0.08)';
 }
-if ($('canvas').length) {
+/*if ($('canvas').length) {
   Chart.defaults.global.tooltips.enabled = false;
   Chart.defaults.global.defaultFontColor = '#354d66';
   Chart.defaults.global.defaultFontFamily = '"Poppins", sans-serif';
@@ -91,7 +91,7 @@ if ($('canvas').length) {
   }
   Chart.defaults.global.legend.labels.fontStyle = "italic";
   Chart.defaults.global.tooltips.intersect = false;
-}
+}*/
 
 (function ($) {
   'use strict';

@@ -65,17 +65,9 @@ class Vehicle extends Model
         return $vehicle->get();
     }
 
-    public function getCountVehicles($company_id, $searchVehicle = null)
+    public function getCountVehicles($company_id)
     {
-        $vehicle = $this->where('company_id', $company_id);
-        if ($searchVehicle)
-            $vehicle->where(function($query) use ($searchVehicle) {
-                $query->where('name', 'like', "%{$searchVehicle}%")
-                    ->orWhere('cpf', 'like', "%{$searchVehicle}%")
-                    ->orWhere('phone', 'like', "%{$searchVehicle}%");
-            });
-
-        return $vehicle->count();
+        return $this->where('company_id', $company_id)->count();
     }
 
     public function getVehicle($vehicle_id, $company_id)

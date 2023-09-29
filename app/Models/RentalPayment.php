@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class RentalPayment extends Model
 {
@@ -278,5 +279,23 @@ class RentalPayment extends Model
             'company_id'    => $company_id,
             'rental_id'     => $rental_id
         ))->where('payment_id', '!=', null)->get();
+    }
+
+    public function getBillsForMonth($company_id, $year, $month)
+    {
+        $register = $this->select(DB::raw('SUM(due_value) as total'))
+            ->where([
+                ['payment_id', '<>', null],
+                ['company_id', '=', $company_id]
+            ])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->first();
+
+        if ($register) {
+            return $register->total;
+        }
+
+        return 0;
     }
 }
