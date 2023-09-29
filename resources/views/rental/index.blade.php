@@ -550,11 +550,10 @@
                             title: response.message
                         });
 
-                        // if (response.rental_updated) {
-                            $(modal_id).modal('hide');
-                        // } else {
-                        //     showModalEquipment(name_operation, $('[name="rental_id[]"]').val());
-                        // }
+                        $(modal_id).modal('hide');
+                        if (typeof last_rental_id !== "undefined") {
+                            last_rental_id = 0;
+                        }
 
                         loadCountsTabRental();
                         getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false);
