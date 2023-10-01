@@ -142,7 +142,24 @@
                     'text' => 'Cadastro'
                 ]
             ]
-       ]
+        ],
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => ['PlanView'],
+            'text'          => 'Plano',
+            'can'           => null,
+            'list'          => [
+                [
+                    'route' => 'plan.index',
+                    'text' => 'Planos'
+                ],
+                [
+                    'route' => 'plan.request',
+                    'text' => 'Solicitações'
+                ]
+            ]
+        ]
     );
 @endphp
 

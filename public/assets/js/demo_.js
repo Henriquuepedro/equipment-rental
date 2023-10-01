@@ -570,6 +570,10 @@ const loadSearchZipcode = (selector, contentElement) => {
     })
 }
 
+const getHtmlLoading = () => {
+    return `<div class="jumping-dots-loader"><span></span><span></span><span></span></div>`;
+}
+
 $(document).on('shown.bs.dropdown', '.dropdown', function () {
     $(this).closest('.dataTables_scrollBody').attr('style', 'overflow: visible !important');
 });
