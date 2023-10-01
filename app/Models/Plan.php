@@ -45,4 +45,9 @@ class Plan extends Model
     {
         return $this->where('id', $id)->update($data);
     }
+
+    public function getByType(string $string)
+    {
+        return $this->where('plan_type', $string)->get();
+    }
 }

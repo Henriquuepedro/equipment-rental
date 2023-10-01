@@ -170,6 +170,14 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
 
     });
 
+    // Relatório
+    Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
+
+        Route::get('/', [App\Http\Controllers\PlanController::class, 'index'])->name('index');
+        Route::get('/solicitacoes', [App\Http\Controllers\PlanController::class, 'request'])->name('request');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -313,6 +321,13 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
                 Route::post('/buscar', [App\Http\Controllers\Master\PlanController::class, 'fetch'])->name('fetch');
             });
+
+        });
+
+        // Relatório
+        Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
+
+            Route::get('/visualizar-planos/{type?}', [App\Http\Controllers\PlanController::class, 'getPlans'])->name('get-plans');
 
         });
     });

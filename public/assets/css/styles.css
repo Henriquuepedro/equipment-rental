@@ -935,3 +935,10 @@ a[disabled] {
 .dataTables_wrapper .dataTable tbody tr.selected {
     background: #216b9e;
 }
+
+.jumping-dots-loader span {
+    background-color: #2196f3;
+}
+.pricing-table .pricing-card .pricing-card-body {
+    padding: 50px 35px 43px
+}

@@ -17,7 +17,7 @@ class PlanSeeder extends Seeder
      */
     public function run()
     {
-        $plans = [
+        /*$plans = [
             ['name' => 'starter_monthly', 'description' => 'Plano básico mensal', 'value' => 49.90, 'quantity_equipment' => 30, 'plan_type' => 'monthly'],
             ['name' => 'standard_monthly', 'description' => 'Plano intermediário mensal', 'value' => 54.90, 'quantity_equipment' => 50, 'plan_type' => 'monthly'],
             ['name' => 'plus_monthly', 'description' => 'Plano avançado mensal', 'value' => 64.90, 'quantity_equipment' => 100, 'plan_type' => 'monthly'],
@@ -28,6 +28,6 @@ class PlanSeeder extends Seeder
             if (Plan::where(array('name' => $plan['name'], 'plan_type' => $plan['plan_type']))->count() === 0) {
                 Plan::create($plan);
             }
-        }
+        }*/
     }
 }
