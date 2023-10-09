@@ -170,11 +170,13 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
 
     });
 
-    // Relatório
+    // Planos
     Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
 
         Route::get('/', [App\Http\Controllers\PlanController::class, 'index'])->name('index');
         Route::get('/solicitacoes', [App\Http\Controllers\PlanController::class, 'request'])->name('request');
+        Route::get('/confirmar/{plan?}', [App\Http\Controllers\PlanController::class, 'confirm'])->name('confirm');
+        Route::post('/criar-pagamento/{plan?}', [App\Http\Controllers\PlanController::class, 'insert'])->name('insert');
 
     });
 

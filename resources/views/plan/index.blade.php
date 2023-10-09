@@ -18,6 +18,7 @@
 @stop
 
 @section('js')
+    <script src="https://www.mercadopago.com/v2/security.js" view="search"></script>
     <script>
         $(function(){
             listPlans($('[data-toggle="tab"].active').attr('id').replace('-tab',''));
@@ -56,7 +57,7 @@
                                 ${value.description}
                             </div>
                             <div class="wrapper">
-                                <a href="#" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block">Assinar</a>
+                                <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block">Assinar</a>
                             </div>
                         </div>
                     </div>`

@@ -11,6 +11,7 @@ const DATETIME_BRAZIL_NO_SECONDS = 'd/m/Y H:i';
 const DATETIME_INTERNATIONAL_NO_SECONDS = 'd/m/Y H:i';
 const DATE_BRAZIL = 'd/m/Y';
 const DATETIME_INTERNATIONAL_TIMEZONE = 'Y-m-d H:i:sP';
+const DATETIME_INTERNATIONAL_MICROSECOND = 'Y-m-d H:i:s.u';
 const TIMEZONE_DEFAULT = 'America/Fortaleza';
 const MONTH_NAME_PT = [
     '01'    => 'Janeiro',
@@ -576,3 +577,48 @@ if (!function_exists('subDate')) {
     }
 }
 
+if (!function_exists('roundDecimal')) {
+    function roundDecimal(string|float $value, int $decimal = 2): float
+    {
+        return (float)number_format($value, 2, '.', '');
+    }
+}
+
+if (! function_exists('formatDateInternational')) {
+    /**
+     * Formata a data internacional.
+     *
+     * @param   string|null $date
+     * @param   string $format
+     * @param   string|null $timezone
+     * @return  string|null
+     */
+    function formatDateInternational(?string $date, string $format = DATETIME_INTERNATIONAL, string $timezone = null): ?string
+    {
+        if (is_null($date)) {
+            return null;
+        }
+
+        try {
+            if ($timezone) {
+                $dateTimeNow = new DateTimeZone($timezone);
+            } else {
+                $dateTimeNow = new DateTimeZone(TIMEZONE_DEFAULT);
+            }
+
+            return (new DateTime($date))->setTimezone($dateTimeNow)->format($format);
+        } catch (Exception | Throwable $e) {
+            return $date;
+        }
+    }
+}
+
+if (! function_exists('getKeyRandom')) {
+    /**
+     * Recuperar uma chave única.
+     */
+    function getKeyRandom(): ?string
+    {
+        return substr(bin2hex(random_bytes(6)), 1) . substr(md5(date("YmdHis")), 1, 14);
+    }
+}
