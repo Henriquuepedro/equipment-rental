@@ -73,7 +73,7 @@ class PlanController extends Controller
                 $value->name,
                 formatMoney($value->value, 2, 'R$ '),
                 $value->quantity_equipment,
-                $value->plan_type,
+                $value->month_time,
                 $buttons
             );
         }
@@ -95,7 +95,7 @@ class PlanController extends Controller
             'description'        => filter_var($request->input('description')),
             'value'              => transformMoneyBr_En(filter_var($request->input('value'))),
             'quantity_equipment' => filter_var($request->input('quantity_equipment')),
-            'plan_type'          => filter_var($request->input('plan_type'))
+            'month_time'         => filter_var($request->input('month_time'), FILTER_VALIDATE_INT)
         ], $id);
 
         if (!$update) {

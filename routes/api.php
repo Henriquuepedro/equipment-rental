@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\MercadoPago\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Spatie\HttpLogger\Middlewares\HttpLogger;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:api')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
+
+Route::group([], function () {
+    Route::group(['prefix' => '/mercado-pago', 'as' => 'mercadopago.'], function () {
+        Route::post('/notificacao', [Notification::class, 'notification'])->name('notification');
+    });
+})->middleware(HttpLogger::class);
