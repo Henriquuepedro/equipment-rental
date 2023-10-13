@@ -15,7 +15,6 @@ class CreatePlanPaymentsTable extends Migration
     {
         Schema::create('plan_payments', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('code_payment');
             $table->bigInteger('id_transaction');
             $table->string('link_billet', 255)->nullable();
             $table->string('barcode_billet', 128)->nullable();
