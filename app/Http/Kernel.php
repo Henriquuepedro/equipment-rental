@@ -24,6 +24,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Routing\Middleware\ValidateSignature;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Spatie\HttpLogger\Middlewares\HttpLogger;
 
 class Kernel extends HttpKernel
 {
@@ -42,6 +43,7 @@ class Kernel extends HttpKernel
         ValidatePostSize::class,
         TrimStrings::class,
         ConvertEmptyStringsToNull::class,
+        HttpLogger::class
     ];
 
     /**

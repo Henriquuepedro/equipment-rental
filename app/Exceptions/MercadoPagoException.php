@@ -47,13 +47,15 @@ class MercadoPagoException extends Exception
         $qr_code_base64 = $this->getPayment()->point_of_interaction->transaction_data->qr_code_base64 ?? '';
         $qr_code = $this->getPayment()->point_of_interaction->transaction_data->qr_code ?? '';
         $external_resource_url = $this->getPayment()->transaction_details->external_resource_url ?? '';
+        $barcode = $this->getPayment()->barcode->content ?? '';
         $statement_descriptor = $this->getPayment()->statement_descriptor ?? '';
         $dateOfExpiration = formatDateInternational($this->getPayment()->date_of_expiration, 'd/m H:i');
+        $dateOfExpirationOnlyDate = formatDateInternational($this->getPayment()->date_of_expiration, 'd/m');
 
         $status=[
             'accredited'                            => "Seu pagamento foi aprovado! Você verá o nome $statement_descriptor na sua fatura de cartão de crédito.",
             'pending_contingency'                   => 'Estamos processando o pagamento. Em até 2 dias úteis informaremos por e-mail o resultado.',
-            'pending_waiting_payment'               => "Boleto gerado! Assim que for compensado, avisaremos por e-mail.<br/><a class='btn btn-primary mt-3' href='$external_resource_url' target='_blank'><i class='fas fa-print'></i> Imprimir Boleto</a>",
+            'pending_waiting_payment'               => "Pronto! Conclua seu pagamento! <br><br>Copie este código para pagar pelo Internet Banking<br><div class='input-group mt-1'><input type='text' class='form-control' value='$barcode' readonly><span class='input-group-btn'><button type='button' class='btn btn-primary btn-flat copy-input'><i class='fas fa-copy'></i></button></span></div><br/><span class='status_copy'></span><br><br>Você também pode pagar com boleto em uma agência bancária.<br><a class='btn btn-primary mt-3' href='$external_resource_url' target='_blank'><i class='fas fa-print'></i> Ver Boleto</a><br><br><b>Seu pagamento pode levar entre 1 e 2 dias para ser creditado.</b><br>Só é possível pagar em dinheiro ou com cartão de débito. Lembre-se de que também enviamos o boleto para seu e-mail.<br><br>Você pode pagar até $dateOfExpirationOnlyDate",
             'pending_review_manual'                 => 'Estamos processando o pagamento. Em até 2 dias úteis informaremos por e-mail se foi aprovado ou se precisamos de mais informações. Fique atento no e-mail cadastrado',
             'cc_rejected_bad_filled_card_number'    => 'Confira o número do cartão.',
             'cc_rejected_bad_filled_date'           => 'Confira a data de validade.',
@@ -68,7 +70,7 @@ class MercadoPagoException extends Exception
             'cc_rejected_invalid_installments'      => 'O cartão não processa pagamentos parcelados.',
             'cc_rejected_max_attempts'              => 'Você atingiu o limite de tentativas permitido. Escolha outro cartão ou outra forma de pagamento.',
             'cc_rejected_other_reason'              => 'O cartão não processou seu pagamento',
-            'pending_waiting_transfer'              => "<p class='mt-2'>Escaneie o QR Code ou copie a chave para efetuar o pagamento.</p><h4>Page até <b>$dateOfExpiration</b>.</h4><img width='200px' src='data:image/jpeg;base64,$qr_code_base64'/><br/><div class='input-group mt-1'><input type='text' class='form-control' value='$qr_code' readonly><span class='input-group-btn'><button type='button' class='btn btn-primary btn-flat copy-input'><i class='fas fa-copy'></i></button></span></div><br/><span class='status_copy'></span>"
+            'pending_waiting_transfer'              => "<p class='mt-2'>Falta pouco! Escaneie o código QR pelo seu app de pagamentos ou Internet Banking</p><h4>Pague até <b>$dateOfExpiration</b>.</h4><img width='200px' src='data:image/jpeg;base64,$qr_code_base64'/><br/><br>Se preferir, você pode pagá-lo copiando e colando o código abaixo:<br><div class='input-group mt-1'><input type='text' class='form-control' value='$qr_code' readonly><span class='input-group-btn'><button type='button' class='btn btn-primary btn-flat copy-input'><i class='fas fa-copy'></i></button></span></div><br/><span class='status_copy'></span>"
         ];
 
         if (array_key_exists($this->getPayment()->status_detail, $status)) {

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Company extends Model
 {
@@ -88,5 +89,19 @@ class Company extends Model
     public function getPlanCompany(int $id)
     {
         return $this->select('plans.*')->join('plans', 'plans.id', '=', 'companies.plan_id')->where('companies.id', $id)->first();
+    }
+
+    public function setDatePlanAndUpdatePlanCompany(int $company_id, int $plan_id, int $months)
+    {
+        if ($months === 0) {
+            return null;
+        }
+
+        return $this->where('id', $company_id)->update(
+            array(
+                'plan_id' => $plan_id,
+                'plan_expiration_date' => DB::raw("date_add(plan_expiration_date, interval $months month)")
+            )
+        );
     }
 }

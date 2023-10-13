@@ -74,7 +74,7 @@
                                 <th>Nome</th>
                                 <th>Valor</th>
                                 <th>Quantidade de Equipamentos</th>
-                                <th>Tipo de Plano</th>
+                                <th>Quantidade de Meses</th>
                                 <th>Ação</th>
                             </tr>
                         </thead>
@@ -85,7 +85,7 @@
                                 <th>Nome</th>
                                 <th>Valor</th>
                                 <th>Quantidade de Equipamentos</th>
-                                <th>Tipo de Plano</th>
+                                <th>Quantidade de Meses</th>
                                 <th>Ação</th>
                             </tr>
                         </tfoot>

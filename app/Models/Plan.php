@@ -19,7 +19,9 @@ class Plan extends Model
         'description',
         'value',
         'quantity_equipment',
-        'plan_type'
+        'plan_type',
+        'highlight',
+        'month_time'
     ];
 
     /**
@@ -48,6 +50,11 @@ class Plan extends Model
 
     public function getByType(string $string)
     {
-        return $this->where('plan_type', $string)->get();
+        return $this->where('plan_type', $string)->orderBy('value')->get();
+    }
+
+    public function getByMonthTime(int $month_time)
+    {
+        return $this->where('month_time', $month_time)->orderBy('value')->get();
     }
 }

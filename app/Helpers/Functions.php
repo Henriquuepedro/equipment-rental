@@ -622,3 +622,21 @@ if (! function_exists('getKeyRandom')) {
         return substr(bin2hex(random_bytes(6)), 1) . substr(md5(date("YmdHis")), 1, 14);
     }
 }
+
+if (! function_exists('getColorStatus')) {
+    /**
+     * Recuperar cor de acordo com o status.
+     */
+    function getColorStatus(string $status): ?string
+    {
+        if (in_array($status, array('pending','inprocess','inmediation'))) {
+            return 'warning';
+        } elseif (in_array($status, array('rejected','cancelled','refunded','chargedback'))) {
+            return 'danger';
+        } elseif (in_array($status, array('approved', 'authorized'))) {
+            return 'success';
+        }
+
+        return '';
+    }
+}

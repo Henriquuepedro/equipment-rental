@@ -145,8 +145,13 @@
                                             <input type="text" class="form-control" name="quantity_equipment" value="{{ old('quantity_equipment', $plan->quantity_equipment ?? '') }}">
                                         </div>
                                         <div class="form-group col-md-3">
-                                            <label>Tipo de Plano</label>
-                                            <input type="text" class="form-control" name="plan_type" value="{{ old('plan_type', $plan->plan_type ?? '') }}">
+                                            <label>Quantidade de Meses</label>
+                                            <select name="month_time" id="month_time" class="form-control select2">
+                                                <option value="1" {{ old('month_time', $plan->month_time) == 1 ? 'selected' : '' }}>1 Mês</option>
+                                                <option value="3" {{ old('month_time', $plan->month_time) == 3 ? 'selected' : '' }}>3 Meses</option>
+                                                <option value="6" {{ old('month_time', $plan->month_time) == 6 ? 'selected' : '' }}>6 Meses</option>
+                                                <option value="12" {{ old('month_time', $plan->month_time) == 12 ? 'selected' : '' }}>1 Ano</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="row">

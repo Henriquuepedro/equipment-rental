@@ -16,6 +16,7 @@ class PlanPayment extends Model
      */
     protected $fillable = [
         'id_transaction',
+        'code_payment',
         'link_billet',
         'barcode_billet',
         'date_of_expiration',
@@ -54,5 +55,24 @@ class PlanPayment extends Model
     public function insert($data)
     {
         return $this->create($data);
+    }
+
+    public function edit($data, $company_id, $id)
+    {
+        return $this->where(['company_id' => $company_id, 'id', $id])->update($data);
+    }
+
+    public function getPaymentByTransaction(int $id_transaction)
+    {
+        return $this->where('id_transaction', $id_transaction)->first();
+    }
+
+    public function getById(int $company_id, int $id)
+    {
+        return $this
+            ->select('plan_payments.*', 'plans.name')
+            ->join('plans', 'plan_payments.plan_id', '=', 'plans.id')
+            ->where(['plan_payments.company_id' => $company_id, 'plan_payments.id' => $id])
+            ->first();
     }
 }
