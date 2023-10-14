@@ -50,6 +50,14 @@
                 width: 20em;
             }
         }
+
+        #statusScreenBrick_container section:first-child {
+            border-radius: 0 !important;
+        }
+
+        #statusScreenBrick_container div[class^=banner-]:first-child {
+            border-radius: 0 !important;
+        }
     </style>
 @stop
 
@@ -58,99 +66,98 @@
     <script src="https://www.mercadopago.com/v2/security.js" view="checkout"></script>
     <script>
 
-        $(function (){
-            const mp = new MercadoPago('{{ env('MP_PUBLIC_KEY') }}', {
-                locale: 'pt-BR'
-            });
-            const bricksBuilder = mp.bricks();
-            const renderPaymentBrick = async (bricksBuilder) => {
-                const settings = {
-                    initialization: {
-                        /*
-                          "amount" é a quantia total a pagar por todos os meios de pagamento com exceção da Conta Mercado Pago e Parcelas sem cartão de crédito, que têm seus valores de processamento determinados no backend através do "preferenceId"
-                        */
-                        amount: $('[name="amount_plan"]').val(),
-                        preferenceId: "<PREFERENCE_ID>",
-                        payer: {
-                            firstName: '{{ $company_data->first_company_name }}',
-                            lastName: '{{ $company_data->last_company_name }}',
-                            identification: {
-                                "type": "{{ $company_data->type_person === 'pf' ? "CPF" : "CNPJ" }}",
-                                "number": "{{ $company_data->cpf_cnpj }}",
-                            },
-                            email: '{{ auth()->user()->email }}',
-                            address: {
-                                zipCode: '{{ $company_data->cep }}',
-                                federalUnit: '{{ $company_data->state }}',
-                                city: '{{ $company_data->city }}',
-                                neighborhood: '{{ $company_data->neigh }}',
-                                streetName: '{{ $company_data->address }}',
-                                streetNumber: '{{ $company_data->number }}',
-                                complement: '{{ $company_data->complement }}',
-                            }
-                        },
-                    },
-                    customization: {
-                        visual: {
-                            style: {
-                                theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default",
-                            },
-                        },
-                        paymentMethods: {
-                            creditCard: "all",
-                            debitCard: "all",
-                            ticket: "all",
-                            bankTransfer: "all",
-                            atm: "all",
-                            onboarding_credits: "all",
-                            wallet_purchase: "all",
-                            maxInstallments: 12
-                        },
-                    },
-                    callbacks: {
-                        onReady: () => {
-                            /*
-                             Callback chamado quando o Brick está pronto.
-                             Aqui, você pode ocultar seu site, por exemplo.
-                            */
-                        },
-                        onSubmit: ({ selectedPaymentMethod, formData }) => {
-                            const obj_token = {'token_plan': $('[name="token_plan"]').val(), 'device_id': $('[name="device_id"]').val()}
-                            let new_object = {...obj_token, ...formData};
+        const mp = new MercadoPago('{{ env('MP_PUBLIC_KEY') }}', {
+            locale: 'pt-BR'
+        });
+        const bricksBuilder = mp.bricks();
 
-                            // callback chamado quando há click no botão de envio de dados
-                            return new Promise((resolve, reject) => {
-                                fetch($('[name="route_send_payment"]').val(), {
-                                    method: "POST",
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify(new_object),
-                                })
+        $(function (){
+            renderPaymentBrick(bricksBuilder);
+        });
+
+        const renderPaymentBrick = async (bricksBuilder) => {
+            const settings = {
+                initialization: {
+                    /*
+                      "amount" é a quantia total a pagar por todos os meios de pagamento com exceção da Conta Mercado Pago e Parcelas sem cartão de crédito, que têm seus valores de processamento determinados no backend através do "preferenceId"
+                    */
+                    amount: $('[name="amount_plan"]').val(),
+                    preferenceId: "<PREFERENCE_ID>",
+                    payer: {
+                        firstName: '{{ $company_data->first_company_name }}',
+                        lastName: '{{ $company_data->last_company_name }}',
+                        identification: {
+                            "type": "{{ $company_data->type_person === 'pf' ? "CPF" : "CNPJ" }}",
+                            "number": "{{ $company_data->cpf_cnpj }}",
+                        },
+                        email: '{{ auth()->user()->email }}',
+                        address: {
+                            zipCode: '{{ $company_data->cep }}',
+                            federalUnit: '{{ $company_data->state }}',
+                            city: '{{ $company_data->city }}',
+                            neighborhood: '{{ $company_data->neigh }}',
+                            streetName: '{{ $company_data->address }}',
+                            streetNumber: '{{ $company_data->number }}',
+                            complement: '{{ $company_data->complement }}',
+                        }
+                    },
+                },
+                customization: {
+                    visual: {
+                        style: {
+                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default",
+                        },
+                    },
+                    paymentMethods: {
+                        creditCard: "all",
+                        debitCard: "all",
+                        ticket: "all",
+                        bankTransfer: "all",
+                        atm: "all",
+                        onboarding_credits: "all",
+                        wallet_purchase: "all",
+                        maxInstallments: 12
+                    },
+                },
+                callbacks: {
+                    onReady: () => {
+                        /*
+                         Callback chamado quando o Brick está pronto.
+                         Aqui, você pode ocultar seu site, por exemplo.
+                        */
+                    },
+                    onSubmit: ({ selectedPaymentMethod, formData }) => {
+                        const obj_token = {'token_plan': $('[name="token_plan"]').val(), 'device_id': $('[name="device_id"]').val()}
+                        let new_object = {...obj_token, ...formData};
+
+                        // callback chamado quando há click no botão de envio de dados
+                        return new Promise((resolve, reject) => {
+                            fetch($('[name="route_send_payment"]').val(), {
+                                method: "POST",
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(new_object),
+                            })
                                 .then((response) => {
                                     if (response.ok) {
                                         return response.json().then((response) => {
-                                            Swal.fire({
-                                                title: 'Pagamento solicitado com sucesso!',
-                                                html: response.message,
-                                                icon: 'success',
-                                                showCancelButton: false,
-                                                confirmButtonColor: '#28a745',
-                                                confirmButtonText: 'Continuar',
-                                            }).then(result => {
-                                                window.location.replace($('[name="route_request_payment"]').val())
-                                            });
+                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
                                         });
                                     }
 
                                     reject();
                                     return response.json().then(error => {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Pagamento não realizado',
-                                            html: error.errors
-                                        });
+                                        if (typeof error.payment_id !== "undefined") {
+                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Pagamento não realizado',
+                                                html: error.errors
+                                            });
+                                        }
                                     });
                                 })
                                 .then((response) => {
@@ -167,22 +174,53 @@
                                         html: error.errors
                                     });
                                 });
-                            });
-                        },
-                        onError: (error) => {
-                            // callback chamado para todos os casos de erro do Brick
-                            console.error(error);
-                        },
+                        });
                     },
-                };
-                window.paymentBrickController = await bricksBuilder.create(
-                    "payment",
-                    "paymentBrick_container",
-                    settings
-                );
+                    onError: (error) => {
+                        // callback chamado para todos os casos de erro do Brick
+                        console.error(error);
+                    },
+                },
             };
-            renderPaymentBrick(bricksBuilder);
-        });
+            window.paymentBrickController = await bricksBuilder.create(
+                "payment",
+                "paymentBrick_container",
+                settings
+            );
+        }
+
+        const renderStatusScreenBrick = async (bricksBuilder, paymentId) => {
+            const settings = {
+                initialization: {
+                    paymentId, // Payment identifier, from which the status will be checked
+                },
+                customization: {
+                    visual: {
+                        hideStatusDetails: true,
+                        hideTransactionDate: true,
+                        style: {
+                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default",
+                            texts: {
+                                ctaReturnLabel: "Ver solicitações"
+                            }
+                        }
+                    },
+                    backUrls: {
+                        'error': window.location.href,
+                        'return': $('[name="route_request_payment"]').val()
+                    }
+                },
+                callbacks: {
+                    onReady: () => {
+                        $('#resultPayment').modal()
+                    },
+                    onError: (error) => {
+                        // Callback called for all Brick error cases
+                    },
+                },
+            };
+            window.statusScreenBrickController = await bricksBuilder.create('statusScreen', 'statusScreenBrick_container', settings);
+        };
 
         $(document).on('click', '.copy-input', function() {
             // Seleciona o conteúdo do input
@@ -213,6 +251,14 @@
                     <p class="card-description">Solicitações realizadas.</p>
                     <div id="paymentBrick_container"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="resultPayment" tabindex="-1" role="dialog" aria-labelledby="resultPaymentLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div id="statusScreenBrick_container"></div>
             </div>
         </div>
     </div>

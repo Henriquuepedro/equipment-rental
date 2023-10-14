@@ -292,13 +292,13 @@ class PlanController extends Controller
             $this->mercado_pago_exception->setPayment($payment);
             $verify = $this->mercado_pago_exception->verifyTransaction();
         }  catch (Exception $exception) {
-            return response()->json(['errors' => $exception->getMessage()], 400);
+            return response()->json(['errors' => $exception->getMessage(), 'payment_id' => $payment->id], 400);
         }
         if ($verify['class'] == 'error') {
-            return response()->json(['errors' => $verify['message']], 400);
+            return response()->json(['errors' => $verify['message'], 'payment_id' => $payment->id], 400);
         }
 
-        return response()->json(['message' => $verify['message']]);
+        return response()->json(['message' => $verify['message'], 'payment_id' => $payment->id]);
     }
 
     /**
@@ -361,22 +361,13 @@ class PlanController extends Controller
         }
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('plan.view', ['payment_id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $color_status = getColorStatus($value->status);
-
-            $form_payment = __("mercadopago.$value->payment_type_id");
-            $form_payment_complement = ucfirst(str_replace('mercadopago.', '', __("mercadopago.$value->payment_method_id")));
-            if (!empty($form_payment_complement)) {
-                $form_payment .= " ($form_payment_complement)";
-            }
-
             $result[] = array(
                 $value->name,
-                $form_payment,
+                getNamePaymentType($value),
                 formatMoney($value->gross_amount, 2, 'R$ '),
-                "<div class='badge badge-pill badge-lg badge-$color_status'>" . __("mercadopago.$value->status") . "</div>",
+                "<div class='badge badge-pill badge-lg badge-".getColorStatus($value->status)."'>" . __("mp.$value->status") . "</div>",
                 formatDateInternational($value->created_at, DATETIME_BRAZIL),
-                $buttons
+                "<a href='".route('plan.view', ['payment_id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Visualizar' ><i class='fas fa-eye'></i></a>"
             );
         }
 

@@ -161,6 +161,18 @@
         $(function(){
             checkLabelAnimate();
         });
+
+        $(document).on('click', '.copy-input', function() {
+            // Seleciona o conteúdo do input
+            $(this).closest('.input-group').find('input').select();
+            // Copia o conteudo selecionado
+            const copy = document.execCommand('copy');
+
+            Toast.fire({
+                icon: 'success',
+                title: copy ? 'Copiado com sucesso.' : 'Não foi possível copiar.'
+            });
+        });
     </script>
 @stop
 
@@ -179,7 +191,7 @@
                                 <div class="row">
                                     <div class="form-group col-md-3">
                                         <label>Forma de Pagamento</label>
-                                        <input type="text" class="form-control" name="type_payment" value="" disabled />
+                                        <input type="text" class="form-control" name="type_payment" value="{{ getNamePaymentType($payment) }}" disabled />
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label>Plano</label>
@@ -191,7 +203,7 @@
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label>Valor</label>
-                                        <input type="text" class="form-control" name="amount" value="{{ $payment->gross_amount }}" disabled />
+                                        <input type="text" class="form-control" name="amount" value="{{ formatMoney($payment->gross_amount, 2, 'R$ ') }}" disabled />
                                     </div>
                                 </div>
                                 <div class="row">
@@ -207,15 +219,21 @@
                                 <div class="row">
                                     <div class="form-group col-md-4">
                                         <label>Situação Atual</label>
-                                        <input type="text" class="form-control" name="status" value="{{ __('mercadopago.' . $payment->status) }}" disabled />
+                                        <input type="text" class="form-control" name="status" value="{{ __("mp.$payment->status") }}" disabled />
                                     </div>
                                     <div class="form-group col-md-8">
                                         <label>Situação Atual Detalhada</label>
-                                        <input type="text" class="form-control" name="status_detail" value="{{ __('mercadopago.' . $payment->status_detail) }}" disabled />
+                                        <input type="text" class="form-control" name="status_detail" value="{{ __("mp.$payment->status_detail") }}" disabled />
                                     </div>
                                 </div>
                                 @if ($payment->payment_method_id === 'pix' && $payment->payment_type_id === 'bank_transfer')
                                 <div class="row justify-content-center flex-wrap">
+                                    <div class="d-flex justify-content-center col-md-12">
+                                        <div class="form-group col-md-4">
+                                            <label>Pague até</label>
+                                            <input type="text" class="form-control" name="pix_date_of_expiration" value="{{ dateInternationalToDateBrazil($payment->date_of_expiration, 'd/m H:i') }}" disabled/>
+                                        </div>
+                                    </div>
                                     <div class='col-md-12 d-flex justify-content-center'>
                                         <img width="250px" class="mt-2" src="data:image/jpeg;base64,{{ $payment->base64_key_pix }}" alt="QR Code"/>
                                     </div>
@@ -227,14 +245,6 @@
                                             </button>
                                         </span>
                                     </div>
-                                    <div class="d-flex justify-content-center col-md-12">
-                                        <div class="form-group col-md-4">
-                                            <label>Pague até</label>
-                                            <input type="text" class="form-control" name="pix_date_of_expiration" value="{{ dateInternationalToDateBrazil($payment->date_of_expiration, 'd/m H:i') }}" disabled/>
-                                        </div>
-                                    </div>
-                                    <br/>
-                                    <span class='status_copy'></span>
                                 </div>
                                 @elseif (in_array($payment->payment_type_id, array('credit_card', 'debit_card', 'prepaid_card')))
                                 <div class="row">
@@ -248,7 +258,7 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Valor Total Pago</label>
-                                        <input type="text" class="form-control" name="card_client_amount" value="{{ $payment->gross_amount }}" disabled />
+                                        <input type="text" class="form-control" name="card_client_amount" value="{{ formatMoney($payment->client_amount, 2, 'R$ ') }}" disabled />
                                     </div>
                                 </div>
                                 @elseif ($payment->payment_method_id === 'bolbradesco' && $payment->payment_type_id === 'ticket')
@@ -264,8 +274,6 @@
                                                 <i class='fas fa-copy'></i>
                                             </button>
                                         </div>
-                                        <br/>
-                                        <span class='status_copy'></span>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label>Pague até</label>
@@ -273,32 +281,34 @@
                                     </div>
                                 </div>
                                 @endif
-                                <div class="row histories-division">
-                                    <div class="col-md-12"><hr/></div>
-                                </div>
-                                <div class="row histories-title">
-                                    <div class="col-md-12 text-center">
-                                        <h4>Histórico da Transação</h4>
+                                @if (count($plan_histories))
+                                    <div class="row histories-division">
+                                        <div class="col-md-12"><hr/></div>
                                     </div>
-                                </div>
-                                <div class="vertical-timeline mt-3">
-                                    @foreach($plan_histories as $key => $plan_history)
-                                        <div class="timeline-wrapper timeline-wrapper-{{ getColorStatus($plan_history->status) }} {{ $key % 2 == 0 ? 'timeline-inverted' : '' }}">
-                                            <div class="timeline-badge"></div>
-                                            <div class="timeline-panel">
-                                                <div class="timeline-heading">
-                                                    <h6 class="timeline-title">{{ __('mercadopago.' . $plan_history->status) }}</h6>
-                                                </div>
-                                                <div class="timeline-body">
-                                                    <p>{{ __('mercadopago.' . $plan_history->status_detail) }}</p>
-                                                </div>
-                                                <div class="timeline-footer d-flex align-items-center">
-                                                    <span class="ml-auto font-weight-bold">{{ dateInternationalToDateBrazil($plan_history->created_at, DATETIME_INTERNATIONAL_NO_SECONDS) }}</span>
+                                    <div class="row histories-title">
+                                        <div class="col-md-12 text-center">
+                                            <h4>Histórico da Transação</h4>
+                                        </div>
+                                    </div>
+                                    <div class="vertical-timeline mt-3">
+                                        @foreach($plan_histories as $key => $plan_history)
+                                            <div class="timeline-wrapper timeline-wrapper-{{ getColorStatus($plan_history->status) }} {{ $key % 2 == 0 ? 'timeline-inverted' : '' }}">
+                                                <div class="timeline-badge"></div>
+                                                <div class="timeline-panel">
+                                                    <div class="timeline-heading">
+                                                        <h6 class="timeline-title">{{ __('mp.' . $plan_history->status) }}</h6>
+                                                    </div>
+                                                    <div class="timeline-body">
+                                                        <p>{{ __('mp.' . $plan_history->status_detail) }}</p>
+                                                    </div>
+                                                    <div class="timeline-footer d-flex align-items-center">
+                                                        <span class="ml-auto font-weight-bold">{{ dateInternationalToDateBrazil($plan_history->created_at, DATETIME_INTERNATIONAL_NO_SECONDS) }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
-                                </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

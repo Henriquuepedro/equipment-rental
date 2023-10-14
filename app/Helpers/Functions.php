@@ -626,6 +626,9 @@ if (! function_exists('getKeyRandom')) {
 if (! function_exists('getColorStatus')) {
     /**
      * Recuperar cor de acordo com o status.
+     *
+     * @param string $status
+     * @return null|string
      */
     function getColorStatus(string $status): ?string
     {
@@ -638,5 +641,24 @@ if (! function_exists('getColorStatus')) {
         }
 
         return '';
+    }
+}
+
+if (! function_exists('getNamePaymentType')) {
+    /**
+     * Recuperar o nome da forma de pagamento.
+     *
+     * @param object $payment
+     * @return null|string
+     */
+    function getNamePaymentType(object $payment): ?string
+    {
+        $payment_type = __("mp.$payment->payment_type_id");
+        $payment_type_complement = ucfirst(str_replace('mp.', '', __("mp.$payment->payment_method_id")));
+        if (!empty($payment_type_complement)) {
+            $payment_type .= " ($payment_type_complement)";
+        }
+
+        return $payment_type;
     }
 }
