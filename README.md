@@ -89,3 +89,14 @@ Permissão para o projeto em caso do seguinte erro: `docker  - Cannot save \\wsl
 sudo chown -R www-data:www-data {PROJECT}/
 sudo chmod g+w {PROJECT}/
 ```
+
+## Configurando cron
+
+```
+apt-get update -y \
+&& apt-get install cron -y \
+&& echo "* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1" >> /etc/cron.d/scheduler \
+&& chmod 644 /etc/cron.d/scheduler \
+&& crontab /etc/cron.d/scheduler
+```
+

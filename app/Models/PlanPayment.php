@@ -75,4 +75,9 @@ class PlanPayment extends Model
             ->where(['plan_payments.company_id' => $company_id, 'plan_payments.id' => $id])
             ->first();
     }
+
+    public function getPaymentOpen()
+    {
+        return $this->whereIn('status', array('pending','inprocess','inmediation'))->get();
+    }
 }
