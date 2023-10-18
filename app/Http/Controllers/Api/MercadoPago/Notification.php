@@ -43,7 +43,7 @@ class Notification extends Controller
                 return response()->json(array(), 406);
             }
 
-            $code = $request->input('data_id');
+            $code = $request->input('data')->id;
 
             return response()->json(array(), $mercado_pago_service->updatePayment($code));
         } catch (Exception $e) {
