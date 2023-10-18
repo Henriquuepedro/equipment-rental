@@ -25,6 +25,13 @@ class Notification extends Controller
     public function notification(Request $request): JsonResponse
     {
         try {
+            if (
+                !in_array($request->input('action'), array("test.created", "test.updated")) ||
+                $request->input('type') != "test"
+            ) {
+                return response()->json();
+            }
+
             $debug = (bool)$request->input('debug');
             $mercado_pago_service = new MercadoPagoService($debug);
 
