@@ -119,7 +119,7 @@ class MercadoPagoService
             $this->plan_payment->edit(array(
                 'status_detail' => $status_detail,
                 'status'        => $status
-            ), $company_id, $plan_config_id);
+            ), $company_id, $plan_payment_id);
 
             return 201;
         } catch (Exception $e) {
