@@ -26,8 +26,8 @@ class Notification extends Controller
     {
         try {
             if (
-                !in_array($request->input('action'), array("test.created", "test.updated")) ||
-                $request->input('type') != "test"
+                in_array($request->input('action'), array("test.created", "test.updated")) &&
+                $request->input('type') == "test"
             ) {
                 return response()->json();
             }
