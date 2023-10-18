@@ -25,13 +25,6 @@ class Notification extends Controller
     public function notification(Request $request): JsonResponse
     {
         try {
-            if (
-                in_array($request->input('action'), array("test.created", "test.updated")) &&
-                $request->input('type') == "test"
-            ) {
-                return response()->json();
-            }
-
             $debug = (bool)$request->input('debug');
             $mercado_pago_service = new MercadoPagoService($debug);
 
@@ -39,6 +32,13 @@ class Notification extends Controller
             if($request->input('source_news') != 'webhook'){
                 $mercado_pago_service->debugEcho("data_id not found.");
                 return response()->json(array('success' => true), 406);
+            }
+
+            if (
+                in_array($request->input('action'), array("test.created", "test.updated")) &&
+                $request->input('type') == "test"
+            ) {
+                return response()->json();
             }
 
             if (
