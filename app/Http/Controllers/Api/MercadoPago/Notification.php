@@ -28,12 +28,6 @@ class Notification extends Controller
             $debug = (bool)$request->input('debug');
             $mercado_pago_service = new MercadoPagoService($debug);
 
-            // Veio via IPN, não será usado, apenas webhook.
-            if($request->input('source_news') != 'webhook'){
-                $mercado_pago_service->debugEcho("data_id not found.");
-                return response()->json(array('success' => true), 406);
-            }
-
             if (
                 in_array($request->input('action'), array("test.created", "test.updated")) &&
                 $request->input('type') == "test"
@@ -42,7 +36,7 @@ class Notification extends Controller
             }
 
             if (
-                !in_array($request->input('action'), array("payment.updated", "payment.updated")) ||
+                !in_array($request->input('action'), array("payment.created", "payment.updated")) ||
                 $request->input('type') != "payment"
             ) {
                 $mercado_pago_service->debugEcho("type or action don't accept. [action={$request->input('action')} | type={$request->input('type')}].");
