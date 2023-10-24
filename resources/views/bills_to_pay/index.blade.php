@@ -464,7 +464,7 @@
                     <div class="header-card-body justify-content-between flex-wrap">
                         <h4 class="card-title no-border">Contas a Pagar</h4>
                         @if(in_array('BillsToPayCreatePost', $permissions))
-                            <a href="{{ route('bills_to_pay.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Pagamento</a>
+                            <a href="{{ route('bills_to_pay.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Nova Compra</a>
                         @endif
                     </div>
                     <div class="row">

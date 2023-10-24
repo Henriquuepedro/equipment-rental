@@ -47,6 +47,11 @@ class BillToPayPayment extends Model
         return $this->create($data);
     }
 
+    public function remove($company_id, $bill_to_pay_id)
+    {
+        return $this->where(['bill_to_pay_id' => $bill_to_pay_id, 'company_id' => $company_id])->delete();
+    }
+
     public function getBillsToReportWithFilters(int $company_id, array $filters, bool $synthetic = true, array $order_by = array())
     {
         $rental = $this ->select(
@@ -106,7 +111,12 @@ class BillToPayPayment extends Model
         return $rental->get();
     }
 
-    public function getPayment($company_id, $payment_id)
+    public function getPaymentsByBillId($company_id, $payment_id)
+    {
+        return $this->where(['bill_to_pay_id' => $payment_id, 'company_id' => $company_id])->get();
+    }
+
+    public function getPayments($company_id, $payment_id)
     {
         if (is_numeric($payment_id)) {
             return $this->where(['id' => $payment_id, 'company_id' => $company_id])->first();
@@ -119,5 +129,23 @@ class BillToPayPayment extends Model
     public function updateById(array $data, int $id)
     {
         return $this->where('id', $id)->update($data);
+    }
+
+    public function getPaymentByRentalAndDueDateAndValue(int $company_id, int $bill_to_pay_id, string $due_date, float $due_value)
+    {
+        return $this->where(array(
+            'company_id'        => $company_id,
+            'bill_to_pay_id'    => $bill_to_pay_id,
+            'due_date'          => $due_date,
+            'due_value'         => $due_value
+        ))->first();
+    }
+
+    public function getPaymentsPaidByBill(int $company_id, int $bill_to_pay_id)
+    {
+        return $this->where(array(
+            'company_id'     => $company_id,
+            'bill_to_pay_id' => $bill_to_pay_id
+        ))->where('payment_id', '!=', null)->get();
     }
 }

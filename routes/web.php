@@ -159,6 +159,8 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
         Route::get('/novo', [App\Http\Controllers\BillsToPayController::class, 'create'])->name('create');
         Route::post('/cadastro', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('insert');
 
+        Route::get('/{id}', [App\Http\Controllers\BillsToPayController::class, 'edit'])->name('edit');
+
     });
 
     // Relatório
@@ -297,12 +299,15 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::get('/faturamento-por-mes/{months}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForMonths'])->name('get-bills-for-month');
         });
         Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
-            Route::post('/nova-locacao', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');
+            Route::post('/nova-compra', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');
+            Route::post('/atualizar-compra/{id}', [App\Http\Controllers\BillsToPayController::class, 'update'])->name('update-bill-to-pay');
             Route::post('/buscar', [App\Http\Controllers\BillsToPayController::class, 'fetchBills'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToPayController::class, 'getQtyTypeBills'])->name('get-qty-type-bills');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToPayController::class, 'confirmPayment'])->name('confirm_payment');
             Route::post('/reabrir-pagamento', [App\Http\Controllers\BillsToPayController::class, 'reopenPayment'])->name('reopen_payment');
+            Route::get('/pagamentos/{id}', [App\Http\Controllers\BillsToPayController::class, 'getPayments'])->name('get_payments');
+            Route::delete('/delete/{id}', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
         });
         Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
             Route::get('/fields/{option}', [App\Http\Controllers\ExportController::class, 'getFields'])->name('client_fields');
