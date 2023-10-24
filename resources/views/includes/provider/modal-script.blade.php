@@ -1,6 +1,6 @@
 <script>
     $(() => {
-        getOptionsForm('providers', $('.provider-load [name="provider"]'));
+        getOptionsForm('providers', $('.provider-load [name="provider"]'), $('#provider_id').val());
     });
 
     $("#formCreateProviderModal").validate({

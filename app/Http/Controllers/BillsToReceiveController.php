@@ -174,7 +174,8 @@ class BillsToReceiveController extends Controller
 
             if ($permissionUpdate && in_array($type_rental, array('late', 'without_pay'))) {
                 $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
-            } elseif ($permissionDelete) {
+            }
+            if ($type_rental == 'paid' && $permissionDelete) {
                 $buttons .= "<button class='dropdown-item btnReopenPayment' $data_prop_button><i class='fa-solid fa-rotate-left'></i> Reabrir Pagamento</button>";
             }
 

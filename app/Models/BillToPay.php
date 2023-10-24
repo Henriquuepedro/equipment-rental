@@ -64,6 +64,16 @@ class BillToPay extends Model
         return $this->create($data);
     }
 
+    public function edit($data, $id)
+    {
+        return $this->where('id', $id)->update($data);
+    }
+
+    public function remove($company_id, $bill_to_pay_id)
+    {
+        return $this->where(['id' => $bill_to_pay_id, 'company_id' => $company_id])->delete();
+    }
+
     public function getCountTypePayments(int $company_id, int $provider, string $start_date, string $end_date): array
     {
         $data = array();
@@ -187,9 +197,9 @@ class BillToPay extends Model
     public function getBill($company_id, $bill_to_pay_id)
     {
         if (is_numeric($bill_to_pay_id)) {
-            return $this->from('bill_to_pay_payments')->where(['id' => $bill_to_pay_id, 'company_id' => $company_id])->first();
+            return $this->where(['id' => $bill_to_pay_id, 'company_id' => $company_id])->first();
         } elseif (is_array($bill_to_pay_id)) {
-            return $this->from('bill_to_pay_payments')->whereIn('id', $bill_to_pay_id)->where('company_id', $company_id)->get();
+            return $this->whereIn('id', $bill_to_pay_id)->where('company_id', $company_id)->get();
         }
         return [];
     }

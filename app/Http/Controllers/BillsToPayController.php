@@ -32,8 +32,13 @@ class BillsToPayController extends Controller
         $this->bill_to_pay_payment = new BillToPayPayment();
     }
 
-    public function index(): Factory|View|Application
+    public function index(): Factory|View|RedirectResponse|Application
     {
+        if (!hasPermission('BillsToPayView')) {
+            return redirect()->route('dashboard')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
         $company_id = Auth::user()->__get('company_id');
         $providers = $this->provider->getProviders($company_id);
 
@@ -138,9 +143,13 @@ class BillsToPayController extends Controller
             $txt_btn_paid = $type_bill == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
             $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";
 
-            if ($permissionUpdate && in_array($type_bill, array('late', 'without_pay'))) {
-                $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
-            } elseif ($permissionDelete) {
+            if ($permissionUpdate) {
+                $buttons .= "<a href='".route('bills_to_pay.edit', ['id' => $value->id])."' class='dropdown-item'><i class='fas fa-edit'></i> Gerenciar Compra</a>";
+                if (in_array($type_bill, array('late', 'without_pay'))) {
+                    $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
+                }
+            }
+            if ($type_bill == 'paid' && $permissionDelete) {
                 $buttons .= "<button class='dropdown-item btnReopenPayment' $data_prop_button><i class='fa-solid fa-rotate-left'></i> Reabrir Pagamento</button>";
             }
 
@@ -189,7 +198,7 @@ class BillsToPayController extends Controller
         $form_payment_id= $request->input('form_payment');
         $date_payment   = $request->input('date_payment');
         $company_id     = $request->user()->company_id;
-        $payments       = $this->bill_to_pay->getBill($company_id, $payment_id);
+        $payments       = $this->bill_to_pay_payment->getPayments($company_id, $payment_id);
         $user_id        = $request->user()->id;
 
         if (!count($payments)) {
@@ -199,7 +208,7 @@ class BillsToPayController extends Controller
         $bill_to_pay_read = array();
         $provider_id = null;
         foreach ($payments as $payment) {
-            $bill_to_pay = $this->bill_to_pay->getBill($company_id, $payment->bill_to_pay_id);
+            $bill_to_pay = $this->bill_to_pay_payment->getPayments($company_id, $payment->bill_to_pay_id);
 
             // Conta não encontrada ou já lida.
             if (!$bill_to_pay || in_array($bill_to_pay->id, $bill_to_pay_read)) {
@@ -243,6 +252,20 @@ class BillsToPayController extends Controller
         return view('bills_to_pay.create');
     }
 
+    public function edit(int $id): Factory|View|RedirectResponse|Application
+    {
+        if (!hasPermission('BillsToPayUpdatePost')) {
+            return redirect()->route('bills_to_pay.index')
+                ->with('warning', "Você não tem permissão para acessar essa página!");
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+        $bill_to_pay = $this->bill_to_pay->getBill($company_id, $id);
+        $bill_to_pay_payment = $this->bill_to_pay_payment->getPayments($company_id, $id);
+
+        return view('bills_to_pay.update', compact('bill_to_pay'));
+    }
+
     private function formatDataToCreateAndUpdate(Request $request, bool $create = true): array
     {
         // data provider
@@ -256,9 +279,8 @@ class BillsToPayController extends Controller
         $automatic_parcel_distribution  = (bool)$request->input('automatic_parcel_distribution');
         $user_field                     = $create ? 'user_insert' : 'user_update';
 
-        return array(
+        $bill = array(
             'company_id'                    => $company_id,
-            'code'                          => $this->bill_to_pay->getNextCode($company_id),
             'provider_id'                   => $provider,
             'gross_value'                   => $value,
             'extra_value'                   => 0,
@@ -270,6 +292,12 @@ class BillsToPayController extends Controller
             'observation'                   => $description,
             $user_field                     => $user_id
         );
+
+        if ($create) {
+            $bill['code'] = $this->bill_to_pay->getNextCode($company_id);
+        }
+
+        return $bill;
     }
 
     public function insert(Request $request): JsonResponse|RedirectResponse
@@ -325,7 +353,131 @@ class BillsToPayController extends Controller
 
     }
 
-    public function setPaymentRental(Request $request): StdClass
+    public function update(int $id, Request $request): JsonResponse|RedirectResponse
+    {
+        $isAjax      = isAjax();
+        $company_id  = $request->user()->company_id;
+        $bill_to_pay = $this->bill_to_pay->getBill($company_id, $id);
+
+        if (!$bill_to_pay) {
+            return response()->json(['success' => true, 'message' => 'Compra não encontrada']);
+        }
+
+        // Pagamento
+        $responsePayment = $this->setPaymentRental($request, $id);
+        if (isset($responsePayment->error)) {
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $responsePayment->error]);
+            }
+
+            return redirect()->back()
+                ->withErrors([$responsePayment->error])
+                ->withInput();
+        }
+
+        $arrPayments         = $responsePayment->arrPayment;
+        $bill_to_pay_payment = $this->bill_to_pay_payment->getPaymentsByBillId($company_id, $id);
+        $recreate_payments   = !$this->makeValidationPaymentToUpdate($company_id, $bill_to_pay,$bill_to_pay_payment, $request, $arrPayments);
+
+        // Mudou o preço.
+        if ($recreate_payments) {
+            // Não mostramos o alerta ainda.
+            if ($request->has('confirm_update_payment') && !$request->input('confirm_update_payment')) {
+                $show_alert_payment = count($this->bill_to_pay_payment->getPaymentsPaidByBill($company_id, $id)) > 0;
+
+                // Se já tinha algum pagamento pago, precisa mostrar o alerta.
+                if ($show_alert_payment) {
+                    return response()->json(['success' => true, 'message' => null, 'show_alert_update_payment' => true]);
+                }
+            }
+        }
+
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis.
+
+        $updateBillToPay = $this->bill_to_pay->edit($this->formatDataToCreateAndUpdate($request, false), $id);
+
+        if ($recreate_payments) {
+            $this->bill_to_pay_payment->remove($company_id, $id);
+            foreach ($arrPayments as $arrPayment) {
+                $this->bill_to_pay_payment->insert($arrPayment);
+            }
+        }
+
+        if ($updateBillToPay) {
+            DB::commit();
+            if ($isAjax) {
+                return response()->json(['success' => true, 'message' => 'Pagamento alterado com sucesso!', 'bill_to_pay_id' => $id]);
+            }
+
+            return redirect()->route('bills_to_pay.index')
+                ->with('success', "Pagamento com o código $id, alterado com sucesso!");
+        }
+
+        DB::rollBack();
+
+        if ($isAjax) {
+            return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o pagamento, tente novamente!']);
+        }
+
+        return redirect()->back()
+            ->withErrors(['Não foi possível cadastrar o pagamento, tente novamente!'])
+            ->withInput();
+    }
+
+    private function makeValidationPaymentToUpdate(int $company_id, $arrBillToPay, $arrPayment, $request, $arrPaymentsRequest): bool
+    {
+        /**
+         * * Pagamento
+         * Valor líquido mudou, limpa pagamentos.
+         * Valor bruto mudou, limpa pagamentos.
+         * Valor de desconto mudou, limpa pagamentos.
+         * Valor de acréscimo mudou, limpa pagamentos.
+         * Ler todos os pagamentos (existente e enviados):
+         * - Alterou alguma informação do pagamento, limpa pagamentos.
+         * - Pagamento tem no banco e não tem na requisição, é uma remoção.
+         * - Pagamento não tem no banco e tem na requisição, é uma inclusão.
+         */
+
+        // A quantidade de pagamentos no banco de dados difere da quantidade enviada na requisição.
+        if (count($arrPaymentsRequest) != count($arrPayment)) {
+            // Limpar pagamentos.
+            return false;
+        }
+
+        if (roundDecimal($arrBillToPay->gross_value) != roundDecimal(transformMoneyBr_En(filter_var($request->input('value'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL)))) {
+            // Limpar pagamentos.
+            return false;
+        }
+
+        foreach ($arrPayment as $payment) {
+            // Um dos pagamentos enviado na requisição, não existe no banco de dados.
+            if (!$this->bill_to_pay_payment->getPaymentByRentalAndDueDateAndValue($company_id, $arrBillToPay->id, $payment['due_date'], $payment['due_value'])) {
+                // Limpar pagamentos.
+                return false;
+            }
+        }
+
+        // Ler os pagamentos já existente no banco de dados.
+        foreach ($arrPayment as $payment) {
+            $payment_found = false;
+            // Ler os pagamentos enviados na requisição.
+            foreach ($arrPaymentsRequest as $payment_request) {
+                // Se o pagamento do banco de dados foi encontrado na requisição enviada, defino '$payment_found' como 'true', para não excluir as pagamentos.
+                if ($payment->due_date == $payment_request['due_date'] && $payment->due_value == $payment_request['due_value']) {
+                    $payment_found = true;
+                    break;
+                }
+            }
+            if (!$payment_found) {
+                // Limpar pagamentos.
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function setPaymentRental(Request $request, int $id = 0): StdClass
     {
         $company_id = $request->user()->company_id;
         $response = new StdClass();
@@ -340,12 +492,12 @@ class BillsToPayController extends Controller
 
         $valueSumParcel = 0;
         $qtyParcel = count($request->input('due_date'));
-        $valueParcel = (float)number_format($value / $qtyParcel, 2,'.','');
+        $valueParcel = roundDecimal($value / $qtyParcel);
 
         foreach ($request->input('due_date') as $parcel => $_) {
             if ($automaticParcelDistribution) {
                 if (($parcel + 1) === $qtyParcel) {
-                    $valueParcel = (float)number_format($value - $valueSumParcel,2,'.','');
+                    $valueParcel = roundDecimal($value - $valueSumParcel);
                 }
                 $valueSumParcel += $valueParcel;
             } else {
@@ -356,7 +508,7 @@ class BillsToPayController extends Controller
 
             $response->arrPayment[] = array(
                 'company_id'    => $company_id,
-                'bill_to_pay_id'=> 0,
+                'bill_to_pay_id'=> $id,
                 'parcel'        => $parcel + 1,
                 'due_day'       => $request->input('due_day')[$parcel],
                 'due_date'      => $request->input('due_date')[$parcel],
@@ -366,7 +518,7 @@ class BillsToPayController extends Controller
         }
 
         // os valores das parcelas não corresponde ao valor líquido
-        if (number_format($priceTemp,2, '.','') != number_format($value,2, '.','')) {
+        if (roundDecimal($priceTemp) != roundDecimal($value)) {
             $response->error = 'A soma das parcelas deve corresponder ao valor líquido.';
             return $response;
         }
@@ -375,10 +527,10 @@ class BillsToPayController extends Controller
         if (!count($response->arrPayment)) {
             $response->arrPayment[] = array(
                 'company_id'    => $company_id,
-                'bill_to_pay_id'=> 0,
+                'bill_to_pay_id'=> $id,
                 'parcel'        => 1,
                 'due_day'       => 0,
-                'due_date'      => date(DATE_INTERNATIONAL),
+                'due_date'      => dateNowInternational(),
                 'due_value'     => $value,
                 'user_insert'   => $request->user()->id
             );
@@ -395,7 +547,7 @@ class BillsToPayController extends Controller
 
         $payment_id = explode('-',$request->input('payment_id'));
         $company_id = $request->user()->company_id;
-        $payments   = $this->bill_to_pay_payment->getPayment($company_id, $payment_id);
+        $payments   = $this->bill_to_pay_payment->getPayments($company_id, $payment_id);
         $user_id    = $request->user()->id;
 
         if (!count($payments)) {
@@ -412,5 +564,37 @@ class BillsToPayController extends Controller
         }
 
         return response()->json(array('success' => true, 'message' => "Pagamento reaberto!"));
+    }
+
+    public function getPayments(int $id): JsonResponse
+    {
+        if (!hasPermission('BillsToPayView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+        $equipments = $this->bill_to_pay_payment->getPaymentsByBillId($company_id, $id);
+
+        return response()->json($equipments);
+    }
+
+    public function delete(int $id, Request $request): JsonResponse
+    {
+        $company_id = $request->user()->company_id;
+
+        if (!$this->bill_to_pay->getBill($company_id, $id)) {
+            return response()->json(['success' => false, 'message' => 'Não foi possível localizar a compra!']);
+        }
+
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis.
+
+        if (!$this->bill_to_pay_payment->remove($company_id, $id) || !$this->bill_to_pay->remove($company_id, $id)) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Não foi possível excluir a compra!']);
+        }
+
+        DB::commit();
+
+        return response()->json(['success' => true, 'message' => 'Compra excluída com sucesso!']);
     }
 }
