@@ -53,119 +53,39 @@ class ClientController extends Controller
 
     public function insert(ClientCreatePost $request): JsonResponse|RedirectResponse
     {
+        $isAjax = isAjax();
+
         if (!hasPermission('ClientCreatePost')) {
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => "Você não tem permissão para acessar essa página!"]);
+            }
+
             return redirect()->route('client.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        // data client
-        $company_id     = $request->user()->company_id;
-        $user_id        = $request->user()->id;
-        $name           = filter_var($request->input('name_client'));
-        $type           = filter_var($request->input('type_person'));
-        $fantasy        = filter_var($request->input('fantasy_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $email          = filter_var($request->input('email'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $contact        = filter_var($request->input('contact'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $sex            = filter_var($request->input('sex'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $birth_date     = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $nationality    = filter_var($request->input('nationality'));
-        $marital_status = filter_var($request->input('marital_status'));
-        $active         = (bool)$request->input('active');
-        $observation    = filter_var($request->input('observation'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $isAjax         = isAjax();
-
-        if (empty($nationality)) {
-            $nationality = null;
-        }
-        if (empty($marital_status)) {
-            $marital_status = null;
-        }
-
-        if ($type === 'pj') {
-            $sex            = null;
-            $birth_date     = null;
-            $nationality    = null;
-            $marital_status = null;
-        } else {
-            $fantasy = null;
-        }
-
         DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
 
-        $createClient = $this->client->insert(array(
-            'company_id'    => $company_id,
-            'type'          => $type,
-            'name'          => $name,
-            'fantasy'       => $fantasy,
-            'email'         => $email,
-            'phone_1'       => $phone_1,
-            'phone_2'       => $phone_2,
-            'cpf_cnpj'      => $cpf_cnpj,
-            'rg_ie'         => $rg_ie,
-            'contact'       => $contact,
-            'sex'           => $sex,
-            'birth_date'    => $birth_date,
-            'nationality'   => $nationality,
-            'marital_status'=> $marital_status,
-            'active'        => $active,
-            'observation'   => $observation,
-            'user_insert'   => $user_id
-        ));
+        $data_update    = $this->formatDataClientToSave($request);
+        $createClient   = $this->client->insert($data_update);
+        $clientId       = $createClient->id;
 
-        $createAddress = true;
-        $clientId = $createClient->id;
-
-        $qtyAddress = is_array($request->input('name_address')) ? count($request->input('name_address')) : 0;
-        for ($adr = 0; $adr < $qtyAddress; $adr++) {
-            $name_address   = $request->input('name_address')[$adr] ? filter_var($request->input('name_address')[$adr]) : null;
-            $cep            = $request->input('cep')[$adr]          ? filter_var(onlyNumbers($request->input('cep')[$adr]), FILTER_SANITIZE_NUMBER_INT) : null;
-            $address        = $request->input('address')[$adr]      ? filter_var($request->input('address')[$adr]) : null;
-            $number         = $request->input('number')[$adr]       ? filter_var($request->input('number')[$adr]) : null;
-            $complement     = $request->input('complement')[$adr]   ? filter_var($request->input('complement')[$adr]) : null;
-            $reference      = $request->input('reference')[$adr]    ? filter_var($request->input('reference')[$adr]) : null;
-            $neigh          = $request->input('neigh')[$adr]        ? filter_var($request->input('neigh')[$adr]) : null;
-            $city           = $request->input('city')[$adr]         ? filter_var($request->input('city')[$adr]) : null;
-            $state          = $request->input('state')[$adr]        ? filter_var($request->input('state')[$adr]) : null;
-            $lat            = $request->input('lat')[$adr]          ? filter_var($request->input('lat')[$adr]) : null;
-            $lng            = $request->input('lng')[$adr]          ? filter_var($request->input('lng')[$adr]) : null;
-
-            $verifyAddressStep_1 = $name_address || $cep || $address || $number || $complement || $reference || $neigh || $city || $state;
-            $verifyAddressStep_2 = $address && $number && $neigh && $city && $state;
-
-            // verifica se foi digitado algo no endereço para validar
-            if ($verifyAddressStep_1 && !$verifyAddressStep_2) {
-                if ($isAjax) {
-                    return response()->json(['success' => false, 'message' => 'É necessário informar os campos de endereço obrigatório. Identificação do Endereço, Endereço, Número, Bairro, Cidade e Estado.']);
-                }
-
-                return redirect()->back()
-                    ->withErrors(['É necessário informar os campos de endereço obrigatório. Identificação do Endereço, Endereço, Número, Bairro, Cidade e Estado.'])
-                    ->withInput();
+        try {
+            $createAddress = $this->formatDataAddressClientToSave($request, $clientId);
+            foreach ($createAddress as $address) {
+                $this->address->insert($address);
+            }
+        } catch (Exception $exception) {
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $exception->getMessage()]);
             }
 
-            $createAddress = $this->address->insert(array(
-                'company_id'    => $company_id,
-                'client_id'     => $clientId,
-                'name_address'  => $name_address,
-                'address'       => $address,
-                'number'        => $number,
-                'cep'           => $cep,
-                'complement'    => $complement,
-                'reference'     => $reference,
-                'neigh'         => $neigh,
-                'city'          => $city,
-                'state'         => $state,
-                'lat'           => $lat,
-                'lng'           => $lng,
-                'user_insert'   => $user_id
-            ));
+            return redirect()->back()
+                ->withErrors([$exception->getMessage()])
+                ->withInput();
         }
 
-        if($createClient && $createAddress) {
+        if($createClient) {
             DB::commit();
 
             if ($isAjax) {
@@ -173,7 +93,7 @@ class ClientController extends Controller
             }
 
             return redirect()->route('client.index')
-                ->with('success', "Cliente com o código {$clientId}, cadastrado com sucesso!");
+                ->with('success', "Cliente com o código $clientId, cadastrado com sucesso!");
         }
 
         DB::rollBack();
@@ -220,6 +140,91 @@ class ClientController extends Controller
                 ->withInput();
         }
 
+        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
+
+        $data_update = $this->formatDataClientToSave($request);
+        $data_update['user_update'] = $data_update['user_insert'];
+        unset($data_update['company_id']);
+        unset($data_update['user_insert']);
+
+        $createClient = $this->client->edit($data_update, $client_id);
+
+        try {
+            $createAddress = $this->formatDataAddressClientToSave($request, $client_id);
+            foreach ($createAddress as $address) {
+                $this->address->insert($address);
+            }
+        } catch (Exception $exception) {
+            return redirect()->back()
+                ->withErrors([$exception->getMessage()])
+                ->withInput();
+        }
+
+        if($createClient) {
+            DB::commit();
+            return redirect()->route('client.index')
+                ->with('success', "Cliente com o código {$client_id}, atualizado com sucesso!");
+        }
+
+        DB::rollBack();
+        return redirect()->back()
+            ->withErrors(['Não foi possível atualizar o cliente, tente novamente!'])
+            ->withInput();
+    }
+    private function formatDataAddressClientToSave($request, $client_id): array
+    {
+        $user_id    = $request->user()->id;
+        $company_id = $request->user()->company_id;
+        // remover todos os endereços desse cliente
+        $this->address->deleteAddressClient($client_id);
+        // data address
+        $createAddress = array();
+        $qtyAddress = isset($request->name_address) ? count($request->name_address) : 0;
+        for ($adr = 0; $adr < $qtyAddress; $adr++) {
+            $name_address   = $request->input('name_address')[$adr] ? filter_var($request->input('name_address')[$adr]) : null;
+            $cep            = $request->input('cep')[$adr]          ? filter_var(onlyNumbers($request->input('cep')[$adr]), FILTER_SANITIZE_NUMBER_INT) : null;
+            $address        = $request->input('address')[$adr]      ? filter_var($request->input('address')[$adr]) : null;
+            $number         = $request->input('number')[$adr]       ? filter_var($request->input('number')[$adr]) : null;
+            $complement     = $request->input('complement')[$adr]   ? filter_var($request->input('complement')[$adr]) : null;
+            $reference      = $request->input('reference')[$adr]    ? filter_var($request->input('reference')[$adr]) : null;
+            $neigh          = $request->input('neigh')[$adr]        ? filter_var($request->input('neigh')[$adr]) : null;
+            $city           = $request->input('city')[$adr]         ? filter_var($request->input('city')[$adr]) : null;
+            $state          = $request->input('state')[$adr]        ? filter_var($request->input('state')[$adr]) : null;
+            $lat            = $request->input('lat')[$adr]          ? filter_var($request->input('lat')[$adr]) : null;
+            $lng            = $request->input('lng')[$adr]          ? filter_var($request->input('lng')[$adr]) : null;
+
+            $verifyAddressStep_1 = $name_address || $cep || $address || $number || $complement || $reference || $neigh || $city || $state;
+            $verifyAddressStep_2 = $address && $number && $neigh && $city && $state;
+
+            // verifica se foi digitado algo no endereço para validar
+            if ($verifyAddressStep_1 && !$verifyAddressStep_2) {
+                throw new Exception('É necessário informar os campos de endereço obrigatório. Endereço, Número, Bairro, Cidade e Estado.');
+            }
+
+            $createAddress[] = array(
+                'company_id'    => $company_id,
+                'client_id'     => $client_id,
+                'name_address'  => $name_address,
+                'address'       => $address,
+                'number'        => $number,
+                'cep'           => $cep,
+                'complement'    => $complement,
+                'reference'     => $reference,
+                'neigh'         => $neigh,
+                'city'          => $city,
+                'state'         => $state,
+                'lat'           => $lat,
+                'lng'           => $lng,
+                'user_insert'   => $user_id
+            );
+        }
+
+        return $createAddress;
+    }
+
+    private function formatDataClientToSave($request)
+    {
+        $company_id     = $request->user()->company_id;
         $user_id        = $request->user()->id;
         $name           = filter_var($request->input('name_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $type           = filter_var($request->input('type_person'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
@@ -253,9 +258,8 @@ class ClientController extends Controller
             $fantasy = null;
         }
 
-        DB::beginTransaction();// Iniciando transação manual para evitar updates não desejáveis
-
-        $createClient = $this->client->edit(array(
+        return array(
+            'company_id'    => $company_id,
             'type'          => $type,
             'name'          => $name,
             'fantasy'       => $fantasy,
@@ -271,70 +275,8 @@ class ClientController extends Controller
             'marital_status'=> $marital_status,
             'active'        => $active,
             'observation'   => $observation,
-            'user_update'   => $user_id
-        ), $client_id);
-
-
-        // data address
-        $createAddressStatus = true;
-        $qtyAddress = isset($request->name_address) ? count($request->name_address) : 0;
-        // remover todos os endereços desse cliente
-        $this->address->deleteAddressClient($client_id);
-        for ($adr = 0; $adr < $qtyAddress; $adr++) {
-            $name_address   = $request->input('name_address')[$adr] ? filter_var($request->input('name_address')[$adr]) : null;
-            $cep            = $request->input('cep')[$adr]          ? filter_var(onlyNumbers($request->input('cep')[$adr]), FILTER_SANITIZE_NUMBER_INT) : null;
-            $address        = $request->input('address')[$adr]      ? filter_var($request->input('address')[$adr]) : null;
-            $number         = $request->input('number')[$adr]       ? filter_var($request->input('number')[$adr]) : null;
-            $complement     = $request->input('complement')[$adr]   ? filter_var($request->input('complement')[$adr]) : null;
-            $reference      = $request->input('reference')[$adr]    ? filter_var($request->input('reference')[$adr]) : null;
-            $neigh          = $request->input('neigh')[$adr]        ? filter_var($request->input('neigh')[$adr]) : null;
-            $city           = $request->input('city')[$adr]         ? filter_var($request->input('city')[$adr]) : null;
-            $state          = $request->input('state')[$adr]        ? filter_var($request->input('state')[$adr]) : null;
-            $lat            = $request->input('lat')[$adr]          ? filter_var($request->input('lat')[$adr]) : null;
-            $lng            = $request->input('lng')[$adr]          ? filter_var($request->input('lng')[$adr]) : null;
-
-            $verifyAddressStep_1 = $name_address || $cep || $address || $number || $complement || $reference || $neigh || $city || $state;
-            $verifyAddressStep_2 = $address && $number && $neigh && $city && $state;
-
-            // verifica se foi digitado algo no endereço para validar
-            if ($verifyAddressStep_1 && !$verifyAddressStep_2) {
-                return redirect()->back()
-                    ->withErrors(['É necessário informar os campos de endereço obrigatório. Endereço, Número, Bairro, Cidade e Estado.'])
-                    ->withInput();
-            }
-
-            $createAddress = $this->address->insert(array(
-                'company_id'    => $company_id,
-                'client_id'     => $client_id,
-                'name_address'  => $name_address,
-                'address'       => $address,
-                'number'        => $number,
-                'cep'           => $cep,
-                'complement'    => $complement,
-                'reference'     => $reference,
-                'neigh'         => $neigh,
-                'city'          => $city,
-                'state'         => $state,
-                'lat'           => $lat,
-                'lng'           => $lng,
-                'user_insert'   => $user_id
-            ));
-            if (!$createAddress) {
-                $createAddressStatus = false;
-            }
-
-        }
-
-        if($createClient && $createAddressStatus) {
-            DB::commit();
-            return redirect()->route('client.index')
-                ->with('success', "Cliente com o código {$client_id}, atualizado com sucesso!");
-        }
-
-        DB::rollBack();
-        return redirect()->back()
-            ->withErrors(['Não foi possível atualizar o cliente, tente novamente!'])
-            ->withInput();
+            'user_insert'   => $user_id
+        );
     }
 
     public function delete(ClientDeletePost $request): JsonResponse
@@ -391,13 +333,17 @@ class ClientController extends Controller
             return response()->json(getErrorDataTables($exception->getMessage(), $draw));
         }
 
-        $permissionUpdate = hasPermission('ClientUpdatePost');
-        $permissionDelete = hasPermission('ClientDeletePost');
+        $permissionUpdate   = hasPermission('ClientUpdatePost');
+        $permissionDelete   = hasPermission('ClientDeletePost');
+        $permissionViewBill = hasPermission('BillsToReceiveView');
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('client.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
-            $buttons .= $permissionUpdate ? "title='Atualizar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveClient btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' data-client-id='{$value->id}'><i class='fas fa-times'></i></button>" : '';
+            $buttons = "<a href='".route('client.edit', ['id' => $value->id])."' class='dropdown-item'>";
+            $buttons .= $permissionUpdate ? "<i class='fas fa-edit'></i> Atualizar Cadastro</a>" : "<i class='fas fa-eye'></i> Visualizar Cadastro</a>";
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveClient' data-client-id='$value->id'><i class='fas fa-solid fa-xmark pr-1'></i> Excluir Cadastro</button>" : '';
+            $buttons .= $permissionViewBill ? "<button class='dropdown-item btnViewBillClient' data-client-id='$value->id' data-client-name='$value->name'><i class='fas fa-regular fa-list-check'></i> Ficha Financeira</button>" : '';
+
+            $buttons = dropdownButtonsDataList($buttons, $value->id);
 
             $result[] = array(
                 $value->id,
