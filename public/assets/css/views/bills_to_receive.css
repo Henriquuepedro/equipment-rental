@@ -1,0 +1,16 @@
+.tickets-tab-switch .nav-item .nav-link.active .badge {
+    background: #fff;
+    color: #2196f3;
+}
+
+#tableBillsToReceive_wrapper .dataTables_scroll .dataTables_scrollBody {
+    overflow-x: hidden !important;
+}
+
+#tableBillsToReceive tbody tr {
+    cursor: pointer;
+}
+
+#tableBillsToReceive_processing {
+    z-index: 1;
+}

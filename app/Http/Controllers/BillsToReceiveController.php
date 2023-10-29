@@ -72,12 +72,13 @@ class BillsToReceiveController extends Controller
 
     public function fetchRentals(Request $request): JsonResponse
     {
-        $result         = array();
-        $draw           = $request->input('draw');
-        $company_id     = $request->user()->company_id;
-        $type_rental    = $request->input('type');
-        $filters        = array();
-        $filter_default = array();
+        $result                 = array();
+        $draw                   = $request->input('draw');
+        $company_id             = $request->user()->company_id;
+        $type_rental            = $request->input('type');
+        $show_client_name_list  = $request->input('show_client_name_list');
+        $filters                = array();
+        $filter_default         = array();
 
         try {
             // Filtro datas
@@ -194,12 +195,13 @@ class BillsToReceiveController extends Controller
 
             $due_date = "<div class='badge badge-pill badge-lg badge-$color_badge'>$due_date</div>";
 
+            $data_info_client = "<div class='d-flex flex-wrap'>";
+            $data_info_client .= $show_client_name_list ? "<span class='font-weight-bold w-100'>$value->client_name</span>" : '';
+            $data_info_client .= "<span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span></div>";
+
             $result[] = array(
                 $rental_code,
-                "<div class='d-flex flex-wrap'>
-                    <span class='font-weight-bold w-100'>$value->client_name</span>
-                    <span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span>
-                </div>",
+                $data_info_client,
                 'R$ ' . number_format($value->due_value, 2, ',', '.'),
                 $due_date,
                 $buttons,

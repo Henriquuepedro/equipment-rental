@@ -7,16 +7,19 @@
 @stop
 
 @section('css')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+    @if(in_array('BillsToReceiveView', $permissions)) <link href="{{ asset('assets/css/views/bills_to_receive.css') }}" rel="stylesheet"> @endif
 @stop
 
 @section('js')
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
     <script>
         var tableClient;
         $(function () {
-            tableClient = getTable(false);
+            tableClient = getTableClient(false);
         });
 
-        const getTable = (stateSave = true) => {
+        const getTableClient = (stateSave = true) => {
 
             const active = $('#active').val();
 
@@ -76,7 +79,7 @@
                             $('[data-toggle="tooltip"]').tooltip('dispose')
                             tableClient.destroy();
                             $("#tableClients tbody").empty();
-                            tableClient = getTable();
+                            tableClient = getTableClient();
                             Toast.fire({
                                 icon: response.success ? 'success' : 'error',
                                 title: response.message
@@ -119,9 +122,21 @@
         $('#active').on('change', function(){
             tableClient.destroy();
             $("#tableClients tbody").empty();
-            tableClient = getTable();
+            tableClient = getTableClient();
+        });
+
+        $(document).on('click', '.btnViewBillClient', function(){
+            const client_id     = $(this).data('client-id');
+            const client_name   = $(this).data('client-name');
+
+            $('#contentListBillToReceive [name="clients"]').empty().append(`<option value="${client_id}">${client_name}</option>`);
+
+            $('#modalFinancialStatement').modal();
+
+            $('#contentListBillToReceive [name="clients"]').trigger('change');
         })
     </script>
+    @if(in_array('BillsToReceiveView', $permissions)) <script src="{{ asset('assets/js/views/bill_to_receive/index.js') }}" type="application/javascript"></script> @endif
 @stop
 
 @section('content')
@@ -179,4 +194,27 @@
             </div>
         </div>
     </div>
+    @if(in_array('BillsToReceiveView', $permissions))
+        <div class="modal fade" id="modalFinancialStatement" tabindex="-1" role="dialog" aria-labelledby="modalFinancialStatement" aria-hidden="true">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ficha Financeira</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-0">
+                        @include('includes.bill_to_receive.content', ['show_select_client' => false, 'card_title' => false, 'billStartFilterDate' => '01/01/2020', 'billEndFilterDate' => dateInternationalToDateBrazil(dateNowInternational(), DATE_BRAZIL)])
+                    </div>
+                    <div class="modal-footer d-flex justify-content-around">
+                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @include('includes.bill_to_receive.confirm_payment')
+        @include('includes.bill_to_receive.view_payment')
+        @include('includes.bill_to_receive.reopen')
+    @endif
 @stop
