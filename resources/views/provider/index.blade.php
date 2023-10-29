@@ -7,16 +7,19 @@
 @stop
 
 @section('css')
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+    @if(in_array('BillsToPayView', $permissions)) <link href="{{ asset('assets/css/views/bills_to_pay.css') }}" rel="stylesheet"> @endif
 @stop
 
 @section('js')
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
     <script>
         var tableProvider;
         $(function () {
-            tableProvider = getTable(false);
+            tableProvider = getTableProvider(false);
         });
 
-        const getTable = (stateSave = true) => {
+        const getTableProvider = (stateSave = true) => {
             return $("#tableProviders").DataTable({
                 "responsive": true,
                 "processing": true,
@@ -73,7 +76,7 @@
                             $('[data-toggle="tooltip"]').tooltip('dispose')
                             tableProvider.destroy();
                             $("#tableProviders tbody").empty();
-                            tableProvider = getTable();
+                            tableProvider = getTableProvider();
                             Toast.fire({
                                 icon: response.success ? 'success' : 'error',
                                 title: response.message
@@ -111,8 +114,21 @@
                     });
                 }
             })
-        })
+        });
+
+        $(document).on('click', '.btnViewBillProvider', function(){
+            const providers_id     = $(this).data('provider-id');
+            const providers_name   = $(this).data('provider-name');
+
+            $('#contentListBillToPay [name="providers"]').empty().append(`<option value="${providers_id}">${providers_name}</option>`);
+
+            $('#modalFinancialStatement').modal();
+
+            $('#contentListBillToPay [name="providers"]').trigger('change');
+            $('#contentListBillToPay #without_pay-tab').trigger('click');
+        });
     </script>
+    @if(in_array('BillsToPayView', $permissions)) <script src="{{ asset('assets/js/views/bill_to_pay/index.js') }}" type="application/javascript"></script> @endif
 @stop
 
 @section('content')
@@ -158,4 +174,27 @@
             </div>
         </div>
     </div>
+    @if(in_array('BillsToPayView', $permissions))
+        <div class="modal fade" id="modalFinancialStatement" tabindex="-1" role="dialog" aria-labelledby="modalFinancialStatement" aria-hidden="true">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ficha Financeira</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body p-0">
+                        @include('includes.bill_to_pay.content', ['show_select_provider' => false, 'card_title' => false, 'billStartFilterDate' => '01/01/2020', 'billEndFilterDate' => dateInternationalToDateBrazil(dateNowInternational(), DATE_BRAZIL)])
+                    </div>
+                    <div class="modal-footer d-flex justify-content-around">
+                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @include('includes.bill_to_pay.confirm_payment')
+        @include('includes.bill_to_pay.view_payment')
+        @include('includes.bill_to_pay.reopen')
+    @endif
 @stop

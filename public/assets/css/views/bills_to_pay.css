@@ -3,15 +3,15 @@
     color: #2196f3;
 }
 
-#tableBillsToReceive_wrapper .dataTables_scroll .dataTables_scrollBody {
+#tableBillsToPay_wrapper .dataTables_scroll .dataTables_scrollBody {
     overflow-x: hidden !important;
 }
 
-#tableBillsToReceive tbody tr {
+#tableBillsToPay tbody tr {
     cursor: pointer;
 }
 
-#tableBillsToReceive_processing {
+#tableBillsToPay_processing {
     z-index: 1;
 }
 .modal {

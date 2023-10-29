@@ -65,12 +65,13 @@ class BillsToPayController extends Controller
 
     public function fetchBills(Request $request): JsonResponse
     {
-        $result         = array();
-        $draw           = $request->input('draw');
-        $company_id     = $request->user()->company_id;
-        $type_bill      = $request->input('type');
-        $filters        = array();
-        $filter_default = array();
+        $result                 = array();
+        $draw                   = $request->input('draw');
+        $company_id             = $request->user()->company_id;
+        $type_bill              = $request->input('type');
+        $show_client_name_list  = $request->input('show_client_name_list');
+        $filters                = array();
+        $filter_default         = array();
 
         try {
             // Filtro datas

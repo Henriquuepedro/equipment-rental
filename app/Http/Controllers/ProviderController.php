@@ -233,11 +233,15 @@ class ProviderController extends Controller
 
         $permissionUpdate = hasPermission('ProviderUpdatePost');
         $permissionDelete = hasPermission('ProviderDeletePost');
+        $permissionViewBill = hasPermission('BillsToPayView');
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('provider.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' ";
-            $buttons .= $permissionUpdate ? "title='Atualizar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveProvider btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' provider-id='$value->id'><i class='fas fa-times'></i></button>" : '';
+            $buttons = "<a href='".route('provider.edit', ['id' => $value->id])."' class='dropdown-item'>";
+            $buttons .= $permissionUpdate ? "<i class='fas fa-edit'></i> Atualizar Cadastro</a>" : "<i class='fas fa-eye'></i> Visualizar Cadastro</a>";
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveProvider' provider-id='$value->id'><i class='fas fa-times'></i> Excluir Cadastro</button>" : '';
+            $buttons .= $permissionViewBill ? "<button class='dropdown-item btnViewBillProvider' data-provider-id='$value->id' data-provider-name='$value->name'><i class='fas fa-regular fa-list-check'></i> Ficha Financeira</button>" : '';
+
+            $buttons = dropdownButtonsDataList($buttons, $value->id);
 
             $result[] = array(
                 $value->id,

@@ -58,7 +58,7 @@ const enabledLoadData = () => {
 
 const getCountsTabRentals = () => {
     const start_date = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
-    const end_date = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+    const end_date   = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
 
     $.ajax({
         headers: {
@@ -66,7 +66,7 @@ const getCountsTabRentals = () => {
         },
         type: 'POST',
         data: {
-            client: $('[name="clients"]').val(),
+            client: $('#contentListBillToReceive [name="clients"]').val(),
             start_date,
             end_date
         },
@@ -107,7 +107,7 @@ const getTable = (typeRentals, stateSave = true) => {
     }
 
     if (isNaN(client_id) || client_id === null) {
-        tableBillsToReceive = $("#tableBillsToReceive").DataTable();
+        tableBillsToReceive = $("#contentListBillToReceive #tableBillsToReceive").DataTable();
         enabledLoadData();
         return;
     }
@@ -117,7 +117,7 @@ const getTable = (typeRentals, stateSave = true) => {
     const start_date = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
     const end_date = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
 
-    tableBillsToReceive = $("#tableBillsToReceive").DataTable({
+    tableBillsToReceive = $("#contentListBillToReceive #tableBillsToReceive").DataTable({
         "responsive": true,
         "processing": true,
         "autoWidth": false,
@@ -126,7 +126,7 @@ const getTable = (typeRentals, stateSave = true) => {
         "searching": true,
         "stateSave": stateSave,
         "serverMethod": "post",
-        "order": [[3, 'asc']],
+        "order": [[ 3, 'asc' ]],
         paging: false,
         scrollCollapse: true,
         scrollY: '50vh',
