@@ -134,7 +134,8 @@
             $('#modalFinancialStatement').modal();
 
             $('#contentListBillToReceive [name="clients"]').trigger('change');
-        })
+            $('#contentListBillToReceive #without_pay-tab').trigger('click');
+        });
     </script>
     @if(in_array('BillsToReceiveView', $permissions)) <script src="{{ asset('assets/js/views/bill_to_receive/index.js') }}" type="application/javascript"></script> @endif
 @stop

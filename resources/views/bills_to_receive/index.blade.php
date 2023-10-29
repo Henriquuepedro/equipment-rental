@@ -28,8 +28,7 @@
     <div class="row profile-page">
         <div class="col-md-12 grid-margin">
             @if(session('success'))
-                <div class="alert alert-animate alert-success"><i class="fa fa-check-circle"></i> {{session('success')}}
-                </div>
+                <div class="alert alert-animate alert-success"><i class="fa fa-check-circle"></i> {{session('success')}}</div>
             @endif
             @if(session('warning'))
                 <div class="alert alert-animate alert-danger mt-2">{{session('warning')}}</div>
