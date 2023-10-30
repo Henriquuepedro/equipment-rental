@@ -46,7 +46,7 @@ class PlanController extends Controller
         try {
             $filters        = array();
             $filter_default = array();
-            $fields_order   = array('name', 'value', 'quantity_equipment', 'plan_type', '');
+            $fields_order   = array('name', 'value', 'quantity_equipment', 'month_time', '');
 
             $query = array(
                 'from' => 'plans'
@@ -54,7 +54,7 @@ class PlanController extends Controller
 
             $data = fetchDataTable(
                 $query,
-                array('plan_type', 'desc'),
+                array('month_time', 'desc'),
                 null,
                 [],
                 $filters,
