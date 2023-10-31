@@ -67,6 +67,7 @@
                 <div class="card-body">
                     <div class="header-card-body justify-content-between flex-wrap">
                         <h4 class="card-title no-border">Planos Cadastrados</h4>
+                        <a href="{{ route('master.plan.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Plano</a>
                     </div>
                     <table id="tablePlans" class="table table-bordered">
                         <thead>

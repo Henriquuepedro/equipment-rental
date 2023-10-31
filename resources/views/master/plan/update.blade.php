@@ -3,7 +3,7 @@
 @section('title', 'Alterar Plano')
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Alterar Plano</h1>
+    <h1 class="m-0 text-dark">{{ empty($plan) ? 'Cadastrar' : 'Alterar' }} Plano</h1>
 @stop
 
 @section('css')
@@ -12,7 +12,7 @@
 @section('js')
 <script>
     $(function(){
-        $('[name="value"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
+        $('[name="value"], [name="from_value"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
 
         if ($('#content_description').length) {
 
@@ -58,38 +58,17 @@
             name: {
                 required: true
             },
-            phone: {
-                rangelength: [13, 14]
+            month_time: {
+                required: true
             },
-            email: {
-                required: true,
-                email: true
+            value: {
+                required: true
             },
-            password: {
-                minlength: 6
-            },
-            password_confirmation: {
-                equalTo : "#password"
+            quantity_equipment: {
+                required: true
             }
         },
-        messages: {
-            name: {
-                required: 'Digite o nome/razão social da empresa.'
-            },
-            phone: {
-                rangelength: "O campo telefone primário deve ser um telefone válido."
-            },
-            email: {
-                required: "Informe um e-mail comercial válido.",
-                email: "Informe um e-mail comercial válido."
-            },
-            password: {
-                minlength: "Senha deve conter no mínimo 6 caracteres."
-            },
-            password_confirmation: {
-                equalTo : "Senhas devem ser iguais."
-            }
-        },
+        messages: {},
         invalidHandler: function(event, validator) {
             let arrErrors = [];
             $.each(validator.errorMap, function (key, val) {
@@ -128,36 +107,49 @@
                             <div class="card-body d-flex flex-wrap">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Plano</h4>
-                                    <p class="card-description"> Preencha o formulário abaixo com as novas informações do plano </p>
+                                    <p class="card-description"> Preencha o formulário abaixo com as informações do plano </p>
                                 </div>
                                 <div class="col-md-12 no-padding">
                                     <div class="row">
+                                        <div class="form-group col-md-5">
+                                            <label>Nome (*)</label>
+                                            <input type="text" class="form-control" name="name" value="{{ old('name', $plan->name ?? '') }}" required>
+                                        </div>
                                         <div class="form-group col-md-4">
-                                            <label>Nome</label>
-                                            <input type="text" class="form-control" name="name" value="{{ old('name', $plan->name ?? '') }}">
-                                        </div>
-                                        <div class="form-group col-md-2">
-                                            <label>Valor</label>
-                                            <input type="text" class="form-control" name="value" value="{{ old('value', formatMoney($plan->value ?? 0)) }}">
-                                        </div>
-                                        <div class="form-group col-md-3">
-                                            <label>Quantidade de Equipamentos</label>
-                                            <input type="text" class="form-control" name="quantity_equipment" value="{{ old('quantity_equipment', $plan->quantity_equipment ?? '') }}">
-                                        </div>
-                                        <div class="form-group col-md-3">
-                                            <label>Quantidade de Meses</label>
-                                            <select name="month_time" id="month_time" class="form-control select2">
-                                                <option value="1" {{ old('month_time', $plan->month_time) == 1 ? 'selected' : '' }}>1 Mês</option>
-                                                <option value="3" {{ old('month_time', $plan->month_time) == 3 ? 'selected' : '' }}>3 Meses</option>
-                                                <option value="6" {{ old('month_time', $plan->month_time) == 6 ? 'selected' : '' }}>6 Meses</option>
-                                                <option value="12" {{ old('month_time', $plan->month_time) == 12 ? 'selected' : '' }}>1 Ano</option>
+                                            <label>Quantidade de Meses (*)</label>
+                                            <select name="month_time" id="month_time" class="form-control select2" required>
+                                                <option value="1" {{ old('month_time', $plan->month_time ?? 0) == 1 ? 'selected' : '' }}>1 Mês</option>
+                                                <option value="3" {{ old('month_time', $plan->month_time ?? 0) == 3 ? 'selected' : '' }}>3 Meses</option>
+                                                <option value="6" {{ old('month_time', $plan->month_time ?? 0) == 6 ? 'selected' : '' }}>6 Meses</option>
+                                                <option value="12" {{ old('month_time', $plan->month_time ?? 0) == 12 ? 'selected' : '' }}>1 Ano</option>
                                             </select>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <div class="switch d-flex mt-4">
+                                                <input type="checkbox" class="check-style check-xs" name="highlight" id="highlight" {{ old('highlight', $plan->highlight ?? false) ? 'checked' : '' }}>
+                                                <label for="highlight" class="check-style check-xs"></label>&nbsp;Em Destaque
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-3">
+                                            <label>Valor De</label>
+                                            <input type="text" class="form-control" name="from_value" value="{{ old('value', formatMoney($plan->from_value ?? 0)) }}">
+                                            <small>Quando informado <b>0,00</b>, não será exibido no card do plano.</small>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>Valor Por (*)</label>
+                                            <input type="text" class="form-control" name="value" value="{{ old('value', formatMoney($plan->value ?? 0)) }}" required>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>Quantidade de Equipamentos (*)</label>
+                                            <input type="text" class="form-control" name="quantity_equipment" value="{{ old('quantity_equipment', $plan->quantity_equipment ?? '') }}" required>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-md-12 mt-3">
                                             <h5>Descrição do plano</h5>
-                                            <div id="content_description" class="quill-container">{!! $plan->description !!}</div>
+                                            <div id="content_description" class="quill-container">{!! $plan->description ?? '' !!}</div>
                                             <textarea type="hidden" class="d-none" name="description" id="description"></textarea>
                                         </div>
                                     </div>

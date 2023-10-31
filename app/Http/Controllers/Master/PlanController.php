@@ -38,6 +38,11 @@ class PlanController extends Controller
         return view('master.plan.update', compact('plan'));
     }
 
+    public function create(): View|Factory|RedirectResponse|Application
+    {
+        return view('master.plan.update');
+    }
+
     public function fetch(Request $request): JsonResponse
     {
         $result     = array();
@@ -94,8 +99,10 @@ class PlanController extends Controller
             'name'               => filter_var($request->input('name')),
             'description'        => filter_var($request->input('description')),
             'value'              => transformMoneyBr_En(filter_var($request->input('value'))),
+            'from_value'         => transformMoneyBr_En(filter_var($request->input('from_value'))) ?: null,
             'quantity_equipment' => filter_var($request->input('quantity_equipment')),
-            'month_time'         => filter_var($request->input('month_time'), FILTER_VALIDATE_INT)
+            'month_time'         => filter_var($request->input('month_time'), FILTER_VALIDATE_INT),
+            'highlight'          => (bool)$request->input('highlight')
         ], $id);
 
         if (!$update) {
@@ -106,5 +113,27 @@ class PlanController extends Controller
 
         return redirect()->route('master.plan.index')
             ->with('success', "Plano atualizado com sucesso!");
+    }
+
+    public function insert(Request $request): RedirectResponse
+    {
+        $insert = $this->plan->insert([
+            'name'               => filter_var($request->input('name')),
+            'description'        => filter_var($request->input('description')),
+            'value'              => transformMoneyBr_En(filter_var($request->input('value'))),
+            'from_value'         => transformMoneyBr_En(filter_var($request->input('from_value'))) ?: null,
+            'quantity_equipment' => filter_var($request->input('quantity_equipment')),
+            'month_time'         => filter_var($request->input('month_time'), FILTER_VALIDATE_INT),
+            'highlight'          => (bool)$request->input('highlight')
+        ]);
+
+        if (!$insert) {
+            return redirect()->back()
+                ->withErrors(['Não foi possível cadastrar o plano, tente novamente!'])
+                ->withInput();
+        }
+
+        return redirect()->route('master.plan.index')
+            ->with('success', "Plano cadastrado com sucesso!");
     }
 }

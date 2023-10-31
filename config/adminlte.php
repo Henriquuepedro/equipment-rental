@@ -224,21 +224,178 @@ return [
     |
     | Here we can modify the sidebar/top navigation of the admin panel.
     |
-    | For more detailed instructions you can look here:
-    | https://github.com/jeroennoten/Laravel-AdminLTE/#8-menu-configuration
-    |
     */
 
     'menu' => [
-//        [
-//            'text' => 'search',
-//            'search' => true,
-//            'topnav' => true,
-//        ],
         [
-            'text' => 'Dashboard',
-            'route'  => 'dashboard',
-            'icon' => 'typcn-document-text'
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => [],
+            'text'          => 'Administração',
+            'can'           => 'admin-master',
+            'class'         => 'bg-primary',
+            'list'          => [
+                [
+                    'route' => 'master.company.index',
+                    'text' => 'Empresas',
+                    'permissions'   => [],
+                    'route_active'  => ['master.company.edit']
+                ],
+                [
+                    'route' => 'master.user.index',
+                    'text' => 'Usuários',
+                    'permissions'   => [],
+                    'route_active'  => ['master.user.edit']
+                ],
+                [
+                    'route' => 'master.plan.index',
+                    'text' => 'Planos',
+                    'permissions'   => [],
+                    'route_active'  => ['master.plan.edit']
+                ]
+            ]
+        ],
+        [
+            'type'          => 'single',
+            'route'         => 'dashboard',
+            'text'          => 'Dashboard',
+            'permissions'   => [],
+        ],
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => [],
+            'text'          => 'Cadastro',
+            'can'           => null,
+            'list'          => [
+                [
+                    'permissions' => [
+                        'ClientView'
+                    ],
+                    'route' => 'client.index',
+                    'text' => 'Cliente',
+                    'route_active'  => ['client.edit']
+                ],
+                [
+                    'permissions' => [
+                        'EquipmentView'
+                    ],
+                    'route' => 'equipment.index',
+                    'text' => 'Equipamento',
+                    'route_active'  => ['equipment.edit']
+                ],
+                [
+                    'permissions' => [
+                        'DriverView'
+                    ],
+                    'route' => 'driver.index',
+                    'text' => 'Motorista',
+                    'route_active'  => ['driver.edit']
+                ],
+                [
+                    'permissions' => [
+                        'VehicleView'
+                    ],
+                    'route' => 'vehicle.index',
+                    'text' => 'Veículo',
+                    'route_active'  => ['vehicle.edit']
+                ],
+                [
+                    'permissions' => [
+                        'ResidueView'
+                    ],
+                    'route' => 'residue.index',
+                    'text' => 'Resíduo'
+                ],
+                [
+                    'permissions' => [
+                        'ProviderView'
+                    ],
+                    'route' => 'provider.index',
+                    'text' => 'Fornecedor',
+                    'route_active'  => ['provider.edit']
+                ]
+            ]
+        ],
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => [],
+            'text'          => 'Controle',
+            'can'           => null,
+            'list'          => [
+                [
+                    'permissions' => [
+                        'RentalView'
+                    ],
+                    'route' => 'rental.index',
+                    'text' => 'Locação',
+                    'route_active'  => ['rental.edit', 'rental.exchange']
+                ],
+                [
+                    'permissions' => [
+                        'BudgetView'
+                    ],
+                    'route' => 'budget.index',
+                    'text' => 'Orçamento',
+                    'route_active'  => ['budget.edit']
+                ],
+                [
+                    'permissions' => [
+                        'BillsToReceiveView'
+                    ],
+                    'route' => 'bills_to_receive.index',
+                    'text' => 'Contas a Receber',
+                ],
+                [
+                    'permissions' => [
+                        'BillsToPayView'
+                    ],
+                    'route' => 'bills_to_pay.index',
+                    'text' => 'Contas a Pagar',
+                    'route_active'  => ['bills_to_pay.edit']
+                ],
+            ]
+        ],
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => ['ReportView'],
+            'text'          => 'Relatório',
+            'can'           => null,
+            'list'          => [
+                [
+                    'route' => 'report.rental',
+                    'text'  => 'Locação'
+                ],
+                [
+                    'route' => 'report.bill',
+                    'text'  => 'Financeiro'
+                ],
+                [
+                    'route' => 'report.register',
+                    'text'  => 'Cadastro'
+                ]
+            ]
+        ],
+        [
+            'type'          => 'level',
+            'route'         => null,
+            'permissions'   => ['PlanView'],
+            'text'          => 'Plano',
+            'can'           => null,
+            'list'          => [
+                [
+                    'route'         => 'plan.index',
+                    'text'          => 'Planos',
+                    'route_active'  => ['plan.confirm']
+                ],
+                [
+                    'route'         => 'plan.request',
+                    'text'          => 'Solicitações',
+                    'route_active'  => ['plan.view']
+                ]
+            ]
         ]
     ],
 

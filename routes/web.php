@@ -371,6 +371,8 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::get('/', [App\Http\Controllers\Master\PlanController::class, 'index'])->name('index');
             Route::get('/atualizar/{id}', [App\Http\Controllers\Master\PlanController::class, 'edit'])->name('edit');
             Route::post('/atualizar/{id}', [App\Http\Controllers\Master\PlanController::class, 'update'])->name('update');
+            Route::get('/novo', [App\Http\Controllers\Master\PlanController::class, 'create'])->name('create');
+            Route::post('/novo', [App\Http\Controllers\Master\PlanController::class, 'insert'])->name('insert');
         });
 
     });

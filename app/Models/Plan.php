@@ -18,6 +18,7 @@ class Plan extends Model
         'name',
         'description',
         'value',
+        'from_value',
         'quantity_equipment',
         'highlight',
         'month_time'
@@ -36,6 +37,11 @@ class Plan extends Model
      * @var array
      */
     protected $casts = [];
+
+    public function insert(array $data)
+    {
+        return $this->create($data);
+    }
 
     public function getById(int $id)
     {
