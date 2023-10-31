@@ -30,6 +30,8 @@
         });
 
         const listPlans = type =>  {
+            const tag_plan = type === 1 ? 'mês' : (type === 3 ? 'trimestre' : (type === 6 ? 'semestre' : 'ano'));
+
             $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).empty().append(getHtmlLoading());
             $.get(`{{ route('ajax.plan.get-plans') }}/${type}`, response => {
                 $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).empty();
@@ -49,10 +51,10 @@
                                 <h3>${value.name}</h3>
 
                                 <p class="mb-0 mt-2 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Equipamentos disponíveis: <b>${value.quantity_equipment}</b></p>
-                                <p class="text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte on-line</p>
+                                <p class="text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte via chamado</p>
 
                                 ${price_from}
-                                <h1 class="fw-normal mb-0">R$ ${numberToReal(value.value)}<small>/mês</small></h1>
+                                <h1 class="fw-normal mb-0">R$ ${numberToReal(value.value)}<small>/${tag_plan}</small></h1>
                             </div>
                             <div class="plan-features">
                                 ${description}
@@ -94,11 +96,11 @@
                                         Mensal
                                     </a>
                                 </li>
-                                <li class="col-md-2 nav-item">
-                                    <a class="d-flex justify-content-center nav-link" id="quarterly" data-toggle="tab" href="#quarterly-plan" data-month-time="3" role="tab" aria-controls="quarterly-plan" aria-selected="false">
-                                        Trimestral
-                                    </a>
-                                </li>
+{{--                                <li class="col-md-2 nav-item">--}}
+{{--                                    <a class="d-flex justify-content-center nav-link" id="quarterly" data-toggle="tab" href="#quarterly-plan" data-month-time="3" role="tab" aria-controls="quarterly-plan" aria-selected="false">--}}
+{{--                                        Trimestral--}}
+{{--                                    </a>--}}
+{{--                                </li>--}}
                                 <li class="col-md-2 nav-item">
                                     <a class="d-flex justify-content-center nav-link" id="semiannual" data-toggle="tab" href="#semiannual-plan" data-month-time="6" role="tab" aria-controls="semiannual-plan" aria-selected="false">
                                         Semestral
