@@ -334,7 +334,7 @@ if (! function_exists('formatMoney')) {
     function formatMoney(string $value = null, int $decimals = 2, string $prefix = ''): string
     {
         if (empty($value)) {
-            return 0.00;
+            return number_format(0, 2, ',', '.');
         }
 
         return $prefix . number_format($value, $decimals, ',', '.');

@@ -36,23 +36,26 @@
 
                 const col_lg = response.length === 1 ? 12 : (response.length === 2 ? 6 : (response.length === 3 ? 4 : 3));
 
-                // const price_from = type !== 'monthly' ? `<h4 class="fw-normal mb-0 text-danger" style="text-decoration:line-through;">R$ 50,00</h4>` : '';
-                const price_from = '';
+                let price_from, description;
 
                 $(response).each(function(key, value){
+                    console.log(value);
+                    price_from = value.from_value === null || parseFloat(value.from_value) === 0 ? '' : `<h4 class="fw-normal mb-0 text-primary" style="text-decoration:line-through;">R$ ${numberToReal(value.from_value)}</h4>`;
+                    description = value.description === '<p><br></p>' ? '' : value.description;
                     $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append(
                         `<div class="col-lg-${col_lg} col-sm-12  grid-margin stretch-card pricing-card">
                         <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body">
                             <div class="text-center pricing-card-head">
                                 <h3>${value.name}</h3>
-                                ${price_from}
-                                <h1 class="fw-normal mb-0">R$ ${numberToReal(value.value)}<small>/mês</small></h1>
 
                                 <p class="mb-0 mt-2 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Equipamentos disponíveis: <b>${value.quantity_equipment}</b></p>
                                 <p class="text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte on-line</p>
+
+                                ${price_from}
+                                <h1 class="fw-normal mb-0">R$ ${numberToReal(value.value)}<small>/mês</small></h1>
                             </div>
                             <div class="plan-features">
-                                ${value.description}
+                                ${description}
                             </div>
                             <div class="wrapper">
                                 <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block">Assinar</a>
