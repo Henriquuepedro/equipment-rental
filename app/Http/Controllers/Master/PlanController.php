@@ -74,12 +74,17 @@ class PlanController extends Controller
         foreach ($data['data'] as $value) {
             $buttons = "<a href='".route('master.plan.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Atualizar' ><i class='fas fa-edit'></i></a>";
 
+            $highlight = $value->highlight ? ' <i class="fa fa-star text-warning"></i>' : '';
+            $month_time = $value->month_time == 1 ? ' mês' : ' meses';
+            $allowed_users = empty($value->allowed_users) ? '' : ' usuários';
+            $from_value = empty($value->from_value) ? '' : "<s>".formatMoney($value->from_value, 2, 'R$ ')."</s> <i class='fa fa-arrow-right'></i> ";
+
             $result[] = array(
-                $value->name,
-                formatMoney($value->value, 2, 'R$ '),
-                $value->quantity_equipment,
-                (int)$value->allowed_users ?: 'Ilimitado',
-                $value->month_time,
+                $value->name . $highlight,
+                $from_value . formatMoney($value->value, 2, 'R$ '),
+                $value->quantity_equipment . ' equipamentos',
+                ((int)$value->allowed_users ?: 'Ilimitado') . $allowed_users,
+                $value->month_time . $month_time,
                 $buttons
             );
         }
