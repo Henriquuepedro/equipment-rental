@@ -78,6 +78,7 @@ class PlanController extends Controller
                 $value->name,
                 formatMoney($value->value, 2, 'R$ '),
                 $value->quantity_equipment,
+                (int)$value->allowed_users ?: 'Ilimitado',
                 $value->month_time,
                 $buttons
             );
@@ -95,15 +96,7 @@ class PlanController extends Controller
 
     public function update(Request $request, int $id): RedirectResponse
     {
-        $update = $this->plan->updateById([
-            'name'               => filter_var($request->input('name')),
-            'description'        => filter_var($request->input('description')),
-            'value'              => transformMoneyBr_En(filter_var($request->input('value'))),
-            'from_value'         => transformMoneyBr_En(filter_var($request->input('from_value'))) ?: null,
-            'quantity_equipment' => filter_var($request->input('quantity_equipment')),
-            'month_time'         => filter_var($request->input('month_time'), FILTER_VALIDATE_INT),
-            'highlight'          => (bool)$request->input('highlight')
-        ], $id);
+        $update = $this->plan->updateById($this->formatDataPlanToSAve($request), $id);
 
         if (!$update) {
             return redirect()->back()
@@ -117,15 +110,7 @@ class PlanController extends Controller
 
     public function insert(Request $request): RedirectResponse
     {
-        $insert = $this->plan->insert([
-            'name'               => filter_var($request->input('name')),
-            'description'        => filter_var($request->input('description')),
-            'value'              => transformMoneyBr_En(filter_var($request->input('value'))),
-            'from_value'         => transformMoneyBr_En(filter_var($request->input('from_value'))) ?: null,
-            'quantity_equipment' => filter_var($request->input('quantity_equipment')),
-            'month_time'         => filter_var($request->input('month_time'), FILTER_VALIDATE_INT),
-            'highlight'          => (bool)$request->input('highlight')
-        ]);
+        $insert = $this->plan->insert($this->formatDataPlanToSAve($request));
 
         if (!$insert) {
             return redirect()->back()
@@ -135,5 +120,19 @@ class PlanController extends Controller
 
         return redirect()->route('master.plan.index')
             ->with('success', "Plano cadastrado com sucesso!");
+    }
+
+    private function formatDataPlanToSAve(Request $request): array
+    {
+        return [
+            'name'                  => filter_var($request->input('name')),
+            'description'           => filter_var($request->input('description')),
+            'value'                 => transformMoneyBr_En(filter_var($request->input('value'))),
+            'from_value'            => transformMoneyBr_En(filter_var($request->input('from_value'))) ?: null,
+            'quantity_equipment'    => filter_var($request->input('quantity_equipment')),
+            'highlight'             => (bool)$request->input('highlight'),
+            'month_time'            => filter_var($request->input('month_time'), FILTER_VALIDATE_INT),
+            'allowed_users'         => filter_var($request->input('allowed_users'), FILTER_VALIDATE_INT, FILTER_FLAG_EMPTY_STRING_NULL) ?: null
+        ];
     }
 }

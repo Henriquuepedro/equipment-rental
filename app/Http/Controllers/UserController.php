@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdatePost;
 use App\Http\Requests\UserCreatePost;
 use App\Http\Requests\UserDeletePost;
+use App\Models\Company;
 use App\Models\Permission;
+use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -15,16 +17,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image as ImageUpload;
+use Intervention\Image\Image;
 
 class UserController extends Controller
 {
     private User $user;
     private Permission $permission;
+    private Plan $plan;
+    private Company $company;
 
     public function __construct()
     {
         $this->user = new User();
         $this->permission = new Permission();
+        $this->plan = new Plan();
+        $this->company = new Company();
     }
 
     public function profile(): Factory|View|Application
@@ -166,7 +173,7 @@ class UserController extends Controller
         }
     }
 
-    private function resizeImageProfile($uploadPath, $imageName): \Intervention\Image\Image
+    private function resizeImageProfile($uploadPath, $imageName): Image
     {
         return ImageUpload::make("{$uploadPath}/{$imageName}")
             ->resize(100, 100)
@@ -175,15 +182,27 @@ class UserController extends Controller
 
     public function newUser(UserCreatePost $request): JsonResponse
     {
-        $company_id = Auth::user()->__get('company_id');
-        $name       = filter_var($request->input('name_modal'));
-        $phone      = $request->input('phone_modal') ? filter_var(onlyNumbers($request->input('phone_modal')), FILTER_SANITIZE_NUMBER_INT) : null;
-        $email      = filter_var($request->input('email_modal'), FILTER_VALIDATE_EMAIL);
-        $password   = Hash::make($request->input('password_modal'));
+        $company_id     = Auth::user()->__get('company_id');
+        $name           = filter_var($request->input('name_modal'));
+        $phone          = $request->input('phone_modal') ? filter_var(onlyNumbers($request->input('phone_modal')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $email          = filter_var($request->input('email_modal'), FILTER_VALIDATE_EMAIL);
+        $password       = Hash::make($request->input('password_modal'));
+        $allowed_users  = 1;
+
+        $data_company = $this->company->getCompany($company_id);
+        if ($data_company->plan_id) {
+            $data_plan = $this->plan->getById($data_company->plan_id);
+            $allowed_users = $data_plan->allowed_users;
+        }
+
+        // quando $allowed_users é null, usuário pode cadastrar usuários ilimitados.
+        if (!is_null($allowed_users) && count($this->user->getUsersCompany($company_id)) >= $allowed_users) {
+            return response()->json(['success' => false, 'message' => "Limite de usuários atingidos. Seu plano permite cadastrar somente $allowed_users usuários."]);
+        }
 
         $permissions = array_map(function($permission) {
             return (int)$permission;
-        }, $request->input('permission'));
+        }, $request->input('permission') ?? []);
 
         if (!$email) {
             return response()->json(['success' => false, 'message' => 'Endereço de e-mail inválido.']);
@@ -306,7 +325,7 @@ class UserController extends Controller
 
         $arrPermissions = array_map(function($permission) {
             return (int)$permission;
-        }, $request->input('permission'));
+        }, $request->input('permission') ?? []);
 
         $company_id = $request->user()->company_id;
         $user_id    = $request->input('user_id');
@@ -356,6 +375,7 @@ class UserController extends Controller
 
     public function deleteUser(UserDeletePost $request): JsonResponse
     {
+        return response()->json(['success' => false, 'message' => 'Você não tem permissão para fazer essa operação!']);
         $company_id     = $request->user()->company_id;
         $user_id_session= $request->user()->id;
         $user_id        = $request->input('user_id');

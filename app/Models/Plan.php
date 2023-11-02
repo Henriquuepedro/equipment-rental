@@ -21,7 +21,8 @@ class Plan extends Model
         'from_value',
         'quantity_equipment',
         'highlight',
-        'month_time'
+        'month_time',
+        'allowed_users'
     ];
 
     /**

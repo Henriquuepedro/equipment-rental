@@ -121,7 +121,7 @@
                                                 <option value="1" {{ old('month_time', $plan->month_time ?? 0) == 1 ? 'selected' : '' }}>1 Mês</option>
                                                 <option value="3" {{ old('month_time', $plan->month_time ?? 0) == 3 ? 'selected' : '' }}>3 Meses</option>
                                                 <option value="6" {{ old('month_time', $plan->month_time ?? 0) == 6 ? 'selected' : '' }}>6 Meses</option>
-                                                <option value="12" {{ old('month_time', $plan->month_time ?? 0) == 12 ? 'selected' : '' }}>1 Ano</option>
+                                                <option value="12" {{ old('month_time', $plan->month_time ?? 0) == 12 ? 'selected' : '' }}>12 Meses</option>
                                             </select>
                                         </div>
                                         <div class="form-group col-md-3">
@@ -144,6 +144,11 @@
                                         <div class="form-group col-md-3">
                                             <label>Quantidade de Equipamentos (*)</label>
                                             <input type="text" class="form-control" name="quantity_equipment" value="{{ old('quantity_equipment', $plan->quantity_equipment ?? '') }}" required>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>Usuários Permitidos</label>
+                                            <input type="number" class="form-control" name="allowed_users" value="{{ old('allowed_users', $plan->allowed_users ?? '') }}">
+                                            <small>Deixe em branco ou informe zero para considerar usuários ilimitados.</small>
                                         </div>
                                     </div>
                                     <div class="row">

@@ -717,8 +717,8 @@ const loadUsers = (openPermissions = false, user_id = false) => {
                     htmlUser += `<button type="button" class="btn btn-sm btn-${colorBtnStatus} col-md-12 inactivate-user text-left" user-id="${value.id}" user-name="${value.name}">${nameBtnStatus}</button>`;
                 }
                 if (viewBtnDeleteUser && viewInativeUser) {
-                    htmlUser += `<div class="dropdown-divider"></div>
-                                    <button type="button" class="btn btn-sm btn-danger col-md-12 removeUser text-left" user-id="${value.id}" user-name="${value.name}"><i class="fa fa-user-times"></i> Excluir</button>`;
+                    //htmlUser += `<div class="dropdown-divider"></div>
+                    //                <button type="button" class="btn btn-sm btn-danger col-md-12 removeUser text-left" user-id="${value.id}" user-name="${value.name}"><i class="fa fa-user-times"></i> Excluir</button>`;
                 }
                 htmlUser += `</div>
                                                 </div>

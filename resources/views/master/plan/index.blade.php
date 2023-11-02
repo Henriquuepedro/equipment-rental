@@ -75,6 +75,7 @@
                                 <th>Nome</th>
                                 <th>Valor</th>
                                 <th>Quantidade de Equipamentos</th>
+                                <th>Usuários Permitidos</th>
                                 <th>Quantidade de Meses</th>
                                 <th>Ação</th>
                             </tr>
@@ -86,6 +87,7 @@
                                 <th>Nome</th>
                                 <th>Valor</th>
                                 <th>Quantidade de Equipamentos</th>
+                                <th>Usuários Permitidos</th>
                                 <th>Quantidade de Meses</th>
                                 <th>Ação</th>
                             </tr>
