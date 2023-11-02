@@ -38,12 +38,12 @@
 
                 const col_lg = response.length === 1 ? 12 : (response.length === 2 ? 6 : (response.length === 3 ? 4 : 3));
 
-                let price_from, description;
+                let price_from, description, alert_user;
 
                 $(response).each(function(key, value){
-                    console.log(value);
                     price_from = value.from_value === null || parseFloat(value.from_value) === 0 ? '' : `<h4 class="fw-normal mb-0 text-primary" style="text-decoration:line-through;">R$ ${numberToReal(value.from_value)}</h4>`;
                     description = value.description === '<p><br></p>' ? '' : value.description;
+                    alert_user = value.allowed_users ? `Cadastre até <b>${value.allowed_users}</b> usuários` : 'Cadastre usuários ilimitados';
                     $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append(
                         `<div class="col-lg-${col_lg} col-sm-12  grid-margin stretch-card pricing-card">
                         <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body">
@@ -51,6 +51,7 @@
                                 <h3>${value.name}</h3>
 
                                 <p class="mb-0 mt-2 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Equipamentos disponíveis: <b>${value.quantity_equipment}</b></p>
+                                <p class="mb-0 mt-2 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${alert_user}</p>
                                 <p class="text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte via chamado</p>
 
                                 ${price_from}
