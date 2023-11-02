@@ -50,8 +50,8 @@
                             <div class="text-center pricing-card-head">
                                 <h3>${value.name}</h3>
 
-                                <p class="mb-0 mt-2 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Equipamentos disponíveis: <b>${value.quantity_equipment}</b></p>
-                                <p class="mb-0 mt-2 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${alert_user}</p>
+                                <p class="mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Equipamentos disponíveis: <b>${value.quantity_equipment}</b></p>
+                                <p class="mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${alert_user}</p>
                                 <p class="text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte via chamado</p>
 
                                 ${price_from}
