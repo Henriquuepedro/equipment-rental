@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class BillToPayPayment extends Model
 {
@@ -147,5 +148,24 @@ class BillToPayPayment extends Model
             'company_id'     => $company_id,
             'bill_to_pay_id' => $bill_to_pay_id
         ))->where('payment_id', '!=', null)->get();
+    }
+
+    public function getBillsForDate(int $company_id, string $date): float|int
+    {
+        $register = $this->select(DB::raw('SUM(due_value) as total'))
+            ->where([
+                ['payment_id', '<>', null],
+                ['company_id', '=', $company_id]
+            ])
+            ->whereDate('payday', $date)
+            ->first();
+
+        if ($register) {
+            if ($register->total) {
+                return roundDecimal($register->total);
+            }
+        }
+
+        return 0;
     }
 }

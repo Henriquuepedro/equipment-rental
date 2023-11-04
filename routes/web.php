@@ -183,6 +183,13 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
 
     });
 
+    // Fluxo de caixa
+    Route::group(['prefix' => '/fluxo-de-caixa', 'as' => 'cash_flow.'], function () {
+
+        Route::get('/', [App\Http\Controllers\CashFlowController::class, 'index'])->name('index');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -296,7 +303,9 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToReceiveController::class, 'getQtyTypeRentals'])->name('get-qty-type-rentals');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'confirmPayment'])->name('confirm_payment');
             Route::post('/reabrir-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'reopenPayment'])->name('reopen_payment');
-            Route::get('/faturamento-por-mes/{months}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForMonths'])->name('get-bills-for-month');
+            Route::get('/pagamentos-por-mes/{months}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForMonths'])->name('get-bills-for-month');
+            Route::get('/pagamentos-por-data/{date?}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForDate'])->name('get-bills-for-date');
+            Route::post('/buscar-pagamentos-por-data', [App\Http\Controllers\BillsToReceiveController::class, 'fetchBillForDate'])->name('fetchBillForDate');
         });
         Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
             Route::post('/nova-compra', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');
@@ -308,6 +317,8 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::post('/reabrir-pagamento', [App\Http\Controllers\BillsToPayController::class, 'reopenPayment'])->name('reopen_payment');
             Route::get('/pagamentos/{id}', [App\Http\Controllers\BillsToPayController::class, 'getPayments'])->name('get_payments');
             Route::delete('/delete/{id}', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
+            Route::get('/pagamentos-por-data/{date?}', [App\Http\Controllers\BillsToPayController::class, 'getBillsForDate'])->name('get-bills-for-date');
+            Route::post('/buscar-pagamentos-por-data', [App\Http\Controllers\BillsToPayController::class, 'fetchBillForDate'])->name('fetchBillForDate');
         });
         Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
             Route::get('/fields/{option}', [App\Http\Controllers\ExportController::class, 'getFields'])->name('client_fields');
