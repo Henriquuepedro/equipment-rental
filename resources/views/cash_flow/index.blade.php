@@ -60,14 +60,21 @@
         })
 
         const loadCashFlow = async () => {
+            const date = transformDateForEn($('[name="date_filter"]').val());
+
+            if (date === false) {
+                $('#received').text('R$ ' + numberToReal(0));
+                $('#paid').text('R$ ' + numberToReal(0));
+                $('#liquid').text('R$ ' + numberToReal(0));
+                return;
+            }
+
             $('#received').html('<i class="fa fa-spinner fa-spin"></i>');
             $('#paid').html('<i class="fa fa-spinner fa-spin"></i>');
             $('#liquid').html('<i class="fa fa-spinner fa-spin"></i>');
 
             date_actual_paid = date_actual_received = '';
             $('#accordion .collapse').collapse('hide');
-
-            const date = transformDateForEn($('[name="date_filter"]').val());
 
             const received = await $.get(`{{ route('ajax.bills_to_receive.get-bills-for-date') }}/${date}`);
             const paid = await $.get(`{{ route('ajax.bills_to_pay.get-bills-for-date') }}/${date}`);
@@ -183,13 +190,10 @@
                     <div class="row">
                         <div class="form-group flatpickr col-md-3 d-flex">
                             <label class="label-date-btns">Data</label>
-                            <input type="tel" name="date_filter" class="form-control col-md-9" value="{{ date('d/m/Y') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy" im-insert="false" data-input>
-                            <div class="input-button-calendar col-md-3 no-padding">
+                            <input type="tel" name="date_filter" class="form-control col-md-8" value="{{ date('d/m/Y') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy" im-insert="false" data-input>
+                            <div class="input-button-calendar col-md-4 no-padding">
                                 <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
                                     <i class="fa fa-calendar text-white"></i>
-                                </a>
-                                <a class="input-button pull-right btn-primary" title="clear" data-clear>
-                                    <i class="fa fa-times text-white"></i>
                                 </a>
                             </div>
                         </div>
