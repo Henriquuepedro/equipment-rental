@@ -4534,10 +4534,10 @@ input[type="button"].btn-block {
   .accordion > .card:not(:first-of-type) .card-header:first-child {
     border-radius: 0; }
   .accordion > .card:not(:first-of-type):not(:last-of-type) {
-    border-bottom: 0;
+    /*border-bottom: 0;*/
     border-radius: 0; }
   .accordion > .card:first-of-type {
-    border-bottom: 0;
+    /*border-bottom: 0;*/
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0; }
   .accordion > .card:last-of-type {
@@ -19995,4 +19995,7 @@ div.dataTables_wrapper div.dataTables_filter input {
 }
 select option {
     color: #000
+}
+.flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover, .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay, .flatpickr-day.notAllowed, .flatpickr-day.notAllowed.prevMonthDay, .flatpickr-day.notAllowed.nextMonthDay {
+    color: #777 !important;
 }

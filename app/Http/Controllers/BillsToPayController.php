@@ -598,4 +598,78 @@ class BillsToPayController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Compra excluída com sucesso!']);
     }
+
+    public function getBillsForDate(string $date): JsonResponse
+    {
+        if (!hasPermission('BillsToReceiveView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        return response()->json(array('total' => $this->bill_to_pay_payment->getBillsForDate($company_id, $date)));
+    }
+
+    public function fetchBillForDate(Request $request): JsonResponse
+    {
+        $result         = array();
+        $draw           = $request->input('draw');
+        $company_id     = $request->user()->company_id;
+        $date_filter    = dateBrazilToDateInternational($request->input('date_filter'));
+        $filters        = array();
+        $filter_default = array();
+
+        try {
+            $filter_default[]['where']['bill_to_pays.company_id'] = $company_id;
+            $filter_default[]['whereDate']['bill_to_pay_payments.payday'] = $date_filter;
+
+            $fields_order = array('bill_to_pays.code','providers.name','bill_to_pay_payments.due_value');
+
+            $query = array();
+            $query['select'] = [
+                'bill_to_pays.id',
+                'bill_to_pays.code',
+                'providers.name as provider_name',
+                'bill_to_pays.created_at',
+                'bill_to_pay_payments.due_date',
+                'bill_to_pay_payments.due_value',
+                'bill_to_pay_payments.id as bill_payment_id',
+                'bill_to_pay_payments.payment_id',
+                'bill_to_pay_payments.payday'
+            ];
+            $query['from'] = 'bill_to_pays';
+            $query['join'][] = ['bill_to_pay_payments','bill_to_pay_payments.bill_to_pay_id','=','bill_to_pays.id'];
+            $query['join'][] = ['providers','providers.id','=','bill_to_pays.provider_id'];
+
+            $data = fetchDataTable(
+                $query,
+                array('bill_to_pays.code', 'asc'),
+                null,
+                ['BillsToPayView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
+            return response()->json(getErrorDataTables($exception->getMessage(), $draw));
+        }
+
+        foreach ($data['data'] as $value) {
+            $result[] = array(
+                formatCodeRental($value->code),
+                $value->provider_name,
+                formatMoney($value->due_value, 2, 'R$ ')
+            );
+        }
+
+        $output = array(
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
+        );
+
+        return response()->json($output);
+    }
 }

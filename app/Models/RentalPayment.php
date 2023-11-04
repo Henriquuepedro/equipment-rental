@@ -281,7 +281,7 @@ class RentalPayment extends Model
         ))->where('payment_id', '!=', null)->get();
     }
 
-    public function getBillsForMonth($company_id, $year, $month)
+    public function getBillsForMonth($company_id, $year, $month): float|int
     {
         $register = $this->select(DB::raw('SUM(due_value) as total'))
             ->where([
@@ -293,7 +293,28 @@ class RentalPayment extends Model
             ->first();
 
         if ($register) {
-            return $register->total;
+            if ($register->total) {
+                return roundDecimal($register->total);
+            }
+        }
+
+        return 0;
+    }
+
+    public function getBillsForDate(int $company_id, string $date): float|int
+    {
+        $register = $this->select(DB::raw('SUM(due_value) as total'))
+            ->where([
+                ['payment_id', '<>', null],
+                ['company_id', '=', $company_id]
+            ])
+            ->whereDate('payday', $date)
+            ->first();
+
+        if ($register) {
+            if ($register->total) {
+                return roundDecimal($register->total);
+            }
         }
 
         return 0;

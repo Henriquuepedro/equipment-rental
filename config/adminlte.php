@@ -355,6 +355,15 @@ return [
                     'text' => 'Contas a Pagar',
                     'route_active'  => ['bills_to_pay.edit']
                 ],
+                [
+                    'permissions' => [
+                        'BillsToPayView',
+                        'BillsToReceiveView'
+                    ],
+                    'route' => 'cash_flow.index',
+                    'text' => 'Fluxo de Caixa',
+                    'route_active'  => []
+                ],
             ]
         ],
         [

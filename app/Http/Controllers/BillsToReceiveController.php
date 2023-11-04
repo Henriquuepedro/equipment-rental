@@ -100,7 +100,6 @@ class BillsToReceiveController extends Controller
                 [
                     'clients.name',
                     'rentals.address_name',
-                    'rentals.address_name',
                     'rentals.address_number',
                     'rentals.address_zipcode',
                     'rentals.address_neigh',
@@ -326,9 +325,107 @@ class BillsToReceiveController extends Controller
             $year_month = date('Y-m', strtotime(subDate(dateNowInternational(), null, ($month - 1))));
             $exp_year_month = explode('-', $year_month);
 
-            $response_months[SHORT_MONTH_NAME_PT[$exp_year_month[1]] . '/' . substr($exp_year_month[0], 2, 4)] = round($this->rental_payment->getBillsForMonth($company_id, $exp_year_month[0], $exp_year_month[1]), 2);
+            $response_months[SHORT_MONTH_NAME_PT[$exp_year_month[1]] . '/' . substr($exp_year_month[0], 2, 4)] = $this->rental_payment->getBillsForMonth($company_id, $exp_year_month[0], $exp_year_month[1]);
         }
 
         return response()->json($response_months);
+    }
+
+    public function getBillsForDate(string $date): JsonResponse
+    {
+        if (!hasPermission('BillsToReceiveView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        return response()->json(array('total' => $this->rental_payment->getBillsForDate($company_id, $date)));
+    }
+
+    public function fetchBillForDate(Request $request): JsonResponse
+    {
+        $result         = array();
+        $draw           = $request->input('draw');
+        $company_id     = $request->user()->company_id;
+        $date_filter    = dateBrazilToDateInternational($request->input('date_filter'));
+        $filters        = array();
+        $filter_default = array();
+        DB::enableQueryLog();
+
+        try {
+            $filter_default[]['where']['rentals.company_id'] = $company_id;
+            $filter_default[]['whereDate']['rental_payments.payday'] = $date_filter;
+
+            $fields_order   = array(
+                'rentals.code',
+                [
+                    'clients.name',
+                    'rentals.address_name',
+                    'rentals.address_number',
+                    'rentals.address_zipcode',
+                    'rentals.address_neigh',
+                    'rentals.address_city',
+                    'rentals.address_state'
+                ],
+                'rental_payments.due_value'
+            );
+
+            $query = array();
+            $query['select'] = [
+                'rentals.id',
+                'rentals.code',
+                'clients.name as client_name',
+                'rentals.address_name',
+                'rentals.address_number',
+                'rentals.address_zipcode',
+                'rentals.address_complement',
+                'rentals.address_neigh',
+                'rentals.address_city',
+                'rentals.address_state',
+                'rentals.created_at',
+                'rental_payments.due_date',
+                'rental_payments.due_value',
+                'rental_payments.id as rental_payment_id',
+                'rental_payments.payment_id',
+                'rental_payments.payday',
+            ];
+            $query['from'] = 'rental_payments';
+            $query['join'][] = ['rentals','rental_payments.rental_id','=','rentals.id'];
+            $query['join'][] = ['clients','clients.id','=','rentals.client_id'];
+
+            $data = fetchDataTable(
+                $query,
+                array('rentals.code', 'asc'),
+                null,
+                ['BillsToReceiveView'],
+                $filters,
+                $fields_order,
+                $filter_default
+            );
+
+        } catch (Exception $exception) {
+            return response()->json(getErrorDataTables($exception->getMessage(), $draw));
+        }
+
+        foreach ($data['data'] as $value) {
+            $data_info_client = "<div class='d-flex flex-wrap'>";
+            $data_info_client .= "<span class='font-weight-bold w-100'>$value->client_name</span>";
+            $data_info_client .= "<span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span></div>";
+
+            $result[] = array(
+                formatCodeRental($value->code),
+                $data_info_client,
+                formatMoney($value->due_value, 2, 'R$ '),
+            );
+        }
+
+        $output = array(
+            "draw"              => $draw,
+            "recordsTotal"      => $data['recordsTotal'],
+            "recordsFiltered"   => $data['recordsFiltered'],
+            "data"              => $result
+        );
+
+        return response()->json($output);
     }
 }
