@@ -16,6 +16,7 @@
 @stop
 
 @section('js')
+<script src="{{ asset('assets/js/views/bill_to_pay/form.js') }}" type="application/javascript"></script>
 <script>
     $(function(){
         if (!$('#parcels .parcel').length) {
