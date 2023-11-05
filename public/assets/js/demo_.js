@@ -287,6 +287,12 @@ const realToNumber = numero => {
     numero = numero.replace(/\./g, "").replace(/,/g, ".");
     return parseFloat(numero);
 }
+
+// Soma dias de acordo com a data de hoje
+const dateNow = (format = FORMAT_DATE_INTERNATIONAL) => {
+    return moment().format(format);
+}
+
 // Soma dias de acordo com a data de hoje
 const sumDaysDateNow = days => {
     return moment().add(days, 'd').format(FORMAT_DATE_INTERNATIONAL);
