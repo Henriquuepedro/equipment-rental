@@ -60,12 +60,10 @@
         })
 
         const loadCashFlow = async () => {
-            const date = transformDateForEn($('[name="date_filter"]').val());
+            let date = transformDateForEn($('[name="date_filter"]').val());
 
             if (date === false) {
-                $('#received').text('R$ ' + numberToReal(0));
-                $('#paid').text('R$ ' + numberToReal(0));
-                $('#liquid').text('R$ ' + numberToReal(0));
+                $('[name="date_filter"]').val(dateNow(FORMAT_DATE_BRAZIL)).trigger('change');
                 return;
             }
 

@@ -14,6 +14,29 @@
             border-radius: 10px;
             background: rgba(0,0,0,.1);
         }
+
+        @media (max-width: 1200px) and (min-width: 992px) {
+            .pricing-table .pricing-card .pricing-card-body {
+                padding: 25px 12px 21px !important;
+            }
+
+            .pricing-table h1.fw-normal {
+                font-size: 20px;
+            }
+
+            .pricing-table h4.fw-normal {
+                font-size: 12px;
+            }
+
+            .pricing-table .pricing-card-head h3 {
+                font-size: 15px;
+                font-weight: bold;
+            }
+
+            .pricing-table .pricing-card-head p {
+                font-size: 10px;
+            }
+        }
     </style>
 @stop
 
@@ -60,8 +83,8 @@
                             <div class="plan-features">
                                 ${description}
                             </div>
-                            <div class="wrapper">
-                                <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block">Assinar</a>
+                            <div class="wrapper d-flex justify-content-center">
+                                <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block col-md-10">Assinar</a>
                             </div>
                         </div>
                     </div>`
