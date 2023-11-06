@@ -233,6 +233,7 @@ const setFieldsToPayment = (btn, modal) => {
     const payment_id        = btn.data('payment-id');
     const bill_payment_id   = btn.data('bill-payment-id');
     const payday            = btn.data('payday');
+    const description       = btn.data('description');
 
     modal.find('[name="date_payment"]').closest('.form-group').show();
     modal.find('[name="form_payment"]').closest('.form-group').show();
@@ -253,8 +254,12 @@ const setFieldsToPayment = (btn, modal) => {
     modal.find('[name="date_bill"]').val(date_bill);
     modal.find('[name="due_date"]').val(due_date);
     modal.find('[name="due_value"]').val(due_value);
-    checkLabelAnimate();
+    modal.find('#observationDiv').html(description);
+
     modal.modal();
+
+    checkLabelAnimate();
+    new Quill('#observationDiv').enable(false);
 }
 
 $('#contentListBillToPay a[data-toggle="tab"]').on('shown.bs.tab', function (e) {

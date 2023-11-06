@@ -843,6 +843,18 @@ label.check-md:after {
 .bbl-r-0 {
     border-bottom-left-radius: 0 !important;
 }
+.btr-r-5 {
+    border-top-right-radius: 5px !important;
+}
+.btl-r-5 {
+    border-top-left-radius: 5px !important;
+}
+.bbr-r-5 {
+    border-bottom-right-radius: 5px !important;
+}
+.bbl-r-5 {
+    border-bottom-left-radius: 5px !important;
+}
 div[disabled] {
     cursor: no-drop !important;
 }
@@ -941,4 +953,7 @@ a[disabled] {
 }
 .pricing-table .pricing-card .pricing-card-body {
     padding: 50px 35px 43px
+}
+.quill-container.ql-container .ql-tooltip.ql-editing {
+    z-index: 11;
 }
