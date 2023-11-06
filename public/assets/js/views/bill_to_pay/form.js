@@ -95,7 +95,7 @@ $("#formCreateBillsToPay").validate({
                             confirmButtonColor: '#2196f3',
                             cancelButtonColor: '#15b67d',
                             confirmButtonText: 'Voltar para a listagem',
-                            cancelButtonText: 'Gerar novo pagamento',
+                            cancelButtonText: 'Gerar nova compra',
                             reverseButtons: true,
                             allowOutsideClick: false
                         }).then((result) => {

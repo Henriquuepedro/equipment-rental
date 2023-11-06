@@ -13,6 +13,7 @@ const DATE_BRAZIL = 'd/m/Y';
 const DATETIME_INTERNATIONAL_TIMEZONE = 'Y-m-d H:i:sP';
 const DATETIME_INTERNATIONAL_MICROSECOND = 'Y-m-d H:i:s.u';
 const TIMEZONE_DEFAULT = 'America/Fortaleza';
+const ALLOWABLE_TAGS = "<p><br><h1><h2><h3><h4><h5><h6><strong><b><em><i><u><small><ul><ol><li><div><span><a>";
 const MONTH_NAME_PT = [
     '01'    => 'Janeiro',
     '02'    => 'Fevereiro',

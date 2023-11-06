@@ -10,7 +10,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="form-group col-md-3">
-                        <label>Locação</label>
+                        <label>Código do Lançamento</label>
                         <input type="text" class="form-control" name="bill_code" value="" disabled>
                     </div>
                     <div class="form-group col-md-6">
@@ -38,6 +38,18 @@
                     <div class="form-group col-md-3">
                         <label>Data de Pagamento</label>
                         <input type="text" class="form-control" name="date_payment" value="" disabled>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <p class="mb-0 pt-3 pl-1 bbl-r-0">Descrição</p>
+
+                        <div id="observationDiv" class="quill-container border btr-r-5 btl-r-5 bbr-r-5 bbl-r-5" contenteditable="true"></div>
+                        <textarea type="hidden" class="d-none" name="observation" id="observation"></textarea>
+
+
+
+{{--                        <div class="observation border p-2 btr-r-5 btl-r-5 bbr-r-5 bbl-r-5"></div>--}}
                     </div>
                 </div>
             </div>

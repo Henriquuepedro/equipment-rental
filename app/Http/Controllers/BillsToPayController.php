@@ -107,6 +107,7 @@ class BillsToPayController extends Controller
             $query = array();
             $query['select'] = [
                 'bill_to_pays.id',
+                'bill_to_pays.observation',
                 'bill_to_pays.code',
                 'providers.name as provider_name',
                 'bill_to_pays.created_at',
@@ -139,7 +140,7 @@ class BillsToPayController extends Controller
 
         foreach ($data['data'] as $value) {
             $bill_code = formatCodeRental($value->code);
-            $data_prop_button = "data-bill-payment-id='$value->bill_payment_id' data-bill-code='$bill_code' data-name-provider='$value->provider_name' data-date-bill='" . date('d/m/Y H:i', strtotime($value->created_at)) . "' data-due-date='" . date('d/m/Y', strtotime($value->due_date)) . "' data-payment-id='{$value->payment_id}' data-payday='" . date('d/m/Y', strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "'";
+            $data_prop_button = "data-bill-payment-id='$value->bill_payment_id' data-bill-code='$bill_code' data-name-provider='$value->provider_name' data-date-bill='" . date('d/m/Y H:i', strtotime($value->created_at)) . "' data-due-date='" . date('d/m/Y', strtotime($value->due_date)) . "' data-payment-id='{$value->payment_id}' data-payday='" . date('d/m/Y', strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "' data-description='$value->observation' ";
 
             $txt_btn_paid = $type_bill == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
             $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";
@@ -273,7 +274,7 @@ class BillsToPayController extends Controller
         $company_id                     = $request->user()->company_id;
         $user_id                        = $request->user()->id;
         $provider                       = (int)filter_var($request->input('provider'), FILTER_SANITIZE_NUMBER_INT);
-        $description                    = strip_tags($request->input('description'), $this->allowableTags);
+        $description                    = strip_tags($request->input('description'), ALLOWABLE_TAGS);
         $value                          = transformMoneyBr_En(filter_var($request->input('value'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL));
         $form_payment                   = (int)filter_var($request->input('form_payment'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $calculate_net_amount_automatic = (bool)$request->input('calculate_net_amount_automatic');
@@ -318,8 +319,9 @@ class BillsToPayController extends Controller
                 ->withInput();
         }
 
-        $arrPayments         = $responsePayment->arrPayment;
-        $createBillToPay    = $this->bill_to_pay->insert($this->formatDataToCreateAndUpdate($request));
+        $arrPayments        = $responsePayment->arrPayment;
+        $create             = $this->formatDataToCreateAndUpdate($request);
+        $createBillToPay    = $this->bill_to_pay->insert($create);
         $bill_to_pay_id     = $createBillToPay->id;
 
         foreach ($arrPayments as $keyPayment => $_) {
@@ -335,21 +337,21 @@ class BillsToPayController extends Controller
         if ($createBillToPay) {
             DB::commit();
             if ($isAjax) {
-                return response()->json(['success' => true, 'message' => 'Pagamento cadastrado com sucesso!', 'bill_to_pay_id' => $bill_to_pay_id]);
+                return response()->json(['success' => true, 'message' => 'Compra cadastrada com sucesso!', 'bill_to_pay_id' => $bill_to_pay_id]);
             }
 
             return redirect()->route('bills_to_pay.index')
-                ->with('success', "Pagamento com o código $bill_to_pay_id, cadastrado com sucesso!");
+                ->with('success', "Compra com o código $create[code], cadastrada com sucesso!");
         }
 
         DB::rollBack();
 
         if ($isAjax) {
-            return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o pagamento, tente novamente!']);
+            return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar a compra, tente novamente!']);
         }
 
         return redirect()->back()
-            ->withErrors(['Não foi possível cadastrar o pagamento, tente novamente!'])
+            ->withErrors(['Não foi possível cadastrar a compra, tente novamente!'])
             ->withInput();
 
     }
@@ -407,21 +409,21 @@ class BillsToPayController extends Controller
         if ($updateBillToPay) {
             DB::commit();
             if ($isAjax) {
-                return response()->json(['success' => true, 'message' => 'Pagamento alterado com sucesso!', 'bill_to_pay_id' => $id]);
+                return response()->json(['success' => true, 'message' => 'Compra alterada com sucesso!', 'bill_to_pay_id' => $id]);
             }
 
             return redirect()->route('bills_to_pay.index')
-                ->with('success', "Pagamento com o código $id, alterado com sucesso!");
+                ->with('success', "Compra com o código $bill_to_pay->code, alterada com sucesso!");
         }
 
         DB::rollBack();
 
         if ($isAjax) {
-            return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar o pagamento, tente novamente!']);
+            return response()->json(['success' => false, 'message' => 'Não foi possível cadastrar a compra, tente novamente!']);
         }
 
         return redirect()->back()
-            ->withErrors(['Não foi possível cadastrar o pagamento, tente novamente!'])
+            ->withErrors(['Não foi possível cadastrar a compra, tente novamente!'])
             ->withInput();
     }
 
