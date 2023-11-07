@@ -18,6 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
     <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.13.7/api/processing().js" type="application/javascript"></script>
     <script src="{{ asset('assets/js/views/bill_to_pay/index.js') }}" type="application/javascript"></script>
 
     @include('includes.driver.modal-script')

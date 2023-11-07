@@ -3,7 +3,7 @@ let rows_selected = [];
 
 $(function () {
     loadDaterangePickerInput($('#contentListBillToReceive input[name="intervalDates"]'), function () {
-        getTable($('#contentListBillToReceive [data-toggle="tab"].active').attr('id').replace('-tab', ''), false);
+        getTable($('#contentListBillToReceive [data-toggle="tab"].active').attr('id').replace('-tab', ''));
     });
     setTabRental();
     getOptionsForm('form-of-payment', $('#modalReopenPayment [name="form_payment"], #modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
@@ -38,7 +38,7 @@ const setTabRental = () => {
     }
 
     $(`#contentListBillToReceive #${tab}-tab`).tab('show');
-    getTable(tab, false);
+    getTable(tab);
 }
 
 const loadCountsTabRental = () => {
@@ -93,7 +93,7 @@ const getCountsTabRentals = () => {
     });
 }
 
-const getTable = (typeRentals, stateSave = true) => {
+const getTable = typeRentals => {
     loadCountsTabRental();
     disabledLoadData();
     const client_id = parseInt($('#contentListBillToReceive [name="clients"]').val());
@@ -102,9 +102,9 @@ const getTable = (typeRentals, stateSave = true) => {
 
     if (typeof tableBillsToReceive !== 'undefined') {
         tableBillsToReceive.destroy();
-
-        $("#contentListBillToReceive #tableBillsToReceive tbody").empty();
     }
+
+    $("#contentListBillToReceive #tableBillsToReceive tbody").empty();
 
     if (isNaN(client_id) || client_id === null) {
         tableBillsToReceive = $("#contentListBillToReceive #tableBillsToReceive").DataTable();
@@ -112,55 +112,38 @@ const getTable = (typeRentals, stateSave = true) => {
         return;
     }
 
-    getCountsTabRentals();
-
-    const start_date = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
-    const end_date = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
-
     tableBillsToReceive = $("#contentListBillToReceive #tableBillsToReceive").DataTable({
-        "responsive": true,
         "processing": true,
         "autoWidth": false,
-        "serverSide": true,
         "sortable": true,
         "searching": true,
-        "stateSave": stateSave,
-        "serverMethod": "post",
         "order": [[ 3, 'asc' ]],
-        paging: false,
-        scrollCollapse: true,
-        scrollY: '50vh',
-        "bLengthChange": false,
-        info: false,
-        "ajax": {
-            url: $('[name="route_bills_to_receive_fetch"]').val(),
-            type: 'POST',
-            data: {
-                "_token": $('meta[name="csrf-token"]').attr('content'),
-                type: typeRentals,
-                client: $('#contentListBillToReceive [name="clients"]').val(),
-                start_date,
-                end_date,
-                show_client_name_list: $('#contentListBillToReceive [name="clients"]').is(':visible') ? 1 : 0
-            },
-            error: function (jqXHR, ajaxOptions, thrownError) {
-                console.log(jqXHR, ajaxOptions, thrownError);
-            }, complete: () => {
-                enabledLoadData();
-            }
-        },
-        "initComplete": function (settings, json) {
-            enabledLoadData();
-            $('#contentListBillToReceive #tableBillsToReceive_wrapper .dt-buttons button.dt-button').removeClass('dt-button');
-            $('#contentListBillToReceive [data-toggle="tooltip"]').tooltip();
-            $('#contentListBillToReceive .table.dataTable thead tr th[aria-controls="tableBillsToReceive"]:eq(3), #contentListBillToReceive .dataTables_scrollFoot .table.dataTable tfoot tr th:eq(3)').text(typeRentals === 'paid' ? 'Pagamento' : 'Vencimento');
-            recalculateTotals();
-        },
         "language": {
-            "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json"
+            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
         },
+        columnDefs: [
+            {
+                targets: 2,
+                render: function (data, type, row) {
+                    if (type === 'sort') {
+                        return parseFloat(row.due_value);
+                    }
+                    return data;
+                }
+            },
+            {
+                targets: 3,
+                render: function (data, type, row) {
+                    if (type === 'sort') {
+                        return row.due_date;
+                    }
+                    return data;
+                }
+            }
+        ],
         dom: 'Bfrtip',
         buttons: [
+            'pageLength',
             {
                 className: typeRentals === 'without_pay' ? 'btn btn-primary' : 'd-none',
                 text: '<i class="fa-solid fa-list-check"></i> Selecionado todos',
@@ -170,9 +153,15 @@ const getTable = (typeRentals, stateSave = true) => {
                     "data-toggle": "tooltip"
                 },
                 action: function (e, dt, node, config) {
-                    tableBillsToReceive.rows().every(function (rowIdx, tableLoop, rowLoop) {
-                        $(tableBillsToReceive.row(rowIdx).node()).addClass('selected');
-                    });
+                    if (tableBillsToReceive.rows('.selected').data().length === tableBillsToReceive.rows().data().length) {
+                        tableBillsToReceive.rows().every(function(rowIdx, tableLoop, rowLoop){
+                            $(tableBillsToReceive.row(rowIdx).node()).removeClass('selected');
+                        });
+                    } else {
+                        tableBillsToReceive.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            $(tableBillsToReceive.row(rowIdx).node()).addClass('selected');
+                        });
+                    }
                     recalculateTotals();
                 }
             },
@@ -222,6 +211,42 @@ const getTable = (typeRentals, stateSave = true) => {
             }
         ],
     });
+
+    tableBillsToReceive.processing(true);
+
+    getCountsTabRentals();
+
+    const start_date = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+    const end_date  = $('#contentListBillToReceive input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'POST',
+        url: $('[name="route_bills_to_receive_fetch"]').val(),
+        data: {
+            type: typeRentals,
+            client: $('#contentListBillToReceive [name="clients"]').val(),
+            start_date,
+            end_date,
+            show_client_name_list: $('#contentListBillToReceive [name="clients"]').is(':visible') ? 1 : 0
+        },
+        dataType: 'json',
+        success: response => {
+            $(response.data).each(function(k,v){
+                tableBillsToReceive.row.add(v);
+            });
+            tableBillsToReceive.draw(false);
+        }, complete: () => {
+            tableBillsToReceive.processing(false);
+            enabledLoadData();
+            $('#contentListBillToReceive #tableBillsToReceive_wrapper .dt-buttons button.dt-button').removeClass('dt-button');
+            $('#contentListBillToReceive [data-toggle="tooltip"]').tooltip();
+            $('#contentListBillToReceive .table.dataTable thead tr th[aria-controls="tableBillsToReceive"]:eq(3), #contentListBillToReceive .dataTables_scrollFoot .table.dataTable tfoot tr th:eq(3)').text(typeRentals === 'paid' ? 'Pagamento' : 'Vencimento');
+            recalculateTotals();
+        }
+    });
 }
 
 $(document).on('ifChanged', '#modalConfirmPayment .equipment, #modalWithdraw .equipment', function () {
@@ -234,7 +259,7 @@ $(document).on('ifChanged', '#modalConfirmPayment .equipment, #modalWithdraw .eq
 });
 
 $('#contentListBillToReceive a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-    getTable(e.target.id.replace('-tab', ''), false);
+    getTable(e.target.id.replace('-tab', ''));
 });
 
 const setFieldsToPayment = (btn, modal) => {
@@ -338,7 +363,7 @@ $('#formConfirmPayment').on('submit', function (e) {
                 title: response.message
             });
 
-            getTable($('#contentListBillToReceive [data-toggle="tab"].active').attr('id').replace('-tab', ''), false);
+            getTable($('#contentListBillToReceive [data-toggle="tab"].active').attr('id').replace('-tab', ''));
         }, error: e => {
             console.log(e);
             let arrErrors = [];
@@ -398,7 +423,7 @@ $('#formReopenPayment').on('submit', function (e) {
                 title: response.message
             });
 
-            getTable($('#contentListBillToReceive [data-toggle="tab"].active').attr('id').replace('-tab', ''), false);
+            getTable($('#contentListBillToReceive [data-toggle="tab"].active').attr('id').replace('-tab', ''));
         }, error: e => {
             console.log(e);
             let arrErrors = [];
@@ -423,5 +448,5 @@ $('#formReopenPayment').on('submit', function (e) {
 });
 
 $('#contentListBillToReceive [name="clients"]').on('change', function () {
-    getTable($('#contentListBillToReceive [data-toggle="tab"].active').attr('id').replace('-tab', ''), false);
+    getTable($('#contentListBillToReceive [data-toggle="tab"].active').attr('id').replace('-tab', ''));
 });

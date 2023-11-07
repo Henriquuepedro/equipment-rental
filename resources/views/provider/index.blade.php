@@ -13,6 +13,7 @@
 
 @section('js')
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.13.7/api/processing().js" type="application/javascript"></script>
     <script>
         var tableProvider;
         $(function () {
@@ -43,7 +44,7 @@
                     $('[data-toggle="tooltip"]').tooltip();
                 },
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json"
+                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
                 }
             });
         }

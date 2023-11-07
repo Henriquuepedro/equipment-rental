@@ -176,7 +176,9 @@ class BillsToPayController extends Controller
                 'R$ ' . number_format($value->due_value, 2, ',', '.'),
                 $due_date,
                 $buttons,
-                "payment_id" => $value->bill_payment_id
+                "payment_id" => $value->bill_payment_id,
+                "due_date"   => strtotime($type_bill == 'paid' ? $value->payday : $value->due_date),
+                "due_value"  => $value->due_value,
             );
         }
 

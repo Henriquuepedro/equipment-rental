@@ -135,9 +135,9 @@ if (!function_exists('fetchDataTable')) {
 
         $body_post  = request()->all();
 
-        $start  = $body_post['start'];
-        $length = $body_post['length'];
-        $search = $body_post['search'];
+        $start  = $body_post['start'] ?? null;
+        $length = $body_post['length'] ?? null;
+        $search = $body_post['search'] ?? null;
 
         if (empty($start)) {
             $start = 0;

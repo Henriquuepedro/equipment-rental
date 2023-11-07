@@ -19999,3 +19999,6 @@ select option {
 .flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover, .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay, .flatpickr-day.notAllowed, .flatpickr-day.notAllowed.prevMonthDay, .flatpickr-day.notAllowed.nextMonthDay {
     color: #777 !important;
 }
+div.dt-button-collection {
+    background-color: #555 !important;
+}
