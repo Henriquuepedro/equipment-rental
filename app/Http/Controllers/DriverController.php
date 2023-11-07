@@ -70,16 +70,27 @@ class DriverController extends Controller
         $permissionDelete = hasPermission('DriverDeletePost');
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('driver.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
-            $buttons .= $permissionUpdate ? "title='Atualizar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveDriver btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' driver-id='{$value->id}'><i class='fas fa-times'></i></button>" : '';
-
             $result[] = array(
                 $value->id,
                 $value->name,
-                $value->cpf ? mask($value->cpf, '###.###.###-##') : '',
-                $value->phone ? mask($value->phone, strlen($value->phone) === 10 ? '(##) ####-####' : '(##) #####-####') : '',
-                $buttons
+                formatCPF_CNPJ($value->cpf),
+                formatPhone($value->phone),
+                newDropdownButtonsDataList([
+                    [
+                        'tag'   => 'a',
+                        'title' => $permissionUpdate ? 'Atualizar Motorista' : 'Visualizar Motorista',
+                        'icon'  => 'fas fa-edit',
+                        'href'  => route('driver.edit', ['id' => $value->id])
+                    ],
+                    [
+                        'tag'       => 'button',
+                        'title'     => 'Excluir Motorista',
+                        'icon'      => 'fas fa-times',
+                        'class'     => 'btnRemoveDriver',
+                        'attribute' => "driver-id='$value->id'",
+                        'can'       => $permissionDelete
+                    ]
+                ], $value->id)
             );
         }
 

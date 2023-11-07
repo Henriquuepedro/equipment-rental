@@ -164,7 +164,7 @@
                     }
                 },
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Portuguese-Brasil.json"
+                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
                 }
             });
         }

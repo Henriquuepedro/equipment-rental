@@ -957,3 +957,11 @@ a[disabled] {
 .quill-container.ql-container .ql-tooltip.ql-editing {
     z-index: 11;
 }
+
+.buttons-collection.buttons-page-length {
+    background-color: #2196f3;
+    color: #fff;
+    border-radius: 5px;
+    height: 35px;
+    border: 1px solid #000;
+}

@@ -204,7 +204,9 @@ class BillsToReceiveController extends Controller
                 'R$ ' . number_format($value->due_value, 2, ',', '.'),
                 $due_date,
                 $buttons,
-                "payment_id" => $value->rental_payment_id
+                "payment_id" => $value->rental_payment_id,
+                "due_date"   => strtotime($type_rental == 'paid' ? $value->payday : $value->due_date),
+                "due_value"  => $value->due_value,
             );
         }
 

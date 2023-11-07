@@ -343,15 +343,13 @@ class ClientController extends Controller
             $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveClient' data-client-id='$value->id'><i class='fas fa-solid fa-xmark pr-1'></i> Excluir Cadastro</button>" : '';
             $buttons .= $permissionViewBill ? "<button class='dropdown-item btnViewBillClient' data-client-id='$value->id' data-client-name='$value->name'><i class='fas fa-regular fa-list-check'></i> Ficha Financeira</button>" : '';
 
-            $buttons = dropdownButtonsDataList($buttons, $value->id);
-
             $result[] = array(
                 $value->id,
                 $value->name,
-                $value->email,
-                $value->phone_1,
+                $value->email ?: 'Não Informado',
+                formatPhone($value->phone_1),
                 $value->active ? '<div class="badge badge-pill badge-lg badge-success">Ativo</div>' : '<div class="badge badge-pill badge-lg badge-danger">Inativo</div>',
-                $buttons
+                dropdownButtonsDataList($buttons, $value->id)
             );
         }
 

@@ -391,6 +391,35 @@ if (!function_exists('dropdownButtonsDataList')) {
     }
 }
 
+if (!function_exists('newDropdownButtonsDataList')) {
+    function newDropdownButtonsDataList(array $data_action, int $index = 0, string $direction = 'left'): string
+    {
+        $data_buttons = '';
+
+        foreach ($data_action as $action) {
+            if (isset($action['can']) && !$action['can']) {
+                continue;
+            }
+
+            $tag        = $action['tag'] ?? '';
+            $title      = $action['title'] ?? '';
+            $icon       = $action['icon'] ?? '';
+            $href       = empty($action['href']) ? '' : "href='$action[href]'";
+            $class      = $action['class'] ?? '';
+            $attribute  = $action['attribute'] ?? '';
+
+            $data_buttons .= "<$tag $href class='dropdown-item $class' $attribute><i class='$icon'></i> $title</$tag>";
+        }
+
+        return "<div class='row'><div class='col-12'><div class='dropdown drop$direction'>
+            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsDataList-$index' data-toggle='dropdown' data-boundary='window' aria-haspopup='true' aria-expanded='false'>
+              <i class='fa fa-cog'></i>
+            </button>
+            <div class='dropdown-menu' aria-labelledby='dropActionsRental-$index'>$data_buttons</div</div>
+        </div>";
+    }
+}
+
 if (!function_exists('uploadFile')) {
     /**
      * @param   string                                  $upload_path

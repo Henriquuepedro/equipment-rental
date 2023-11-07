@@ -74,17 +74,28 @@ class VehicleController extends Controller
         $permissionDelete = hasPermission('VehicleDeletePost');
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('vehicle.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
-            $buttons .= $permissionUpdate ? "title='Atualizar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveVehicle btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' vehicle-id='{$value->id}'><i class='fas fa-times'></i></button>" : '';
-
             $result[] = array(
                 $value->id,
                 $value->name,
                 $value->brand,
                 $value->model,
                 $value->reference,
-                $buttons
+                newDropdownButtonsDataList([
+                    [
+                        'tag'   => 'a',
+                        'title' => $permissionUpdate ? 'Atualizar Veículo' : 'Visualizar Veículo',
+                        'icon'  => 'fas fa-edit',
+                        'href'  => route('vehicle.edit', ['id' => $value->id])
+                    ],
+                    [
+                        'tag'       => 'button',
+                        'title'     => 'Excluir Veículo',
+                        'icon'      => 'fas fa-times',
+                        'class'     => 'btnRemoveVehicle',
+                        'attribute' => "vehicle-id='$value->id'",
+                        'can'       => $permissionDelete
+                    ]
+                ], $value->id)
             );
         }
 

@@ -367,16 +367,16 @@ class EquipmentController extends Controller
         $permissionDelete = hasPermission('EquipmentDeletePost');
 
         foreach ($data as $key => $value) {
-            $buttons = "<a href='".route('equipment.edit', ['id' => $value['id']])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip'";
-            $buttons .= $permissionUpdate ? "title='Atualizar' ><i class='fas fa-edit'></i></a>" : "title='Visualizar' ><i class='fas fa-eye'></i></a>";
-            $buttons .= $permissionDelete ? "<button class='btn btn-danger btnRemoveEquipment btn-sm btn-rounded btn-action ml-md-1' data-toggle='tooltip' title='Excluir' equipment-id='{$value['id']}'><i class='fas fa-times'></i></button>" : '';
+            $buttons = "<a href='".route('equipment.edit', ['id' => $value['id']])."' class='dropdown-item'>";
+            $buttons .= $permissionUpdate ? "<i class='fas fa-edit'></i> Atualizar Equipamento</a>" : "<i class='fas fa-eye'></i> Visualizar Equipamento</a>";
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveEquipment' equipment-id='{$value['id']}'><i class='fas fa-times'></i> Excluir Equipamento</button>" : '';
 
             $result[$key] = array(
                 $value['id'],
                 $value['name'] ?? "Caçamba {$value['volume']}m³",
                 $value['reference'],
                 $value['stock'],
-                $buttons
+                dropdownButtonsDataList($buttons, $value->id)
             );
         }
 

@@ -19010,7 +19010,7 @@ div.tagsinput {
 
 .profile-page .profile-header {
   width: 100%;
-  background: url("../../images/samples/profile_page/profile_header_banner.jpg") no-repeat center center;
+  background: linear-gradient(#5c86ff, #fff);
   background-size: cover;
   padding: 60px 0;
   border-radius: 5px; }
@@ -19998,4 +19998,7 @@ select option {
 }
 .flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover, .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay, .flatpickr-day.notAllowed, .flatpickr-day.notAllowed.prevMonthDay, .flatpickr-day.notAllowed.nextMonthDay {
     color: #777 !important;
+}
+div.dt-button-collection {
+    background-color: #555 !important;
 }
