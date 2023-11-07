@@ -81,15 +81,6 @@ Executar `docker-compose up --build --force-recreate`
 
 Acessar container `docker exec -it locacao-php /bin/bash`
 
-Alterar em `/etc/apache2/sites-available/000-default.conf` para `DocumentRoot /var/www/public`
-
-Permissão para o projeto em caso do seguinte erro: `docker  - Cannot save \\wsl$\Ubuntu\home\... Unable to open the file for writing.`
-
-```
-sudo chown -R www-data:www-data {PROJECT}/
-sudo chmod g+w {PROJECT}/
-```
-
 ## Configurando cron
 
 ```
@@ -100,3 +91,29 @@ apt-get update -y \
 && crontab /etc/cron.d/scheduler
 ```
 
+## Correções
+
+---
+
+#### `Call to undefined function Intervention\\Image\\Gd\\imagecreatefromjpeg()`
+```
+RUN apt-get update && apt-get install -y \
+libfreetype6-dev \
+libjpeg62-turbo-dev \
+libpng-dev \
+&& docker-php-ext-configure gd --with-freetype --with-jpeg \
+&& docker-php-ext-install -j$(nproc) gd
+```
+---
+
+#### Error 404
+Alterar em `/etc/apache2/sites-available/000-default.conf` para `DocumentRoot /var/www/public`
+
+---
+
+#### Permissão para o projeto em caso do seguinte erro: `docker  - Cannot save \\wsl$\Ubuntu\home\... Unable to open the file for writing.`
+
+```
+sudo chown -R www-data:www-data {PROJECT}/
+sudo chmod g+w {PROJECT}/
+```

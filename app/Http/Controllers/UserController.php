@@ -16,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image as ImageUpload;
 use Intervention\Image\Image;
 
@@ -86,8 +87,8 @@ class UserController extends Controller
         }
 
         // verifica senha atual
-        if($request->input('password')) {
-            if(!Hash::check($request->input('password_current'), auth()->user()->__get('password'))) {
+        if ($request->input('password')) {
+            if (!Hash::check($request->input('password_current'), auth()->user()->__get('password'))) {
                 if ($isAjax) {
                     return response()->json(['success' => false, 'data' => 'Senha informada não corresponde com a senha atual!']);
                 }
@@ -105,7 +106,7 @@ class UserController extends Controller
             'style_template'  => $request->input('style_template')
         ];
 
-        if($request->input('password')) {
+        if ($request->input('password')) {
             $dataUserUpdate['password'] = Hash::make($request->input('password'));
         }
 
@@ -128,7 +129,7 @@ class UserController extends Controller
 
         $update = $this->user->edit($dataUserUpdate, $user_id, $company_id);
 
-        if($update) {
+        if ($update) {
             if ($isAjax) {
                 return response()->json(['success' => true, 'data' => 'Usuário atualizado com sucesso!']);
             }
@@ -147,11 +148,29 @@ class UserController extends Controller
 
     public function updateImage(Request $request): JsonResponse
     {
+        $validator = Validator::make($request->file(),
+            [
+                'image' => 'required|image|mimes:jpg,png,jpeg|max:4096',
+            ], [
+                'image.required'    => 'Imagem é obrigatório.',
+                'image.image'       => 'O arquivo deve ser uma imagem.',
+                'image.mimes'       => 'São aceitos os tipos jpg, png e jpeg.',
+                'image.max'         => 'O tamanho máximo é de 4mb.'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json(array(
+                'success' => false,
+                'message' => implode('<br>',  $validator->errors()->all())
+            ));
+        }
+
         $file = $request->file('image');
         $user_id    = $request->user()->id;
         $company_id = $request->user()->company_id;
 
-        $uploadPath = "assets/images/profile/{$user_id}"; // Faz o upload para o caminho 'admin/dist/images/autos/{ID}/'
+        $uploadPath = "assets/images/profile/$user_id"; // Faz o upload para o caminho 'admin/dist/images/autos/{ID}/'
         $extension = $file->getClientOriginalExtension(); // Recupera extensão da imagem
         $nameOriginal = $file->getClientOriginalName(); // Recupera nome da imagem
         $imageName = base64_encode($nameOriginal); // Gera um novo nome para a imagem.
@@ -161,7 +180,7 @@ class UserController extends Controller
             if ($this->resizeImageProfile($uploadPath, $imageName)) {
                 $update = $this->user->edit(['profile' => $imageName], $user_id, $company_id);
                 if ($update) {
-                    return response()->json(['success' => true, 'path' => asset("{$uploadPath}/{$imageName}")]);
+                    return response()->json(['success' => true, 'path' => asset("$uploadPath/$imageName")]);
                 } else {
                     return response()->json(['success' => false, 'message' => 'Não foi possível salvar a imagem. Se o erro persistir tentar com outra imagem.']);
                 }
@@ -175,9 +194,9 @@ class UserController extends Controller
 
     private function resizeImageProfile($uploadPath, $imageName): Image
     {
-        return ImageUpload::make("{$uploadPath}/{$imageName}")
+        return ImageUpload::make("$uploadPath/$imageName")
             ->resize(100, 100)
-            ->save("{$uploadPath}/{$imageName}");
+            ->save("$uploadPath/$imageName");
     }
 
     public function newUser(UserCreatePost $request): JsonResponse
