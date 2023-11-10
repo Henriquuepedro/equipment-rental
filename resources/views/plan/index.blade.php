@@ -113,7 +113,7 @@
                     <h4 class="card-title">Planos</h4>
                     <p class="card-description">Escolha um plano que melhor se adapte a você.</p>
                     <div class="row mt-5">
-                        <div class="col-md-12 col-sm-12 col-lg-10 mx-auto">
+                        <div class="col-md-12">
                             <ul class="nav nav-tabs tab-solid tab-solid-primary d-flex justify-content-around border-primary" role="tablist">
                                 <li class="col-md-2 nav-item">
                                     <a class="d-flex justify-content-center nav-link active" id="monthly" data-toggle="tab" href="#monthly-plan" data-month-time="1" role="tab" aria-controls="monthly-plan" aria-selected="true">
