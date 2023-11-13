@@ -103,7 +103,14 @@
                         ctx.fillText(numberToReal(total_open_payments, 'R$ '), xPos, yPos - 11);
 
                         ctx.font = '12px sans-serif';
-                        ctx.fillText(`de ${total_clients} lançamentos`, xPos, yPos + 11);
+
+                        let complement_fill_text_payment = '';
+                        if (total_clients <= 1) {
+                            complement_fill_text_payment = 'lançamento';
+                        } else {
+                            complement_fill_text_payment = 'lançamentos';
+                        }
+                        ctx.fillText(`de ${total_clients} ${complement_fill_text_payment}`, xPos, yPos + 11);
                     }
 
                     break;
