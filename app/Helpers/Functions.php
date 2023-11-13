@@ -350,7 +350,7 @@ if (! function_exists('formatCodeRental')) {
 }
 
 if (!function_exists('dateNowInternational')) {
-    function dateNowInternational($timezone = null, string $format = null): string
+    function dateNowInternational($timezone = null, string $format = DATETIME_INTERNATIONAL): string
     {
         if ($timezone) {
             $dateTimeNow = new DateTimeZone($timezone);
@@ -358,7 +358,7 @@ if (!function_exists('dateNowInternational')) {
             $dateTimeNow = new DateTimeZone(TIMEZONE_DEFAULT);
         }
 
-        return (new DateTime())->setTimezone($dateTimeNow)->format($format ?? DATETIME_INTERNATIONAL);
+        return (new DateTime())->setTimezone($dateTimeNow)->format($format);
 
     }
 }

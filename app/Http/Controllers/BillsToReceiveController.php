@@ -31,7 +31,7 @@ class BillsToReceiveController extends Controller
         $this->form_payment = new FormPayment();
     }
 
-    public function index(): Factory|View|RedirectResponse|Application
+    public function index(string $filter_start_date = null, string $filter_end_date = null, int $client_id = null): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('BillsToReceiveView')) {
             return redirect()->route('dashboard')
@@ -41,7 +41,7 @@ class BillsToReceiveController extends Controller
         $company_id = Auth::user()->__get('company_id');
         $clients = $this->client->getClients($company_id);
 
-        return view('bills_to_receive.index', compact('clients'));
+        return view('bills_to_receive.index', compact('clients', 'filter_start_date', 'filter_end_date', 'client_id'));
     }
 
     public function getQtyTypeRentals(Request $request): JsonResponse
@@ -348,6 +348,9 @@ class BillsToReceiveController extends Controller
     {
         $result         = array();
         $draw           = $request->input('draw');
+        $client_id      = $request->input('client_id');
+        $only_is_open   = $request->input('only_is_open');
+        $show_address   = $request->input('show_address');
         $company_id     = $request->user()->company_id;
         $date_filter    = dateBrazilToDateInternational($request->input('date_filter'));
         $filters        = array();
@@ -356,7 +359,17 @@ class BillsToReceiveController extends Controller
 
         try {
             $filter_default[]['where']['rentals.company_id'] = $company_id;
-            $filter_default[]['whereDate']['rental_payments.payday'] = $date_filter;
+
+            if ($only_is_open) {
+                $filter_default[]['whereDate']['rental_payments.due_date'] = $date_filter;
+                $filter_default[]['where']['rental_payments.payment_id'] = null;
+            } else {
+                $filter_default[]['whereDate']['rental_payments.payday'] = $date_filter;
+            }
+
+            if ($client_id) {
+                $filter_default[]['where']['rentals.client_id'] = $client_id;
+            }
 
             $fields_order   = array(
                 'rentals.code',
@@ -376,6 +389,7 @@ class BillsToReceiveController extends Controller
             $query['select'] = [
                 'rentals.id',
                 'rentals.code',
+                'rentals.client_id',
                 'clients.name as client_name',
                 'rentals.address_name',
                 'rentals.address_number',
@@ -414,6 +428,10 @@ class BillsToReceiveController extends Controller
             $data_info_client .= "<span class='font-weight-bold w-100'>$value->client_name</span>";
             $data_info_client .= "<span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span></div>";
 
+            if (!$show_address) {
+                $data_info_client = $value->client_name;
+            }
+
             $result[] = array(
                 formatCodeRental($value->code),
                 $data_info_client,
@@ -429,5 +447,23 @@ class BillsToReceiveController extends Controller
         );
 
         return response()->json($output);
+    }
+
+    public function getBillsForDateAndClient(string $date): JsonResponse
+    {
+        if (!hasPermission('BillsToReceiveView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        return response()->json(
+            array_map(function($payment) {
+                    $payment['total'] = roundDecimal($payment['total']);
+                    return $payment;
+                },
+                $this->rental_payment->getBillClientByDate($company_id, $date)->toArray()
+            )
+        );
     }
 }

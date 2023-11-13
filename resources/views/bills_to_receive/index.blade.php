@@ -34,7 +34,13 @@
             @if(session('warning'))
                 <div class="alert alert-animate alert-danger mt-2">{{session('warning')}}</div>
             @endif
-            @include('includes.bill_to_receive.content', ['show_select_client' => true, 'card_title' => 'Contas a Receber'])
+            @include('includes.bill_to_receive.content', [
+                'show_select_client'    => true,
+                'card_title'            => 'Contas a Receber',
+                'billStartFilterDate'   => formatDateInternational($filter_start_date, DATE_BRAZIL),
+                'billEndFilterDate'     => formatDateInternational($filter_end_date, DATE_BRAZIL),
+                'client_id_selected'    => $client_id
+            ])
         </div>
     </div>
     @include('includes.bill_to_receive.confirm_payment')

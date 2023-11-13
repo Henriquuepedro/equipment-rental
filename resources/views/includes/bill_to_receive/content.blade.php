@@ -10,7 +10,7 @@
                     @if ($show_select_client === true)
                         <option value="0">Todos</option>
                         @foreach($clients as $client)
-                            <option value="{{ $client->id }}">{{ $client->name }}</option>
+                            <option value="{{ $client->id }}" {{ ($client_id_selected ?? 0) == $client->id ? 'selected' : '' }}>{{ $client->name }}</option>
                         @endforeach
                     @endif
                 </select>
