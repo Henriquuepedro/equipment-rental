@@ -148,14 +148,16 @@
                     key: key_value
                 },
                 onClick: (evt, item) => {
-                    const cards = id_canvas.closest('.content-graph')
+                    if (evt.chart.boxes[0].legendItems.length) {
+                        const cards = id_canvas.closest('.content-graph')
 
-                    cards.find('.card-body.graph').fadeOut(500);
-                    setTimeout(() => {
-                        cards.find('.card-body.table').fadeIn(500);
-                    }, 500);
+                        cards.find('.card-body.graph').fadeOut(500);
+                        setTimeout(() => {
+                            cards.find('.card-body.table').fadeIn(500);
+                        }, 500);
 
-                    onClickGraph(item);
+                        onClickGraph(item);
+                    }
                 },
                 onHover: event => {
                     event.native.target.style.cursor = 'pointer';
@@ -167,12 +169,31 @@
                 beforeDatasetsDraw(chart) {
                     const { ctx } = chart;
 
-                    ctx.save();
+                    if (chart.getDatasetMeta(0).data.length) {
+                        ctx.save();
 
-                    const xPos = chart.getDatasetMeta(0).data[0].x;
-                    const yPos = chart.getDatasetMeta(0).data[0].y;
+                        const xPos = chart.getDatasetMeta(0).data[0].x;
+                        const yPos = chart.getDatasetMeta(0).data[0].y;
 
-                    datasetCenterGraph(ctx, xPos, yPos);
+                        datasetCenterGraph(ctx, xPos, yPos);
+                    }
+                },afterDraw: function(chart) {
+                    if (chart.data.datasets[0].data.every(item => item === 0)) {
+                        let ctx = chart.ctx;
+                        let width = chart.width;
+                        let height = chart.height;
+
+                        chart.clear();
+                        ctx.save();
+
+                        ctx.font = '20px sans-serif';
+                        ctx.fillStyle = '#19d895';
+                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center'
+
+                        ctx.fillText('Tudo bem! Nada a fazer.', width / 2, height / 2);
+                        ctx.restore();
+                    }
                 }
             }
 
