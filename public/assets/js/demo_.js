@@ -273,11 +273,11 @@ const getTodayDateEn = (returnTime = true, returnSeconds = true) => {
 }
 
 // converte valor de Float -> R$
-const numberToReal = numero => {
+const numberToReal = (numero, prefix = '') => {
     numero = parseFloat(numero);
     numero = numero.toFixed(2).split('.');
     numero[0] = numero[0].split(/(?=(?:...)*$)/).join('.');
-    return numero.join(',');
+    return prefix + numero.join(',');
 }
 
 // converte valor de R$ -> Float

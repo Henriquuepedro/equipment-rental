@@ -319,4 +319,18 @@ class RentalPayment extends Model
 
         return 0;
     }
+
+    public function getBillClientByDate(int $company_id, string $date)
+    {
+        return $this->select(DB::raw('SUM(rental_payments.due_value) as total, rentals.client_id, clients.name, count(rentals.id) as total_payment_client'))
+            ->join('rentals', 'rentals.id', '=', 'rental_payments.rental_id')
+            ->join('clients', 'rentals.client_id', '=', 'clients.id')
+            ->where([
+                ['rental_payments.payment_id', '=', null],
+                ['rentals.company_id', '=', $company_id]
+            ])
+            ->whereDate('rental_payments.due_date', $date)
+            ->groupBy('rentals.client_id')
+            ->get();
+    }
 }

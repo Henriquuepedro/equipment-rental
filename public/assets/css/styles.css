@@ -965,3 +965,9 @@ a[disabled] {
     height: 35px;
     border: 1px solid #000;
 }
+.dataTables_wrapper .dataTables_info {
+    float: left;
+}
+.dataTables_wrapper .dataTables_paginate {
+    float: right
+}

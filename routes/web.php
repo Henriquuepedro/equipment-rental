@@ -148,7 +148,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
     // Contas a receber
     Route::group(['prefix' => '/contas-a-receber', 'as' => 'bills_to_receive.'], function () {
 
-        Route::get('/', [App\Http\Controllers\BillsToReceiveController::class, 'index'])->name('index');
+        Route::get('/{filter_start_date?}/{filter_end_date?}/{client_id?}', [App\Http\Controllers\BillsToReceiveController::class, 'index'])->name('index');
 
     });
 
@@ -306,6 +306,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::get('/pagamentos-por-mes/{months}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForMonths'])->name('get-bills-for-month');
             Route::get('/pagamentos-por-data/{date?}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForDate'])->name('get-bills-for-date');
             Route::post('/buscar-pagamentos-por-data', [App\Http\Controllers\BillsToReceiveController::class, 'fetchBillForDate'])->name('fetchBillForDate');
+            Route::get('/buscar-pagamentos-por-data-e-client/{date?}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForDateAndClient'])->name('getBillsForDateAndClient');
         });
         Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
             Route::post('/nova-compra', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');

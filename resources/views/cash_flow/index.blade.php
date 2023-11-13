@@ -158,7 +158,7 @@
                     url,
                     pages: 2,
                     type: 'POST',
-                    data: { "_token": $('meta[name="csrf-token"]').attr('content'), date_filter },
+                    data: { "_token": $('meta[name="csrf-token"]').attr('content'), date_filter, show_address: 1 },
                     error: function(jqXHR, ajaxOptions, thrownError) {
                         console.log(jqXHR, ajaxOptions, thrownError);
                     }
