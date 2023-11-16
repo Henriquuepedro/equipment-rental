@@ -34,7 +34,13 @@
             @if(session('warning'))
                 <div class="alert alert-animate alert-danger mt-2">{{session('warning')}}</div>
             @endif
-            @include('includes.bill_to_pay.content', ['show_select_provider' => true, 'card_title' => 'Contas a Pagar'])
+            @include('includes.bill_to_pay.content', [
+                'show_select_provider'  => true,
+                'card_title'            => 'Contas a Pagar',
+                'billStartFilterDate'   => formatDateInternational($filter_start_date, DATE_BRAZIL),
+                'billEndFilterDate'     => formatDateInternational($filter_end_date, DATE_BRAZIL),
+                'provider_id_selected'  => $provider_id
+            ])
         </div>
     </div>
     @include('includes.bill_to_pay.confirm_payment')

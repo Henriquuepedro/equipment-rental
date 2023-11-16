@@ -168,4 +168,18 @@ class BillToPayPayment extends Model
 
         return 0;
     }
+
+    public function getBillProviderByDate(int $company_id, string $date)
+    {
+        return $this->select(DB::raw('SUM(bill_to_pay_payments.due_value) as total, bill_to_pays.provider_id, providers.name, count(bill_to_pays.id) as total_payment_provider'))
+            ->join('bill_to_pays', 'bill_to_pays.id', '=', 'bill_to_pay_payments.bill_to_pay_id')
+            ->join('providers', 'bill_to_pays.provider_id', '=', 'providers.id')
+            ->where([
+                ['bill_to_pay_payments.payment_id', '=', null],
+                ['bill_to_pays.company_id', '=', $company_id]
+            ])
+            ->whereDate('bill_to_pay_payments.due_date', $date)
+            ->groupBy('bill_to_pays.provider_id')
+            ->get();
+    }
 }

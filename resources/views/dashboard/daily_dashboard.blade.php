@@ -9,6 +9,10 @@
 @section('css')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <style>
+        .content-graph .card {
+            border: 1px solid #ccc;
+        }
+
         .content-graph .card-body.table {
             display: none;
         }
@@ -49,6 +53,9 @@
             let response;
             let labels;
             let key_value = '';
+            let total_open_payments = 0;
+            let total_clients = 0;
+            let total_providers = 0;
 
             switch (type) {
                 case 'receive_today':
@@ -91,8 +98,8 @@
                     labels = response.map((payment) => {
                         return payment.name;
                     });
-                    const total_open_payments = response.reduce((total, payment) => total + payment.total, 0);
-                    const total_clients = response.reduce((total, payment) => total + payment.total_payment_client, 0);
+                    total_open_payments = response.reduce((total, payment) => total + payment.total, 0);
+                    total_clients = response.reduce((total, payment) => total + payment.total_payment_client, 0);
 
                     datasetCenterGraph = (ctx, xPos, yPos) =>  {
                         ctx.font = '20px sans-serif';
@@ -111,6 +118,69 @@
                             complement_fill_text_payment = 'lançamentos';
                         }
                         ctx.fillText(`de ${total_clients} ${complement_fill_text_payment}`, xPos, yPos + 11);
+                    }
+
+                    break;
+                case 'pay_today':
+                    graph_endpoint = $('#route_bill_to_pay_today').val() + `/${dateNow()}`;
+                    table_endpoint =  $('#route_table_bill_to_pay_today').val();
+                    id_canvas = $('#cavasPayToday');
+                    id_list_table = $('#tableBillToPayToday');
+                    data_action_button_go_list.button_name = "Contas a receber";
+                    data_action_button_go_list.href = $('#route_list_table_bill_to_pay_today').val();
+                    data_action_button_go_list.custom_data.date_filter = transformDateForBr(dateNow());
+                    data_action_button_go_list.custom_data.only_is_open = 1;
+                    data_action_button_go_list.custom_data.show_address = 0;
+                    key_value = 'total';
+
+                    callbackTooltipLabel = tooltipItems => {
+                        const payments = tooltipItems.raw.total_payment_provider;
+                        let complement = '';
+
+                        if (payments <= 1) {
+                            complement = ` de ${payments} lançamento`;
+                        } else {
+                            complement = ` de ${payments} lançamentos`;
+                        }
+                        return numberToReal(tooltipItems.parsed, 'R$ ') + complement;
+                    }
+
+                    onClickGraph = item => {
+                        data_action_button_go_list.custom_data.provider_id = 0;
+                        data_action_button_go_list.href = $('#route_list_table_bill_to_pay_today').val();
+                        if (item.length) {
+                            const provider_id = item[0].element['$context'].raw.provider_id;
+                            data_action_button_go_list.custom_data.provider_id = provider_id;
+                            data_action_button_go_list.href += `/${provider_id}`;
+                        }
+
+                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list);
+                    }
+
+                    response = await $.getJSON(graph_endpoint);
+                    labels = response.map((payment) => {
+                        return payment.name;
+                    });
+                    total_open_payments = response.reduce((total, payment) => total + payment.total, 0);
+                    total_providers = response.reduce((total, payment) => total + payment.total_payment_provider, 0);
+
+                    datasetCenterGraph = (ctx, xPos, yPos) =>  {
+                        ctx.font = '20px sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center'
+
+                        ctx.fillText(numberToReal(total_open_payments, 'R$ '), xPos, yPos - 11);
+
+                        ctx.font = '12px sans-serif';
+
+                        let complement_fill_text_payment = '';
+                        if (total_providers <= 1) {
+                            complement_fill_text_payment = 'lançamento';
+                        } else {
+                            complement_fill_text_payment = 'lançamentos';
+                        }
+                        ctx.fillText(`de ${total_providers} ${complement_fill_text_payment}`, xPos, yPos + 11);
                     }
 
                     break;
@@ -198,7 +268,7 @@
                         ctx.textBaseline = 'middle';
                         ctx.textAlign = 'center'
 
-                        ctx.fillText('Tudo bem! Nada a fazer.', width / 2, height / 2);
+                        ctx.fillText('Tudo bem! Nada a fazer 🎉', width / 2, height / 2);
                         ctx.restore();
                     }
                 }
@@ -280,6 +350,7 @@
             'use strict';
             $(function () {
                 loadDoughnutGraph('receive_today');
+                loadDoughnutGraph('pay_today');
                 if ($("#humanResouceDoughnutChart").length) {
                     var doughnutChartCanvas = $("#humanResouceDoughnutChart").get(0).getContext("2d");
                     var doughnutPieData = {
@@ -532,8 +603,7 @@
                                                 <th>Valor</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                        </tbody>
+                                        <tbody></tbody>
                                     </table>
                                 </div>
                             </div>
@@ -544,29 +614,44 @@
 
 
                 {{-- Contas A pagar Hoje --}}
-                <div class="col-md-6 grid-margin stretch-card">
+                <div class="col-md-6 grid-margin stretch-card content-graph">
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body graph">
                             <h4 class="card-title">Contas A pagar Hoje</h4>
                             <div class="row d-flex justify-content-center">
                                 <div class="col-md-7 aligner-wrapper">
-                                    <canvas class="my-auto" id="trafficSourceDoughnutChart"></canvas>
-                                    <div class="wrapper d-flex flex-column justify-content-center absolute absolute-center">
-                                        <h4 class="d-block text-center mb-0">2.500,00</h4>
-                                        <small class="d-block text-center mb-2">de 6 lançamentos</small>
-                                    </div>
+                                    <canvas class="my-4 my-md-auto" id="cavasPayToday"></canvas>
                                 </div>
 
                             </div>
                         </div>
+                        <div class="card-body table">
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <table id="tableBillToPayToday" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Compra</th>
+                                                <th>Fornecedor</th>
+                                                <th>Valor</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
 
-                <div class="col-md-4 grid-margin stretch-card">
+
+
+
+
+                <div class="col-md-4 grid-margin stretch-card content-graph">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Contas a receber/pagar vencidos em aberto</h4>
+                            <h4 class="card-title">Contas a receber/pagar vencidos em aberto (NÃO FEITO)</h4>
                             <div class="aligner-wrapper">
                                 <canvas id="humanResouceDoughnutChart1" height="140"></canvas>
                                 <div class="wrapper d-flex flex-column justify-content-center absolute absolute-center">
@@ -591,10 +676,10 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 grid-margin stretch-card">
+                <div class="col-md-4 grid-margin stretch-card content-graph">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Para entregar/retirar hoje</h4>
+                            <h4 class="card-title">Para entregar/retirar hoje (NÃO FEITO)</h4>
                             <div class="aligner-wrapper">
                                 <canvas id="humanResouceDoughnutChart" height="140"></canvas>
                                 <div class="wrapper d-flex flex-column justify-content-center absolute absolute-center">
@@ -619,10 +704,10 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 grid-margin stretch-card">
+                <div class="col-md-4 grid-margin stretch-card content-graph">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Entrega/retirada atrasada</h4>
+                            <h4 class="card-title">Entrega/retirada atrasada (NÃO FEITO)</h4>
                             <div class="aligner-wrapper">
                                 <canvas id="humanResouceDoughnutChart2" height="140"></canvas>
                                 <div class="wrapper d-flex flex-column justify-content-center absolute absolute-center">
@@ -651,62 +736,13 @@
     </div>
 </div>
 
-
-<div class="row">
-    <div class="col-lg-6 grid-margin stretch-card">
-        <div class="card">
-
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center pb-4">
-                    <h4 class="card-title mb-0">Clientes novos</h4>
-                    <div id="line-traffic-legend"></div>
-                </div>
-
-                <canvas id="lineChart" style="height:250px"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6 grid-margin stretch-card">
-        <div class="card">
-
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center pb-4">
-                    <h4 class="card-title mb-0">Locações realizadas</h4>
-                    <div id="area-traffic-legend"></div>
-                </div>
-
-                <canvas id="areaChart" style="height:250px"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div class="row">
-    <div class="col-lg-6 grid-margin stretch-card">
-        <div class="card">
-
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center pb-4">
-                    <h4 class="card-title mb-0">Faturamento</h4>
-                    <div id="bar-traffic-legend"></div>
-                </div>
-
-                <canvas id="barChart" style="height:250px"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6 grid-margin stretch-card">
-        <div class="card">
-            <div class="card-body">
-                <p>Clientes que mais locaram</p>
-                <ul class="bullet-line-list pb-3" id="top_clients_rental"></ul>
-            </div>
-        </div>
-    </div>
-</div>
 <input type="hidden" id="route_bill_to_receive_today" value="{{ route('ajax.bills_to_receive.getBillsForDateAndClient') }}">
 <input type="hidden" id="route_table_bill_to_receive_today" value="{{ route('ajax.bills_to_receive.fetchBillForDate') }}">
 <input type="hidden" id="route_list_table_bill_to_receive_today" value="{{ route('bills_to_receive.index', array('filter_start_date' => dateNowInternational(null, DATE_INTERNATIONAL), 'filter_end_date' => dateNowInternational(null, DATE_INTERNATIONAL))) }}">
+
+
+
+<input type="hidden" id="route_bill_to_pay_today" value="{{ route('ajax.bills_to_pay.getBillsForDateAndProvider') }}">
+<input type="hidden" id="route_table_bill_to_pay_today" value="{{ route('ajax.bills_to_pay.fetchBillForDate') }}">
+<input type="hidden" id="route_list_table_bill_to_pay_today" value="{{ route('bills_to_pay.index', array('filter_start_date' => dateNowInternational(null, DATE_INTERNATIONAL), 'filter_end_date' => dateNowInternational(null, DATE_INTERNATIONAL))) }}">
 @stop
