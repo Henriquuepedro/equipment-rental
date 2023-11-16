@@ -13,7 +13,7 @@
                     @if ($show_select_provider === true)
                         <option value="0">Todos</option>
                         @foreach($providers as $provider)
-                            <option value="{{ $provider->id }}">{{ $provider->name }}</option>
+                            <option value="{{ $provider->id }}" {{ ($provider_id_selected ?? 0) == $provider->id ? 'selected' : '' }}>{{ $provider->name }}</option>
                         @endforeach
                     @endif
                 </select>

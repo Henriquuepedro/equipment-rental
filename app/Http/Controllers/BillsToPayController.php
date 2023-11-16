@@ -32,7 +32,7 @@ class BillsToPayController extends Controller
         $this->bill_to_pay_payment = new BillToPayPayment();
     }
 
-    public function index(): Factory|View|RedirectResponse|Application
+    public function index(string $filter_start_date = null, string $filter_end_date = null, int $provider_id = null): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('BillsToPayView')) {
             return redirect()->route('dashboard')
@@ -42,7 +42,7 @@ class BillsToPayController extends Controller
         $company_id = Auth::user()->__get('company_id');
         $providers = $this->provider->getProviders($company_id);
 
-        return view('bills_to_pay.index', compact('providers'));
+        return view('bills_to_pay.index', compact('providers', 'filter_start_date', 'filter_end_date', 'provider_id'));
     }
 
     public function getQtyTypeBills(Request $request): JsonResponse
@@ -618,6 +618,8 @@ class BillsToPayController extends Controller
     {
         $result         = array();
         $draw           = $request->input('draw');
+        $provider_id    = $request->input('provider_id');
+        $only_is_open   = $request->input('only_is_open');
         $company_id     = $request->user()->company_id;
         $date_filter    = dateBrazilToDateInternational($request->input('date_filter'));
         $filters        = array();
@@ -625,7 +627,17 @@ class BillsToPayController extends Controller
 
         try {
             $filter_default[]['where']['bill_to_pays.company_id'] = $company_id;
-            $filter_default[]['whereDate']['bill_to_pay_payments.payday'] = $date_filter;
+
+            if ($only_is_open) {
+                $filter_default[]['whereDate']['bill_to_pay_payments.due_date'] = $date_filter;
+                $filter_default[]['where']['bill_to_pay_payments.payment_id'] = null;
+            } else {
+                $filter_default[]['whereDate']['bill_to_pay_payments.payday'] = $date_filter;
+            }
+
+            if ($provider_id) {
+                $filter_default[]['where']['bill_to_pays.provider_id'] = $provider_id;
+            }
 
             $fields_order = array('bill_to_pays.code','providers.name','bill_to_pay_payments.due_value');
 
@@ -633,6 +645,7 @@ class BillsToPayController extends Controller
             $query['select'] = [
                 'bill_to_pays.id',
                 'bill_to_pays.code',
+                'bill_to_pays.provider_id',
                 'providers.name as provider_name',
                 'bill_to_pays.created_at',
                 'bill_to_pay_payments.due_date',
@@ -675,5 +688,23 @@ class BillsToPayController extends Controller
         );
 
         return response()->json($output);
+    }
+
+    public function getBillsForDateAndProvider(string $date): JsonResponse
+    {
+        if (!hasPermission('BillsToPayView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        return response()->json(
+            array_map(function($payment) {
+                $payment['total'] = roundDecimal($payment['total']);
+                return $payment;
+            },
+                $this->bill_to_pay_payment->getBillProviderByDate($company_id, $date)->toArray()
+            )
+        );
     }
 }

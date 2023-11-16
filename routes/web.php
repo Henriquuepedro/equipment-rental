@@ -155,7 +155,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
     // Contas a pagar
     Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
 
-        Route::get('/', [App\Http\Controllers\BillsToPayController::class, 'index'])->name('index');
+        Route::get('/{filter_start_date?}/{filter_end_date?}/{provider_id?}', [App\Http\Controllers\BillsToPayController::class, 'index'])->name('index');
         Route::get('/novo', [App\Http\Controllers\BillsToPayController::class, 'create'])->name('create');
         Route::post('/cadastro', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('insert');
 
@@ -320,6 +320,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::delete('/delete/{id}', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
             Route::get('/pagamentos-por-data/{date?}', [App\Http\Controllers\BillsToPayController::class, 'getBillsForDate'])->name('get-bills-for-date');
             Route::post('/buscar-pagamentos-por-data', [App\Http\Controllers\BillsToPayController::class, 'fetchBillForDate'])->name('fetchBillForDate');
+            Route::get('/buscar-pagamentos-por-data-e-fornecedor/{date?}', [App\Http\Controllers\BillsToPayController::class, 'getBillsForDateAndProvider'])->name('getBillsForDateAndProvider');
         });
         Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
             Route::get('/fields/{option}', [App\Http\Controllers\ExportController::class, 'getFields'])->name('client_fields');
