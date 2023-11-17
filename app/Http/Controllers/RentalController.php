@@ -63,7 +63,7 @@ class RentalController extends Controller
         $this->rental_residue = new RentalResidue();
     }
 
-    public function index(): Factory|View|RedirectResponse|Application
+    public function index(string $filter_start_date = null, string $filter_end_date = null, string $date_filter_by = null, int $client_id = null): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('RentalView')) {
             return redirect()->route('dashboard')
@@ -74,15 +74,18 @@ class RentalController extends Controller
 
         $clients = $this->client->getClients($company_id);
 
-        return view('rental.index', compact('clients'));
+        return view('rental.index', compact('clients', 'filter_start_date', 'filter_end_date', 'date_filter_by', 'client_id'));
     }
 
     public function fetchRentals(Request $request): JsonResponse
     {
-        $draw           = $request->input('draw');
-        $company_id     = $request->user()->company_id;
-        $type_rental    = $request->input('type');
-        $result         = array();
+        $draw                   = $request->input('draw');
+        $company_id             = $request->user()->company_id;
+        $type_rental            = $request->input('type');
+        $type_to_today          = $request->input('type_to_today'); // Se '$type_rental' for 'deliver' retornar para entregar hoje, se for 'withdraw' retornar para retirar hoje.
+        $response_simplified    = $request->input('response_simplified'); // Retornar somente código e cliente com endereço.
+        $date_filter_by         = $request->input('date_filter_by'); // created_at, delivery, withdraw
+        $result                 = array();
 
         try {
             // Filtro datas
@@ -96,7 +99,27 @@ class RentalController extends Controller
             $filter_default = array();
 
             $filter_default[]['where']['rentals.company_id'] = $company_id;
-            $filter_default[]['whereBetween']['rentals.created_at'] = ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
+
+            if ($type_to_today && in_array($type_rental, array('deliver', 'withdraw'))) {
+                if ($type_rental == 'deliver') {
+                    $filter_default[]['whereBetween']['rental_equipments.expected_delivery_date'] = ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
+                }
+                // withdraw
+                else {
+                    $filter_default[]['whereBetween']['rental_equipments.expected_withdrawal_date'] = ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
+                }
+            } else {
+                $where_date_filter = match ($date_filter_by) {
+                    'created_at'        => 'rentals.created_a',
+                    'delivery'          => 'rental_equipments.actual_delivery_date',
+                    'withdraw'          => 'rental_equipments.actual_withdrawal_date',
+                    'expected_delivery' => 'rental_equipments.expected_delivery_date',
+                    'expected_withdraw' => 'rental_equipments.expected_withdrawal_date',
+                    default             => throw new Exception('Filtro de data não localizada.'),
+                };
+
+                $filter_default[]['whereBetween'][$where_date_filter] = ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
+            }
 
             switch ($type_rental) {
                 case 'deliver':
@@ -110,6 +133,8 @@ class RentalController extends Controller
                     $filter_default[]['where']['rental_equipments.actual_delivery_date <>'] = null;
                     $filter_default[]['where']['rental_equipments.actual_withdrawal_date <>'] = null;
                     break;
+                default:
+                    return response()->json(getErrorDataTables('Tipo de locação não localizada.', $draw));
             }
 
             if (!empty($client)) {
@@ -144,7 +169,8 @@ class RentalController extends Controller
                 'rentals.address_neigh',
                 'rentals.address_city',
                 'rentals.address_state',
-                'rentals.created_at'
+                'rentals.created_at',
+                'SUM(rental_equipments.quantity) as quantity_equipment'
             ];
             $query['from'] = 'rentals';
             $query['join'][] = ['clients','clients.id','=','rentals.client_id'];
@@ -168,6 +194,18 @@ class RentalController extends Controller
         $permissionDelete = hasPermission('RentalDeletePost');
 
         foreach ($data['data'] as $value) {
+            if ($response_simplified) {
+                $result[] = array(
+                    formatCodeRental($value->code),
+                    "<div class='d-flex flex-wrap'>
+                        <span class='font-weight-bold w-100'>$value->client_name</span>
+                        <span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span>
+                    </div>",
+                    $value->quantity_equipment
+                );
+                continue;
+            }
+
             $buttons = "<button class='dropdown-item btnViewRental' data-rental-id='$value->id'><i class='fas fa-eye'></i> Visualizar Locação</button>";
 
             if ($permissionUpdate && in_array($type_rental, array('deliver', 'withdraw'))) {
@@ -695,12 +733,13 @@ class RentalController extends Controller
 
     public function getQtyTypeRentals(Request $request): JsonResponse
     {
-        $company_id = $request->user()->company_id;
-        $client     = $request->input('client');
-        $start_date = $request->input('start_date');
-        $end_date   = $request->input('end_date');
+        $company_id     = $request->user()->company_id;
+        $client         = $request->input('client');
+        $start_date     = $request->input('start_date');
+        $end_date       = $request->input('end_date');
+        $date_filter_by = $request->input('date_filter_by');
 
-        $typesQuery = $this->rental->getCountTypeRentals($company_id, $client, $start_date, $end_date);
+        $typesQuery = $this->rental->getCountTypeRentals($company_id, $client, $start_date, $end_date, $date_filter_by);
 
         $arrTypes = array(
             'deliver'   => $typesQuery['deliver'],
@@ -978,5 +1017,23 @@ class RentalController extends Controller
         }
 
         return response()->json($response_months);
+    }
+
+    public function getRentalsForDateAndClient(string $date, string $type = null): JsonResponse
+    {
+        if (!hasPermission('RentalView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        return response()->json(
+            array_map(function($payment) {
+                $payment['total'] = roundDecimal($payment['total']);
+                return $payment;
+            },
+                $this->rental_equipment->getRentalClientByDate($company_id, $date, $type)->toArray()
+            )
+        );
     }
 }

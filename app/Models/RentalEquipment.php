@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class RentalEquipment extends Model
 {
@@ -177,5 +178,27 @@ class RentalEquipment extends Model
             'actual_withdrawal_date' => null,
             'exchanged' => false
         ])->get();
+    }
+
+    public function getRentalClientByDate(int $company_id, string $date, string $type)
+    {
+        $query = $this->select(DB::raw('SUM(rental_equipments.quantity) as total, COUNT(DISTINCT rental_equipments.rental_id) as rentals, rentals.client_id, clients.name'))
+            ->join('rentals', 'rentals.id', '=', 'rental_equipments.rental_id')
+            ->join('clients', 'rentals.client_id', '=', 'clients.id')
+            ->where('rentals.company_id', $company_id);
+
+        if ($type === 'deliver') {
+            $query->where('rental_equipments.actual_delivery_date', null)->whereDate('rental_equipments.expected_delivery_date', $date);
+        } elseif ($type === 'withdraw') {
+            $query->where([
+                ['rental_equipments.actual_delivery_date', '!=', null],
+                ['rental_equipments.actual_withdrawal_date', '=', null],
+            ])
+            ->whereDate('rental_equipments.expected_withdrawal_date', $date);
+        } else {
+            $query->whereDate('rentals.created_at', $date);
+        }
+
+        return $query->groupBy('rentals.client_id')->get();
     }
 }

@@ -971,3 +971,8 @@ a[disabled] {
 .dataTables_wrapper .dataTables_paginate {
     float: right
 }
+
+.select2-results .select2-results__options {
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}

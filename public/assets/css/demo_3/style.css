@@ -20002,3 +20002,6 @@ select option {
 div.dt-button-collection {
     background-color: #555 !important;
 }
+.select2-container--default .select2-dropdown, .select2-container--default .select2-selection--multiple {
+    border-color: #656565;
+}

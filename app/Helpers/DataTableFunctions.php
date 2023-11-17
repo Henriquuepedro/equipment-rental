@@ -237,7 +237,7 @@ if (!function_exists('doQuery')) {
                 continue;
             }
             if ($type_field === 'select') {
-                $db->select($fields);
+                $db->select(DB::raw(implode(',', $fields)));
                 continue;
             }
 
