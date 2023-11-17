@@ -216,9 +216,26 @@ class Rental extends Model
         return $this->where(['id' => $rental_id, 'company_id' => $company_id])->delete();
     }
 
-    public function getCountTypeRentals(int $company_id, int $client, string $start_date, string $end_date): array
+    public function getCountTypeRentals(int $company_id, int $client, string $start_date, string $end_date, string $date_filter_by): array
     {
         $data = array();
+
+        $where_date_filter = match ($date_filter_by) {
+            'created_at'        => 'rentals.created_at',
+            'delivery'          => 'rental_equipments.actual_delivery_date',
+            'withdraw'          => 'rental_equipments.actual_withdrawal_date',
+            'expected_delivery' => 'rental_equipments.expected_delivery_date',
+            'expected_withdraw' => 'rental_equipments.expected_withdrawal_date',
+            default             => null,
+        };
+
+        if (is_null($where_date_filter)) {
+            return array(
+                'deliver'   => 0,
+                'withdraw'  => 0,
+                'finished'  => 0
+            );
+        }
 
         foreach (array(
              'deliver' => array(
@@ -241,8 +258,9 @@ class Rental extends Model
 
             $query = $this->from('rental_equipments')
                 ->join('rentals', 'rental_equipments.rental_id', '=', 'rentals.id')
-                ->where($where)
-                ->whereBetween('rentals.created_at', ["$start_date 00:00:00", "$end_date 23:59:59"]);
+                ->where($where);
+
+            $query->whereBetween($where_date_filter, ["$start_date 00:00:00", "$end_date 23:59:59"]);
 
             $data[$type] = $query
                 ->groupBy('rental_equipments.rental_id')

@@ -20,8 +20,11 @@
         .dataTable thead tr th, .dataTable tfoot tr th {
             background: unset;
         }
-        .dataTable tbody tr td {
-            padding: 0px 8px !important;
+        .dataTable:not(#tableRentalToWithdrawToday) tbody tr td {
+            padding: 0 8px !important;
+        }
+        .dataTable#tableRentalToWithdrawToday tbody tr td {
+            padding: 2px 8px !important;
         }
         .aligner-wrapper .absolute.absolute-center {
             width: 25%;
@@ -56,6 +59,9 @@
             let total_open_payments = 0;
             let total_clients = 0;
             let total_providers = 0;
+            let total_equipments = 0;
+            let total_rentals = 0;
+            let pageLength = 10;
 
             switch (type) {
                 case 'receive_today':
@@ -69,17 +75,13 @@
                     data_action_button_go_list.custom_data.only_is_open = 1;
                     data_action_button_go_list.custom_data.show_address = 0;
                     key_value = 'total';
+                    pageLength = 9;
 
                     callbackTooltipLabel = tooltipItems => {
                         const payments = tooltipItems.raw.total_payment_client;
-                        let complement = '';
+                        let complement = payments <= 1 ? 'lançamento' : 'lançamentos';
 
-                        if (payments <= 1) {
-                            complement = ` de ${payments} lançamento`;
-                        } else {
-                            complement = ` de ${payments} lançamentos`;
-                        }
-                        return numberToReal(tooltipItems.parsed, 'R$ ') + complement;
+                        return numberToReal(tooltipItems.parsed, 'R$ ') + ` de ${payments} ${complement}`;
                     }
 
                     onClickGraph = item => {
@@ -91,7 +93,7 @@
                             data_action_button_go_list.href += `/${client_id}`;
                         }
 
-                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list);
+                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list, pageLength);
                     }
 
                     response = await $.getJSON(graph_endpoint);
@@ -132,17 +134,12 @@
                     data_action_button_go_list.custom_data.only_is_open = 1;
                     data_action_button_go_list.custom_data.show_address = 0;
                     key_value = 'total';
+                    pageLength = 9;
 
                     callbackTooltipLabel = tooltipItems => {
                         const payments = tooltipItems.raw.total_payment_provider;
-                        let complement = '';
-
-                        if (payments <= 1) {
-                            complement = ` de ${payments} lançamento`;
-                        } else {
-                            complement = ` de ${payments} lançamentos`;
-                        }
-                        return numberToReal(tooltipItems.parsed, 'R$ ') + complement;
+                        let complement = payments <= 1 ? 'lançamento' : 'lançamentos';
+                        return numberToReal(tooltipItems.parsed, 'R$ ') + ` de ${payments} ${complement}`;
                     }
 
                     onClickGraph = item => {
@@ -154,7 +151,7 @@
                             data_action_button_go_list.href += `/${provider_id}`;
                         }
 
-                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list);
+                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list, pageLength);
                     }
 
                     response = await $.getJSON(graph_endpoint);
@@ -184,6 +181,122 @@
                     }
 
                     break;
+                case 'delivery_today':
+                    graph_endpoint = $('#route_rental_to_delivery_today').val();
+                    table_endpoint =  $('#route_table_rental_to_delivery_today').val();
+                    id_canvas = $('#cavasDeliveryToday');
+                    id_list_table = $('#tableRentalToDeliveryToday');
+                    data_action_button_go_list.button_name = "Locação";
+                    data_action_button_go_list.href = $('#route_list_table_rental_to_delivery_today').val();
+                    data_action_button_go_list.custom_data.start_date = dateNow();
+                    data_action_button_go_list.custom_data.end_date = dateNow();
+                    data_action_button_go_list.custom_data.type_to_today = 1;
+                    data_action_button_go_list.custom_data.response_simplified = 1;
+                    data_action_button_go_list.custom_data.type = 'deliver';
+                    key_value = 'total';
+                    pageLength = 8;
+
+                    callbackTooltipLabel = tooltipItems => {
+                        const equipments = tooltipItems.raw.total;
+                        const rentals = tooltipItems.raw.rentals;
+                        let complement_equipment = equipments <= 1 ? 'equipamento' : 'equipamentos';
+                        let complement_rental = rentals <= 1 ? 'locação' : 'locações';
+
+                        return `${equipments} ${complement_equipment} de ${rentals} ${complement_rental}`;
+                    }
+
+                    onClickGraph = item => {
+                        data_action_button_go_list.custom_data.client = 0;
+                        data_action_button_go_list.href = $('#route_list_table_rental_to_delivery_today').val();
+                        if (item.length) {
+                            const client_id = item[0].element['$context'].raw.client_id;
+                            data_action_button_go_list.custom_data.client = client_id;
+                            data_action_button_go_list.href += `/${client_id}`;
+                        }
+                        data_action_button_go_list.href += '#deliver';
+
+                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list, pageLength);
+                    }
+
+                    response = await $.getJSON(graph_endpoint);
+                    labels = response.map((equipment) => {
+                        return equipment.name;
+                    });
+                    total_equipments = response.reduce((total, equipment) => total + equipment.total, 0);
+                    total_rentals = response.reduce((rentals, rental) => rentals + rental.rentals, 0);
+
+                    datasetCenterGraph = (ctx, xPos, yPos) =>  {
+                        ctx.font = '17px sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center'
+
+                        let complement_fill_text_equipment = total_equipments <= 1 ? 'equipamento' : 'equipamentos';
+                        let complement_fill_text_rental = total_rentals <= 1 ? 'locação' : 'locações';
+
+                        ctx.fillText(`${total_equipments} ${complement_fill_text_equipment}`, xPos, yPos - 12);
+                        ctx.fillText(`de ${total_rentals} ${complement_fill_text_rental}`, xPos, yPos + 12);
+                    }
+
+                    break;
+                case 'withdraw_today':
+                    graph_endpoint = $('#route_rental_to_withdraw_today').val();
+                    table_endpoint =  $('#route_table_rental_to_withdraw_today').val();
+                    id_canvas = $('#cavasWithdrawToday');
+                    id_list_table = $('#tableRentalToWithdrawToday');
+                    data_action_button_go_list.button_name = "Locação";
+                    data_action_button_go_list.href = $('#route_list_table_rental_to_withdraw_today').val();
+                    data_action_button_go_list.custom_data.start_date = dateNow();
+                    data_action_button_go_list.custom_data.end_date = dateNow();
+                    data_action_button_go_list.custom_data.type_to_today = 1;
+                    data_action_button_go_list.custom_data.response_simplified = 1;
+                    data_action_button_go_list.custom_data.type = 'withdraw';
+                    key_value = 'total';
+                    pageLength = 8;
+
+                    callbackTooltipLabel = tooltipItems => {
+                        const equipments = tooltipItems.raw.total;
+                        const rentals = tooltipItems.raw.rentals;
+                        let complement_equipment = equipments <= 1 ? 'equipamento' : 'equipamentos';
+                        let complement_rental = rentals <= 1 ? 'locação' : 'locações';
+
+                        return `${equipments} ${complement_equipment} de ${rentals} ${complement_rental}`;
+                    }
+
+                    onClickGraph = item => {
+                        data_action_button_go_list.custom_data.client = 0;
+                        data_action_button_go_list.href = $('#route_list_table_rental_to_withdraw_today').val();
+                        if (item.length) {
+                            const client_id = item[0].element['$context'].raw.client_id;
+                            data_action_button_go_list.custom_data.client = client_id;
+                            data_action_button_go_list.href += `/${client_id}`;
+                        }
+                        data_action_button_go_list.href += '#withdraw';
+
+                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list, pageLength);
+                    }
+
+                    response = await $.getJSON(graph_endpoint);
+                    labels = response.map((equipment) => {
+                        return equipment.name;
+                    });
+                    total_equipments = response.reduce((total, equipment) => total + equipment.total, 0);
+                    total_rentals = response.reduce((rentals, rental) => rentals + rental.rentals, 0);
+
+                    datasetCenterGraph = (ctx, xPos, yPos) =>  {
+                        ctx.font = '17px sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center'
+
+                        let complement_fill_text_equipment = total_equipments <= 1 ? 'equipamento' : 'equipamentos';
+                        let complement_fill_text_rental = total_rentals <= 1 ? 'locação' : 'locações';
+
+                        ctx.fillText(`${total_equipments} ${complement_fill_text_equipment}`, xPos, yPos - 12);
+                        ctx.fillText(`de ${total_rentals} ${complement_fill_text_rental}`, xPos, yPos + 12);
+                    }
+
+                    break;
 
                 default:
                     alert('Tipo de gráfico não configurado.');
@@ -199,7 +312,6 @@
                 ],
                 labels
             };
-
             const doughnutPieOptions = {
                 cutoutPercentage: 75,
                 animationEasing: "easeOutBounce",
@@ -240,7 +352,6 @@
                     event.native.target.style.cursor = 'pointer';
                 }
             };
-
             const doughnutLabel = {
                 id: 'doughnutLabel',
                 beforeDatasetsDraw(chart) {
@@ -282,7 +393,7 @@
             });
         }
 
-        const loadTableGraph = (id_list_table, url, data_action_button_go_list) => {
+        const loadTableGraph = (id_list_table, url, data_action_button_go_list, pageLength) => {
             const data_default = {
                 _token: $('meta[name="csrf-token"]').attr('content')
             };
@@ -303,7 +414,7 @@
                 "autoWidth": false,
                 "sortable": true,
                 "searching": false,
-                "pageLength": 7,
+                "pageLength": pageLength,
                 "serverSide": true,
                 "serverMethod": "post",
                 "ajax": {
@@ -351,222 +462,8 @@
             $(function () {
                 loadDoughnutGraph('receive_today');
                 loadDoughnutGraph('pay_today');
-                if ($("#humanResouceDoughnutChart").length) {
-                    var doughnutChartCanvas = $("#humanResouceDoughnutChart").get(0).getContext("2d");
-                    var doughnutPieData = {
-                        datasets: [{
-                            data: [20, 80, 85, 45],
-                            backgroundColor: [
-                                successColor,
-                                primaryColor,
-                                dangerColor,
-                                secondaryColor
-                            ],
-                            borderColor: [
-                                successColor,
-                                primaryColor,
-                                dangerColor,
-                                secondaryColor
-                            ],
-                        }],
-
-                        // These labels appear in the legend and in the tooltips when hovering different arcs
-                        labels: [
-                            'Human Resources',
-                            'Manger',
-                            'Other'
-                        ]
-                    };
-                    var doughnutPieOptions = {
-                        cutoutPercentage: 75,
-                        animationEasing: "easeOutBounce",
-                        animateRotate: true,
-                        animateScale: false,
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        showScale: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                        },
-                        layout: {
-                            padding: {
-                                left: 0,
-                                right: 0,
-                                top: 0,
-                                bottom: 0
-                            }
-                        }
-                    };
-                    var doughnutChart = new Chart(doughnutChartCanvas, {
-                        type: 'doughnut',
-                        data: doughnutPieData,
-                        options: doughnutPieOptions
-                    });
-                }
-                if ($("#humanResouceDoughnutChart1").length) {
-                    var doughnutChartCanvas = $("#humanResouceDoughnutChart1").get(0).getContext("2d");
-                    var doughnutPieData = {
-                        datasets: [{
-                            data: [20, 80, 85, 45],
-                            backgroundColor: [
-                                successColor,
-                                primaryColor,
-                                dangerColor,
-                                secondaryColor
-                            ],
-                            borderColor: [
-                                successColor,
-                                primaryColor,
-                                dangerColor,
-                                secondaryColor
-                            ],
-                        }],
-
-                        // These labels appear in the legend and in the tooltips when hovering different arcs
-                        labels: [
-                            'Human Resources',
-                            'Manger',
-                            'Other'
-                        ]
-                    };
-                    var doughnutPieOptions = {
-                        cutoutPercentage: 75,
-                        animationEasing: "easeOutBounce",
-                        animateRotate: true,
-                        animateScale: false,
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        showScale: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                        },
-                        layout: {
-                            padding: {
-                                left: 0,
-                                right: 0,
-                                top: 0,
-                                bottom: 0
-                            }
-                        }
-                    };
-                    var doughnutChart = new Chart(doughnutChartCanvas, {
-                        type: 'doughnut',
-                        data: doughnutPieData,
-                        options: doughnutPieOptions
-                    });
-                }
-                if ($("#humanResouceDoughnutChart2").length) {
-                    var doughnutChartCanvas = $("#humanResouceDoughnutChart2").get(0).getContext("2d");
-                    var doughnutPieData = {
-                        datasets: [{
-                            data: [20, 80, 85, 45],
-                            backgroundColor: [
-                                successColor,
-                                primaryColor,
-                                dangerColor,
-                                secondaryColor
-                            ],
-                            borderColor: [
-                                successColor,
-                                primaryColor,
-                                dangerColor,
-                                secondaryColor
-                            ],
-                        }],
-
-                        // These labels appear in the legend and in the tooltips when hovering different arcs
-                        labels: [
-                            'Human Resources',
-                            'Manger',
-                            'Other'
-                        ]
-                    };
-                    var doughnutPieOptions = {
-                        cutoutPercentage: 75,
-                        animationEasing: "easeOutBounce",
-                        animateRotate: true,
-                        animateScale: false,
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        showScale: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                        },
-                        layout: {
-                            padding: {
-                                left: 0,
-                                right: 0,
-                                top: 0,
-                                bottom: 0
-                            }
-                        }
-                    };
-                    var doughnutChart = new Chart(doughnutChartCanvas, {
-                        type: 'doughnut',
-                        data: doughnutPieData,
-                        options: doughnutPieOptions
-                    });
-                }
-                if ($("#trafficSourceDoughnutChart").length) {
-                    var doughnutChartCanvas = $("#trafficSourceDoughnutChart").get(0).getContext("2d");
-                    var doughnutPieData = {
-                        datasets: [{
-                            data: [185, 85, 15],
-                            backgroundColor: [
-                                secondaryColor,
-                                successColor,
-                                dangerColor,
-
-                            ],
-                            borderColor: [
-                                secondaryColor,
-                                successColor,
-                                dangerColor,
-
-                            ],
-                        }],
-
-                        // These labels appear in the legend and in the tooltips when hovering different arcs
-                        labels: [
-                            'Human Resources',
-                            'Manger',
-                            'Other'
-                        ]
-                    };
-                    var doughnutPieOptions = {
-                        cutoutPercentage: 75,
-                        animationEasing: "easeOutBounce",
-                        animateRotate: true,
-                        animateScale: false,
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        showScale: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                        },
-                        layout: {
-                            padding: {
-                                left: 0,
-                                right: 0,
-                                top: 0,
-                                bottom: 0
-                            }
-                        }
-                    };
-                    var doughnutChart = new Chart(doughnutChartCanvas, {
-                        type: 'doughnut',
-                        data: doughnutPieData,
-                        options: doughnutPieOptions
-                    });
-                }
+                loadDoughnutGraph('delivery_today');
+                loadDoughnutGraph('withdraw_today');
             });
         })(jQuery)
     </script>
@@ -577,6 +474,71 @@
     <div class="col-12 grid-margin">
         <div class="card card-statistics">
             <div class="row">
+
+
+
+                {{-- Entregar hoje --}}
+                <div class="col-md-6 grid-margin stretch-card content-graph">
+                    <div class="card">
+                        <div class="card-body graph">
+                            <h4 class="card-title">Equipamentos Para Entregar Hoje</h4>
+                            <div class="row d-flex justify-content-center">
+                                <div class="col-md-7 aligner-wrapper">
+                                    <canvas class="my-4 my-md-auto" id="cavasDeliveryToday"></canvas>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="card-body table">
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <table id="tableRentalToDeliveryToday" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Locação</th>
+                                                <th>Cliente/Endereço</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                {{-- Retirar hoje --}}
+                <div class="col-md-6 grid-margin stretch-card content-graph">
+                    <div class="card">
+                        <div class="card-body graph">
+                            <h4 class="card-title">Equipamentos Para Retirar Hoje</h4>
+                            <div class="row d-flex justify-content-center">
+                                <div class="col-md-7 aligner-wrapper">
+                                    <canvas class="my-4 my-md-auto" id="cavasWithdrawToday"></canvas>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="card-body table">
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <table id="tableRentalToWithdrawToday" class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>Locação</th>
+                                            <th>Cliente/Endereço</th>
+                                            <th>Equipamentos</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
 
@@ -645,92 +607,6 @@
                 </div>
 
 
-
-
-
-                <div class="col-md-4 grid-margin stretch-card content-graph">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Contas a receber/pagar vencidos em aberto (NÃO FEITO)</h4>
-                            <div class="aligner-wrapper">
-                                <canvas id="humanResouceDoughnutChart1" height="140"></canvas>
-                                <div class="wrapper d-flex flex-column justify-content-center absolute absolute-center">
-                                    <h4 class="text-center mb-0">30</h4>
-                                    <small class="d-block text-center text-muted mb-0">Contas</small>
-                                </div>
-                            </div>
-                            <div class="wrapper mt-4">
-                                <div class="d-flex align-items-center py-3 border-bottom">
-                                    <span class="dot-indicator bg-success"></span>
-                                    <p class="mb-0 ml-3">Receber</p>
-                                    <p class="ml-auto mb-0 text-muted">25 lançamentos</p>
-                                </div>
-                                <div class="d-flex align-items-center py-3 border-bottom">
-                                    <span class="dot-indicator bg-danger"></span>
-                                    <p class="mb-0 ml-3">Pagar</p>
-                                    <p class="ml-auto mb-0 text-muted">5 lançamentos</p>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 grid-margin stretch-card content-graph">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Para entregar/retirar hoje (NÃO FEITO)</h4>
-                            <div class="aligner-wrapper">
-                                <canvas id="humanResouceDoughnutChart" height="140"></canvas>
-                                <div class="wrapper d-flex flex-column justify-content-center absolute absolute-center">
-                                    <h4 class="text-center mb-0">30</h4>
-                                    <small class="d-block text-center text-muted mb-0">Equipamentos</small>
-                                </div>
-                            </div>
-                            <div class="wrapper mt-4">
-                                <div class="d-flex align-items-center py-3 border-bottom">
-                                    <span class="dot-indicator bg-danger"></span>
-                                    <p class="mb-0 ml-3">Entregar</p>
-                                    <p class="ml-auto mb-0 text-muted">25 equipamentos</p>
-                                </div>
-                                <div class="d-flex align-items-center py-3 border-bottom">
-                                    <span class="dot-indicator bg-success"></span>
-                                    <p class="mb-0 ml-3">Retirar</p>
-                                    <p class="ml-auto mb-0 text-muted">5 equipamentos</p>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 grid-margin stretch-card content-graph">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Entrega/retirada atrasada (NÃO FEITO)</h4>
-                            <div class="aligner-wrapper">
-                                <canvas id="humanResouceDoughnutChart2" height="140"></canvas>
-                                <div class="wrapper d-flex flex-column justify-content-center absolute absolute-center">
-                                    <h4 class="text-center mb-0">30</h4>
-                                    <small class="d-block text-center text-muted mb-0">Equipamentos</small>
-                                </div>
-                            </div>
-                            <div class="wrapper mt-4">
-                                <div class="d-flex align-items-center py-3 border-bottom">
-                                    <span class="dot-indicator bg-danger"></span>
-                                    <p class="mb-0 ml-3">Entrega</p>
-                                    <p class="ml-auto mb-0 text-muted">25 equipamentos</p>
-                                </div>
-                                <div class="d-flex align-items-center py-3 border-bottom">
-                                    <span class="dot-indicator bg-success"></span>
-                                    <p class="mb-0 ml-3">Retirada</p>
-                                    <p class="ml-auto mb-0 text-muted">5 equipamentos</p>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -740,9 +616,15 @@
 <input type="hidden" id="route_table_bill_to_receive_today" value="{{ route('ajax.bills_to_receive.fetchBillForDate') }}">
 <input type="hidden" id="route_list_table_bill_to_receive_today" value="{{ route('bills_to_receive.index', array('filter_start_date' => dateNowInternational(null, DATE_INTERNATIONAL), 'filter_end_date' => dateNowInternational(null, DATE_INTERNATIONAL))) }}">
 
-
-
 <input type="hidden" id="route_bill_to_pay_today" value="{{ route('ajax.bills_to_pay.getBillsForDateAndProvider') }}">
 <input type="hidden" id="route_table_bill_to_pay_today" value="{{ route('ajax.bills_to_pay.fetchBillForDate') }}">
 <input type="hidden" id="route_list_table_bill_to_pay_today" value="{{ route('bills_to_pay.index', array('filter_start_date' => dateNowInternational(null, DATE_INTERNATIONAL), 'filter_end_date' => dateNowInternational(null, DATE_INTERNATIONAL))) }}">
+
+<input type="hidden" id="route_rental_to_delivery_today" value="{{ route('ajax.rental.getRentalsForDateAndClient', array('date' => dateNowInternational(null, DATE_INTERNATIONAL), 'type' => 'deliver')) }}">
+<input type="hidden" id="route_table_rental_to_delivery_today" value="{{ route('ajax.rental.fetch') }}">
+<input type="hidden" id="route_list_table_rental_to_delivery_today" value="{{ route('rental.index', array('filter_start_date' => dateNowInternational(null, DATE_INTERNATIONAL), 'filter_end_date' => dateNowInternational(null, DATE_INTERNATIONAL), 'date_filter_by' => 'expected_delivery')) }}">
+
+<input type="hidden" id="route_rental_to_withdraw_today" value="{{ route('ajax.rental.getRentalsForDateAndClient', array('date' => dateNowInternational(null, DATE_INTERNATIONAL), 'type' => 'withdraw')) }}">
+<input type="hidden" id="route_table_rental_to_withdraw_today" value="{{ route('ajax.rental.fetch') }}">
+<input type="hidden" id="route_list_table_rental_to_withdraw_today" value="{{ route('rental.index', array('filter_start_date' => dateNowInternational(null, DATE_INTERNATIONAL), 'filter_end_date' => dateNowInternational(null, DATE_INTERNATIONAL), 'date_filter_by' => 'expected_withdraw')) }}">
 @stop

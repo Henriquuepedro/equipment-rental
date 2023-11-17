@@ -93,14 +93,13 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
 
     // Locação
     Route::group(['prefix' => '/locacao', 'as' => 'rental.'], function () {
-
-        Route::get('/', [App\Http\Controllers\RentalController::class, 'index'])->name('index');
         Route::get('/novo', [App\Http\Controllers\RentalController::class, 'create'])->name('create');
         Route::get('/atualizar/{id}', [App\Http\Controllers\RentalController::class, 'edit'])->name('edit');
         Route::get('/trocar-equipamento/{id}', [App\Http\Controllers\RentalController::class, 'exchange'])->name('exchange');
         Route::post('/cadastro', [App\Http\Controllers\RentalController::class, 'insert'])->name('insert');
         Route::post('/atualizar/{id}', [App\Http\Controllers\RentalController::class, 'update'])->name('update');
 
+        Route::get('/{filter_start_date?}/{filter_end_date?}/{date_filter_by?}/{client_id?}', [App\Http\Controllers\RentalController::class, 'index'])->name('index');
     });
 
     // Impressões
@@ -154,13 +153,12 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
 
     // Contas a pagar
     Route::group(['prefix' => '/contas-a-pagar', 'as' => 'bills_to_pay.'], function () {
-
-        Route::get('/{filter_start_date?}/{filter_end_date?}/{provider_id?}', [App\Http\Controllers\BillsToPayController::class, 'index'])->name('index');
         Route::get('/novo', [App\Http\Controllers\BillsToPayController::class, 'create'])->name('create');
         Route::post('/cadastro', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('insert');
 
         Route::get('/{id}', [App\Http\Controllers\BillsToPayController::class, 'edit'])->name('edit');
 
+        Route::get('/{filter_start_date?}/{filter_end_date?}/{provider_id?}', [App\Http\Controllers\BillsToPayController::class, 'index'])->name('index');
     });
 
     // Relatório
@@ -270,6 +268,8 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::get('/pagamentos/{rental_id}', [App\Http\Controllers\BillsToReceiveController::class, 'getPaymentsRental'])->name('get_payments_rental');
             Route::get('/full/{rental_id?}', [App\Http\Controllers\RentalController::class, 'getFull'])->name('get_full');
             Route::get('/locacoes-por-mes/{months}', [App\Http\Controllers\RentalController::class, 'getRentalsForMonths'])->name('get-rentals-for-month');
+
+            Route::get('/buscar-locacoes-por-data-e-cliente/{date?}/{type?}', [App\Http\Controllers\RentalController::class, 'getRentalsForDateAndClient'])->name('getRentalsForDateAndClient');
         });
         Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');

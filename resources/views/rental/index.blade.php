@@ -63,6 +63,15 @@
             padding-right: 1rem;
             overflow: unset;
         }
+        [aria-labelledby="select2-date_filter_by-container"] {
+             border-bottom-right-radius: 0 !important;
+             border-top-right-radius: 0 !important;
+         }
+        [name="intervalDates"] {
+            border-bottom-left-radius: 0 !important;
+            border-top-left-radius: 0 !important;
+            border-left: 0;
+        }
     </style>
 @stop
 
@@ -97,8 +106,9 @@
             const splitUrl = url.split('#');
             let tab = 'deliver';
 
-            if (splitUrl.length === 2)
+            if (splitUrl.length === 2) {
                 tab = splitUrl[1];
+            }
 
             $(`#${tab}-tab`).tab('show');
             getTable(tab, false);
@@ -119,8 +129,9 @@
         }
 
         const getCountsTabRentals = () => {
-            const start_date = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
-            const end_date   = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            const start_date     = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+            const end_date       = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            const date_filter_by = $('#date_filter_by').val();
 
             $.ajax({
                 headers: {
@@ -131,7 +142,8 @@
                 data: {
                     client: $('[name="clients"]').val(),
                     start_date,
-                    end_date
+                    end_date,
+                    date_filter_by
                 },
                 dataType: 'json',
                 success: response => {
@@ -155,7 +167,10 @@
             });
         }
 
-        const getTable = (typeRentals, stateSave = true) => {
+        const getTable = (typeRentals = null, stateSave = true) => {
+            if (typeRentals === null) {
+                typeRentals = $('[data-toggle="tab"].active').attr('id').replace('-tab','');
+            }
 
             loadCountsTabRental();
             disabledLoadData();
@@ -170,8 +185,9 @@
 
             getCountsTabRentals();
 
-            const start_date = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
-            const end_date   = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            const start_date     = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
+            const end_date       = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            const date_filter_by = $('#date_filter_by').val();
 
             tableRental = $("#tableRentals").DataTable({
                 "responsive": true,
@@ -192,6 +208,7 @@
                         type: typeRentals,
                         start_date,
                         end_date,
+                        date_filter_by,
                         client: $('[name="clients"]').val()
                     },
                     error: function(jqXHR, ajaxOptions, thrownError) {
@@ -426,8 +443,12 @@
             getTable(e.target.id.replace('-tab',''), false);
         });
 
+        $('#date_filter_by').on('change', function (e) {
+            getTable(null, false);
+        });
+
         $('[name="intervalDates"], [name="clients"]').change(function(){
-            getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false);
+            getTable(null, false);
         });
 
         $('.modal .equipmentsRentalTable tbody').on('change', 'select[name="vechicles[]"]', function (){
@@ -556,7 +577,7 @@
                         }
 
                         loadCountsTabRental();
-                        getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''), false);
+                        getTable(null, false);
                     }, error: e => {
                         console.log(e);
                         getForm.find('button[type="submit"]').attr('disabled', false);
@@ -604,18 +625,26 @@
                         @endif
                     </div>
                     <div class="row">
-                        <div class="col-md-9 form-group">
+                        <div class="col-md-8 form-group">
                             <label>Cliente</label>
                             <select class="form-control" name="clients">
                                 <option value="0">Todos</option>
                                 @foreach($clients as $client)
-                                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                    <option value="{{ $client->id }}" {{ ($client_id ?? 0) == $client->id ? 'selected' : '' }}>{{ $client->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3 form-group">
-                            <label>Data de Criação</label>
-                            <input type="text" name="intervalDates" class="form-control" value="{{ $settings['intervalDates']['start'] . ' - ' . $settings['intervalDates']['finish'] }}" />
+
+                        <div class="form-group col-md-4 d-flex mt-4">
+                            <label class="label-date-btns" for="date_filter_by">Filtrar por data de</label>
+                            <select class="form-control select2 col-md-6" id="date_filter_by" name="date_filter_by">
+                                <option value="created_at" {{ $date_filter_by == 'created_at' ? 'selected' : '' }}>Criação</option>
+                                <option value="delivery" {{ $date_filter_by == 'delivery' ? 'selected' : '' }}>Entrega</option>
+                                <option value="withdraw" {{ $date_filter_by == 'withdraw' ? 'selected' : '' }}>Retirada</option>
+                                <option value="expected_delivery" {{ $date_filter_by == 'expected_delivery' ? 'selected' : '' }}>Previsão de Entrega</option>
+                                <option value="expected_withdraw" {{ $date_filter_by == 'expected_withdraw' ? 'selected' : '' }}>Previsão de Retirada</option>
+                            </select>
+                            <input type="text" name="intervalDates" class="form-control col-md-6" value="{{ (formatDateInternational($filter_start_date, DATE_BRAZIL) ?? $settings['intervalDates']['start']) . ' - ' . (formatDateInternational($filter_end_date, DATE_BRAZIL) ?? $settings['intervalDates']['finish']) }}" />
                         </div>
                     </div>
                     <div class="nav-scroller mt-3">
