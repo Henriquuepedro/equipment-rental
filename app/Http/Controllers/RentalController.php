@@ -110,7 +110,7 @@ class RentalController extends Controller
                 }
             } else {
                 $where_date_filter = match ($date_filter_by) {
-                    'created_at'        => 'rentals.created_a',
+                    'created_at'        => 'rentals.created_at',
                     'delivery'          => 'rental_equipments.actual_delivery_date',
                     'withdraw'          => 'rental_equipments.actual_withdrawal_date',
                     'expected_delivery' => 'rental_equipments.expected_delivery_date',
