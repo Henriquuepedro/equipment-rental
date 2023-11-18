@@ -29,6 +29,16 @@
         .aligner-wrapper .absolute.absolute-center {
             width: 25%;
         }
+        .content-graph .table-responsive::-webkit-scrollbar{
+            height: 8px;
+            width: 4px;
+            background: #ccc;
+            border-radius: 10px;
+        }
+        .content-graph .table-responsive::-webkit-scrollbar-thumb:horizontal{
+            background: #555;
+            border-radius: 10px;
+        }
 
     </style>
 @stop
@@ -110,7 +120,7 @@
 
                     datasetCenterGraph = (ctx, xPos, yPos) =>  {
                         ctx.font = getPixelFontGraph() + ' sans-serif';
-                        ctx.fillStyle = '#fff';
+                        ctx.fillStyle = primaryColor;
                         ctx.textBaseline = 'middle';
                         ctx.textAlign = 'center'
 
@@ -168,7 +178,7 @@
 
                     datasetCenterGraph = (ctx, xPos, yPos) =>  {
                         ctx.font = getPixelFontGraph() + ' sans-serif';
-                        ctx.fillStyle = '#fff';
+                        ctx.fillStyle = primaryColor;
                         ctx.textBaseline = 'middle';
                         ctx.textAlign = 'center'
 
@@ -221,7 +231,7 @@
 
                     datasetCenterGraph = (ctx, xPos, yPos) =>  {
                         ctx.font = getPixelFontGraph() + ' sans-serif';
-                        ctx.fillStyle = '#fff';
+                        ctx.fillStyle = primaryColor;
                         ctx.textBaseline = 'middle';
                         ctx.textAlign = 'center'
 
@@ -279,7 +289,7 @@
 
                     datasetCenterGraph = (ctx, xPos, yPos) =>  {
                         ctx.font = getPixelFontGraph() + ' sans-serif';
-                        ctx.fillStyle = '#fff';
+                        ctx.fillStyle = primaryColor;
                         ctx.textBaseline = 'middle';
                         ctx.textAlign = 'center'
 
@@ -543,13 +553,12 @@
                                 <div class="col-md-7 aligner-wrapper">
                                     <canvas class="my-4 my-md-auto" id="cavasDeliveryToday"></canvas>
                                 </div>
-
                             </div>
                         </div>
                         <div class="card-body table">
                             <div class="row mt-2">
-                                <div class="col-md-12">
-                                    <table id="tableRentalToDeliveryToday" class="table table-responsive w-100 d-block d-md-table">
+                                <div class="col-md-12 table-responsive">
+                                    <table id="tableRentalToDeliveryToday" class="table">
                                         <thead>
                                             <tr>
                                                 <th>Locação</th>
@@ -580,13 +589,12 @@
                         </div>
                         <div class="card-body table">
                             <div class="row mt-2">
-                                <div class="col-md-12">
-                                    <table id="tableRentalToWithdrawToday" class="table table-responsive w-100 d-block d-md-table">
+                                <div class="col-md-12 table-responsive">
+                                    <table id="tableRentalToWithdrawToday" class="table">
                                         <thead>
                                         <tr>
                                             <th>Locação</th>
                                             <th>Cliente/Endereço</th>
-                                            <th>Equipamentos</th>
                                         </tr>
                                         </thead>
                                         <tbody></tbody>
@@ -596,9 +604,8 @@
                         </div>
                     </div>
                 </div>
-
-
-
+            </div>
+            <div class="row">
                 {{-- Contas a receber hoje --}}
                 <div class="col-md-6 grid-margin stretch-card content-graph">
                     <div class="card">
@@ -613,8 +620,8 @@
                         </div>
                         <div class="card-body table">
                             <div class="row mt-2">
-                                <div class="col-md-12">
-                                    <table id="tableBillToReceiveToday" class="table table-responsive w-100 d-block d-md-table">
+                                <div class="col-md-12 table-responsive">
+                                    <table id="tableBillToReceiveToday" class="table">
                                         <thead>
                                             <tr>
                                                 <th>Locação</th>
@@ -646,8 +653,8 @@
                         </div>
                         <div class="card-body table">
                             <div class="row mt-2">
-                                <div class="col-md-12">
-                                    <table id="tableBillToPayToday" class="table table-responsive w-100 d-block d-md-table">
+                                <div class="col-md-12 table-responsive">
+                                    <table id="tableBillToPayToday" class="table">
                                         <thead>
                                             <tr>
                                                 <th>Compra</th>
