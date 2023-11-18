@@ -64,123 +64,6 @@
             let pageLength = 10;
 
             switch (type) {
-                case 'receive_today':
-                    graph_endpoint = $('#route_bill_to_receive_today').val() + `/${dateNow()}`;
-                    table_endpoint =  $('#route_table_bill_to_receive_today').val();
-                    id_canvas = $('#cavasReceiveToday');
-                    id_list_table = $('#tableBillToReceiveToday');
-                    data_action_button_go_list.button_name = "Contas a receber";
-                    data_action_button_go_list.href = $('#route_list_table_bill_to_receive_today').val();
-                    data_action_button_go_list.custom_data.date_filter = transformDateForBr(dateNow());
-                    data_action_button_go_list.custom_data.only_is_open = 1;
-                    data_action_button_go_list.custom_data.show_address = 0;
-                    key_value = 'total';
-                    pageLength = 9;
-
-                    callbackTooltipLabel = tooltipItems => {
-                        const payments = tooltipItems.raw.total_payment_client;
-                        let complement = payments <= 1 ? 'lançamento' : 'lançamentos';
-
-                        return numberToReal(tooltipItems.parsed, 'R$ ') + ` de ${payments} ${complement}`;
-                    }
-
-                    onClickGraph = item => {
-                        data_action_button_go_list.custom_data.client_id = 0;
-                        data_action_button_go_list.href = $('#route_list_table_bill_to_receive_today').val();
-                        if (item.length) {
-                            const client_id = item[0].element['$context'].raw.client_id;
-                            data_action_button_go_list.custom_data.client_id = client_id;
-                            data_action_button_go_list.href += `/${client_id}`;
-                        }
-
-                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list, pageLength);
-                    }
-
-                    response = await $.getJSON(graph_endpoint);
-                    labels = response.map((payment) => {
-                        return payment.name;
-                    });
-                    total_open_payments = response.reduce((total, payment) => total + payment.total, 0);
-                    total_clients = response.reduce((total, payment) => total + payment.total_payment_client, 0);
-
-                    datasetCenterGraph = (ctx, xPos, yPos) =>  {
-                        ctx.font = '20px sans-serif';
-                        ctx.fillStyle = '#fff';
-                        ctx.textBaseline = 'middle';
-                        ctx.textAlign = 'center'
-
-                        ctx.fillText(numberToReal(total_open_payments, 'R$ '), xPos, yPos - 11);
-
-                        ctx.font = '12px sans-serif';
-
-                        let complement_fill_text_payment = '';
-                        if (total_clients <= 1) {
-                            complement_fill_text_payment = 'lançamento';
-                        } else {
-                            complement_fill_text_payment = 'lançamentos';
-                        }
-                        ctx.fillText(`de ${total_clients} ${complement_fill_text_payment}`, xPos, yPos + 11);
-                    }
-
-                    break;
-                case 'pay_today':
-                    graph_endpoint = $('#route_bill_to_pay_today').val() + `/${dateNow()}`;
-                    table_endpoint =  $('#route_table_bill_to_pay_today').val();
-                    id_canvas = $('#cavasPayToday');
-                    id_list_table = $('#tableBillToPayToday');
-                    data_action_button_go_list.button_name = "Contas a receber";
-                    data_action_button_go_list.href = $('#route_list_table_bill_to_pay_today').val();
-                    data_action_button_go_list.custom_data.date_filter = transformDateForBr(dateNow());
-                    data_action_button_go_list.custom_data.only_is_open = 1;
-                    data_action_button_go_list.custom_data.show_address = 0;
-                    key_value = 'total';
-                    pageLength = 9;
-
-                    callbackTooltipLabel = tooltipItems => {
-                        const payments = tooltipItems.raw.total_payment_provider;
-                        let complement = payments <= 1 ? 'lançamento' : 'lançamentos';
-                        return numberToReal(tooltipItems.parsed, 'R$ ') + ` de ${payments} ${complement}`;
-                    }
-
-                    onClickGraph = item => {
-                        data_action_button_go_list.custom_data.provider_id = 0;
-                        data_action_button_go_list.href = $('#route_list_table_bill_to_pay_today').val();
-                        if (item.length) {
-                            const provider_id = item[0].element['$context'].raw.provider_id;
-                            data_action_button_go_list.custom_data.provider_id = provider_id;
-                            data_action_button_go_list.href += `/${provider_id}`;
-                        }
-
-                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list, pageLength);
-                    }
-
-                    response = await $.getJSON(graph_endpoint);
-                    labels = response.map((payment) => {
-                        return payment.name;
-                    });
-                    total_open_payments = response.reduce((total, payment) => total + payment.total, 0);
-                    total_providers = response.reduce((total, payment) => total + payment.total_payment_provider, 0);
-
-                    datasetCenterGraph = (ctx, xPos, yPos) =>  {
-                        ctx.font = '20px sans-serif';
-                        ctx.fillStyle = '#fff';
-                        ctx.textBaseline = 'middle';
-                        ctx.textAlign = 'center'
-
-                        ctx.fillText(numberToReal(total_open_payments, 'R$ '), xPos, yPos - 11);
-
-                        ctx.font = '12px sans-serif';
-
-                        let complement_fill_text_payment = '';
-                        if (total_providers <= 1) {
-                            complement_fill_text_payment = 'lançamento';
-                        } else {
-                            complement_fill_text_payment = 'lançamentos';
-                        }
-                        ctx.fillText(`de ${total_providers} ${complement_fill_text_payment}`, xPos, yPos + 11);
-                    }
-
-                    break;
                 case 'delivery_today':
                     graph_endpoint = $('#route_rental_to_delivery_today').val();
                     table_endpoint =  $('#route_table_rental_to_delivery_today').val();
@@ -226,7 +109,7 @@
                     total_rentals = response.reduce((rentals, rental) => rentals + rental.rentals, 0);
 
                     datasetCenterGraph = (ctx, xPos, yPos) =>  {
-                        ctx.font = '17px sans-serif';
+                        ctx.font = getPixelFontGraph() + ' sans-serif';
                         ctx.fillStyle = '#fff';
                         ctx.textBaseline = 'middle';
                         ctx.textAlign = 'center'
@@ -284,7 +167,7 @@
                     total_rentals = response.reduce((rentals, rental) => rentals + rental.rentals, 0);
 
                     datasetCenterGraph = (ctx, xPos, yPos) =>  {
-                        ctx.font = '17px sans-serif';
+                        ctx.font = getPixelFontGraph() + ' sans-serif';
                         ctx.fillStyle = '#fff';
                         ctx.textBaseline = 'middle';
                         ctx.textAlign = 'center'
@@ -294,6 +177,123 @@
 
                         ctx.fillText(`${total_equipments} ${complement_fill_text_equipment}`, xPos, yPos - 12);
                         ctx.fillText(`de ${total_rentals} ${complement_fill_text_rental}`, xPos, yPos + 12);
+                    }
+
+                    break;
+                case 'receive_today':
+                    graph_endpoint = $('#route_bill_to_receive_today').val() + `/${dateNow()}`;
+                    table_endpoint =  $('#route_table_bill_to_receive_today').val();
+                    id_canvas = $('#cavasReceiveToday');
+                    id_list_table = $('#tableBillToReceiveToday');
+                    data_action_button_go_list.button_name = "Contas a receber";
+                    data_action_button_go_list.href = $('#route_list_table_bill_to_receive_today').val();
+                    data_action_button_go_list.custom_data.date_filter = transformDateForBr(dateNow());
+                    data_action_button_go_list.custom_data.only_is_open = 1;
+                    data_action_button_go_list.custom_data.show_address = 0;
+                    key_value = 'total';
+                    pageLength = 9;
+
+                    callbackTooltipLabel = tooltipItems => {
+                        const payments = tooltipItems.raw.total_payment_client;
+                        let complement = payments <= 1 ? 'lançamento' : 'lançamentos';
+
+                        return numberToReal(tooltipItems.parsed, 'R$ ') + ` de ${payments} ${complement}`;
+                    }
+
+                    onClickGraph = item => {
+                        data_action_button_go_list.custom_data.client_id = 0;
+                        data_action_button_go_list.href = $('#route_list_table_bill_to_receive_today').val();
+                        if (item.length) {
+                            const client_id = item[0].element['$context'].raw.client_id;
+                            data_action_button_go_list.custom_data.client_id = client_id;
+                            data_action_button_go_list.href += `/${client_id}`;
+                        }
+
+                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list, pageLength);
+                    }
+
+                    response = await $.getJSON(graph_endpoint);
+                    labels = response.map((payment) => {
+                        return payment.name;
+                    });
+                    total_open_payments = response.reduce((total, payment) => total + payment.total, 0);
+                    total_clients = response.reduce((total, payment) => total + payment.total_payment_client, 0);
+
+                    datasetCenterGraph = (ctx, xPos, yPos) =>  {
+                        ctx.font = getPixelFontGraph() + ' sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center'
+
+                        ctx.fillText(numberToReal(total_open_payments, 'R$ '), xPos, yPos - 11);
+
+                        ctx.font = getPixelFontGraph() + ' sans-serif';
+
+                        let complement_fill_text_payment = '';
+                        if (total_clients <= 1) {
+                            complement_fill_text_payment = 'lançamento';
+                        } else {
+                            complement_fill_text_payment = 'lançamentos';
+                        }
+                        ctx.fillText(`de ${total_clients} ${complement_fill_text_payment}`, xPos, yPos + 11);
+                    }
+
+                    break;
+                case 'pay_today':
+                    graph_endpoint = $('#route_bill_to_pay_today').val() + `/${dateNow()}`;
+                    table_endpoint =  $('#route_table_bill_to_pay_today').val();
+                    id_canvas = $('#cavasPayToday');
+                    id_list_table = $('#tableBillToPayToday');
+                    data_action_button_go_list.button_name = "Contas a receber";
+                    data_action_button_go_list.href = $('#route_list_table_bill_to_pay_today').val();
+                    data_action_button_go_list.custom_data.date_filter = transformDateForBr(dateNow());
+                    data_action_button_go_list.custom_data.only_is_open = 1;
+                    data_action_button_go_list.custom_data.show_address = 0;
+                    key_value = 'total';
+                    pageLength = 9;
+
+                    callbackTooltipLabel = tooltipItems => {
+                        const payments = tooltipItems.raw.total_payment_provider;
+                        let complement = payments <= 1 ? 'lançamento' : 'lançamentos';
+                        return numberToReal(tooltipItems.parsed, 'R$ ') + ` de ${payments} ${complement}`;
+                    }
+
+                    onClickGraph = item => {
+                        data_action_button_go_list.custom_data.provider_id = 0;
+                        data_action_button_go_list.href = $('#route_list_table_bill_to_pay_today').val();
+                        if (item.length) {
+                            const provider_id = item[0].element['$context'].raw.provider_id;
+                            data_action_button_go_list.custom_data.provider_id = provider_id;
+                            data_action_button_go_list.href += `/${provider_id}`;
+                        }
+
+                        loadTableGraph(id_list_table, table_endpoint, data_action_button_go_list, pageLength);
+                    }
+
+                    response = await $.getJSON(graph_endpoint);
+                    labels = response.map((payment) => {
+                        return payment.name;
+                    });
+                    total_open_payments = response.reduce((total, payment) => total + payment.total, 0);
+                    total_providers = response.reduce((total, payment) => total + payment.total_payment_provider, 0);
+
+                    datasetCenterGraph = (ctx, xPos, yPos) =>  {
+                        ctx.font = getPixelFontGraph() + ' sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.textBaseline = 'middle';
+                        ctx.textAlign = 'center'
+
+                        ctx.fillText(numberToReal(total_open_payments, 'R$ '), xPos, yPos - 11);
+
+                        ctx.font = getPixelFontGraph() + ' sans-serif';
+
+                        let complement_fill_text_payment = '';
+                        if (total_providers <= 1) {
+                            complement_fill_text_payment = 'lançamento';
+                        } else {
+                            complement_fill_text_payment = 'lançamentos';
+                        }
+                        ctx.fillText(`de ${total_providers} ${complement_fill_text_payment}`, xPos, yPos + 11);
                     }
 
                     break;
@@ -457,6 +457,63 @@
             });
         }
 
+        const getPixelFontGraph = () => {
+            if (getWidth() < 768) {
+                return '25px';
+            }
+            if (getWidth() < 850) {
+                return '9px';
+            }
+            if (getWidth() < 992) {
+                return '10px';
+            }
+            if (getWidth() >= 1800) {
+                return '20px';
+            }
+            if (getWidth() >= 1700) {
+                return '19px';
+            }
+            if (getWidth() >= 1600) {
+                return '18px';
+            }
+            if (getWidth() >= 1550) {
+                return '17px';
+            }
+            if (getWidth() >= 1500) {
+                return '16px';
+            }
+            if (getWidth() >= 1450) {
+                return '15px';
+            }
+            if (getWidth() >= 1400) {
+                return '14px';
+            }
+            if (getWidth() >= 1350) {
+                return '13px';
+            }
+            if (getWidth() >= 1300) {
+                return '12px';
+            }
+            if (getWidth() >= 1250) {
+                return '11px';
+            }
+            if (getWidth() >= 1200) {
+                return '10px';
+            }
+            if (getWidth() >= 1100) {
+                return '9px';
+            }
+            if (getWidth() >= 1000) {
+                return '8px';
+            }
+            if (getWidth() >= 992) {
+                return '7px';
+            }
+
+            return ((getWidth() * 20) / 1300).toFixed(2) + 'px'
+
+        }
+
         (function ($) {
             'use strict';
             $(function () {
@@ -492,7 +549,7 @@
                         <div class="card-body table">
                             <div class="row mt-2">
                                 <div class="col-md-12">
-                                    <table id="tableRentalToDeliveryToday" class="table">
+                                    <table id="tableRentalToDeliveryToday" class="table table-responsive w-100 d-block d-md-table">
                                         <thead>
                                             <tr>
                                                 <th>Locação</th>
@@ -524,7 +581,7 @@
                         <div class="card-body table">
                             <div class="row mt-2">
                                 <div class="col-md-12">
-                                    <table id="tableRentalToWithdrawToday" class="table">
+                                    <table id="tableRentalToWithdrawToday" class="table table-responsive w-100 d-block d-md-table">
                                         <thead>
                                         <tr>
                                             <th>Locação</th>
@@ -557,7 +614,7 @@
                         <div class="card-body table">
                             <div class="row mt-2">
                                 <div class="col-md-12">
-                                    <table id="tableBillToReceiveToday" class="table">
+                                    <table id="tableBillToReceiveToday" class="table table-responsive w-100 d-block d-md-table">
                                         <thead>
                                             <tr>
                                                 <th>Locação</th>
@@ -590,7 +647,7 @@
                         <div class="card-body table">
                             <div class="row mt-2">
                                 <div class="col-md-12">
-                                    <table id="tableBillToPayToday" class="table">
+                                    <table id="tableBillToPayToday" class="table table-responsive w-100 d-block d-md-table">
                                         <thead>
                                             <tr>
                                                 <th>Compra</th>
