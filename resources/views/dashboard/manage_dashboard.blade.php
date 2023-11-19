@@ -1,24 +1,3 @@
-@extends('adminlte::page')
-
-@section('title', 'Dashboard')
-
-@section('content_header')
-    <h1 class="m-0 text-dark">Dashboard</h1>
-@stop
-
-@section('css')
-@stop
-
-@section('js')
-    <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap.min.js') }}"></script>
-    <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
-    <script src="{{ asset('assets/vendors/justgage/raphael-2.1.4.min.js') }}"></script>
-    <script src="{{ asset('assets/vendors/justgage/justgage.js') }}"></script>
-    <script src="{{ asset('assets/vendors/chart.js/Chart.min.js') }}"></script>
-    <script src="{{ asset('assets/js/demo_1/dashboard.js') }}"></script>
-@stop
-
-@section('content')
 <div class="row">
     <div class="col-12 grid-margin">
         <div class="card card-statistics">
@@ -79,8 +58,6 @@
         </div>
     </div>
 </div>
-
-
 <div class="row">
     <div class="col-lg-6 grid-margin stretch-card">
         <div class="card">
@@ -109,8 +86,6 @@
         </div>
     </div>
 </div>
-
-
 <div class="row">
     <div class="col-lg-6 grid-margin stretch-card">
         <div class="card">
@@ -139,4 +114,4 @@
 <input type="hidden" id="route_rentals_for_month" value="{{ route('ajax.rental.get-rentals-for-month', array('months' => 9)) }}">
 <input type="hidden" id="route_bills_for_month" value="{{ route('ajax.bills_to_receive.get-bills-for-month', array('months' => 9)) }}">
 <input type="hidden" id="route_clients_top_rentals" value="{{ route('ajax.client.get-clients-top-rentals', array('count' => 8)) }}">
-@stop
+<input type="hidden" id="route_update_client" value="{{ route('client.edit') }}">

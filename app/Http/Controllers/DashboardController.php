@@ -37,6 +37,6 @@ class DashboardController extends Controller
             'rentals'       => $this->rental->getCountRentals($company_id)
         );
 
-        return view('dashboard.daily_dashboard', compact('indicator'));
+        return view('dashboard.dashboard', compact('indicator'));
     }
 }
