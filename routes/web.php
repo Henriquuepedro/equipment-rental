@@ -50,7 +50,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
         Route::get('/novo', [App\Http\Controllers\ClientController::class, 'create'])->name('create');
         Route::post('/cadastro', [App\Http\Controllers\ClientController::class, 'insert'])->name('insert');
 
-        Route::get('/{id}', [App\Http\Controllers\ClientController::class, 'edit'])->name('edit');
+        Route::get('/{id?}', [App\Http\Controllers\ClientController::class, 'edit'])->name('edit');
         Route::post('/atualizar', [App\Http\Controllers\ClientController::class, 'update'])->name('update');
 
     });

@@ -1,0 +1,30 @@
+.content-graph .card {
+    border: 1px solid #ccc;
+}
+
+.content-graph .card-body.table {
+    display: none;
+}
+
+.dataTable thead tr th, .dataTable tfoot tr th {
+    background: unset;
+}
+.dataTable:not(#tableRentalToWithdrawToday) tbody tr td {
+    padding: 0 8px !important;
+}
+.dataTable#tableRentalToWithdrawToday tbody tr td {
+    padding: 2px 8px !important;
+}
+.aligner-wrapper .absolute.absolute-center {
+    width: 25%;
+}
+.content-graph .table-responsive::-webkit-scrollbar{
+    height: 8px;
+    width: 4px;
+    background: #ccc;
+    border-radius: 10px;
+}
+.content-graph .table-responsive::-webkit-scrollbar-thumb:horizontal{
+    background: #555;
+    border-radius: 10px;
+}
