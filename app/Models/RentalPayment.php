@@ -338,10 +338,11 @@ class RentalPayment extends Model
     {
         $date = dateNowInternational(null, DATE_INTERNATIONAL);
 
-        return $this->where(array(
-            ['company_id', '=', $company_id],
-            ['payment_id', '=', null],
-            ['due_date', '<', $date]
-        ))->count();
+        return $this->select(DB::raw('SUM(due_value) as total_value, count(id) as total_count'))
+            ->where(array(
+                ['company_id', '=', $company_id],
+                ['payment_id', '=', null],
+                ['due_date', '<', $date]
+            ))->first();
     }
 }

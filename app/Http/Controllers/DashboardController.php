@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BillToPayPayment;
 use App\Models\Equipment;
+use App\Models\Provider;
 use App\Models\Rental;
 use App\Models\RentalPayment;
 use App\Models\Vehicle;
@@ -21,6 +22,7 @@ class DashboardController extends Controller
     private Vehicle $vehicle;
     private Equipment $equipment;
     private Rental $rental;
+    private Provider $provider;
     private RentalPayment $rental_payment;
     private BillToPayPayment $bill_to_pay_payment;
 
@@ -30,6 +32,7 @@ class DashboardController extends Controller
         $this->vehicle              = new Vehicle();
         $this->equipment            = new Equipment();
         $this->rental               = new Rental();
+        $this->provider             = new Provider();
         $this->rental_payment       = new RentalPayment();
         $this->bill_to_pay_payment  = new BillToPayPayment();
     }
@@ -41,7 +44,7 @@ class DashboardController extends Controller
             'clients'       => $this->client->getCountClientsActive($company_id),
             'vehicles'      => $this->vehicle->getCountVehicles($company_id),
             'equipments'    => $this->equipment->getCountEquipments($company_id),
-            'rentals'       => $this->rental->getCountRentals($company_id)
+            'providers'     => $this->provider->getCountProvidersActive($company_id)
         );
 
         return view('dashboard.dashboard', compact('indicator'));
@@ -50,8 +53,8 @@ class DashboardController extends Controller
     public function getBillingOpenLate(): JsonResponse
     {
         $company_id = Auth::user()->__get('company_id');
-        $receive = 0;
-        $pay     = 0;
+        $receive = array('total_value' => 0, 'total_count' => 0);
+        $pay     = array('total_value' => 0, 'total_count' => 0);
 
         if (hasPermission('BillsToReceiveView')) {
             $receive = $this->rental_payment->getBillLate($company_id);
