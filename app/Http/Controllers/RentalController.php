@@ -1036,4 +1036,16 @@ class RentalController extends Controller
             )
         );
     }
-}
+
+    public function getRentalsLateByType(): JsonResponse
+    {
+        if (!hasPermission('RentalView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        $rentals = $this->rental->getRentalsLateByType($company_id);
+
+        return response()->json($rentals->toArray());
+    }}

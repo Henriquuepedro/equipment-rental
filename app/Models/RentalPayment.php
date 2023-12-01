@@ -333,4 +333,15 @@ class RentalPayment extends Model
             ->groupBy('rentals.client_id')
             ->get();
     }
+
+    public function getBillLate(int $company_id)
+    {
+        $date = dateNowInternational(null, DATE_INTERNATIONAL);
+
+        return $this->where(array(
+            ['company_id', '=', $company_id],
+            ['payment_id', '=', null],
+            ['due_date', '<', $date]
+        ))->count();
+    }
 }
