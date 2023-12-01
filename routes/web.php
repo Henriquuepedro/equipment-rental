@@ -263,13 +263,12 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::post('/equipamentos-para-retirar', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRentalToWithdraw'])->name('get-equipments-to-withdraw');
             Route::post('/atualizar-para-entregue', [App\Http\Controllers\RentalEquipmentController::class, 'deliverEquipment'])->name('delivery_equipment');
             Route::post('/atualizar-para-retirado', [App\Http\Controllers\RentalEquipmentController::class, 'withdrawEquipment'])->name('withdrawal_equipment');
-
             Route::get('/equipamentos/{rental_id}', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRental'])->name('get_equipments_rental');
             Route::get('/pagamentos/{rental_id}', [App\Http\Controllers\BillsToReceiveController::class, 'getPaymentsRental'])->name('get_payments_rental');
             Route::get('/full/{rental_id?}', [App\Http\Controllers\RentalController::class, 'getFull'])->name('get_full');
             Route::get('/locacoes-por-mes/{months}', [App\Http\Controllers\RentalController::class, 'getRentalsForMonths'])->name('get-rentals-for-month');
-
             Route::get('/buscar-locacoes-por-data-e-cliente/{date?}/{type?}', [App\Http\Controllers\RentalController::class, 'getRentalsForDateAndClient'])->name('getRentalsForDateAndClient');
+            Route::get('/locacoes-atrasadas-por-tipo', [App\Http\Controllers\RentalController::class, 'getRentalsLateByType'])->name('get-rentals-late-by-type');
         });
         Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');
@@ -350,6 +349,13 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
 
             Route::get('/visualizar-planos/{type?}', [App\Http\Controllers\PlanController::class, 'getPlans'])->name('get-plans');
             Route::post('/buscar', [App\Http\Controllers\PlanController::class, 'fetchRequests'])->name('fetch');
+
+        });
+
+        // Dashboard
+        Route::group(['prefix' => '/dashboard', 'as' => 'dashboard.'], function () {
+
+            Route::get('/lancamentos-vencidos', [App\Http\Controllers\DashboardController::class, 'getBillingOpenLate'])->name('get-billing-open-late');
 
         });
     });

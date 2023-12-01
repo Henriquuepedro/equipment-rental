@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BillToPayPayment;
 use App\Models\Equipment;
 use App\Models\Rental;
+use App\Models\RentalPayment;
 use App\Models\Vehicle;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use Illuminate\Support\Facades\Auth;
@@ -18,13 +21,17 @@ class DashboardController extends Controller
     private Vehicle $vehicle;
     private Equipment $equipment;
     private Rental $rental;
+    private RentalPayment $rental_payment;
+    private BillToPayPayment $bill_to_pay_payment;
 
     public function __construct()
     {
-        $this->client       = new Client();
-        $this->vehicle      = new Vehicle();
-        $this->equipment    = new Equipment();
-        $this->rental       = new Rental();
+        $this->client               = new Client();
+        $this->vehicle              = new Vehicle();
+        $this->equipment            = new Equipment();
+        $this->rental               = new Rental();
+        $this->rental_payment       = new RentalPayment();
+        $this->bill_to_pay_payment  = new BillToPayPayment();
     }
 
     public function dashboard(): Factory|View|Application
@@ -38,5 +45,24 @@ class DashboardController extends Controller
         );
 
         return view('dashboard.dashboard', compact('indicator'));
+    }
+
+    public function getBillingOpenLate(): JsonResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+        $receive = 0;
+        $pay     = 0;
+
+        if (hasPermission('BillsToReceiveView')) {
+            $receive = $this->rental_payment->getBillLate($company_id);
+        }
+        if (hasPermission('BillsToPayView')) {
+            $pay = $this->bill_to_pay_payment->getBillLate($company_id);
+        }
+
+        return response()->json(array(
+            'receive'   => $receive,
+            'pay'       => $pay
+        ));
     }
 }

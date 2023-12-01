@@ -16,6 +16,8 @@ const initCharts = () => {
     rentalsForMonth();
     billsForMonth();
     clientsTopRentals();
+    rentalsLate();
+    billingOpenLate();
 }
 
 const newClientsForMonth = () => {
@@ -82,8 +84,8 @@ const newClientsForMonth = () => {
                 }
             },
         }
-        let lineChartCanvas = $("#lineChart").get(0).getContext("2d");
-        new Chart(lineChartCanvas, {
+        let newClientsChartCanvas = $("#newClientsChart").get(0).getContext("2d");
+        new Chart(newClientsChartCanvas, {
             type: 'line',
             data: lineData,
             options: lineOptions
@@ -109,8 +111,8 @@ const rentalsForMonth = () => {
 
         step_size = Math.ceil(max_registers/10);
 
-        let areaChartCanvas = $("#areaChart").get(0).getContext("2d");
-        let gradientStrokeFill_1 = areaChartCanvas.createLinearGradient(1, 2, 1, 280);
+        let rentalsDoneChartCanvas = $("#rentalsDoneChart").get(0).getContext("2d");
+        let gradientStrokeFill_1 = rentalsDoneChartCanvas.createLinearGradient(1, 2, 1, 280);
         gradientStrokeFill_1.addColorStop(0, "rgba(20, 88, 232, 0.37)");
         gradientStrokeFill_1.addColorStop(1, "rgba(255,255,255,0.4)")
         let lineData = {
@@ -164,8 +166,8 @@ const rentalsForMonth = () => {
                 }
             }
         }
-        let lineChartCanvas = $("#areaChart").get(0).getContext("2d");
-        new Chart(lineChartCanvas, {
+
+        new Chart(rentalsDoneChartCanvas, {
             type: 'line',
             data: lineData,
             options: lineOptions
@@ -191,8 +193,8 @@ const billsForMonth = () => {
 
         step_size = Math.ceil(max_registers/10);
 
-        var barChartCanvas = $("#barChart").get(0).getContext("2d");
-        new Chart(barChartCanvas, {
+        var billingChartCanvas = $("#billingChart").get(0).getContext("2d");
+        new Chart(billingChartCanvas, {
             type: 'bar',
             data: {
                 labels,
@@ -274,6 +276,145 @@ const clientsTopRentals = () => {
                     </div>
                 </div>
             </li>`);
+        });
+    });
+}
+
+const rentalsLate = () => {
+    $.getJSON($('#route_rentals_late_by_type').val(), function(response) {
+        let data = [
+            response.to_delivery ?? 0,
+            response.to_withdraw ?? 0,
+            response.no_date_to_withdraw ?? 0
+        ];
+        let max_registers = Math.max.apply(null, data);
+        let step_size = Math.ceil(max_registers/10);
+
+        let lineData = {
+            labels: ["Para entregar atrasado", "Para retirar atrasado", "Sem data de retirada"],
+            datasets: [{
+                data,
+                backgroundColor: [ChartColor[0], ChartColor[1], ChartColor[3]],
+                borderColor: [ChartColor[0], ChartColor[1], ChartColor[3]],
+                borderWidth: 1,
+                label: "Locações atrasadas"
+            }]
+        };
+        let lineOptions = {
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: tooltipItems => {
+                            const rentals = tooltipItems.raw;
+                            let complement_rental = rentals <= 1 ? 'locação' : 'locações';
+
+                            return `${rentals} ${complement_rental}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: false,
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Quantidade de locações',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        display: true,
+                        autoSkip: false,
+                        maxRotation: 0,
+                        stepSize: step_size,
+                        min: 0,
+                        max: max_registers
+                    }
+                }
+            },
+        }
+        let rentalsLateChartCanvas = $("#rentalsLateChart").get(0).getContext("2d");
+        new Chart(rentalsLateChartCanvas, {
+            type: 'bar',
+            data: lineData,
+            options: lineOptions
+        });
+    });
+}
+
+const billingOpenLate = () => {
+    $.getJSON($('#route_dashboard_get_billing_open_late').val(), function(response) {
+        let data = [
+            response.receive ?? 0,
+            response.pay ?? 0
+        ];
+        let max_registers = Math.max.apply(null, data);
+        let step_size = Math.ceil(max_registers/10);
+
+        let lineData = {
+            labels: ["Receber atrasado", "Pagar atrasado"],
+            datasets: [{
+                data,
+                backgroundColor: [ChartColor[1], ChartColor[2]],
+                borderColor: [ChartColor[1], ChartColor[2]],
+                borderWidth: 1,
+                label: "Pagamentos atrasadas"
+            }]
+        };
+        let lineOptions = {
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: tooltipItems => {
+                            const payments = tooltipItems.raw;
+                            let complement_payment = payments <= 1 ? 'pagamento' : 'pagamento';
+
+                            return `${payments} ${complement_payment}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: false,
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Quantidade de pagamentos',
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        display: true,
+                        autoSkip: false,
+                        maxRotation: 0,
+                        stepSize: step_size,
+                        min: 0,
+                        max: max_registers
+                    }
+                }
+            },
+        }
+        let billingOpenLateChartCanvas = $("#billingOpenLateChart").get(0).getContext("2d");
+        new Chart(billingOpenLateChartCanvas, {
+            type: 'bar',
+            data: lineData,
+            options: lineOptions
         });
     });
 }

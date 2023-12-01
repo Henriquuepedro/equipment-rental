@@ -182,4 +182,15 @@ class BillToPayPayment extends Model
             ->groupBy('bill_to_pays.provider_id')
             ->get();
     }
+
+    public function getBillLate(int $company_id)
+    {
+        $date = dateNowInternational(null, DATE_INTERNATIONAL);
+
+        return $this->where(array(
+            ['company_id', '=', $company_id],
+            ['payment_id', '=', null],
+            ['due_date', '<', $date]
+        ))->count();
+    }
 }

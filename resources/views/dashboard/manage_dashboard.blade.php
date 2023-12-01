@@ -7,7 +7,7 @@
                         <div class="d-flex align-items-center justify-content-center flex-column flex-sm-row">
                             <i class="mdi mdi-account-multiple-outline text-primary mr-0 mr-sm-4 icon-lg"></i>
                             <div class="wrapper text-center text-sm-left">
-                                <p class="card-text mb-0">Total clientes ativos</p>
+                                <p class="card-text mb-0">Clientes Ativos</p>
                                 <div class="fluid-container">
                                     <h3 class="mb-0 font-weight-medium">{{ $indicator['clients'] }}</h3>
                                 </div>
@@ -20,7 +20,7 @@
                         <div class="d-flex align-items-center justify-content-center flex-column flex-sm-row">
                             <i class="mdi mdi-checkbox-marked-circle-outline text-primary mr-0 mr-sm-4 icon-lg"></i>
                             <div class="wrapper text-center text-sm-left">
-                                <p class="card-text mb-0">Total equipamentos</p>
+                                <p class="card-text mb-0">Equipamentos</p>
                                 <div class="fluid-container">
                                     <h3 class="mb-0 font-weight-medium">{{ $indicator['equipments'] }}</h3>
                                 </div>
@@ -33,7 +33,7 @@
                         <div class="d-flex align-items-center justify-content-center flex-column flex-sm-row">
                             <i class="mdi mdi-trophy-outline text-primary mr-0 mr-sm-4 icon-lg"></i>
                             <div class="wrapper text-center text-sm-left">
-                                <p class="card-text mb-0">Total veículos</p>
+                                <p class="card-text mb-0">Veículos</p>
                                 <div class="fluid-container">
                                     <h3 class="mb-0 font-weight-medium">{{ $indicator['vehicles'] }}</h3>
                                 </div>
@@ -46,7 +46,7 @@
                         <div class="d-flex align-items-center justify-content-center flex-column flex-sm-row">
                             <i class="mdi mdi-target text-primary mr-0 mr-sm-4 icon-lg"></i>
                             <div class="wrapper text-center text-sm-left">
-                                <p class="card-text mb-0">Total locações realizadas</p>
+                                <p class="card-text mb-0">Locações realizadas</p>
                                 <div class="fluid-container">
                                     <h3 class="mb-0 font-weight-medium">{{ $indicator['rentals'] }}</h3>
                                 </div>
@@ -61,14 +61,11 @@
 <div class="row">
     <div class="col-lg-6 grid-margin stretch-card">
         <div class="card">
-
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center pb-4">
-                    <h4 class="card-title mb-0">Clientes novos</h4>
-                    <div id="line-traffic-legend"></div>
+                    <h4 class="card-title mb-0">Lançamentos vencidos (Receber x Pagar)</h4>
                 </div>
-
-                <canvas id="lineChart" style="height:250px"></canvas>
+                <canvas id="billingOpenLateChart"></canvas>
             </div>
         </div>
     </div>
@@ -77,11 +74,9 @@
 
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center pb-4">
-                    <h4 class="card-title mb-0">Locações realizadas</h4>
-                    <div id="area-traffic-legend"></div>
+                    <h4 class="card-title mb-0">Controle de locações</h4>
                 </div>
-
-                <canvas id="areaChart" style="height:250px"></canvas>
+                <canvas id="rentalsLateChart"></canvas>
             </div>
         </div>
     </div>
@@ -89,14 +84,33 @@
 <div class="row">
     <div class="col-lg-6 grid-margin stretch-card">
         <div class="card">
-
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center pb-4">
+                    <h4 class="card-title mb-0">Clientes novos</h4>
+                </div>
+                <canvas id="newClientsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center pb-4">
+                    <h4 class="card-title mb-0">Locações realizadas</h4>
+                </div>
+                <canvas id="rentalsDoneChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center pb-4">
                     <h4 class="card-title mb-0">Faturamento</h4>
-                    <div id="bar-traffic-legend"></div>
                 </div>
-
-                <canvas id="barChart" style="height:250px"></canvas>
+                <canvas id="billingChart"></canvas>
             </div>
         </div>
     </div>
@@ -115,3 +129,5 @@
 <input type="hidden" id="route_bills_for_month" value="{{ route('ajax.bills_to_receive.get-bills-for-month', array('months' => 9)) }}">
 <input type="hidden" id="route_clients_top_rentals" value="{{ route('ajax.client.get-clients-top-rentals', array('count' => 8)) }}">
 <input type="hidden" id="route_update_client" value="{{ route('client.edit') }}">
+<input type="hidden" id="route_rentals_late_by_type" value="{{ route('ajax.rental.get-rentals-late-by-type') }}">
+<input type="hidden" id="route_dashboard_get_billing_open_late" value="{{ route('ajax.dashboard.get-billing-open-late') }}">
