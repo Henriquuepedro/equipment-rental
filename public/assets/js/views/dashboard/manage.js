@@ -36,7 +36,7 @@ const newClientsForMonth = () => {
             }
         }
 
-        step_size = Math.ceil(max_registers/10);
+        step_size = getStepSizeChart(max_registers);
 
         let lineData = {
             labels,
@@ -109,7 +109,7 @@ const rentalsForMonth = () => {
             }
         }
 
-        step_size = Math.ceil(max_registers/10);
+        step_size = getStepSizeChart(max_registers);
 
         let rentalsDoneChartCanvas = $("#rentalsDoneChart").get(0).getContext("2d");
         let gradientStrokeFill_1 = rentalsDoneChartCanvas.createLinearGradient(1, 2, 1, 280);
@@ -191,7 +191,7 @@ const billsForMonth = () => {
             }
         }
 
-        step_size = Math.ceil(max_registers/10);
+        step_size = getStepSizeChart(max_registers);
 
         var billingChartCanvas = $("#billingChart").get(0).getContext("2d");
         new Chart(billingChartCanvas, {
@@ -288,7 +288,7 @@ const rentalsLate = () => {
             response.no_date_to_withdraw ?? 0
         ];
         let max_registers = Math.max.apply(null, data);
-        let step_size = Math.ceil(max_registers/10);
+        let step_size = getStepSizeChart(max_registers);
 
         let lineData = {
             labels: ["Para entregar atrasado", "Para retirar atrasado", "Sem data de retirada"],
@@ -353,11 +353,11 @@ const rentalsLate = () => {
 const billingOpenLate = () => {
     $.getJSON($('#route_dashboard_get_billing_open_late').val(), function(response) {
         let data = [
-            response.receive ?? 0,
-            response.pay ?? 0
+            {...{x: "Receber atrasado"}, ...response.receive},
+            {...{x: "Pagar atrasado"}, ...response.pay}
         ];
-        let max_registers = Math.max.apply(null, data);
-        let step_size = Math.ceil(max_registers/10);
+        let max_registers = Math.max.apply(null, [data[0].total_value, data[1].total_value]);
+        let step_size = getStepSizeChart(max_registers);
 
         let lineData = {
             labels: ["Receber atrasado", "Pagar atrasado"],
@@ -366,7 +366,10 @@ const billingOpenLate = () => {
                 backgroundColor: [ChartColor[1], ChartColor[2]],
                 borderColor: [ChartColor[1], ChartColor[2]],
                 borderWidth: 1,
-                label: "Pagamentos atrasadas"
+                label: "Pagamentos atrasadas",
+                parsing: {
+                    yAxisKey: 'total_value'
+                }
             }]
         };
         let lineOptions = {
@@ -378,9 +381,9 @@ const billingOpenLate = () => {
                     callbacks: {
                         label: tooltipItems => {
                             const payments = tooltipItems.raw;
-                            let complement_payment = payments <= 1 ? 'pagamento' : 'pagamento';
+                            let complement_payment = payments.total_count <= 1 ? 'pagamento' : 'pagamentos';
 
-                            return `${payments} ${complement_payment}`;
+                            return `${numberToReal(payments.total_value, 'R$ ')} de ${payments.total_count} ${complement_payment}`;
                         }
                     }
                 }
@@ -394,7 +397,7 @@ const billingOpenLate = () => {
                 y: {
                     title: {
                         display: true,
-                        text: 'Quantidade de pagamentos',
+                        text: 'Valores de pagamentos',
                         font: {
                             weight: 'bold'
                         }
@@ -405,16 +408,64 @@ const billingOpenLate = () => {
                         maxRotation: 0,
                         stepSize: step_size,
                         min: 0,
-                        max: max_registers
+                        max: max_registers,
+                        callback: function(val, index) {
+                            // Hide every 2nd tick label
+                            return numberToReal(val, 'R$ ');
+                        }
                     }
                 }
-            },
+            }
         }
         let billingOpenLateChartCanvas = $("#billingOpenLateChart").get(0).getContext("2d");
         new Chart(billingOpenLateChartCanvas, {
             type: 'bar',
-            data: lineData,
+                data: lineData,
             options: lineOptions
         });
     });
+}
+
+const getStepSizeChart = max_registers => {
+    if (max_registers <= 10) {
+        return 1;
+    }
+    if (max_registers <= 20) {
+        return 2;
+    }
+    if (max_registers <= 50) {
+        return 5;
+    }
+    if (max_registers <= 100) {
+        return 10;
+    }
+    if (max_registers <= 200) {
+        return 20;
+    }
+    if (max_registers <= 500) {
+        return 50;
+    }
+    if (max_registers <= 1000) {
+        return 100;
+    }
+    if (max_registers <= 2000) {
+        return 200;
+    }
+    if (max_registers <= 5000) {
+        return 500;
+    }
+    if (max_registers <= 10000) {
+        return 1000;
+    }
+    if (max_registers <= 20000) {
+        return 2000;
+    }
+    if (max_registers <= 50000) {
+        return 5000;
+    }
+    if (max_registers <= 100000) {
+        return 10000;
+    }
+
+    return Math.ceil(max_registers/10);
 }

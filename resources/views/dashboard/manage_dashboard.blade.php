@@ -1,57 +1,83 @@
 <div class="row">
     <div class="col-12 grid-margin">
-        <div class="card card-statistics">
-            <div class="row">
-                <div class="card-col col-xl-3 col-lg-3 col-md-3 col-6">
+        <div class="row">
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+                <div class="card card-statistics">
                     <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-center flex-column flex-sm-row">
-                            <i class="mdi mdi-account-multiple-outline text-primary mr-0 mr-sm-4 icon-lg"></i>
-                            <div class="wrapper text-center text-sm-left">
-                                <p class="card-text mb-0">Clientes Ativos</p>
+                        <div class="clearfix">
+                            <div class="float-left">
+                                <i class="mdi mdi-account text-danger icon-lg"></i>
+                            </div>
+                            <div class="d-flex justify-content-center pt-2">
+                                <p class="mb-0 text-right"></p>
                                 <div class="fluid-container">
-                                    <h3 class="mb-0 font-weight-medium">{{ $indicator['clients'] }}</h3>
+                                    <h3 class="font-weight-medium text-right mb-0" style="font-size: 35px">{{ $indicator['clients'] }}</h3>
                                 </div>
                             </div>
                         </div>
+                        <p class="text-muted mt-3 mb-0">
+                            <i class="mdi mdi-account mr-1" aria-hidden="true"></i>Clientes ativos
+                        </p>
                     </div>
                 </div>
-                <div class="card-col col-xl-3 col-lg-3 col-md-3 col-6">
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+                <div class="card card-statistics">
                     <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-center flex-column flex-sm-row">
-                            <i class="mdi mdi-checkbox-marked-circle-outline text-primary mr-0 mr-sm-4 icon-lg"></i>
-                            <div class="wrapper text-center text-sm-left">
-                                <p class="card-text mb-0">Equipamentos</p>
+                        <div class="clearfix">
+                            <div class="float-left">
+                                <i class="mdi mdi-truck text-warning icon-lg"></i>
+                            </div>
+                            <div class="d-flex justify-content-center pt-2">
+                                <p class="mb-0 text-right"></p>
                                 <div class="fluid-container">
-                                    <h3 class="mb-0 font-weight-medium">{{ $indicator['equipments'] }}</h3>
+                                    <h3 class="font-weight-medium text-right mb-0" style="font-size: 35px">{{ $indicator['providers'] }}</h3>
                                 </div>
                             </div>
                         </div>
+                        <p class="text-muted mt-3 mb-0">
+                            <i class="mdi mdi-truck mr-1" aria-hidden="true"></i>Fornecedores
+                        </p>
                     </div>
                 </div>
-                <div class="card-col col-xl-3 col-lg-3 col-md-3 col-6">
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+                <div class="card card-statistics">
                     <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-center flex-column flex-sm-row">
-                            <i class="mdi mdi-trophy-outline text-primary mr-0 mr-sm-4 icon-lg"></i>
-                            <div class="wrapper text-center text-sm-left">
-                                <p class="card-text mb-0">Veículos</p>
+                        <div class="clearfix">
+                            <div class="float-left">
+                                <i class="mdi mdi-cube text-success icon-lg"></i>
+                            </div>
+                            <div class="d-flex justify-content-center pt-2">
+                                <p class="mb-0 text-right"></p>
                                 <div class="fluid-container">
-                                    <h3 class="mb-0 font-weight-medium">{{ $indicator['vehicles'] }}</h3>
+                                    <h3 class="font-weight-medium text-right mb-0" style="font-size: 35px">{{ $indicator['equipments'] }}</h3>
                                 </div>
                             </div>
                         </div>
+                        <p class="text-muted mt-3 mb-0">
+                            <i class="mdi mdi-cube mr-1" aria-hidden="true"></i>Equipamentos
+                        </p>
                     </div>
                 </div>
-                <div class="card-col col-xl-3 col-lg-3 col-md-3 col-6">
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 grid-margin stretch-card">
+                <div class="card card-statistics">
                     <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-center flex-column flex-sm-row">
-                            <i class="mdi mdi-target text-primary mr-0 mr-sm-4 icon-lg"></i>
-                            <div class="wrapper text-center text-sm-left">
-                                <p class="card-text mb-0">Locações realizadas</p>
+                        <div class="clearfix">
+                            <div class="float-left">
+                                <i class="mdi mdi-car text-info icon-lg"></i>
+                            </div>
+                            <div class="d-flex justify-content-center pt-2">
+                                <p class="mb-0 text-right"></p>
                                 <div class="fluid-container">
-                                    <h3 class="mb-0 font-weight-medium">{{ $indicator['rentals'] }}</h3>
+                                    <h3 class="font-weight-medium text-right mb-0" style="font-size: 35px">{{ $indicator['vehicles'] }}</h3>
                                 </div>
                             </div>
                         </div>
+                        <p class="text-muted mt-3 mb-0">
+                            <i class="mdi mdi-car mr-1" aria-hidden="true"></i>Veículos
+                        </p>
                     </div>
                 </div>
             </div>
@@ -63,7 +89,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center pb-4">
-                    <h4 class="card-title mb-0">Lançamentos vencidos (Receber x Pagar)</h4>
+                    <h4 class="card-title mb-0">Financeiro vencidos</h4>
                 </div>
                 <canvas id="billingOpenLateChart"></canvas>
             </div>

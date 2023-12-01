@@ -82,4 +82,12 @@ class Provider extends Model
     {
         return $this->where(['id' => $provider_id, 'company_id' => $company_id])->first();
     }
+
+    public function getCountProvidersActive($company_id)
+    {
+        return $this->where([
+            'company_id' => $company_id,
+            //'active' => true
+        ])->count();
+    }
 }
