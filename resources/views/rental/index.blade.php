@@ -450,7 +450,16 @@
         });
 
         $('#date_filter_by').on('change', function (e) {
-            $('#no_date_to_withdraw').prop('checked', false).closest('.form-group').css('display', $(this).val() === 'expected_withdraw' ? 'block' : 'none');
+            $('#no_date_to_withdraw')
+                .prop('checked', false)
+                .closest('.form-group')
+                .css('display', $(this).val() === 'expected_withdraw' ? 'block' : 'none');
+
+            $('input[name="intervalDates"]')
+                .css({ 'text-decoration': 'unset', 'color': 'unset' })
+                .prop('disabled', false)
+                .attr('data-can-enable', true);
+
             getTable(null, false);
         });
 
