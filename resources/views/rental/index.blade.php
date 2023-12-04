@@ -121,16 +121,16 @@
         }
 
         const disabledLoadData = () => {
-            $('a[data-toggle="tab"], input[name="intervalDates"], select[name="clients"]').prop('disabled', true);
+            $('a[data-toggle="tab"], input[name="intervalDates"], select[name="clients"], #no_date_to_withdraw').prop('disabled', true);
         }
 
         const enabledLoadData = () => {
-            $('a[data-toggle="tab"], input[name="intervalDates"], select[name="clients"]').prop('disabled', false);
+            $('a[data-toggle="tab"], input[name="intervalDates"]:not([data-can-enable="false"]), select[name="clients"], #no_date_to_withdraw').prop('disabled', false);
         }
 
         const getCountsTabRentals = () => {
-            const start_date     = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
-            const end_date       = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            const start_date     = $('input[name="intervalDates"]').data('daterangepicker').startDate.format(FORMAT_DATE_INTERNATIONAL);
+            const end_date       = $('input[name="intervalDates"]').data('daterangepicker').endDate.format(FORMAT_DATE_INTERNATIONAL);
             const date_filter_by = $('#date_filter_by').val();
 
             $.ajax({
@@ -143,7 +143,8 @@
                     client: $('[name="clients"]').val(),
                     start_date,
                     end_date,
-                    date_filter_by
+                    date_filter_by,
+                    no_date_to_withdraw: $('#no_date_to_withdraw').is(':checked') ? 1 : 0
                 },
                 dataType: 'json',
                 success: response => {
@@ -168,6 +169,10 @@
         }
 
         const getTable = (typeRentals = null, stateSave = true) => {
+            if (typeof $('input[name="intervalDates"]').data('daterangepicker') === "undefined") {
+                return;
+            }
+
             if (typeRentals === null) {
                 typeRentals = $('[data-toggle="tab"].active').attr('id').replace('-tab','');
             }
@@ -185,8 +190,8 @@
 
             getCountsTabRentals();
 
-            const start_date     = $('input[name="intervalDates"]').data('daterangepicker').startDate.format('YYYY-MM-DD');
-            const end_date       = $('input[name="intervalDates"]').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            const start_date     = $('input[name="intervalDates"]').data('daterangepicker').startDate.format(FORMAT_DATE_INTERNATIONAL);
+            const end_date       = $('input[name="intervalDates"]').data('daterangepicker').endDate.format(FORMAT_DATE_INTERNATIONAL);
             const date_filter_by = $('#date_filter_by').val();
 
             tableRental = $("#tableRentals").DataTable({
@@ -209,7 +214,8 @@
                         start_date,
                         end_date,
                         date_filter_by,
-                        client: $('[name="clients"]').val()
+                        client: $('[name="clients"]').val(),
+                        no_date_to_withdraw: $('#no_date_to_withdraw').is(':checked') ? 1 : 0
                     },
                     error: function(jqXHR, ajaxOptions, thrownError) {
                         console.log(jqXHR, ajaxOptions, thrownError);
@@ -444,6 +450,19 @@
         });
 
         $('#date_filter_by').on('change', function (e) {
+            $('#no_date_to_withdraw').prop('checked', false).closest('.form-group').css('display', $(this).val() === 'expected_withdraw' ? 'block' : 'none');
+            getTable(null, false);
+        });
+
+        $('#no_date_to_withdraw').on('change', function() {
+            $('input[name="intervalDates"]')
+                .prop('disabled', $(this).is(':checked'))
+                .attr('data-can-enable', !$(this).is(':checked'))
+                .css({
+                    'text-decoration': $(this).is(':checked') ? 'line-through' : 'unset',
+                    'color': $(this).is(':checked') ? '#512727' : 'unset'
+                });
+
             getTable(null, false);
         });
 
@@ -642,9 +661,21 @@
                                 <option value="delivery" {{ $date_filter_by == 'delivery' ? 'selected' : '' }}>Entrega</option>
                                 <option value="withdraw" {{ $date_filter_by == 'withdraw' ? 'selected' : '' }}>Retirada</option>
                                 <option value="expected_delivery" {{ $date_filter_by == 'expected_delivery' ? 'selected' : '' }}>Previsão de Entrega</option>
-                                <option value="expected_withdraw" {{ $date_filter_by == 'expected_withdraw' ? 'selected' : '' }}>Previsão de Retirada</option>
+                                <option value="expected_withdraw" {{ $date_filter_by == 'expected_withdraw' || $date_filter_by == 'no_date_to_withdraw' ? 'selected' : '' }}>Previsão de Retirada</option>
                             </select>
-                            <input type="text" name="intervalDates" class="form-control col-md-6" value="{{ (formatDateInternational($filter_start_date, DATE_BRAZIL) ?? $settings['intervalDates']['start']) . ' - ' . (formatDateInternational($filter_end_date, DATE_BRAZIL) ?? $settings['intervalDates']['finish']) }}" />
+                            <input type="text" name="intervalDates" class="form-control col-md-6"
+                                   value="{{ (formatDateInternational($filter_start_date, DATE_BRAZIL) ?? $settings['intervalDates']['start']) . ' - ' . (formatDateInternational($filter_end_date, DATE_BRAZIL) ?? $settings['intervalDates']['finish']) }}"
+                                   data-can-enable="{{ $date_filter_by == 'no_date_to_withdraw' ? 'false' : 'true' }}"
+                                   {{ $date_filter_by == 'no_date_to_withdraw' ? 'disabled' : '' }}
+                                   style="text-decoration: {{ $date_filter_by == 'no_date_to_withdraw' ? 'line-through' : 'unset' }}; color: {{ $date_filter_by == 'no_date_to_withdraw' ? 'rgb(81, 39, 39)' : 'unset' }}"/>
+                        </div>
+                        <div class="form-group col-md-12 mt-1 {{ $date_filter_by == 'expected_withdraw' || $date_filter_by == 'no_date_to_withdraw' ? '' : 'display-none' }}">
+                            <div class="d-flex justify-content-end mr-3">
+                                <div class="switch d-flex">
+                                    <input type="checkbox" class="check-style check-xs" name="no_date_to_withdraw" id="no_date_to_withdraw" {{ $date_filter_by == 'no_date_to_withdraw' ? 'checked' : '' }} autocomplete="new-password">
+                                    <label for="no_date_to_withdraw" class="check-style check-xs"></label>&nbsp;Sem data prevista
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="nav-scroller mt-3">

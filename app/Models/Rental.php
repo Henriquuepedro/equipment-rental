@@ -216,7 +216,7 @@ class Rental extends Model
         return $this->where(['id' => $rental_id, 'company_id' => $company_id])->delete();
     }
 
-    public function getCountTypeRentals(int $company_id, int $client, string $start_date, string $end_date, string $date_filter_by): array
+    public function getCountTypeRentals(int $company_id, int $client, string $start_date, string $end_date, string $date_filter_by, bool $no_date_to_withdraw): array
     {
         $data = array();
 
@@ -260,7 +260,11 @@ class Rental extends Model
                 ->join('rentals', 'rental_equipments.rental_id', '=', 'rentals.id')
                 ->where($where);
 
-            $query->whereBetween($where_date_filter, ["$start_date 00:00:00", "$end_date 23:59:59"]);
+            if ($no_date_to_withdraw) {
+                $query->where($where_date_filter, null);
+            } else {
+                $query->whereBetween($where_date_filter, ["$start_date 00:00:00", "$end_date 23:59:59"]);
+            }
 
             $data[$type] = $query
                 ->groupBy('rental_equipments.rental_id')
@@ -439,28 +443,5 @@ class Rental extends Model
     public function getRentalsForMonth(int $company_id, $year, $month)
     {
         return $this->where('company_id', $company_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->count();
-    }
-
-    public function getRentalsLateByType(int $company_id)
-    {
-        $date = dateNowInternational();
-
-        return $this->select(DB::raw("
-            SUM(if(actual_delivery_date IS NULL AND expected_delivery_date < '$date', 1, 0)) as to_delivery,
-            SUM(if(actual_delivery_date is not null and actual_withdrawal_date is null AND expected_withdrawal_date < '$date', 1, 0)) as to_withdraw,
-            SUM(if(not_use_date_withdrawal = 1 and actual_delivery_date is not null and actual_withdrawal_date is null, 1, 0)) as no_date_to_withdraw
-        "))->where('company_id', $company_id)
-        ->where(function($query) use ($date) {
-            $query->orWhere(function($query) use ($date) {
-                $query->where('actual_delivery_date', null)->where('expected_delivery_date', '<', $date);
-            });
-            $query->orWhere(function($query) use ($date) {
-                $query->where('actual_delivery_date', '!=', null)->where('actual_withdrawal_date', null)->where('expected_withdrawal_date', '<', $date);
-            });
-            $query->orWhere(function($query) {
-                $query->where('not_use_date_withdrawal', 1)->where('actual_delivery_date', '!=', null)->where('actual_withdrawal_date', null);
-            });
-        })
-        ->first();
     }
 }

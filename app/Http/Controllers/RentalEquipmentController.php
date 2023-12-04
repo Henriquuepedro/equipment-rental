@@ -236,4 +236,57 @@ class RentalEquipmentController extends Controller
             'rental_updated' => $rental_updated
         ));
     }
+
+    public function getEquipmentsLateByRentalAndType(): JsonResponse
+    {
+        if (!hasPermission('RentalView')) {
+            return response()->json();
+        }
+
+        $date = dateNowInternational();
+        $date_time = strtotime(dateNowInternational());
+        $company_id = Auth::user()->__get('company_id');
+
+        $rentals = $this->rental_equipment->getRentalsLateByType($company_id, $date);
+        $to_delivery = 0;
+        $to_withdraw = 0;
+        $no_date_to_withdraw = 0;
+        $rental_already = array(
+            'to_delivery' => array(),
+            'to_withdraw' => array(),
+            'no_date_to_withdraw' => array(),
+        );
+        $y_ = [];
+
+        foreach ($rentals as $rental) {
+            if (is_null($rental['actual_delivery_date']) && !is_null($rental['expected_delivery_date']) && !is_null($rental['expected_withdrawal_date']) && strtotime($rental['expected_delivery_date']) < $date_time) {
+                if (in_array($rental['rental_id'], $rental_already['to_delivery'])) {
+                    continue;
+                }
+                $rental_already['to_delivery'][] = $rental['rental_id'];
+                $to_delivery++;
+            }
+            else if (!is_null($rental['actual_delivery_date']) && is_null($rental['actual_withdrawal_date']) && !is_null($rental['expected_withdrawal_date']) && strtotime($rental['expected_withdrawal_date']) < $date_time) {
+                if (in_array($rental['rental_id'], $rental_already['to_withdraw'])) {
+                    continue;
+                }
+                $rental_already['to_withdraw'][] = $rental['rental_id'];
+                $to_withdraw++;
+            }
+            else if (is_null($rental['expected_withdrawal_date']) && !is_null($rental['actual_delivery_date']) && is_null($rental['actual_withdrawal_date'])) {
+                if (in_array($rental['rental_id'], $rental_already['no_date_to_withdraw'])) {
+                    continue;
+                }
+                $rental_already['no_date_to_withdraw'][] = $rental['rental_id'];
+                $no_date_to_withdraw++;
+            }
+        }
+
+
+        return response()->json(array(
+            'to_delivery' => $to_delivery,
+            'to_withdraw' => $to_withdraw,
+            'no_date_to_withdraw' => $no_date_to_withdraw,
+        ));
+    }
 }

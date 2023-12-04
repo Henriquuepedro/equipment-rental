@@ -157,3 +157,8 @@
 <input type="hidden" id="route_update_client" value="{{ route('client.edit') }}">
 <input type="hidden" id="route_rentals_late_by_type" value="{{ route('ajax.rental.get-rentals-late-by-type') }}">
 <input type="hidden" id="route_dashboard_get_billing_open_late" value="{{ route('ajax.dashboard.get-billing-open-late') }}">
+<input type="hidden" id="route_list_table_bill_to_receive_late" value="{{ route('bills_to_receive.index', array('filter_start_date' => '2020-01-01', 'filter_end_date' => subDate(dateNowInternational(null, DATE_INTERNATIONAL), null, null, 1))) }}">
+<input type="hidden" id="route_list_table_bill_to_pay_late" value="{{ route('bills_to_pay.index', array('filter_start_date' => '2020-01-01', 'filter_end_date' => subDate(dateNowInternational(null, DATE_INTERNATIONAL), null, null, 1))) }}">
+<input type="hidden" id="route_list_table_rental_to_delivery_late" value="{{ route('rental.index', array('filter_start_date' => '2020-01-01', 'filter_end_date' => subDate(dateNowInternational(null, DATE_INTERNATIONAL), null, null, 1), 'date_filter_by' => 'expected_delivery')) }}">
+<input type="hidden" id="route_list_table_rental_to_withdraw_late" value="{{ route('rental.index', array('filter_start_date' => '2020-01-01', 'filter_end_date' => subDate(dateNowInternational(null, DATE_INTERNATIONAL), null, null, 1), 'date_filter_by' => 'expected_withdraw')) }}#withdraw">
+<input type="hidden" id="route_list_table_rental_no_date_to_withdraw_late" value="{{ route('rental.index', array('filter_start_date' => '2020-01-01', 'filter_end_date' => subDate(dateNowInternational(null, DATE_INTERNATIONAL), null, null, 1), 'date_filter_by' => 'no_date_to_withdraw')) }}#withdraw">

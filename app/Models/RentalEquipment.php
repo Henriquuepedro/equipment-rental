@@ -201,4 +201,35 @@ class RentalEquipment extends Model
 
         return $query->groupBy('rentals.client_id')->get();
     }
+
+    public function getRentalsLateByType(int $company_id, string $date)
+    {
+        return $this->select(DB::raw("
+            rental_id, actual_delivery_date, expected_delivery_date, actual_withdrawal_date, expected_withdrawal_date, not_use_date_withdrawal
+        "))->where('company_id', $company_id)
+            ->where(function($query) use ($date) {
+                $query->orWhere(function($query) use ($date) {
+                    $query->where(array(
+                        ['actual_delivery_date', '=', null],
+                        ['expected_delivery_date', '<', $date],
+                        ['expected_withdrawal_date', '!=', null]
+                    ));
+                });
+                $query->orWhere(function($query) use ($date) {
+                    $query->where(array(
+                        ['actual_delivery_date', '!=', null],
+                        ['actual_withdrawal_date', '=', null],
+                        ['expected_withdrawal_date', '<', $date]
+                    ));
+                });
+                $query->orWhere(function($query) {
+                    $query->where(array(
+                        ['expected_withdrawal_date', '=', null],
+                        ['actual_delivery_date', '!=', null],
+                        ['actual_withdrawal_date', '=', null]
+                    ));
+                });
+            })
+            ->get();
+    }
 }
