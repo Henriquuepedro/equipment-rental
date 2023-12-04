@@ -85,6 +85,7 @@ class RentalController extends Controller
         $type_to_today          = $request->input('type_to_today'); // Se '$type_rental' for 'deliver' retornar para entregar hoje, se for 'withdraw' retornar para retirar hoje.
         $response_simplified    = $request->input('response_simplified'); // Retornar somente código e cliente com endereço.
         $date_filter_by         = $request->input('date_filter_by'); // created_at, delivery, withdraw
+        $no_date_to_withdraw    = $request->input('no_date_to_withdraw'); // Filtro sem data de retirada. Data nula.
         $result                 = array();
 
         try {
@@ -106,7 +107,7 @@ class RentalController extends Controller
                 }
                 // withdraw
                 else {
-                    $filter_default[]['whereBetween']['rental_equipments.expected_withdrawal_date'] = ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
+                    $filter_default[][$no_date_to_withdraw ? 'where' : 'whereBetween']['rental_equipments.expected_withdrawal_date'] = $no_date_to_withdraw ? null : ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
                 }
             } else {
                 $where_date_filter = match ($date_filter_by) {
@@ -118,7 +119,7 @@ class RentalController extends Controller
                     default             => throw new Exception('Filtro de data não localizada.'),
                 };
 
-                $filter_default[]['whereBetween'][$where_date_filter] = ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
+                $filter_default[][$no_date_to_withdraw ? 'where' : 'whereBetween'][$where_date_filter] = $no_date_to_withdraw ? null : ["{$filters_date['dateStart']} 00:00:00", "{$filters_date['dateFinish']} 23:59:59"];
             }
 
             switch ($type_rental) {
@@ -733,13 +734,14 @@ class RentalController extends Controller
 
     public function getQtyTypeRentals(Request $request): JsonResponse
     {
-        $company_id     = $request->user()->company_id;
-        $client         = $request->input('client');
-        $start_date     = $request->input('start_date');
-        $end_date       = $request->input('end_date');
-        $date_filter_by = $request->input('date_filter_by');
+        $company_id             = $request->user()->company_id;
+        $client                 = $request->input('client');
+        $start_date             = $request->input('start_date');
+        $end_date               = $request->input('end_date');
+        $date_filter_by         = $request->input('date_filter_by');
+        $no_date_to_withdraw    = (bool)$request->input('no_date_to_withdraw'); // Filtro sem data de retirada. Data nula.
 
-        $typesQuery = $this->rental->getCountTypeRentals($company_id, $client, $start_date, $end_date, $date_filter_by);
+        $typesQuery = $this->rental->getCountTypeRentals($company_id, $client, $start_date, $end_date, $date_filter_by, $no_date_to_withdraw);
 
         $arrTypes = array(
             'deliver'   => $typesQuery['deliver'],
@@ -1036,16 +1038,4 @@ class RentalController extends Controller
             )
         );
     }
-
-    public function getRentalsLateByType(): JsonResponse
-    {
-        if (!hasPermission('RentalView')) {
-            return response()->json();
-        }
-
-        $company_id = Auth::user()->__get('company_id');
-
-        $rentals = $this->rental->getRentalsLateByType($company_id);
-
-        return response()->json($rentals->toArray());
-    }}
+}

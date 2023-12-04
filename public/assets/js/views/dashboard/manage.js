@@ -283,9 +283,9 @@ const clientsTopRentals = () => {
 const rentalsLate = () => {
     $.getJSON($('#route_rentals_late_by_type').val(), function(response) {
         let data = [
-            response.to_delivery ?? 0,
-            response.to_withdraw ?? 0,
-            response.no_date_to_withdraw ?? 0
+            {...{x: "Para entregar atrasado", type: "to_delivery"}, ...{total: response.to_delivery ?? 0}},
+            {...{x: "Para retirar atrasado", type: "to_withdraw"}, ...{total: response.to_withdraw ?? 0}},
+            {...{x: "Sem data de retirada", type: "no_date_to_withdraw"}, ...{total: response.no_date_to_withdraw ?? 0}},
         ];
         let max_registers = Math.max.apply(null, data);
         let step_size = getStepSizeChart(max_registers);
@@ -297,7 +297,10 @@ const rentalsLate = () => {
                 backgroundColor: [ChartColor[0], ChartColor[1], ChartColor[3]],
                 borderColor: [ChartColor[0], ChartColor[1], ChartColor[3]],
                 borderWidth: 1,
-                label: "Locações atrasadas"
+                label: "Locações atrasadas",
+                parsing: {
+                    yAxisKey: 'total'
+                }
             }]
         };
         let lineOptions = {
@@ -308,7 +311,7 @@ const rentalsLate = () => {
                 tooltip: {
                     callbacks: {
                         label: tooltipItems => {
-                            const rentals = tooltipItems.raw;
+                            const rentals = tooltipItems.raw.total;
                             let complement_rental = rentals <= 1 ? 'locação' : 'locações';
 
                             return `${rentals} ${complement_rental}`;
@@ -340,6 +343,25 @@ const rentalsLate = () => {
                     }
                 }
             },
+            onClick: (evt, item) => {
+                if (evt.chart.boxes[0].legendItems.length) {
+                    const type = item[0].element['$context'].raw.type;
+                    let url_redirect = '';
+
+                    if (type === 'to_delivery') {
+                        url_redirect = $('#route_list_table_rental_to_delivery_late').val();
+                    } else if (type === 'to_withdraw') {
+                        url_redirect = $('#route_list_table_rental_to_withdraw_late').val();
+                    } else if (type === 'no_date_to_withdraw') {
+                        url_redirect = $('#route_list_table_rental_no_date_to_withdraw_late').val();
+                    }
+
+                    window.location.href = url_redirect;
+                }
+            },
+            onHover: event => {
+                event.native.target.style.cursor = 'pointer';
+            }
         }
         let rentalsLateChartCanvas = $("#rentalsLateChart").get(0).getContext("2d");
         new Chart(rentalsLateChartCanvas, {
@@ -353,8 +375,8 @@ const rentalsLate = () => {
 const billingOpenLate = () => {
     $.getJSON($('#route_dashboard_get_billing_open_late').val(), function(response) {
         let data = [
-            {...{x: "Receber atrasado"}, ...response.receive},
-            {...{x: "Pagar atrasado"}, ...response.pay}
+            {...{x: "Receber atrasado", type: "receive"}, ...response.receive},
+            {...{x: "Pagar atrasado", type: "pay"}, ...response.pay}
         ];
         let max_registers = Math.max.apply(null, [data[0].total_value, data[1].total_value]);
         let step_size = getStepSizeChart(max_registers);
@@ -415,6 +437,21 @@ const billingOpenLate = () => {
                         }
                     }
                 }
+            },
+            onClick: (evt, item) => {
+                if (evt.chart.boxes[0].legendItems.length) {
+                    const type = item[0].element['$context'].raw.type;
+                    let url_redirect = '';
+                    if (type === 'receive') {
+                        url_redirect = $('#route_list_table_bill_to_receive_late').val();
+                    } else if (type === 'pay') {
+                        url_redirect = $('#route_list_table_bill_to_pay_late').val();
+                    }
+                    window.location.href = url_redirect;
+                }
+            },
+            onHover: event => {
+                event.native.target.style.cursor = 'pointer';
             }
         }
         let billingOpenLateChartCanvas = $("#billingOpenLateChart").get(0).getContext("2d");

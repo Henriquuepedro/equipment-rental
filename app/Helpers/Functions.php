@@ -574,15 +574,18 @@ if (!function_exists('subDate')) {
             return null;
         }
 
-        $data = DateTime::createFromFormat(DATETIME_INTERNATIONAL, $date);
-
         $format = DATE_INTERNATIONAL;
+        $format_in = DATE_INTERNATIONAL;
 
         if (strlen($date) === 16) {
             $format .= ' H:i';
+            $format_in .= ' H:i';
         } elseif (strlen($date) === 19) {
             $format .= ' H:i:s';
+            $format_in .= ' H:i:s';
         }
+
+        $data = DateTime::createFromFormat($format_in, $date);
 
         if (!is_null($year)) {
             $data->sub(new DateInterval("P{$year}Y"));
