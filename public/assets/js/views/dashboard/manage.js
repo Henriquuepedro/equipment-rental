@@ -1,4 +1,4 @@
-var charts_started = false;
+let charts_started = false;
 $(function () {
     /* ChartJS */
 
@@ -178,33 +178,47 @@ const rentalsForMonth = () => {
 const billsForMonth = () => {
     $.getJSON($('#route_bills_for_month').val(), function(response) {
         let labels = [];
-        let data = [];
+        let data_receive = [];
+        let data_pay = [];
         let max_registers = 0;
         let step_size = 0;
 
         for (const property in response) {
             labels.push(property);
-            data.push(response[property]);
+            data_receive.push(response[property].receive);
+            data_pay.push(response[property].pay);
 
-            if (response[property] > max_registers) {
-                max_registers = response[property];
+            if (response[property].receive > max_registers) {
+                max_registers = response[property].receive;
+            }
+            if (response[property].pay > max_registers) {
+                max_registers = response[property].pay;
             }
         }
 
         step_size = getStepSizeChart(max_registers);
 
-        var billingChartCanvas = $("#billingChart").get(0).getContext("2d");
+        let billingChartCanvas = $("#billingChart").get(0).getContext("2d");
         new Chart(billingChartCanvas, {
             type: 'bar',
             data: {
                 labels,
-                datasets: [{
-                    label: 'Faturamento',
-                    data,
-                    backgroundColor: ChartColor[0],
-                    borderColor: ChartColor[0],
-                    borderWidth: 0
-                }]
+                datasets: [
+                    {
+                        label: 'Faturamento',
+                        data: data_receive,
+                        backgroundColor: ChartColor[1],
+                        borderColor: ChartColor[1],
+                        borderWidth: 0
+                    },
+                    {
+                        label: 'Despesas',
+                        data: data_pay,
+                        backgroundColor: ChartColor[2],
+                        borderColor: ChartColor[2],
+                        borderWidth: 0
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -234,7 +248,7 @@ const billsForMonth = () => {
                     y: {
                         title: {
                             display: true,
-                            text: 'Faturamento por mês',
+                            text: 'Financeiro por mês',
                             font: {
                                 weight: 'bold'
                             }

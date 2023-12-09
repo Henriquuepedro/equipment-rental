@@ -10,6 +10,11 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/views/dashboard/daily.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/views/dashboard/manage.css') }}">
+    <style>
+        #tabDashboard .nav-link {
+            padding: 15px;
+        }
+    </style>
 @stop
 
 @section('js')
@@ -29,14 +34,16 @@
 @stop
 
 @section('content')
-    <ul class="nav nav-tabs tab-solid tab-solid-primary" role="tablist" id="tabDashboard">
-        <li class="nav-item col-md-2 no-padding">
-            <a class="nav-link active" id="daily-tab" data-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="true">Diário</a>
-        </li>
-        <li class="nav-item col-md-2 no-padding">
-            <a class="nav-link" id="manage-tab" data-toggle="tab" href="#manage" role="tab" aria-controls="manage" aria-selected="false">Gerencial</a>
-        </li>
-    </ul>
+    <div class="nav-scroller mb-3">
+        <ul class="nav nav-tabs tickets-tab-switch d-flex justify-content-center" role="tablist" id="tabDashboard">
+            <li class="nav-item col-md-3">
+                <a class="nav-link d-flex justify-content-center active" id="daily-tab" data-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="true">DIÁRIO</a>
+            </li>
+            <li class="nav-item col-md-3">
+                <a class="nav-link d-flex justify-content-center" id="manage-tab" data-toggle="tab" href="#manage" role="tab" aria-controls="manage" aria-selected="false">GERENCIAL</a>
+            </li>
+        </ul>
+    </div>
     <div class="tab-content tab-content-basic">
         <div class="tab-pane fade show active" id="daily" role="tabpanel" aria-labelledby="daily-tab">
             @include('dashboard.daily_dashboard')

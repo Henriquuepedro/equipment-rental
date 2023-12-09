@@ -288,8 +288,8 @@ class RentalPayment extends Model
                 ['payment_id', '<>', null],
                 ['company_id', '=', $company_id]
             ])
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
+            ->whereYear('payday', $year)
+            ->whereMonth('payday', $month)
             ->first();
 
         if ($register) {

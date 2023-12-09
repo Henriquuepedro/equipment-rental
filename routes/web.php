@@ -302,7 +302,6 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToReceiveController::class, 'getQtyTypeRentals'])->name('get-qty-type-rentals');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'confirmPayment'])->name('confirm_payment');
             Route::post('/reabrir-pagamento', [App\Http\Controllers\BillsToReceiveController::class, 'reopenPayment'])->name('reopen_payment');
-            Route::get('/pagamentos-por-mes/{months}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForMonths'])->name('get-bills-for-month');
             Route::get('/pagamentos-por-data/{date?}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForDate'])->name('get-bills-for-date');
             Route::post('/buscar-pagamentos-por-data', [App\Http\Controllers\BillsToReceiveController::class, 'fetchBillForDate'])->name('fetchBillForDate');
             Route::get('/buscar-pagamentos-por-data-e-client/{date?}', [App\Http\Controllers\BillsToReceiveController::class, 'getBillsForDateAndClient'])->name('getBillsForDateAndClient');
@@ -356,6 +355,7 @@ Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], 
         Route::group(['prefix' => '/dashboard', 'as' => 'dashboard.'], function () {
 
             Route::get('/lancamentos-vencidos', [App\Http\Controllers\DashboardController::class, 'getBillingOpenLate'])->name('get-billing-open-late');
+            Route::get('/pagamentos-por-mes/{months}', [App\Http\Controllers\DashboardController::class, 'getBillsForMonths'])->name('get-bills-for-month');
 
         });
     });
