@@ -314,25 +314,6 @@ class BillsToReceiveController extends Controller
         return response()->json(array('success' => true, 'message' => "Pagamento reaberto!"));
     }
 
-    public function getBillsForMonths(int $months): JsonResponse
-    {
-        if (!hasPermission('BillsToReceiveView')) {
-            return response()->json();
-        }
-
-        $company_id = Auth::user()->__get('company_id');
-        $response_months = array();
-
-        for ($month = $months; $month > 0; $month--) {
-            $year_month = date('Y-m', strtotime(subDate(dateNowInternational(), null, ($month - 1))));
-            $exp_year_month = explode('-', $year_month);
-
-            $response_months[SHORT_MONTH_NAME_PT[$exp_year_month[1]] . '/' . substr($exp_year_month[0], 2, 4)] = $this->rental_payment->getBillsForMonth($company_id, $exp_year_month[0], $exp_year_month[1]);
-        }
-
-        return response()->json($response_months);
-    }
-
     public function getBillsForDate(string $date): JsonResponse
     {
         if (!hasPermission('BillsToReceiveView')) {

@@ -134,7 +134,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center pb-4">
-                    <h4 class="card-title mb-0">Faturamento</h4>
+                    <h4 class="card-title mb-0">Financeiro</h4>
                 </div>
                 <canvas id="billingChart"></canvas>
             </div>
@@ -152,7 +152,7 @@
 </div>
 <input type="hidden" id="route_new_clients_for_month" value="{{ route('ajax.client.get-new-client-for-month', array('months' => 9)) }}">
 <input type="hidden" id="route_rentals_for_month" value="{{ route('ajax.rental.get-rentals-for-month', array('months' => 9)) }}">
-<input type="hidden" id="route_bills_for_month" value="{{ route('ajax.bills_to_receive.get-bills-for-month', array('months' => 9)) }}">
+<input type="hidden" id="route_bills_for_month" value="{{ route('ajax.dashboard.get-bills-for-month', array('months' => 9)) }}">
 <input type="hidden" id="route_clients_top_rentals" value="{{ route('ajax.client.get-clients-top-rentals', array('count' => 8)) }}">
 <input type="hidden" id="route_update_client" value="{{ route('client.edit') }}">
 <input type="hidden" id="route_rentals_late_by_type" value="{{ route('ajax.rental.get-rentals-late-by-type') }}">

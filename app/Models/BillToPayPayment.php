@@ -194,4 +194,24 @@ class BillToPayPayment extends Model
                 ['due_date', '<', $date]
             ))->first();
     }
+
+    public function getBillsForMonth($company_id, $year, $month): float|int
+    {
+        $register = $this->select(DB::raw('SUM(due_value) as total'))
+            ->where([
+                ['payment_id', '<>', null],
+                ['company_id', '=', $company_id]
+            ])
+            ->whereYear('payday', $year)
+            ->whereMonth('payday', $month)
+            ->first();
+
+        if ($register) {
+            if ($register->total) {
+                return roundDecimal($register->total);
+            }
+        }
+
+        return 0;
+    }
 }
