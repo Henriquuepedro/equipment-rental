@@ -1,10 +1,26 @@
 @extends('adminlte::auth.auth-page', ['auth_type' => 'login'])
 
+@php( $password_reset_url = View::getSection('password_reset_url') ?? config('adminlte.password_reset_url', 'password/reset') )
+
+@if (config('adminlte.use_route_url', false))
+    @php( $password_reset_url = $password_reset_url ? route($password_reset_url) : '' )
+@else
+    @php( $password_reset_url = $password_reset_url ? url($password_reset_url) : '' )
+@endif
+
 @section('adminlte_css_pre')
     <link rel="stylesheet" href="{{ asset('vendor/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+    <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
 @stop
 @section('adminlte_js')
-    <script src="{{ asset('assets/snippets/pages/user/login.js') }}" type="text/javascript"></script>
+    <script>
+        $(function(){
+            $('[name="remember"]').iCheck({
+                checkboxClass: 'icheckbox_minimal-blue',
+                increaseArea: '20%'
+            });
+        })
+    </script>
 @stop
 
 @section('auth_body')
@@ -37,58 +53,29 @@
                                 {{ csrf_field() }}
                                 <div class="form-group">
                                     <label class="label">E-mail</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="email" value="{{ old('email') }}" placeholder="{{ __('adminlte::adminlte.email') }}" required>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                              <i class="mdi mdi-check-circle-outline"></i>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <input type="text" class="form-control" name="email" value="{{ old('email') }}" placeholder="{{ __('adminlte::adminlte.email') }}" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="label">Password</label>
-                                    <div class="input-group">
-                                        <input type="password" class="form-control" name="password" placeholder="{{ __('adminlte::adminlte.password') }}" required>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                              <i class="mdi mdi-check-circle-outline"></i>
-                                            </span>
-                                        </div>
+                                    <label class="label">Senha</label>
+                                    <input type="password" class="form-control" name="password" placeholder="{{ __('adminlte::adminlte.password') }}" required>
+                                </div>
+                                <div class="form-group mt-2">
+                                    <button class="btn btn-primary submit-btn btn-block">Entrar</button>
+                                </div>
+                                <div class="form-group d-flex justify-content-between mt-2">
+                                    <div class="icheck">
+                                        <label class="ml-0">
+                                            <input type="checkbox" name="remember"> {{ __('adminlte::adminlte.remember_me') }}
+                                        </label>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn btn-primary submit-btn btn-block">Login</button>
-                                </div>
-                                <div class="form-group d-flex justify-content-between">
-                                    <div class="form-check form-check-flat mt-0">
-                                        <label class="form-check-label">
-                                        <input type="checkbox" class="form-check-input" name="remember"> {{ __('adminlte::adminlte.remember_me') }} </label>
-                                    </div>
-                                    <a href="#" class="text-small forgot-password text-black">Forgot Password</a>
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn btn-block g-login">
-                                        <img class="mr-3" src="../../../assets/images/file-icons/icon-google.svg" alt="">Log in with Google</button>
+                                    <a href="{{ $password_reset_url }}" class="text-small forgot-password text-black">Esqueci minha senha</a>
                                 </div>
                                 <div class="text-block text-center my-3">
-                                    <span class="text-small font-weight-semibold">Not a member ?</span>
-                                    <a href="register.html" class="text-black text-small">Create new account</a>
+                                    <span class="text-small font-weight-semibold">Não é membro?</span>
+                                    <a href="{{ route('register') }}" class="text-black text-small">Cadastre-se agora.</a>
                                 </div>
                             </form>
                         </div>
-                        <ul class="auth-footer">
-                            <li>
-                                <a href="#">Conditions</a>
-                            </li>
-                            <li>
-                                <a href="#">Help</a>
-                            </li>
-                            <li>
-                                <a href="#">Terms</a>
-                            </li>
-                        </ul>
-                        <p class="footer-text text-center">copyright © 2018 Bootstrapdash. All rights reserved.</p>
                     </div>
                 </div>
             </div>

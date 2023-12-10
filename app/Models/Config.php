@@ -15,7 +15,9 @@ class Config extends Model
      * @var array
      */
     protected $fillable = [
-        'view_observation_client_rental', 'user_update'
+        'view_observation_client_rental',
+        'user_update',
+        'company_id'
     ];
 
     /**
@@ -43,6 +45,11 @@ class Config extends Model
     public function edit($data, $company_id)
     {
         return $this->where('company_id', $company_id)->update($data);
+    }
+
+    public function insert(array $data)
+    {
+        return $this->create($data);
     }
 
     public function getConfigCompany($company_id, $config): bool
