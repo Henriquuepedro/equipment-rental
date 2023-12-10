@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -29,7 +32,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected string $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
@@ -49,10 +52,30 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        $data['cpf_cnpj'] = onlyNumbers($data['cpf_cnpj']);
+        $validator_cpf_cnpj = $data['type_person'] === 'pj' ? 'cnpj' : 'cpf';
+
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'type_person'   => ['size:2'],
+            'name'          => ['required', 'string', 'max:255'],
+            'cpf_cnpj'      => ['required', $validator_cpf_cnpj, 'unique:companies'],
+            'phone_1'       => ['required', 'celular_com_ddd'],
+            'contact'       => ['required'],
+            'email'         => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'      => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'type_person.*' => 'Informe Pessoa Física ou Jurídica.',
+            'name.*' => $data['type_person'] === 'pj' ? 'Razão Social deve ser informada e conter até 255 caracteres.' : 'Nome Completo deve ser informada e conter até 255 caracteres.',
+            'phone_1.*' => 'Telefone informado é inválido.',
+            'contact.*' => 'Nome do Contato deve ser informado.',
+            'email.required' => 'E-mail deve ser informado.',
+            'email.email' => 'E-mail informado é inválido.',
+            'email.unique' => 'E-mail informado já está em uso. Caso não se lembre da senha, clique em esqueci minha senha.',
+            'password.required' => 'Senha deve ser informado.',
+            'password.min' => 'Senha deve conter 8 caracteres no mínimo.',
+            'password.confirmed' => 'Senhas devem ser iguais.',
+            'cpf_cnpj.cnpj' => 'CNPJ informado é inválido.',
+            'cpf_cnpj.cpf' => 'CPF informado é inválido.'
         ]);
     }
 
@@ -64,10 +87,28 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $company = Company::create([
+            'name'          => $data['name'],
+            'fantasy'       => $data['fantasy'],
+            'type_person'   => $data['type_person'],
+            'cpf_cnpj'      => onlyNumbers($data['cpf_cnpj']),
+            'email'         => $data['email'],
+            'phone_1'       => onlyNumbers($data['phone_1']),
+            'phone_2'       => onlyNumbers($data['phone_2']),
+            'contact'       => $data['contact'],
+            'plan_id'       => 4,
+            'plan_expiration_date'  => sumDate(dateNowInternational(), null, null, 15)
+        ]);
+
         return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'name'                  => $data['contact'],
+            'email'                 => $data['email'],
+            'phone'                 => onlyNumbers($data['phone_1']),
+            'password'              => Hash::make($data['password']),
+            'company_id'            => $company->id,
+            'active'                => 1,
+            'permission'            => '[]',
+            'type_user'             => User::$TYPE_USER['admin']
         ]);
     }
 }

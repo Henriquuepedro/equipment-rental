@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
                 'company_id'    => 1,
                 'active'        => 1,
                 'permission'    => json_encode($permissions),
-                'type_user'     => 2,
+                'type_user'     => User::$TYPE_USER['master'],
                 'logout'        => 0
             ]);
         }

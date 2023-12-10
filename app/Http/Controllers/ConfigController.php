@@ -34,7 +34,12 @@ class ConfigController extends Controller
             $arrUpdate[$configIndex] = (bool)$request->input($configIndex);
         }
 
-        $updateConfig = $this->config->edit($arrUpdate, $company_id);
+        if (is_null($dataConfigCompany['value'])) {
+            $arrUpdate['company_id'] = $company_id;
+            $updateConfig = $this->config->insert($arrUpdate);
+        } else {
+            $updateConfig = $this->config->edit($arrUpdate, $company_id);
+        }
 
         if ($updateConfig) {
             return redirect()->route('config.index')

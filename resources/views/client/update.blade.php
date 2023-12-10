@@ -118,7 +118,7 @@
                                     </div>
                                     <div class="form-group col-md-5 d-none">
                                         <label for="fantasy_client">Fantasia</label>
-                                        <input  {{ $disabled }}type="text" class="form-control" id="fantasy_client" name="fantasy_client" autocomplete="nope" value="{{ old('fantasy_client', $client->fantasy) }}">
+                                        <input {{ $disabled }} type="text" class="form-control" id="fantasy_client" name="fantasy_client" autocomplete="nope" value="{{ old('fantasy_client', $client->fantasy) }}">
                                     </div>
                                     <div class="form-group col-md-2">
                                         <div class="switch d-flex mt-4">

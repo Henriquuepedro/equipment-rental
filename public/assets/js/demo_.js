@@ -25,6 +25,15 @@ var FORMAT_DATETIME_BRAZIL = 'DD/MM/YYYY HH:mm:ss';
 var FORMAT_DATETIME_BRAZIL_NO_SECONDS = 'DD/MM/YYYY HH:mm';
 var FORMAT_DATE_BRAZIL = 'DD/MM/YYYY';
 
+var MaskPhoneBehavior = function (val) {
+        return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+    },
+    maskPhoneOptions = {
+    onKeyPress: function(val, e, field, options) {
+        field.mask(MaskPhoneBehavior.apply({}, arguments), options);
+    }
+};
+
 (function ($) {
     'use strict';
     $(function () {

@@ -11,6 +11,12 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    static public array $TYPE_USER = array(
+        'user'   => 0,
+        'admin'  => 1,
+        'master' => 2,
+    );
+
     /**
      * The attributes that are mass assignable.
      *

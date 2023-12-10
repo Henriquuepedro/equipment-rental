@@ -26,7 +26,7 @@
                 <div class="row w-100">
                     <div class="col-lg-4 mx-auto">
                         <div class="auth-form-transparent text-left p-5 text-center">
-                            <img src="{{ $settings['img_profile'] }}" class="lock-profile-img rounded-circle mb-3" alt="img">
+                            <img src="{{ $settings['img_profile'] }}" width="100" class="lock-profile-img rounded-circle mb-3" alt="img">
                             <p class="text-uppercase mb-0">{{ $settings['name_company'] }}</p>
                             <p>{{ auth()->user()->__get('email') }}</p>
                             <div class="box box-primary mt-3">
@@ -37,10 +37,10 @@
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <a class="btn btn-block btn-success btn-lg font-weight-medium" href="#">Renovar Plano</a>
+                                <a class="btn btn-block btn-success btn-lg font-weight-medium" href="{{ route('plan.index') }}">Renovar Plano</a>
                             </div>
                             <div class="mt-3 text-center">
-                                <a class="auth-link text-white" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-power-off"></i> Encerrar Sessão</a>
+                                <a class="auth-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-power-off"></i> Encerrar Sessão</a>
                             </div>
                         </div>
                     </div>
@@ -49,6 +49,13 @@
         </div>
     </div>
 
+
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @if(config('adminlte.logout_method'))
+            {{ method_field(config('adminlte.logout_method')) }}
+        @endif
+        {{ csrf_field() }}
+    </form>
 @stop
 
 @section('adminlte_js')

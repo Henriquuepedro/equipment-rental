@@ -20,7 +20,7 @@ class CheckPlan
      */
     public function handle(Request $request, Closure $next)
     {
-        $company_id = Auth::user()->company_id;
+        $company_id = Auth::user()->__get('company_id');
         $company = new Company();
 
         $data_company = $company->getCompany($company_id);
@@ -30,7 +30,12 @@ class CheckPlan
                 return redirect()->route('dashboard');
             }
         } else if (strtotime($data_company->plan_expiration_date) < strtotime(dateNowInternational())) {
-            return redirect()->route('expired_plan');
+            $exp_route = explode('.', $request->route()->getName());
+
+            // Se são rotas de plano não deve bloquear.
+            if ($exp_route[0] !== 'plan' && ($exp_route[0] !== 'ajax' || $exp_route[1] !== 'plan')) {
+                return redirect()->route('expired_plan');
+            }
         }
 
         return $next($request);
