@@ -24,14 +24,10 @@
                                 <input type="hidden" name="token" value="{{ $token }}">
 
                                 {{-- Email field --}}
-                                <div class="input-group mb-3">
+                                <div class="form-group">
+                                    <label class="label">E-mail</label>
                                     <input type="email" name="email" class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                                           value="{{ old('email') }}" placeholder="{{ __('adminlte::adminlte.email') }}" autofocus>
-                                    <div class="input-group-append">
-                                        <div class="input-group-text">
-                                            <span class="fas fa-envelope {{ config('adminlte.classes_auth_icon', '') }}"></span>
-                                        </div>
-                                    </div>
+                                           value="{{ old('email') }}" placeholder="{{ __('adminlte::adminlte.email') }}">
                                     @if($errors->has('email'))
                                         <div class="invalid-feedback">
                                             <strong>{{ $errors->first('email') }}</strong>
@@ -40,15 +36,11 @@
                                 </div>
 
                                 {{-- Password field --}}
-                                <div class="input-group mb-3">
+                                <div class="form-group">
+                                    <label class="label">Senha</label>
                                     <input type="password" name="password"
                                            class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                                            placeholder="{{ __('adminlte::adminlte.password') }}">
-                                    <div class="input-group-append">
-                                        <div class="input-group-text">
-                                            <span class="fas fa-lock {{ config('adminlte.classes_auth_icon', '') }}"></span>
-                                        </div>
-                                    </div>
                                     @if($errors->has('password'))
                                         <div class="invalid-feedback">
                                             <strong>{{ $errors->first('password') }}</strong>
@@ -57,15 +49,11 @@
                                 </div>
 
                                 {{-- Password confirmation field --}}
-                                <div class="input-group mb-3">
+                                <div class="form-group">
+                                    <label class="label">Confirme a Senha</label>
                                     <input type="password" name="password_confirmation"
                                            class="form-control {{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
                                            placeholder="{{ trans('adminlte::adminlte.retype_password') }}">
-                                    <div class="input-group-append">
-                                        <div class="input-group-text">
-                                            <span class="fas fa-lock {{ config('adminlte.classes_auth_icon', '') }}"></span>
-                                        </div>
-                                    </div>
                                     @if($errors->has('password_confirmation'))
                                         <div class="invalid-feedback">
                                             <strong>{{ $errors->first('password_confirmation') }}</strong>
@@ -74,12 +62,15 @@
                                 </div>
 
                                 {{-- Confirm password reset button --}}
-                                <button type="submit" class="btn btn-block {{ config('adminlte.classes_auth_btn', 'btn-flat btn-primary') }}">
+                                <button type="submit" class="btn btn-block btn-primary mt-3">
                                     <span class="fas fa-sync-alt"></span>
                                     {{ __('adminlte::adminlte.reset_password') }}
                                 </button>
 
                             </form>
+                            <div class="text-block text-center my-3">
+                                <a href="{{ route('login') }}" class="text-black text-small">Voltar para o login</a>
+                            </div>
                         </div>
                     </div>
                 </div>
