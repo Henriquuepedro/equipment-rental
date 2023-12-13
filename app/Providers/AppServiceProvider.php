@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Permission;
+use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
@@ -52,16 +53,31 @@ class AppServiceProvider extends ServiceProvider
                 $settings['type_user'] = auth()->user()->__get('type_user');
                 $settings['style_template'] = auth()->user()->__get('style_template');
                 $settings['company_id'] = str_pad($dataCompany->id, 5, 0, STR_PAD_LEFT);
-                $settings['plan_expiration_date'] = date('d/m/Y H:i', strtotime($dataCompany->plan_expiration_date));
+                $settings['plan_expiration_date'] = date(DATETIME_BRAZIL_NO_SECONDS, strtotime($dataCompany->plan_expiration_date));
+
+                $settings['notices'] = '';
+
+                if (strtotime($dataCompany->plan_expiration_date) > strtotime(subDate(dateNowInternational(), null, null, 3))) {
+                    $datetime_plan_expiration_date = new DateTime($dataCompany->plan_expiration_date);
+                    $datetime_now = new DateTime(dateNowInternational());
+                    $interval_plan_expiration = $datetime_plan_expiration_date->diff($datetime_now);
+
+                    $color_alert_plan_expiration = 'warning';
+                    if ($interval_plan_expiration->d <= 1) {
+                        $color_alert_plan_expiration = 'danger';
+                    }
+
+                    $settings['notices'] .= "<div class='alert alert-fill-$color_alert_plan_expiration mt-3 text-center' role='alert'><i class='mdi mdi-alert-circle'></i> Seu plano vence em: $settings[plan_expiration_date]. <a href='".route('plan.index')."' class='ml-2 btn btn-rounded btn-fw btn-sm btn-light'>Renovar</a> </div>";
+                }
 
                 $months = 2;
                 $settings['intervalDates'] = [
-                    'start' => date('d/m/Y', strtotime("-$months months", time())),
-                    'finish' => date('d/m/Y')
+                    'start' => date(DATE_BRAZIL, strtotime("-$months months", time())),
+                    'finish' => date(DATE_BRAZIL)
                 ];
                 $settings['intervalBillDates'] = [
-                    'start' => date('d/m/Y', strtotime("-1 months", time())),
-                    'finish' => date('d/m/Y', strtotime("+1 months", time())),
+                    'start' => date(DATE_BRAZIL, strtotime("-1 months", time())),
+                    'finish' => date(DATE_BRAZIL, strtotime("+1 months", time())),
                 ];
 
                 // permissões

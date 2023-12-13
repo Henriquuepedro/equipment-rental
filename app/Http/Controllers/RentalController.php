@@ -305,8 +305,8 @@ class RentalController extends Controller
             $labelBadgeDeliveryDate     = $allDelivered ? 'Entregue em' : 'Entrega prevista em';
             $labelBadgeWithdrawalDate   = $allWithdrawn ? 'Retirada em' : 'Retirada prevista para';
 
-            $strDateDelivery            = date('d/m/Y H:i', strtotime($allDelivered ? $actualDeliveryDate : $expectedDeliveryDate));
-            $strDateWithdraw            = $expectedWithdrawalDate === null && !$allWithdrawn ? 'Não informado' : date('d/m/Y H:i', strtotime($allWithdrawn ? $actualWithdrawalDate : $expectedWithdrawalDate));
+            $strDateDelivery            = date(DATETIME_BRAZIL_NO_SECONDS, strtotime($allDelivered ? $actualDeliveryDate : $expectedDeliveryDate));
+            $strDateWithdraw            = $expectedWithdrawalDate === null && !$allWithdrawn ? 'Não informado' : date(DATETIME_BRAZIL_NO_SECONDS, strtotime($allWithdrawn ? $actualWithdrawalDate : $expectedWithdrawalDate));
 
             $strDeliveryDate    = "<div class='badge badge-pill badge-lg badge-$colorBadgeDeliveryDate'>$labelBadgeDeliveryDate: $strDateDelivery</div>";
             $strWithdrawalDate  = "<div class='badge badge-pill badge-lg badge-$colorBadgeWithdrawalDate'>$labelBadgeWithdrawalDate: $strDateWithdraw</div>";
@@ -330,7 +330,7 @@ class RentalController extends Controller
                     <span class='font-weight-bold w-100'>$value->client_name</span>
                     <span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span>
                 </div>",
-                date('d/m/Y H:i', strtotime($value->created_at)),
+                date(DATETIME_BRAZIL_NO_SECONDS, strtotime($value->created_at)),
                 $buttons
             );
         }
@@ -442,8 +442,8 @@ class RentalController extends Controller
 
         $company_id = $request->user()->company_id;
 
-        $dateDelivery = $request->date_delivery ? DateTime::createFromFormat('d/m/Y H:i', $request->date_delivery) : null;
-        $dateWithdrawal = $request->date_withdrawal ? DateTime::createFromFormat('d/m/Y H:i', $request->date_withdrawal) : null;
+        $dateDelivery = $request->date_delivery ? DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $request->date_delivery) : null;
+        $dateWithdrawal = $request->date_withdrawal ? DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $request->date_withdrawal) : null;
         $notUseDateWithdrawal = (bool)$request->not_use_date_withdrawal;
         $noCharged = $request->type_rental; // 0 = Com cobrança, 1 = Sem cobrança
         $total_rental_paid = transformMoneyBr_En($request->input('total_rental_paid'));
@@ -481,8 +481,8 @@ class RentalController extends Controller
             $withdrawalEquipmentActualVehicle   = $request->{"withdrawal_equipment_actual_vehicle_$equipmentId->id"} ?? null;
             $withdrawalEquipmentActualDriver    = $request->{"withdrawal_equipment_actual_driver_$equipmentId->id"} ?? null;
 
-            $dateDeliveryEquip = $dateDeliveryEquip ? DateTime::createFromFormat('d/m/Y H:i', $dateDeliveryEquip) : null;
-            $dateWithdrawalEquip = $dateWithdrawalEquip ? DateTime::createFromFormat('d/m/Y H:i', $dateWithdrawalEquip) : null;
+            $dateDeliveryEquip = $dateDeliveryEquip ? DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $dateDeliveryEquip) : null;
+            $dateWithdrawalEquip = $dateWithdrawalEquip ? DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $dateWithdrawalEquip) : null;
 
             if ($stockRequest > $stockDb && !$budget) {
                 return $response->error = "O equipamento ( <strong>$reference</strong> ) não tem estoque suficiente. <strong>Disponível: $stockDb un</strong>";

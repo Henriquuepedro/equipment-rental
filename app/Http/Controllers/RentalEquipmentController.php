@@ -106,7 +106,7 @@ class RentalEquipmentController extends Controller
                 ));
             }
 
-            $date_deliver_equipment = DateTime::createFromFormat('d/m/Y H:i', $date_deliver[$count]);
+            $date_deliver_equipment = DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $date_deliver[$count]);
 
             $datas_update[] = array(
                 'actual_delivery_date'      => $date_deliver_equipment,
@@ -193,7 +193,7 @@ class RentalEquipmentController extends Controller
                 ));
             }
 
-            $date_withdraw_equipment = DateTime::createFromFormat('d/m/Y H:i', $date_withdraw[$count]);
+            $date_withdraw_equipment = DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $date_withdraw[$count]);
 
             $datas_update[] = array(
                 'actual_withdrawal_date'    => $date_withdraw_equipment,

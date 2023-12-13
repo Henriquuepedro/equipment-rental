@@ -96,6 +96,10 @@
                     imageOriginal = response.path;
                 }, error: e => {
                     console.log(e);
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Não foi possível enviar a imagem. Tente selecionar uma imagem menor ou de outro formato.'
+                    });
                 }
             });
         });

@@ -167,7 +167,7 @@ class BillsToReceiveController extends Controller
 
         foreach ($data['data'] as $value) {
             $rental_code = formatCodeRental($value->code);
-            $data_prop_button = "data-rental-payment-id='$value->rental_payment_id' data-rental-code='$rental_code' data-name-client='$value->client_name' data-date-rental='" . date('d/m/Y H:i', strtotime($value->created_at)) . "' data-due-date='" . date('d/m/Y', strtotime($value->due_date)) . "' data-payment-id='$value->payment_id' data-payday='" . date('d/m/Y', strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "'";
+            $data_prop_button = "data-rental-payment-id='$value->rental_payment_id' data-rental-code='$rental_code' data-name-client='$value->client_name' data-date-rental='" . date(DATETIME_BRAZIL_NO_SECONDS, strtotime($value->created_at)) . "' data-due-date='" . date(DATE_BRAZIL, strtotime($value->due_date)) . "' data-payment-id='$value->payment_id' data-payday='" . date(DATE_BRAZIL, strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "'";
 
             $txt_btn_paid = $type_rental == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
             $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";

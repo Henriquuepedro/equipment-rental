@@ -61,8 +61,8 @@ trait RentalTrait
         }
 
         // datas da locação
-        $dateDelivery           = $request->input('date_delivery') ? DateTime::createFromFormat('d/m/Y H:i', $request->input('date_delivery')) : null;
-        $dateWithdrawal         = $request->input('date_withdrawal') ? DateTime::createFromFormat('d/m/Y H:i', $request->input('date_withdrawal')) : null;
+        $dateDelivery           = $request->input('date_delivery') ? DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $request->input('date_delivery')) : null;
+        $dateWithdrawal         = $request->input('date_withdrawal') ? DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $request->input('date_withdrawal')) : null;
         $notUseDateWithdrawal   = (bool)$request->input('not_use_date_withdrawal');
 
         if (!$dateDelivery) { // não reconheceu a data de entrega

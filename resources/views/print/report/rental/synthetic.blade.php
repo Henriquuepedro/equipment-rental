@@ -23,7 +23,7 @@
                     {{ $rental->client_name }}
                 </td>
                 <td class='info' style='width: 20%'>
-                    {{ dateInternationalToDateBrazil($rental->created_at, 'd/m/Y H:i') }}
+                    {{ dateInternationalToDateBrazil($rental->created_at, DATETIME_BRAZIL_NO_SECONDS) }}
                 </td>
                 <td class='info' style='width: 20%'>
                     {{ formatMoney($rental->net_value, 2, 'R$ ') }}
