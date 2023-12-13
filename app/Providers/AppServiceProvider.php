@@ -57,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
 
                 $settings['notices'] = '';
 
-                if (strtotime($dataCompany->plan_expiration_date) > strtotime(subDate(dateNowInternational(), null, null, 3))) {
+                if (strtotime($dataCompany->plan_expiration_date) < strtotime(sumDate(dateNowInternational(), null, null, 4))) {
                     $datetime_plan_expiration_date = new DateTime($dataCompany->plan_expiration_date);
                     $datetime_now = new DateTime(dateNowInternational());
                     $interval_plan_expiration = $datetime_plan_expiration_date->diff($datetime_now);
