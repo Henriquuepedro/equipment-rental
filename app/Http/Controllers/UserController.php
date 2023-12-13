@@ -305,9 +305,9 @@ class UserController extends Controller
                 'phone'         => $user['phone'],
                 'active'        => $user['active'],
                 'image'         => asset($user['profile'] ? "assets/images/profile/{$user['id']}/{$user['profile']}" : "assets/images/profile/profile.png"),
-                'last_access'   => $user['last_access_at'] ? date('d/m/Y H:i', strtotime($user['last_access_at'])) : 'Sem registro',
-                'updated_at'    => $user['updated_at'] ? date('d/m/Y H:i', strtotime($user['updated_at'])) : 'Sem registro',
-                'last_login'    => $user['last_login_at'] ? date('d/m/Y H:i', strtotime($user['last_login_at'])) : 'Sem registro',
+                'last_access'   => $user['last_access_at'] ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($user['last_access_at'])) : 'Sem registro',
+                'updated_at'    => $user['updated_at'] ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($user['updated_at'])) : 'Sem registro',
+                'last_login'    => $user['last_login_at'] ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($user['last_login_at'])) : 'Sem registro',
                 'user_id_session'   => $user_id
             ];
         }

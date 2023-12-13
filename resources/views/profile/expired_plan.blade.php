@@ -33,7 +33,7 @@
                                 <div class="box-body">
                                     <p>Olá, {{ auth()->user()->__get('name') }}.</p>
                                     <p>Seu plano expirou em <u>{{ $settings['plan_expiration_date'] }}</u>, renove o plano para não ficar sem acesso a plataforma.</p>
-                                    <p>Caso já tenha efetuado o pagamento, aguarde alguns instantes até que seja compensado.</p>
+                                    <p>Caso já tenha efetuado o pagamento, aguarde alguns instantes até que seja processado.</p>
                                 </div>
                             </div>
                             <div class="mt-3">

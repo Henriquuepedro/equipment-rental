@@ -71,7 +71,7 @@ class ResidueController extends Controller
         foreach ($data['data'] as $value) {
             $result[] = array(
                 $value->name,
-                date('d/m/Y H:i', strtotime($value->created_at)),
+                date(DATETIME_BRAZIL_NO_SECONDS, strtotime($value->created_at)),
                 newDropdownButtonsDataList([
                     [
                         'tag'       => 'button',

@@ -58,4 +58,9 @@ class Plan extends Model
     {
         return $this->where('month_time', $month_time)->orderBy('value')->get();
     }
+
+    public function getPlanAtLowerPrice()
+    {
+        return $this->orderBy('value', 'ASC')->first();
+    }
 }

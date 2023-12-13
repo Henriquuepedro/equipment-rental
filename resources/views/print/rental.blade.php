@@ -138,7 +138,7 @@
             <tr>
                 <td class='info'>
                     <span>Data de Emissão</span>
-                    <p>{{ date('d/m/Y H:i', strtotime($rental->created_at)) }}</p>
+                    <p>{{ date(DATETIME_BRAZIL_NO_SECONDS, strtotime($rental->created_at)) }}</p>
                 </td>
             </tr>
             <tr>
@@ -216,7 +216,7 @@
                     @if(!$budget)
                     <td class='info' style='width: 17%'>
                         <span>Data Entrega{{ $equipment->actual_delivery_date ? '' : '*' }}</span>
-                        <p class='dadosLocacao'>{{ date('d/m/Y H:i', strtotime($equipment->actual_delivery_date ?? $equipment->expected_delivery_date)) }}</p>
+                        <p class='dadosLocacao'>{{ date(DATETIME_BRAZIL_NO_SECONDS, strtotime($equipment->actual_delivery_date ?? $equipment->expected_delivery_date)) }}</p>
                     </td>
                     <td class='info' style='width: 17%'>
                         <span>Data Retirada{{ $equipment->actual_withdrawal_date ? '' : '*' }}</span>
@@ -275,7 +275,7 @@
                         </td>
                         <td class='info' style='width: 25%'>
                             <span>Vencimento</span>
-                            <p class='dadosLocacao'>{{ date('d/m/Y', strtotime($payment->due_date)) }}</p>
+                            <p class='dadosLocacao'>{{ date(DATE_BRAZIL, strtotime($payment->due_date)) }}</p>
                         </td>
                         <td class='info' style='width: 25%'>
                             <span>Valor</span>
@@ -322,14 +322,14 @@
         <table class='table'>
             <tr>
                 <td style='width:50%' class='text-center border-1'>
-                    <div>{{ date('d/m/Y') }}</div>
+                    <div>{{ date(DATE_BRAZIL) }}</div>
                     <br><br><br><br>
                     <div>_______________________________________</div>
                     <br>
                     <div class='nomeAssinatura'>{{ mb_strimwidth($company->name, 0, 50) }}</div>
                 </td>
                 <td style='width:50%' class='text-center border-1'>
-                    <div>{{ date('d/m/Y') }}</div>
+                    <div>{{ date(DATE_BRAZIL) }}</div>
                     <br><br><br><br>
                     <div>_______________________________________</div>
                     <br>

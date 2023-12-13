@@ -256,7 +256,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group flatpickr d-flex">
                                                 <label class="label-date-btns">Data Prevista de Entrega <sup>*</sup></label>
-                                                <input type="tel" name="date_delivery" class="form-control col-md-9" value="{{ date('d/m/Y H:i', strtotime($rental->expected_delivery_date)) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <input type="tel" name="date_delivery" class="form-control col-md-9" value="{{ date(DATETIME_BRAZIL_NO_SECONDS, strtotime($rental->expected_delivery_date)) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
                                                 <div class="input-button-calendar col-md-3 no-padding">
                                                     <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
@@ -270,7 +270,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group flatpickr d-flex">
                                                 <label class="label-date-btns">Data Prevista de Retirada</label>
-                                                <input type="tel" name="date_withdrawal" class="form-control col-md-9" value="{{ !$rental->not_use_date_withdrawal ? date('d/m/Y H:i', strtotime($rental->expected_withdrawal_date)) : '' }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <input type="tel" name="date_withdrawal" class="form-control col-md-9" value="{{ !$rental->not_use_date_withdrawal ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($rental->expected_withdrawal_date)) : '' }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
                                                 <div class="input-button-calendar col-md-3 no-padding">
                                                     <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>

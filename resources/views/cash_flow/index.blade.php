@@ -188,7 +188,7 @@
                     <div class="row">
                         <div class="form-group flatpickr col-md-3 d-flex">
                             <label class="label-date-btns">Data</label>
-                            <input type="tel" name="date_filter" class="form-control col-md-8" value="{{ date('d/m/Y') }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy" im-insert="false" data-input>
+                            <input type="tel" name="date_filter" class="form-control col-md-8" value="{{ date(DATE_BRAZIL) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy" im-insert="false" data-input>
                             <div class="input-button-calendar col-md-4 no-padding">
                                 <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
                                     <i class="fa fa-calendar text-white"></i>

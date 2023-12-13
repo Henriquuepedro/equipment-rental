@@ -37,6 +37,20 @@
                 font-size: 10px;
             }
         }
+
+        .tooltip >.tooltip-inner {
+            background-color: #2196f3;
+            color: #fff;
+            border: 2px solid #0c83e2;
+        }
+
+        .tooltip.show {
+            top: -10px !important;
+        }
+
+        .bs-tooltip-top .arrow::before {
+            border-top-color: #0c83e2
+        }
     </style>
 @stop
 
@@ -45,6 +59,7 @@
     <script>
         $(function(){
             listPlans($('[data-toggle="tab"].active').data('month-time'));
+            $('[data-toggle-second="tooltip"]').tooltip('show');
         });
 
 
@@ -79,6 +94,7 @@
 
                                 ${price_from}
                                 <h1 class="fw-normal mb-0">R$ ${numberToReal(value.value)}<small>/${tag_plan}</small></h1>
+                                <small>Parcele em até 12x</small>
                             </div>
                             <div class="plan-features">
                                 ${description}
@@ -126,12 +142,12 @@
 {{--                                    </a>--}}
 {{--                                </li>--}}
                                 <li class="col-md-2 nav-item">
-                                    <a class="d-flex justify-content-center nav-link" id="semiannual" data-toggle="tab" href="#semiannual-plan" data-month-time="6" role="tab" aria-controls="semiannual-plan" aria-selected="false">
+                                    <a class="d-flex justify-content-center nav-link" id="semiannual" data-toggle="tab" href="#semiannual-plan" data-month-time="6" role="tab" aria-controls="semiannual-plan" aria-selected="false" data-toggle-second="tooltip" data-placement="top" title="10% OFF" data-trigger="manual">
                                         Semestral
                                     </a>
                                 </li>
                                 <li class="col-md-2 nav-item">
-                                    <a class="d-flex justify-content-center nav-link" id="annual" data-toggle="tab" href="#annual-plan" data-month-time="12" role="tab" aria-controls="annual-plan" aria-selected="false">
+                                    <a class="d-flex justify-content-center nav-link" id="annual" data-toggle="tab" href="#annual-plan" data-month-time="12" role="tab" aria-controls="annual-plan" aria-selected="false" data-toggle-second="tooltip" data-placement="top" title="20% OFF" data-trigger="manual">
                                         Anual
                                     </a>
                                 </li>

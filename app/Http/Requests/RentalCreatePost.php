@@ -64,8 +64,8 @@ class RentalCreatePost extends FormRequest
                                 break;
                             }
                             if (!$not_use_date_withdrawal) {
-                                $date_delivery = DateTime::createFromFormat('d/m/Y H:i', $date_delivery)->getTimestamp();
-                                $date_withdrawal = DateTime::createFromFormat('d/m/Y H:i', $date_withdrawal)->getTimestamp();
+                                $date_delivery = DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $date_delivery)->getTimestamp();
+                                $date_withdrawal = DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $date_withdrawal)->getTimestamp();
 
                                 if ($date_delivery >= $date_withdrawal) {
                                     $fail("A data de retirada deve ser maior que a de entrega no equipamento ( $reference ).");

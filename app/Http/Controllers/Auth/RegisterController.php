@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Plan;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -34,6 +35,8 @@ class RegisterController extends Controller
      */
     protected string $redirectTo = RouteServiceProvider::HOME;
 
+    private Plan $plan;
+
     /**
      * Create a new controller instance.
      *
@@ -42,6 +45,7 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+        $this->plan = new Plan();
     }
 
     /**
@@ -83,32 +87,34 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\Models\User
+     * @return User
      */
     protected function create(array $data)
     {
+        $plan = $this->plan->getPlanAtLowerPrice();
+
         $company = Company::create([
-            'name'          => $data['name'],
-            'fantasy'       => $data['fantasy'],
-            'type_person'   => $data['type_person'],
-            'cpf_cnpj'      => onlyNumbers($data['cpf_cnpj']),
-            'email'         => $data['email'],
-            'phone_1'       => onlyNumbers($data['phone_1']),
-            'phone_2'       => onlyNumbers($data['phone_2']),
-            'contact'       => $data['contact'],
-            'plan_id'       => 4,
+            'name'                  => $data['name'],
+            'fantasy'               => $data['fantasy'],
+            'type_person'           => $data['type_person'],
+            'cpf_cnpj'              => onlyNumbers($data['cpf_cnpj']),
+            'email'                 => $data['email'],
+            'phone_1'               => onlyNumbers($data['phone_1']),
+            'phone_2'               => onlyNumbers($data['phone_2']),
+            'contact'               => $data['contact'],
+            'plan_id'               => $plan->id,
             'plan_expiration_date'  => sumDate(dateNowInternational(), null, null, 15)
         ]);
 
         return User::create([
-            'name'                  => $data['contact'],
-            'email'                 => $data['email'],
-            'phone'                 => onlyNumbers($data['phone_1']),
-            'password'              => Hash::make($data['password']),
-            'company_id'            => $company->id,
-            'active'                => 1,
-            'permission'            => '[]',
-            'type_user'             => User::$TYPE_USER['admin']
+            'name'          => $data['contact'],
+            'email'         => $data['email'],
+            'phone'         => onlyNumbers($data['phone_1']),
+            'password'      => Hash::make($data['password']),
+            'company_id'    => $company->id,
+            'active'        => 1,
+            'permission'    => '[]',
+            'type_user'     => User::$TYPE_USER['admin']
         ]);
     }
 }
