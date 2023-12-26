@@ -15,6 +15,14 @@
             background: rgba(0,0,0,.1);
         }
 
+        .pricing-card-head h1.fw-normal {
+            font-size: 1.75rem
+        }
+
+        .pricing-table .pricing-card .pricing-card-body {
+            padding: 35px 15px 353px
+        }
+
         @media (max-width: 1200px) and (min-width: 992px) {
             .pricing-table .pricing-card .pricing-card-body {
                 padding: 25px 12px 21px !important;
@@ -76,24 +84,25 @@
 
                 const col_lg = response.length === 1 ? 12 : (response.length === 2 ? 6 : (response.length === 3 ? 4 : 3));
 
-                let price_from, description, alert_user;
+                let price_from, description, alert_user, message_equipment_mmanager;
 
                 $(response).each(function(key, value){
                     price_from = value.from_value === null || parseFloat(value.from_value) === 0 ? '' : `<h4 class="fw-normal mb-0 text-primary" style="text-decoration:line-through;">R$ ${numberToReal(value.from_value)}</h4>`;
                     description = value.description === '<p><br></p>' ? '' : value.description;
-                    alert_user = value.allowed_users ? `Cadastre até <b>${value.allowed_users}</b> usuários` : 'Cadastre usuários ilimitados';
+                    alert_user = value.allowed_users ? `Até <b>${value.allowed_users}</b> usuários` : 'Usuários ilimitados';
+                    message_equipment_mmanager = value.quantity_equipment ? `Até <b>${value.quantity_equipment}</b> equipamentos` : 'Equipamentos ilimitados'
                     $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append(
                         `<div class="col-lg-${col_lg} col-sm-12  grid-margin stretch-card pricing-card">
                         <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body">
                             <div class="text-center pricing-card-head">
                                 <h3>${value.name}</h3>
 
-                                <p class="mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Gerencie até <b>${value.quantity_equipment}</b> equipamentos</p>
+                                <p class="mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${message_equipment_mmanager}</p>
                                 <p class="mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${alert_user}</p>
                                 <p class="text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte via chamado</p>
 
                                 ${price_from}
-                                <h1 class="fw-normal mb-0">R$ ${numberToReal(value.value)}<small>/${tag_plan}</small></h1>
+                                <h1 class="fw-normal mb-0">R$ ${numberToReal(value.value)}</h1>
                                 <small>Parcele em até 12x</small>
                             </div>
                             <div class="plan-features">

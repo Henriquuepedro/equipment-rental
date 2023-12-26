@@ -418,7 +418,7 @@ const availableStock = (el, id = null) => {
         type: 'GET',
         url,
         success: response => {
-            el.text(response.total_equipment);
+            el.text(response.total_equipment ?? 'Ilimitado');
         }, error: e => {
             console.log(e);
             el.text(0);

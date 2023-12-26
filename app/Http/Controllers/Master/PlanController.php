@@ -82,7 +82,7 @@ class PlanController extends Controller
             $result[] = array(
                 $value->name . $highlight,
                 $from_value . formatMoney($value->value, 2, 'R$ '),
-                $value->quantity_equipment . ' equipamentos',
+                $value->quantity_equipment ?  $value->quantity_equipment . ' equipamentos' : 'Ilimitado',
                 ((int)$value->allowed_users ?: 'Ilimitado') . $allowed_users,
                 $value->month_time . $month_time,
                 $buttons
@@ -134,7 +134,7 @@ class PlanController extends Controller
             'description'           => filter_var($request->input('description')),
             'value'                 => transformMoneyBr_En(filter_var($request->input('value'))),
             'from_value'            => transformMoneyBr_En(filter_var($request->input('from_value'))) ?: null,
-            'quantity_equipment'    => filter_var($request->input('quantity_equipment')),
+            'quantity_equipment'    => filter_var($request->input('quantity_equipment')) ?: null,
             'highlight'             => (bool)$request->input('highlight'),
             'month_time'            => filter_var($request->input('month_time'), FILTER_VALIDATE_INT),
             'allowed_users'         => filter_var($request->input('allowed_users'), FILTER_VALIDATE_INT, FILTER_FLAG_EMPTY_STRING_NULL) ?: null

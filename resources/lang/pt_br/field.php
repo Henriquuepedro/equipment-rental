@@ -14,7 +14,7 @@ return [
     */
     'id' => 'Código',
     'company_id' => 'Empresa',
-    'name' => 'Nome',
+    'name' => 'Nome/Razão Social',
     'fantasy' => 'Fantasia',
     'email' => 'E-mail',
     'phone_1' => 'Telefone Primário',
@@ -53,5 +53,6 @@ return [
     'model' => 'Modelo',
     'board' => 'Placa',
     'driver_id' => 'Código do motorista',
+    'active' => 'Ativo',
 
 ];

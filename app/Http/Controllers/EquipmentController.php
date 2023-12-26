@@ -60,7 +60,7 @@ class EquipmentController extends Controller
 
         // valida se tem estoque disponível na conta.
         $available_stock = $this->equipment->getAllStockEquipment($dataEquipment->company_id);
-        if ($dataEquipment->stock > $available_stock) {
+        if (!is_null($available_stock) && $dataEquipment->stock > $available_stock) {
             if ($isAjax) {
                 return response()->json(['success' => false, 'message' => "Você tem disponível somente $available_stock unidades para cadastro."]);
             }
@@ -200,7 +200,7 @@ class EquipmentController extends Controller
 
         // valida se tem estoque disponível na conta.
         $available_stock = $this->equipment->getAllStockEquipment($dataEquipment->company_id, $dataEquipment->equipment_id);
-        if ($dataEquipment->stock > $available_stock) {
+        if (!is_null($available_stock) && $dataEquipment->stock > $available_stock) {
             return redirect()->back()
                 ->withErrors(["Você tem disponível somente $available_stock unidades para cadastro."])
                 ->withInput();
