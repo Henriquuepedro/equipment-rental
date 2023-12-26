@@ -55,7 +55,7 @@ class RegistersExport implements FromCollection
                     $register[$field_key] = dateInternationalToDateBrazil($field_value) ?? $field_value;
                 }
                 if (likeText('%cpf%', $field_key) || likeText('%cnpj%', $field_key)) {
-                    $register[$field_key] = formatCPF_CNPJ($field_value) ?? $field_value;
+                    $register[$field_key] = formatCPF_CNPJ($field_value, '') ?? $field_value;
                 }
                 if (likeText('%phone%', $field_key)) {
                     $register[$field_key] = formatPhone($field_value, '') ?? $field_value;
