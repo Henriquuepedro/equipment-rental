@@ -63,9 +63,6 @@
             },
             value: {
                 required: true
-            },
-            quantity_equipment: {
-                required: true
             }
         },
         messages: {},
@@ -142,8 +139,9 @@
                                             <input type="text" class="form-control" name="value" value="{{ old('value', formatMoney($plan->value ?? 0)) }}" required>
                                         </div>
                                         <div class="form-group col-md-3">
-                                            <label>Quantidade de Equipamentos (*)</label>
-                                            <input type="text" class="form-control" name="quantity_equipment" value="{{ old('quantity_equipment', $plan->quantity_equipment ?? '') }}" required>
+                                            <label>Quantidade de Equipamentos</label>
+                                            <input type="text" class="form-control" name="quantity_equipment" value="{{ old('quantity_equipment', $plan->quantity_equipment ?? '') }}">
+                                            <small>Deixe em branco ou informe zero para considerar equipamentos ilimitados.</small>
                                         </div>
                                         <div class="form-group col-md-3">
                                             <label>Usuários Permitidos</label>

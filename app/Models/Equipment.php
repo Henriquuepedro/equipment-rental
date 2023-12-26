@@ -143,11 +143,14 @@ class Equipment extends Model
                     ->get();
     }
 
-    public function getAllStockEquipment(int $company_id, int $ignore_id = null): int
+    public function getAllStockEquipment(int $company_id, int $ignore_id = null): ?int
     {
         $quantity_equipment = 0;
         $company = (new Company())->getPlanCompany($company_id);
         if ($company) {
+            if (is_null($company->quantity_equipment)) {
+                return null;
+            }
             $quantity_equipment = $company->quantity_equipment;
         }
 
