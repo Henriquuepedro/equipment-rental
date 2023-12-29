@@ -107,9 +107,13 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-12">
+                                    <div class="form-group col-md-6">
                                         <label for="cpf_cnpj">CPF <sup>*</sup></label>
                                         <input type="tel" class="form-control" id="cpf_cnpj" name="cpf_cnpj" autocomplete="nope" value="{{ old('cpf_cnpj') }}" required>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="contact">Nome de Contato <sup>*</sup></label>
+                                        <input type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact') }}" required>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -123,13 +127,9 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-6">
+                                    <div class="form-group col-md-12">
                                         <label for="email">Endereço de E-mail <sup>*</sup></label>
                                         <input type="email" class="form-control" id="email" name="email" autocomplete="nope" value="{{ old('email') }}" required>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label for="contact">Nome de Contato <sup>*</sup></label>
-                                        <input type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact') }}" required>
                                     </div>
                                 </div>
                                 <div class="row">
