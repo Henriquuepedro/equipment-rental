@@ -17,6 +17,11 @@ class User extends Authenticatable
         'master' => 2,
     );
 
+    static public array $STYLE_TEMPLATE = array(
+        'white' => 1,
+        'black' => 3,
+    );
+
     /**
      * The attributes that are mass assignable.
      *

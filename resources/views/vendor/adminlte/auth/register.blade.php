@@ -149,7 +149,7 @@
 
                                 <div class="text-block text-center my-3">
                                     <span class="text-small font-weight-semibold">Já é membro?</span>
-                                    <a href="{{ route('login') }}" class="text-black text-small">Entre.</a>
+                                    <a href="{{ route('login') }}" class="text-small">Entre.</a>
                                 </div>
                             </form>
                         </div>
