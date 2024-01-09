@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 Route::get('/mail-test', [App\Http\Controllers\Auth\RegisterController::class, 'mail_test']);
 
@@ -26,7 +26,7 @@ Route::get('/mail-test', [App\Http\Controllers\Auth\RegisterController::class, '
 //})->name('home')->middleware('auth');
 
 /** ROTAS AUTENTICADO */
-Route::group(['middleware' => ['auth', CheckPlan::class, ControlUsers::class]], function (){
+Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUsers::class]], function (){
 
     Route::get('', [App\Http\Controllers\DashboardController::class, 'dashboard']);
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'dashboard'])->name('dashboard');

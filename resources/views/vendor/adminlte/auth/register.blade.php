@@ -68,7 +68,6 @@
                     <div class="col-lg-4 mx-auto">
                         <div class="auto-form-wrapper">
 
-
                             @if ($errors->any())
                                 <div class="alert alert-animate alert-warning">
                                     <ol>
