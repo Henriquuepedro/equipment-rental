@@ -312,7 +312,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/nova-compra', [App\Http\Controllers\BillsToPayController::class, 'insert'])->name('new-bill-to-pay');
             Route::post('/atualizar-compra/{id}', [App\Http\Controllers\BillsToPayController::class, 'update'])->name('update-bill-to-pay');
             Route::post('/buscar', [App\Http\Controllers\BillsToPayController::class, 'fetchBills'])->name('fetch');
-            Route::post('/delete', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
+//            Route::post('/delete', [App\Http\Controllers\BillsToPayController::class, 'delete'])->name('delete');
             Route::post('/quantidade-tipos', [App\Http\Controllers\BillsToPayController::class, 'getQtyTypeBills'])->name('get-qty-type-bills');
             Route::post('/confirmar-pagamento', [App\Http\Controllers\BillsToPayController::class, 'confirmPayment'])->name('confirm_payment');
             Route::post('/reabrir-pagamento', [App\Http\Controllers\BillsToPayController::class, 'reopenPayment'])->name('reopen_payment');
