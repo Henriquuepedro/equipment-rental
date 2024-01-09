@@ -235,8 +235,8 @@ return [
 
     // Custom
     'mail' => [
-        'top_logo'          => asset('assets/images/system/logo.png'),
-        'welcome_url'       => 'https://www.simple-pleb.com/login',
+        'top_logo'          => env('APP_URL', null) . '/assets/images/system/logo.png',
+        'welcome_url'       => env('APP_URL', null),
         'street_address'    => 'Endereço da empresa - Florianópolis/SC',
         'phone_number'      => '(11) 987654321',
         'info_email'        => 'info@website.com',
