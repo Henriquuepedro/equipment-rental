@@ -42,7 +42,7 @@
                                 </button>
                             </form>
                             <div class="text-block text-center my-3">
-                                <a href="{{ route('login') }}" class="text-black text-small">Voltar para o login</a>
+                                <a href="{{ route('login') }}" class="text-small">Voltar para o login</a>
                             </div>
                         </div>
                     </div>

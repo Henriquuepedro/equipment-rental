@@ -114,7 +114,8 @@ class RegisterController extends Controller
             'company_id'    => $company->id,
             'active'        => 1,
             'permission'    => '[]',
-            'type_user'     => User::$TYPE_USER['admin']
+            'style_template'=> User::$TYPE_USER['black'],
+            'type_user'     => User::$TYPE_USER['admin'],
         ]);
     }
 }

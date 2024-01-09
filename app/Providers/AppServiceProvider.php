@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Permission;
+use App\Models\User;
+use App\Observers\CompanyObserver;
+use App\Observers\ObserverUser;
 use DateTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -31,17 +34,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Company::observe(CompanyObserver::class);
+        Schema::defaultStringLength(191);
+
         if (env('APP_ENV') !== 'local') {
             URL::forceScheme('https');
         }
 
-        Schema::defaultStringLength(191);
 
         // Variaveis para serem usadas em todas as views
-        // Definir um array chamado settings contendo suas
+        // Definir um array chamado settings contendo a suas
         // respectivas possições para variaveis
         view()->composer('*',function( View $view ) {
-            $settings = array('style_template' => 1);
+            $settings = array('style_template' => User::$TYPE_USER['black']);
 
             if (auth()->user()) {
                 $company = new Company();
@@ -81,9 +86,9 @@ class AppServiceProvider extends ServiceProvider
                 ];
 
                 // permissões
-                if (auth()->user()->__get('type_user') == 1 || auth()->user()->__get('type_user') == 2) { // administrador permissão total
+                if (auth()->user()->__get('type_user') == User::$TYPE_USER['admin'] || auth()->user()->__get('type_user') == User::$TYPE_USER['master']) { // administrador permissão total
                     $permissions = Permission::query()->select('name')->get()->toArray();
-                } else { // permissão por usuário
+                } else { // permissão por usuário.
                     $permissions = empty(auth()->user()->__get('permission')) ? [] : json_decode(auth()->user()->__get('permission'), true);
                     $permissions = Permission::query()->select('name')->whereIn('id', $permissions)->get()->toArray();
                 }

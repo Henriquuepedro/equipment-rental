@@ -68,11 +68,11 @@
                                             <input type="checkbox" name="remember"> {{ __('adminlte::adminlte.remember_me') }}
                                         </label>
                                     </div>
-                                    <a href="{{ $password_reset_url }}" class="text-small forgot-password text-black">Esqueci minha senha</a>
+                                    <a href="{{ $password_reset_url }}" class="text-small forgot-password">Esqueci minha senha</a>
                                 </div>
                                 <div class="text-block text-center my-3">
                                     <span class="text-small font-weight-semibold">Não é membro?</span>
-                                    <a href="{{ route('register') }}" class="text-black text-small">Cadastre-se agora.</a>
+                                    <a href="{{ route('register') }}" class="text-small">Cadastre-se agora.</a>
                                 </div>
                             </form>
                         </div>

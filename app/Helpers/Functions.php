@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\UploadedFile;
 
@@ -79,20 +80,14 @@ if (! function_exists('hasPermission')) {
 if (! function_exists('hasAdmin')) {
     function hasAdmin(): bool
     {
-        // 0 = user
-        // 1 = admin
-        // 2 = master
-        return auth()->user()->__get('type_user') === 1 || hasAdminMaster();
+        return auth()->user()->__get('type_user') === User::$TYPE_USER['admin'] || hasAdminMaster();
     }
 }
 
 if (! function_exists('hasAdminMaster')) {
     function hasAdminMaster(): bool
     {
-        // 0 = user
-        // 1 = admin
-        // 2 = master
-        return auth()->user()->__get('type_user') === 2;
+        return auth()->user()->__get('type_user') === User::$TYPE_USER['master'];
     }
 }
 
