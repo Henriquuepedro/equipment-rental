@@ -40,11 +40,22 @@ class RegisterCompanyNotification extends Notification
      */
     public function toMail(mixed $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Seja bem-vindo ao ' . config('app.name'))
-            ->line('Seja bem vindo(a)!')
-            ->action('Clique aqui para acessar', url('/'))
-            ->line('Qualquer dúvida nossa equipe está sempre a disposição!');
+        return (new MailMessage)->view('mail.welcome', [
+            'mail_title'        => 'Bem-vindo',
+            'header_title'      => 'Bem-vindo',
+            'description_title' => '',
+            'body_title'        => 'Título do corpo do e-mail',
+            'body_contents'     => [
+                [
+                    'title'         => 'Fique por dentro de tudo',
+                    'description'   => 'A cada nova atualização, será enviado uma nova mensagem via e-mail. Não perca nada.',
+                    'icon'          => [
+                        'name'  => 'fa fa-home',
+                        'style' => 'color: #000; font-size: 50px'
+                    ]
+                ]
+            ],
+        ]);
     }
 
     /**
