@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
         // Definir um array chamado settings contendo a suas
         // respectivas possições para variaveis
         view()->composer('*',function( View $view ) {
-            $settings = array('style_template' => User::$TYPE_USER['black']);
+            $settings = array('style_template' => User::$STYLE_TEMPLATE['black']);
 
             if (auth()->user()) {
                 $company = new Company();
