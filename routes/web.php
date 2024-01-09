@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Auth;
 
 Auth::routes();
 
+Route::get('/mail-test', [App\Http\Controllers\Auth\RegisterController::class, 'mail_test']);
+
 //Route::get('/home', function() {
 //    return view('dashboard.home');
 //})->name('home')->middleware('auth');

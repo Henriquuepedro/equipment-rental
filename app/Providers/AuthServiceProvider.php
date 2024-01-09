@@ -51,7 +51,8 @@ class AuthServiceProvider extends ServiceProvider
                 ->line('Você está recebendo este e-mail porque recebemos uma solicitação de redefinição de senha para sua conta.')
                 ->action('Redefinir senha', $url)
                 ->line('Este link de redefinição de senha irá expirar em '.config('auth.passwords.'.config('auth.defaults.passwords').'.expire').' minutos.')
-                ->line('Se você não solicitou uma redefinição de senha, nenhuma ação adicional será necessária.');
+                ->line('Se você não solicitou uma redefinição de senha, nenhuma ação adicional será necessária.')
+                ->view('mail.welcome', ['mail_title' => 'Bem vindo']);
         });
     }
 }

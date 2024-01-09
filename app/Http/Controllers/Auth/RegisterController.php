@@ -118,4 +118,24 @@ class RegisterController extends Controller
             'type_user'     => User::$TYPE_USER['admin'],
         ]);
     }
+
+    public function mail_test()
+    {
+        return view('mail.welcome', [
+            'mail_title'        => 'Bem-vindo',
+            'header_title'      => 'Bem-vindo',
+            'description_title' => '',
+            'body_title'        => 'Título do corpo do e-mail',
+            'body_contents'     => [
+                [
+                    'title'         => 'Fique por dentro de tudo',
+                    'description'   => 'A cada nova atualização, será enviado uma nova mensagem via e-mail. Não perca nada.',
+                    'icon'          => [
+                        'name'  => 'fa fa-home',
+                        'style' => 'color: #000; font-size: 50px'
+                    ]
+                ]
+            ],
+        ]);
+    }
 }
