@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Auth;
 
 Auth::routes(['verify' => true]);
 
-Route::get('/mail-test', [App\Http\Controllers\Auth\RegisterController::class, 'mail_test']);
+//Route::get('/mail-test', [App\Http\Controllers\Auth\RegisterController::class, 'mail_test']);
 
 //Route::get('/home', function() {
 //    return view('dashboard.home');
