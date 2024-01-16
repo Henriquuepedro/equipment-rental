@@ -39,14 +39,16 @@ class AuthServiceProvider extends ServiceProvider
 
         VerifyEmail::toMailUsing(function ($notifiable, $url) {
             return (new MailMessage)
-                ->subject('Verifique endereço de e-mail')
-                ->line('Por favor clique no botão abaixo para verificar seu endereço de e-mail.')
+                ->greeting('Olá,')
+                ->subject('Verifique seu endereço de e-mail')
+                ->line('Por favor, clique no botão abaixo para verificar seu endereço de e-mail.')
                 ->action('Verificar endereço de e-mail', $url)
                 ->line('Se você não criou uma conta, nenhuma ação adicional será necessária.');
         });
 
         ResetPassword::toMailUsing(function ($notifiable, $url) {
             return (new MailMessage)
+                ->greeting('Olá,')
                 ->subject('Notificação de redefinição de senha')
                 ->line('Você está recebendo este e-mail porque recebemos uma solicitação de redefinição de senha para sua conta.')
                 ->action('Redefinir senha', $url)
