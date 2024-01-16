@@ -34,6 +34,10 @@
 @stop
 
 @section('content')
+    @lang(
+        "If you're having trouble clicking the  button, copy and paste the URL below\n".
+        'into your web browser:'
+    )
     <div class="nav-scroller mb-3">
         <ul class="nav nav-tabs tickets-tab-switch d-flex justify-content-center" role="tablist" id="tabDashboard">
             <li class="nav-item col-md-3">
