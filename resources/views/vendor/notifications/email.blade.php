@@ -47,7 +47,7 @@ Equipe {{ config('app.name') }}
 @isset($actionText)
 <x-slot:subcopy>
 @lang(
-    "Se você estiver tendo problemas para clicar no botão \":actionText\" button, copie a URL abaixo\n".
+    "Se você estiver tendo problemas para clicar no botão \":actionText\", copie a URL abaixo\n".
     'e cole em seu navegador:',
     [
         'actionText' => $actionText,
