@@ -57,6 +57,31 @@
                 $('[name="state"], [name="city"]').select2()
             }, 500)
         });
+
+        $('#password').on('keyup', function(){
+            let border_color_pwd = 'unset';
+            let border_color_cfm_pwd = 'unset';
+            const confirm_password_input = $('#password_confirmation');
+            if ($(this).val().length < 8) {
+                border_color_pwd = '#ff6258';
+            }
+
+            if (confirm_password_input.val().length && $(this).val() !== confirm_password_input.val()) {
+                border_color_cfm_pwd = '#ff6258';
+            }
+
+            $(this).css({borderColor: border_color_pwd});
+            confirm_password_input.css({borderColor: border_color_cfm_pwd});
+        });
+
+        $('#password_confirmation').on('keyup', function(){
+            let border_color = 'unset';
+            if ($(this).val() !== $('#password').val()) {
+                border_color = '#ff6258';
+            }
+
+            $(this).css({borderColor: border_color})
+        });
     </script>
 @stop
 
@@ -135,6 +160,7 @@
                                     <div class="form-group col-md-6">
                                         <label for="password">Senha <sup>*</sup></label>
                                         <input type="password" class="form-control" id="password" name="password" autocomplete="nope" value="{{ old('password') }}" required>
+                                        <small>A senha deve conter no mínimo 8 dígitos.</small>
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="password_confirmation">Confirme a Senha <sup>*</sup></label>
