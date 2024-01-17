@@ -38,7 +38,7 @@ class CompanyController extends Controller
         $company_id = Auth::user()->__get('company_id');
 
         $company = $this->company->getCompany($company_id);
-        $company->logo = asset($company->logo ? "assets/images/company/{$company_id}/{$company->logo}" : "assets/images/company/company.png");
+        $company->logo = asset($company->logo ? "assets/images/company/{$company_id}/{$company->logo}" : "assets/images/system/company.png");
 
         $htmlPermissions     = getFormPermission($this->permission->getAllPermissions());
 

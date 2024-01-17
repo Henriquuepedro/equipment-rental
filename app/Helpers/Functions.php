@@ -364,7 +364,7 @@ if (!function_exists('getImageCompanyBase64')) {
         if ($company->logo) {
             $image = "assets/images/company/$company->id/$company->logo";
         } else {
-            $image = "assets/images/company/company.png";
+            $image = "assets/images/system/company.png";
         }
 
         $extension = File::extension($image);

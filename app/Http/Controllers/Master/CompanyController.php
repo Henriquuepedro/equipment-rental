@@ -34,7 +34,7 @@ class CompanyController extends Controller
         if (!$company) {
             return redirect()->route('master.company.index');
         }
-        $company->logo = asset($company->logo ? "assets/images/company/$id/$company->logo" : "assets/images/company/company.png");
+        $company->logo = asset($company->logo ? "assets/images/company/$id/$company->logo" : "assets/images/system/company.png");
 
         return view('master.company.update', compact('company'));
     }
