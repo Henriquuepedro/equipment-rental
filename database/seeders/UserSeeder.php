@@ -23,17 +23,18 @@ class UserSeeder extends Seeder
             }, Permission::all()->toArray());
 
             User::create([
-                'id'            => 1,
-                'name'          => 'Administrador',
-                'username'      => 'admin',
-                'email'         => 'admin@admin.com',
-                'phone'         => Str::random(10),
-                'password'      => Hash::make('123'),
-                'company_id'    => 1,
-                'active'        => 1,
-                'permission'    => json_encode($permissions),
-                'type_user'     => User::$TYPE_USER['master'],
-                'logout'        => 0
+                'id'                => 1,
+                'name'              => 'Administrador',
+                'username'          => 'admin',
+                'email'             => 'admin@admin.com',
+                'email_verified_at' => dateNowInternational(),
+                'phone'             => Str::random(10),
+                'password'          => Hash::make('123'),
+                'company_id'        => 1,
+                'active'            => 1,
+                'permission'        => json_encode($permissions),
+                'type_user'         => User::$TYPE_USER['master'],
+                'logout'            => 0
             ]);
         }
     }
