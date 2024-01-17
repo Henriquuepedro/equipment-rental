@@ -41,7 +41,7 @@ class Notification extends Controller
             }
 
             if (
-                !in_array($request->input('action'), array("payment.created", "payment.updated")) ||
+                !in_array($request->input('action'), array("payment.created", "payment.updated", "payment.create", "payment.update")) ||
                 $request->input('type') != "payment"
             ) {
                 $mercado_pago_service->debugEcho("type or action don't accept. [action={$request->input('action')} | type={$request->input('type')}].");
