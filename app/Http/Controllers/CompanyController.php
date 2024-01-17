@@ -133,6 +133,8 @@ class CompanyController extends Controller
     private function uploadLogoCompany($company_id, $file): bool|string
     {
         $uploadPath = "assets/images/company/$company_id";
+        checkPathExistToCreate($uploadPath);
+
         $extension = $file->getClientOriginalExtension(); // Recupera extensão da imagem
         $nameOriginal = $file->getClientOriginalName(); // Recupera nome da imagem
         $imageName = base64_encode($nameOriginal); // Gera um novo nome para a imagem.

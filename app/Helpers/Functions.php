@@ -447,6 +447,8 @@ if (!function_exists('uploadFile')) {
             $name_file = substr($imageName, 0, 15) . rand(0, 100) . ".$extension"; // Pega apenas o 15 primeiros e adiciona a extensão.
         }
 
+        checkPathExistToCreate($upload_path);
+
         $uploaded = $file->move($upload_path, $name_file);
 
         if (!$uploaded) {
@@ -690,3 +692,23 @@ if (! function_exists('getNamePaymentType')) {
         return $payment_type;
     }
 }
+
+if (! function_exists('checkPathExistToCreate')) {
+    /**
+     * Se o caminho não existir, será criado.
+     *
+     * @param string $path
+     */
+    function checkPathExistToCreate(string $path): void
+    {
+        $path_validate = public_path();
+        foreach (explode('/', $path) as $p_) {
+            $path_validate .= "/$p_";
+            if (!is_dir($path_validate)) {
+                File::makeDirectory($path_validate);
+            }
+        }
+    }
+}
+
+
