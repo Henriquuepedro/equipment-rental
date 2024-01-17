@@ -29,8 +29,13 @@ class Notification extends Controller
             $mercado_pago_service = new MercadoPagoService($debug);
 
             if (
-                in_array($request->input('action'), array("test.created", "test.updated")) &&
-                $request->input('type') == "test"
+                (
+                    in_array($request->input('action'), array("test.created", "test.updated")) &&
+                    $request->input('type') == "test"
+                ) || (
+                    $request->input('type') == "subscription_preapproval" &&
+                    $request->input('entity') == "preapproval"
+                )
             ) {
                 return response()->json();
             }
