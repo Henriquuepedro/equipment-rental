@@ -24,8 +24,7 @@ class CompanySeeder extends Seeder
                 'cpf_cnpj'      => '00000000000099',
                 'email'         => Str::random(10) . '@gmail.com',
                 'phone_1'       => '11987654321',
-                'contact'       => 'Teste',
-                'plan_id'       => 4
+                'contact'       => 'Teste'
             ]);
         }
     }
