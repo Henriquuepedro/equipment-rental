@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Company::observe(CompanyObserver::class);
-        Company::observe(UserObserver::class);
+        User::observe(UserObserver::class);
         Schema::defaultStringLength(191);
 
         if (env('APP_ENV') !== 'local') {
