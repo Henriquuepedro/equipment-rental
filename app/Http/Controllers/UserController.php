@@ -171,6 +171,8 @@ class UserController extends Controller
         $company_id = $request->user()->company_id;
 
         $uploadPath = "assets/images/profile/$user_id"; // Faz o upload para o caminho 'admin/dist/images/autos/{ID}/'
+        checkPathExistToCreate($uploadPath);
+
         $extension = $file->getClientOriginalExtension(); // Recupera extensão da imagem
         $nameOriginal = $file->getClientOriginalName(); // Recupera nome da imagem
         $imageName = base64_encode($nameOriginal); // Gera um novo nome para a imagem.
