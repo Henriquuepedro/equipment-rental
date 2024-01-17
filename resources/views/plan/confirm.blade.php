@@ -62,7 +62,7 @@
 @stop
 
 @section('js')
-    <script src="http://sdk.mercadopago.com/js/v2"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
     <script src="https://www.mercadopago.com/v2/security.js" view="checkout"></script>
     <script>
 

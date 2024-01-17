@@ -28,6 +28,31 @@ class Notification extends Controller
             $debug = (bool)$request->input('debug');
             $mercado_pago_service = new MercadoPagoService($debug);
 
+            // Valida assinatura enviada no cabeçalho.
+            $signature_mp = env('MP_SIGNATURE');
+            if (!empty($signature_mp)) {
+                $request_signature = explode(',', $request->header('x-signature'));
+                if (count($request_signature) !== 2) {
+                    $mercado_pago_service->debugEcho("signature invalid. step 1. [x-signature={$request->header('x-signature')}].");
+                    return response()->json(array(), 401);
+                }
+
+                $request_signature_ts = explode('=', $request_signature[0]);
+                $request_signature_v1 = explode('=', $request_signature[1]);
+
+                if (count($request_signature_v1) !== 2) {
+                    $mercado_pago_service->debugEcho("signature invalid. step 2. [x-signature={$request->header('x-signature')}].");
+                    return response()->json(array(), 401);
+                }
+
+                $request_signature_check = $request_signature_v1[1];
+
+                if ($request_signature_check != $signature_mp) {
+                    $mercado_pago_service->debugEcho("signature invalid. step 3. [x-signature={$request->header('x-signature')}].");
+                    return response()->json(array(), 401);
+                }
+            }
+
             if (
                 (
                     in_array($request->input('action'), array("test.created", "test.updated")) &&
