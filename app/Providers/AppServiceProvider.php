@@ -5,10 +5,8 @@ namespace App\Providers;
 use App\Models\Permission;
 use App\Models\User;
 use App\Observers\CompanyObserver;
-use App\Observers\ObserverUser;
+use App\Observers\UserObserver;
 use DateTime;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Contracts\View\View;
@@ -35,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Company::observe(CompanyObserver::class);
+        Company::observe(UserObserver::class);
         Schema::defaultStringLength(191);
 
         if (env('APP_ENV') !== 'local') {
