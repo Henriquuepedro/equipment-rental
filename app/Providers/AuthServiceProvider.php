@@ -47,11 +47,16 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         ResetPassword::toMailUsing(function ($notifiable, $url) {
+            $rest_url = url(route('password.reset', [
+                'token' => $url,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ], false));
+
             return (new MailMessage)
                 ->greeting('Olá,')
                 ->subject('Notificação de redefinição de senha')
                 ->line('Você está recebendo este e-mail porque recebemos uma solicitação de redefinição de senha para sua conta.')
-                ->action('Redefinir senha', $url)
+                ->action('Redefinir senha', $rest_url)
                 ->line('Este link de redefinição de senha irá expirar em '.config('auth.passwords.'.config('auth.defaults.passwords').'.expire').' minutos.')
                 ->line('Se você não solicitou uma redefinição de senha, nenhuma ação adicional será necessária.');
         });
