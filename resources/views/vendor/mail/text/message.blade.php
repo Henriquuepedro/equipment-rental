@@ -24,4 +24,4 @@
             © {{ date('Y') }} {{ config('app.name') }}. Todos os direitos reservados.
         </x-mail::footer>
     </x-slot:footer>
-</x-mail:
+</x-mail::layout>
