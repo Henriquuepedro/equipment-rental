@@ -328,7 +328,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
 
         // Admin Master
-        Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => [AdminMaster::class]], function () {
+        Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => 'admin-master'], function () {
 
             Route::group(['prefix' => '/empresas', 'as' => 'company.'], function () {
                 Route::post('/buscar', [App\Http\Controllers\Master\CompanyController::class, 'fetch'])->name('fetch');
@@ -370,7 +370,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
     });
 
     // Admin Master
-    Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => [AdminMaster::class]], function () {
+    Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => 'admin-master'], function () {
 
         Route::group(['prefix' => '/empresas', 'as' => 'company.'], function () {
             Route::get('/', [App\Http\Controllers\Master\CompanyController::class, 'index'])->name('index');
