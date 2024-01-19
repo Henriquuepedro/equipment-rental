@@ -14,7 +14,7 @@ class EquipmentWalletObserver
      */
     public function created(EquipmentWallet $equipmentWallet)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $equipmentWallet);
+        createLogEvent(__FUNCTION__, $equipmentWallet);
     }
 
     /**
@@ -25,7 +25,7 @@ class EquipmentWalletObserver
      */
     public function updated(EquipmentWallet $equipmentWallet)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $equipmentWallet);
+        createLogEvent(__FUNCTION__, $equipmentWallet);
     }
 
     /**
@@ -36,7 +36,7 @@ class EquipmentWalletObserver
      */
     public function deleted(EquipmentWallet $equipmentWallet)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $equipmentWallet);
+        createLogEvent(__FUNCTION__, $equipmentWallet);
     }
 
     /**

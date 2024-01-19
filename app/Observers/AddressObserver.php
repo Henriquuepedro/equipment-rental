@@ -14,7 +14,7 @@ class AddressObserver
      */
     public function created(Address $address)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $address);
+        createLogEvent(__FUNCTION__, $address);
     }
 
     /**
@@ -25,7 +25,7 @@ class AddressObserver
      */
     public function updated(Address $address)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $address);
+        createLogEvent(__FUNCTION__, $address);
     }
 
     /**
@@ -36,7 +36,7 @@ class AddressObserver
      */
     public function deleted(Address $address)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $address);
+        createLogEvent(__FUNCTION__, $address);
     }
 
     /**

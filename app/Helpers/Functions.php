@@ -720,11 +720,11 @@ if (! function_exists('createLogEvent')) {
      * @param string $event             Nome do evento.
      * @param object $auditable_model   Entidade de log.
      */
-    function createLogEvent(string $function_validation, string $event, object $auditable_model): void
+    function createLogEvent(string $event, object $auditable_model): void
     {
         try {
             $details = null;
-            if ($function_validation === 'updated') {
+            if ($event === 'updated') {
                 $old_log = [];
                 foreach ($auditable_model->getDirty() as $dity_key => $dirty_value) {
                     $old_log[$dity_key] = $auditable_model->getOriginal($dity_key);
@@ -734,7 +734,7 @@ if (! function_exists('createLogEvent')) {
                     'old' => $old_log,
                     'new' => $auditable_model->getDirty()
                 ];
-            } elseif ($function_validation === 'deleted') {
+            } elseif ($event === 'deleted') {
                 $details = $auditable_model->toArray();
             }
 

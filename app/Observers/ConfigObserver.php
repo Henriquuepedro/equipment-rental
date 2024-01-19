@@ -14,7 +14,7 @@ class ConfigObserver
      */
     public function created(Config $config)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $config);
+        createLogEvent(__FUNCTION__, $config);
     }
 
     /**
@@ -25,7 +25,7 @@ class ConfigObserver
      */
     public function updated(Config $config)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $config);
+        createLogEvent(__FUNCTION__, $config);
     }
 
     /**
@@ -36,7 +36,7 @@ class ConfigObserver
      */
     public function deleted(Config $config)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $config);
+        createLogEvent(__FUNCTION__, $config);
     }
 
     /**

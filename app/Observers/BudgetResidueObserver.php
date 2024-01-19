@@ -14,7 +14,7 @@ class BudgetResidueObserver
      */
     public function created(BudgetResidue $budgetResidue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $budgetResidue);
+        createLogEvent(__FUNCTION__, $budgetResidue);
     }
 
     /**
@@ -25,7 +25,7 @@ class BudgetResidueObserver
      */
     public function updated(BudgetResidue $budgetResidue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $budgetResidue);
+        createLogEvent(__FUNCTION__, $budgetResidue);
     }
 
     /**
@@ -36,7 +36,7 @@ class BudgetResidueObserver
      */
     public function deleted(BudgetResidue $budgetResidue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $budgetResidue);
+        createLogEvent(__FUNCTION__, $budgetResidue);
     }
 
     /**

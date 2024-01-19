@@ -14,7 +14,7 @@ class ClientObserver
      */
     public function created(Client $client)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $client);
+        createLogEvent(__FUNCTION__, $client);
     }
 
     /**
@@ -25,7 +25,7 @@ class ClientObserver
      */
     public function updated(Client $client)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $client);
+        createLogEvent(__FUNCTION__, $client);
     }
 
     /**
@@ -36,7 +36,7 @@ class ClientObserver
      */
     public function deleted(Client $client)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $client);
+        createLogEvent(__FUNCTION__, $client);
     }
 
     /**

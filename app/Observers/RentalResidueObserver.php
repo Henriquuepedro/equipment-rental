@@ -14,7 +14,7 @@ class RentalResidueObserver
      */
     public function created(RentalResidue $rentalResidue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalResidue);
+        createLogEvent(__FUNCTION__, $rentalResidue);
     }
 
     /**
@@ -25,7 +25,7 @@ class RentalResidueObserver
      */
     public function updated(RentalResidue $rentalResidue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalResidue);
+        createLogEvent(__FUNCTION__, $rentalResidue);
     }
 
     /**
@@ -36,7 +36,7 @@ class RentalResidueObserver
      */
     public function deleted(RentalResidue $rentalResidue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalResidue);
+        createLogEvent(__FUNCTION__, $rentalResidue);
     }
 
     /**

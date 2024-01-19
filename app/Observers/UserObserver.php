@@ -18,7 +18,7 @@ class UserObserver
     {
         $user->notify(new RegisterUserNotification());
 
-        createLogEvent(__FUNCTION__, __METHOD__, $user);
+        createLogEvent(__FUNCTION__, $user);
     }
 
     /**
@@ -29,7 +29,7 @@ class UserObserver
      */
     public function updated(User $user): void
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $user);
+        createLogEvent(__FUNCTION__, $user);
     }
 
     /**
@@ -40,7 +40,7 @@ class UserObserver
      */
     public function deleted(User $user): void
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $user);
+        createLogEvent(__FUNCTION__, $user);
     }
 
     /**

@@ -155,7 +155,7 @@ class PlanController extends Controller
                     $createRequest = [
                         'external_reference' => $code_payment,
                         "transaction_amount" => roundDecimal($plan_data->value),
-                        "description"        => "Plano $plan_data->name",
+                        "description"        => $plan_data->name,
                         "payment_method_id"  => $request->input('payment_method_id'),
                         "payer" => array(
                             "email"          => $payer['email'],

@@ -14,7 +14,7 @@ class PlanObserver
      */
     public function created(Plan $plan)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $plan);
+        createLogEvent(__FUNCTION__, $plan);
     }
 
     /**
@@ -25,7 +25,7 @@ class PlanObserver
      */
     public function updated(Plan $plan)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $plan);
+        createLogEvent(__FUNCTION__, $plan);
     }
 
     /**
@@ -36,7 +36,7 @@ class PlanObserver
      */
     public function deleted(Plan $plan)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $plan);
+        createLogEvent(__FUNCTION__, $plan);
     }
 
     /**

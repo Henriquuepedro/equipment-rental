@@ -14,7 +14,7 @@ class EquipmentObserver
      */
     public function created(Equipment $equipment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $equipment);
+        createLogEvent(__FUNCTION__, $equipment);
     }
 
     /**
@@ -25,7 +25,7 @@ class EquipmentObserver
      */
     public function updated(Equipment $equipment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $equipment);
+        createLogEvent(__FUNCTION__, $equipment);
     }
 
     /**
@@ -36,7 +36,7 @@ class EquipmentObserver
      */
     public function deleted(Equipment $equipment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $equipment);
+        createLogEvent(__FUNCTION__, $equipment);
     }
 
     /**
