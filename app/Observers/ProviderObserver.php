@@ -14,7 +14,7 @@ class ProviderObserver
      */
     public function created(Provider $provider)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $provider);
+        createLogEvent(__FUNCTION__, $provider);
     }
 
     /**
@@ -25,7 +25,7 @@ class ProviderObserver
      */
     public function updated(Provider $provider)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $provider);
+        createLogEvent(__FUNCTION__, $provider);
     }
 
     /**
@@ -36,7 +36,7 @@ class ProviderObserver
      */
     public function deleted(Provider $provider)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $provider);
+        createLogEvent(__FUNCTION__, $provider);
     }
 
     /**

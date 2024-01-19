@@ -14,7 +14,7 @@ class BillToPayPaymentObserver
      */
     public function created(BillToPayPayment $billToPayPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $billToPayPayment);
+        createLogEvent(__FUNCTION__, $billToPayPayment);
     }
 
     /**
@@ -25,7 +25,7 @@ class BillToPayPaymentObserver
      */
     public function updated(BillToPayPayment $billToPayPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $billToPayPayment);
+        createLogEvent(__FUNCTION__, $billToPayPayment);
     }
 
     /**
@@ -36,7 +36,7 @@ class BillToPayPaymentObserver
      */
     public function deleted(BillToPayPayment $billToPayPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $billToPayPayment);
+        createLogEvent(__FUNCTION__, $billToPayPayment);
     }
 
     /**

@@ -14,7 +14,7 @@ class RentalPaymentObserver
      */
     public function created(RentalPayment $rentalPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalPayment);
+        createLogEvent(__FUNCTION__, $rentalPayment);
     }
 
     /**
@@ -25,7 +25,7 @@ class RentalPaymentObserver
      */
     public function updated(RentalPayment $rentalPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalPayment);
+        createLogEvent(__FUNCTION__, $rentalPayment);
     }
 
     /**
@@ -36,7 +36,7 @@ class RentalPaymentObserver
      */
     public function deleted(RentalPayment $rentalPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalPayment);
+        createLogEvent(__FUNCTION__, $rentalPayment);
     }
 
     /**

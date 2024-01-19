@@ -14,7 +14,7 @@ class BudgetPaymentObserver
      */
     public function created(BudgetPayment $budgetPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $budgetPayment);
+        createLogEvent(__FUNCTION__, $budgetPayment);
     }
 
     /**
@@ -25,7 +25,7 @@ class BudgetPaymentObserver
      */
     public function updated(BudgetPayment $budgetPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $budgetPayment);
+        createLogEvent(__FUNCTION__, $budgetPayment);
     }
 
     /**
@@ -36,7 +36,7 @@ class BudgetPaymentObserver
      */
     public function deleted(BudgetPayment $budgetPayment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $budgetPayment);
+        createLogEvent(__FUNCTION__, $budgetPayment);
     }
 
     /**

@@ -14,7 +14,7 @@ class VehicleObserver
      */
     public function created(Vehicle $vehicle)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $vehicle);
+        createLogEvent(__FUNCTION__, $vehicle);
     }
 
     /**
@@ -25,7 +25,7 @@ class VehicleObserver
      */
     public function updated(Vehicle $vehicle)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $vehicle);
+        createLogEvent(__FUNCTION__, $vehicle);
     }
 
     /**
@@ -36,7 +36,7 @@ class VehicleObserver
      */
     public function deleted(Vehicle $vehicle)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $vehicle);
+        createLogEvent(__FUNCTION__, $vehicle);
     }
 
     /**

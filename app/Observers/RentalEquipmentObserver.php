@@ -14,7 +14,7 @@ class RentalEquipmentObserver
      */
     public function created(RentalEquipment $rentalEquipment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalEquipment);
+        createLogEvent(__FUNCTION__, $rentalEquipment);
     }
 
     /**
@@ -25,7 +25,7 @@ class RentalEquipmentObserver
      */
     public function updated(RentalEquipment $rentalEquipment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalEquipment);
+        createLogEvent(__FUNCTION__, $rentalEquipment);
     }
 
     /**
@@ -36,7 +36,7 @@ class RentalEquipmentObserver
      */
     public function deleted(RentalEquipment $rentalEquipment)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $rentalEquipment);
+        createLogEvent(__FUNCTION__, $rentalEquipment);
     }
 
     /**

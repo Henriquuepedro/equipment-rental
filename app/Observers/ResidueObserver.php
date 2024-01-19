@@ -14,7 +14,7 @@ class ResidueObserver
      */
     public function created(Residue $residue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $residue);
+        createLogEvent(__FUNCTION__, $residue);
     }
 
     /**
@@ -25,7 +25,7 @@ class ResidueObserver
      */
     public function updated(Residue $residue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $residue);
+        createLogEvent(__FUNCTION__, $residue);
     }
 
     /**
@@ -36,7 +36,7 @@ class ResidueObserver
      */
     public function deleted(Residue $residue)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $residue);
+        createLogEvent(__FUNCTION__, $residue);
     }
 
     /**

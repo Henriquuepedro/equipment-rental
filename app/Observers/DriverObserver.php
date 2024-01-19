@@ -14,7 +14,7 @@ class DriverObserver
      */
     public function created(Driver $driver)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $driver);
+        createLogEvent(__FUNCTION__, $driver);
     }
 
     /**
@@ -25,7 +25,7 @@ class DriverObserver
      */
     public function updated(Driver $driver)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $driver);
+        createLogEvent(__FUNCTION__, $driver);
     }
 
     /**
@@ -36,7 +36,7 @@ class DriverObserver
      */
     public function deleted(Driver $driver)
     {
-        createLogEvent(__FUNCTION__, __METHOD__, $driver);
+        createLogEvent(__FUNCTION__, $driver);
     }
 
     /**
