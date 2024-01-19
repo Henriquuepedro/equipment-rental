@@ -82,7 +82,7 @@
                       "amount" é a quantia total a pagar por todos os meios de pagamento com exceção da Conta Mercado Pago e Parcelas sem cartão de crédito, que têm seus valores de processamento determinados no backend através do "preferenceId"
                     */
                     amount: $('[name="amount_plan"]').val(),
-                    preferenceId: "<PREFERENCE_ID>",
+                    // preferenceId: "<PREFERENCE_ID>",
                     payer: {
                         firstName: '{{ $company_data->first_company_name }}',
                         lastName: '{{ $company_data->last_company_name }}',
@@ -110,12 +110,12 @@
                     },
                     paymentMethods: {
                         creditCard: "all",
-                        debitCard: "all",
+                        //debitCard: "all",
                         ticket: "all",
                         bankTransfer: "all",
-                        atm: "all",
-                        onboarding_credits: "all",
-                        wallet_purchase: "all",
+                        //atm: "all",
+                        //onboarding_credits: "all",
+                        //wallet_purchase: "all",
                         maxInstallments: 12
                     },
                 },
@@ -123,7 +123,7 @@
                     onReady: () => {
                         /*
                          Callback chamado quando o Brick está pronto.
-                         Aqui, você pode ocultar seu site, por exemplo.
+                         Aqui, você pode ocultar o seu site, por exemplo.
                         */
                     },
                     onSubmit: ({ selectedPaymentMethod, formData }) => {
@@ -143,22 +143,22 @@
                             .then((response) => {
                                 if (response.ok) {
                                     return response.json().then((response) => {
-                                        if (response.errors) {
+                                        if (typeof response.payment_id !== "undefined" && response.payment_id) {
+                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
+                                        } else {
                                             Swal.fire({
                                                 icon: 'error',
                                                 title: 'Pagamento não realizado',
                                                 html: response.errors
                                             });
-                                        } else {
-                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
                                         }
                                     });
                                 }
 
                                 reject();
                                 return response.json().then(error => {
-                                    if (typeof error.payment_id !== "undefined") {
-                                        renderStatusScreenBrick(bricksBuilder, response.payment_id);
+                                    if (typeof error.payment_id !== "undefined" && error.payment_id) {
+                                        renderStatusScreenBrick(bricksBuilder, error.payment_id);
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -207,10 +207,12 @@
                         hideStatusDetails: true,
                         hideTransactionDate: true,
                         style: {
-                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default",
-                            texts: {
-                                ctaReturnLabel: "Ver solicitações"
-                            }
+                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default"
+                        },
+                        texts: {
+                            //ctaGeneralErrorLabel: "",
+                            //ctaCardErrorLabel: "",
+                            ctaReturnLabel: "Ver solicitações",
                         }
                     },
                     backUrls: {
