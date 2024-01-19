@@ -140,40 +140,48 @@
                                 },
                                 body: JSON.stringify(new_object),
                             })
-                                .then((response) => {
-                                    if (response.ok) {
-                                        return response.json().then((response) => {
-                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
-                                        });
-                                    }
-
-                                    reject();
-                                    return response.json().then(error => {
-                                        if (typeof error.payment_id !== "undefined") {
-                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
-                                        } else {
+                            .then((response) => {
+                                if (response.ok) {
+                                    return response.json().then((response) => {
+                                        if (response.errors) {
                                             Swal.fire({
                                                 icon: 'error',
                                                 title: 'Pagamento não realizado',
-                                                html: error.errors
+                                                html: response.errors
                                             });
+                                        } else {
+                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
                                         }
                                     });
-                                })
-                                .then((response) => {
-                                    // receber o resultado do pagamento
-                                    resolve();
-                                })
-                                .catch((error) => {
-                                    // manejar a resposta de erro ao tentar criar um pagamento
-                                    reject();
+                                }
 
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Pagamento não realizado',
-                                        html: error.errors
-                                    });
+                                reject();
+                                return response.json().then(error => {
+                                    if (typeof error.payment_id !== "undefined") {
+                                        renderStatusScreenBrick(bricksBuilder, response.payment_id);
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Pagamento não realizado',
+                                            html: error.errors
+                                        });
+                                    }
                                 });
+                            })
+                            .then((response) => {
+                                // receber o resultado do pagamento
+                                resolve();
+                            })
+                            .catch((error) => {
+                                // manejar a resposta de erro ao tentar criar um pagamento
+                                reject();
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Pagamento não realizado',
+                                    html: error.errors
+                                });
+                            });
                         });
                     },
                     onError: (error) => {
