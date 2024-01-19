@@ -13,6 +13,7 @@ use MercadoPago\MercadoPagoConfig;
 class MercadoPagoService
 {
     private bool $debug = false;
+    public string $log_payment_data = '';
     private PlanPayment $plan_payment;
     private PlanHistory $plan_history;
     private Plan $plan;
@@ -25,6 +26,7 @@ class MercadoPagoService
         $this->plan = new Plan();
         $this->company = new Company();
         $this->debug = $debug;
+        $this->log_payment_data = '';
     }
 
     public function updatePayment(string $code): int
@@ -134,8 +136,11 @@ class MercadoPagoService
      */
     public function debugEcho(string $text): void
     {
+        $message = "$text\n";
+        $this->log_payment_data .= $message;
+
         if ($this->debug) {
-            echo $text . "\n";
+            echo $message;
         }
     }
 }

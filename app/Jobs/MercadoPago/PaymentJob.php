@@ -33,11 +33,17 @@ class PaymentJob implements ShouldQueue
     public function handle()
     {
         $plan_payment = new PlanPayment();
-        $mercado_pago_service = new MercadoPagoService();
+        $payments = $plan_payment->getPaymentOpen();
 
-        foreach ($plan_payment->getPaymentOpen() as $payment) {
+        foreach ($payments as $key_payment => $payment) {
+            $mercado_pago_service = new MercadoPagoService(true);
             $mercado_pago_service->updatePayment($payment->id_transaction);
-            echo "-----------------------\n";
+
+            Log::info($mercado_pago_service->log_payment_data);
+
+            if (count($payments) != ($key_payment + 1)) {
+                echo "-----------------------\n";
+            }
         }
     }
 }
