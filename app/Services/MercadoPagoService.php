@@ -9,6 +9,7 @@ use App\Models\PlanPayment;
 use Exception;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\MercadoPagoConfig;
+use Symfony\Component\HttpFoundation\Response;
 
 class MercadoPagoService
 {
@@ -36,7 +37,7 @@ class MercadoPagoService
 
             if (!$plan_payment) {
                 $this->debugEcho("plan code ($code) not found.");
-                return 404;
+                return Response::HTTP_NOT_FOUND;
             }
 
             $plan_payment_id    = (int)$plan_payment->id;
@@ -51,7 +52,7 @@ class MercadoPagoService
                 $data_payment = $payment->get($code);
             } catch(\Exception $e) {
                 $this->debugEcho("get payment ($code) to mercadoPago found a error. {$e->getMessage()}");
-                return 400;
+                return Response::HTTP_BAD_REQUEST;
             }
 
             $status         = $data_payment->status;
@@ -67,7 +68,7 @@ class MercadoPagoService
             // verificar se o status já existe
             if ($this->plan_history->getHistoryByStatusAndStatusDetail($plan_payment_id, $status, $status_detail)) {
                 $this->debugEcho("status ($status) and status_detail ($status_detail) in use to plan_id ($plan_payment_id).");
-                return 200;
+                return Response::HTTP_OK;
             }
 
             $plan_config = $this->plan->getById($plan_config_id);
@@ -111,21 +112,24 @@ class MercadoPagoService
                 }
             }
 
-            $this->plan_history->insert(array(
+            $plan_history = array(
                 'payment_id'    => $plan_payment_id,
                 'status_detail' => $status_detail,
                 'status'        => $status,
                 'status_date'   => $last_modified
-            ));
+            );
+            $this->plan_history->insert($plan_history);
+            $this->debugEcho("New history created. " . json_encode($plan_history, JSON_UNESCAPED_UNICODE) . "\n");
 
             $this->plan_payment->edit(array(
                 'status_detail' => $status_detail,
                 'status'        => $status
             ), $company_id, $plan_payment_id);
 
-            return 201;
+            return Response::HTTP_CREATED;
         } catch (Exception $e) {
-            return 400;
+            $this->debugEcho("Exception to get payment. {$e->getMessage()}");
+            return Response::HTTP_BAD_REQUEST;
         }
     }
 
