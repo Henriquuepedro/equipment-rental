@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
@@ -100,6 +101,8 @@ class PlanController extends Controller
 
     public function insert(int $plan, Request $request)
     {
+        $company_id = $request->user()->company_id;
+
         try {
             $config = Configuration::forSymmetricSigner(new Sha256(), InMemory::plainText(config('app.key')));
             $clock = new SystemClock(new DateTimeZone(TIMEZONE_DEFAULT));
@@ -125,7 +128,6 @@ class PlanController extends Controller
 
             MercadoPagoConfig::setAccessToken(env('MP_ACCESS_TOKEN'));
 
-            $company_id             = $request->user()->company_id;
             $check_payment_method   = $request->input('payment_method_id');
             $company_data           = $this->company->getCompany($company_id);
             $plan_data              = $this->plan->getById($plan);
@@ -233,10 +235,26 @@ class PlanController extends Controller
             $payment = $client->create($createRequest, $request_options);
 
             $this->validatePaymentResult($payment);
+            Log::info("Payment created successfully to the company $company_id to the plan $plan.", [
+                'request'  => $createRequest,
+                'response' => $payment->getResponse()
+            ]);
         } catch (MPApiException $exception) {
-            return response()->json(['errors' => $exception->getApiResponse()], 400);
+            $error_message = $exception->getApiResponse() ?? $exception->getMessage();
+            Log::error("[MPApiException] Payment doesn't created to the company $company_id to the plan $plan.", [
+                'request'   => $createRequest ?? [],
+                'response'  => $error_message,
+                'trace'     => $exception->getTraceAsString()
+            ]);
+            return response()->json(['errors' => $error_message], 400);
         } catch (Exception $exception) {
-            return response()->json(['errors' => $exception->getMessage()], 400);
+            $error_message = $exception->getMessage();
+            Log::error("[Exception] Payment doesn't created to the company $company_id to the plan $plan.", [
+                'request'   => $createRequest ?? [],
+                'response'  => $error_message,
+                'trace'     => $exception->getTraceAsString()
+            ]);
+            return response()->json(['errors' => $error_message], 400);
         }
 
         // Taxas: https://www.mercadopago.com.br/ajuda/custo-receber-pagamentos_220
@@ -256,9 +274,8 @@ class PlanController extends Controller
         }
 
         $dateOfExpiration = formatDateInternational($payment->date_of_expiration ?? null);
-        $dateCreated = formatDateInternational($payment->date_created) ?? dateNowInternational();
 
-        $paymentPlan = $this->plan_payment->insert(array(
+        $this->plan_payment->insert(array(
             'id_transaction'    => $payment->id,
             'code_payment'      => $code_payment,
             'link_billet'       => $payment->transaction_details->external_resource_url ?? null,
@@ -278,14 +295,6 @@ class PlanController extends Controller
             'company_id'        => $company_id,
             'user_created'      => $request->user()->id
         ));
-
-        // Essa notificação acontecerá por webhook.
-        /*$this->plan_history->insert(array(
-            'payment_id'    => $paymentPlan->id,
-            'status_detail' => $payment->status_detail,
-            'status'        => $payment->status,
-            'status_date'   => $dateCreated
-        ));*/
 
         // Pagamento foi criado. Validar a situação. Ele poder ter sido rejeitado diretamente.
         try {
@@ -310,7 +319,7 @@ class PlanController extends Controller
         if ($payment->id === null) {
             $error_message = 'Unknown error cause';
 
-            if(!property_exists($payment, 'id') || $payment->error !== null) {
+            if (!property_exists($payment, 'id') || $payment->error !== null) {
                 $sdk_error_message = $payment->error->message ?? null;
                 $error_message = $sdk_error_message !== null ? $sdk_error_message : $error_message;
             }
