@@ -39,12 +39,12 @@ class Provider extends Model
 
     public function remove($provider_id, $company_id)
     {
-        return $this->where(['id' => $provider_id, 'company_id' => $company_id])->delete();
+        return $this->getProvider($provider_id, $company_id)->delete();
     }
 
     public function edit($data, $provider_id)
     {
-        return $this->where('id', $provider_id)->update($data);
+        return $this->where('id', $provider_id)->first()->fill($data)->save();
     }
 
     public function getProviders($company_id, $init = null, $length = null, $searchUser = null, $orderBy = array(), $select = '*')

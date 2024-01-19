@@ -79,7 +79,7 @@ class Company extends Model
 
     public function edit($data, $id)
     {
-        return $this->where('id', $id)->update($data);
+        return $this->where('id', $id)->first()->fill($data)->save();
     }
 
     public function insert(array $data)
@@ -98,11 +98,11 @@ class Company extends Model
             return null;
         }
 
-        return $this->where('id', $company_id)->update(
+        return $this->where('id', $company_id)->first()->fill(
             array(
                 'plan_id' => $plan_id,
                 'plan_expiration_date' => DB::raw("date_add(plan_expiration_date, interval $months month)")
             )
-        );
+        )->save();
     }
 }

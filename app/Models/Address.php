@@ -42,14 +42,19 @@ class Address extends Model
         return $this->where(['id' => $address_id, 'client_id' => $client_id, 'company_id' => $company_id])->first();
     }
 
+    public function getAddressesByClient($company_id, $client_id)
+    {
+        return $this->where(['client_id' => $client_id, 'company_id' => $company_id])->get();
+    }
+
     public function getAddressClient($company_id, $client_id)
     {
         return $this->where(['client_id' => $client_id, 'company_id' => $company_id])->get();
     }
 
-    public function deleteAddressClient($client_id)
+    public function deleteAddressClient($company_id, $client_id)
     {
-        return $this->where('client_id', $client_id)->delete();
+        return $this->getAddressesByClient($company_id, $client_id)->each(fn ($register) => $register->delete());
     }
 
     public function updateLanLngAddressClient($company_id, $client_id, $adrress_id, $dataUpdate)
@@ -58,6 +63,6 @@ class Address extends Model
             'id'            => $adrress_id,
             'company_id'    => $company_id,
             'client_id'     => $client_id
-        ])->update($dataUpdate);
+        ])->first()->fill($dataUpdate)->save();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\LogEvent;
 use App\Models\User;
 use App\Notifications\RegisterUserNotification;
 
@@ -13,9 +14,11 @@ class UserObserver
      * @param User $user
      * @return void
      */
-    public function created(User $user)
+    public function created(User $user): void
     {
         $user->notify(new RegisterUserNotification());
+
+        createLogEvent(__FUNCTION__, __METHOD__, $user);
     }
 
     /**
@@ -24,9 +27,9 @@ class UserObserver
      * @param User $user
      * @return void
      */
-    public function updated(User $user)
+    public function updated(User $user): void
     {
-        //
+        createLogEvent(__FUNCTION__, __METHOD__, $user);
     }
 
     /**
@@ -35,9 +38,9 @@ class UserObserver
      * @param User $user
      * @return void
      */
-    public function deleted(User $user)
+    public function deleted(User $user): void
     {
-        //
+        createLogEvent(__FUNCTION__, __METHOD__, $user);
     }
 
     /**

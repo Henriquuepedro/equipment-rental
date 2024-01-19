@@ -47,12 +47,12 @@ class Equipment extends Model
 
     public function remove($equipment_id, $company_id)
     {
-        return $this->where(['id' => $equipment_id, 'company_id' => $company_id])->delete();
+        return $this->getEquipment($equipment_id, $company_id)->delete();
     }
 
     public function edit($data, $equipment_id)
     {
-        return $this->where('id', $equipment_id)->update($data);
+        return $this->where('id', $equipment_id)->first()->fill($data)->save();
     }
 
     public function getEquipments($company_id, $init = null, $length = null, $searchEquipment = null, $orderBy = array(), $getCacamba = false, $select = '*')

@@ -129,7 +129,7 @@ class UserController extends Controller
             'phone'         => onlyNumbers($request->input('phone')),
             'permission'    => json_encode($arrPermissions),
             'type_user'     => $request->input('type_user'),
-            'active'        => (bool)$request->input('active')
+            'active'        => $request->input('active') ? 1 : 0
         ], $id);
 
         if (!$update) {
@@ -156,7 +156,7 @@ class UserController extends Controller
             'password'      => Hash::make($request->input('password')),
             'company_id'    => $request->input('company'),
             'type_user'     => $request->input('type_user'),
-            'active'        => (bool)$request->input('active')
+            'active'        => $request->input('active') ? 1 : 0
         ]);
 
         if (!$create) {

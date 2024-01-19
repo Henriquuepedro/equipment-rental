@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class UserCreatePost extends FormRequest
 {
@@ -34,6 +35,7 @@ class UserCreatePost extends FormRequest
                     }
                 }
             ],
+            'type_user'         => [Rule::in([0,1])],
             'email_modal'       => [
                 'required',
                 'email:rfc,dns',
@@ -57,6 +59,7 @@ class UserCreatePost extends FormRequest
     {
         return [
             'name_modal.required'       => 'O Nome é obrigatório',
+            'type_user.*'               => 'O tipo de usuário é inválido',
             'email_modal.required'      => 'O endereço de e-mail é obrigatório',
             'email_modal.email'         => 'O endereço de e-mail deve ser um e-mail válido',
             'phone_modal.min'           => 'O telefone deve conter o DDD e o número telefônico',

@@ -58,17 +58,17 @@ class RentalPayment extends Model
 
     public function remove($rental_id, $company_id)
     {
-        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->delete();
+        return $this->getPayments($company_id, $rental_id)->each(fn ($register) => $register->delete());
     }
 
     public function removeByPaid($company_id, $rental_id)
     {
-        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id, 'payment_id' => null])->delete();
+        return $this->where(['rental_id' => $rental_id, 'company_id' => $company_id, 'payment_id' => null])->get()->each(fn ($register) => $register->delete());
     }
 
     public function updateById(array $data, int $id)
     {
-        return $this->where('id', $id)->update($data);
+        return $this->where('id', $id)->first()->fill($data)->save();
     }
 
     public function getPayments($company_id, $rental_id)

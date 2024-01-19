@@ -51,7 +51,7 @@ class Plan extends Model
 
     public function updateById(array $data, int $id)
     {
-        return $this->where('id', $id)->update($data);
+        return $this->where('id', $id)->first()->fill($data)->save();
     }
 
     public function getByMonthTime(int $month_time)

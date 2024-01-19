@@ -122,7 +122,7 @@ class CompanyController extends Controller
         $neigh          = $request->input('neigh') ? filter_var($request->input('neigh')) : null;
         $city           = $request->input('city') ? filter_var($request->input('city')) : null;
         $state          = $request->input('state') ? filter_var($request->input('state')) : null;
-        $status         = (bool)$request->input('status');
+        $status         = $request->input('status') ? 1 : 0;
         $plan_expiration_date = dateBrazilToDateInternational($request->input('plan_expiration_date'));
 
         return array(

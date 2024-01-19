@@ -15,6 +15,10 @@ $(() => {
     setTabConfigCompany();
 });
 
+$('#newUserModal').on('shown.bs.modal', function(){
+    checkLabelAnimate();
+});
+
 const setTabConfigCompany = () => {
     const url = window.location.href;
     const splitUrl = url.split('#');
@@ -213,6 +217,8 @@ $('#formCreateUser').validate({
                 $('#newUserModal #formCreateUser .permissions input[type="checkbox"]').each(function (){
                     $(this).prop('checked', false);
                 });
+                $('#newUserModal #formCreateUser [name="type_user"]').val(0);
+                $('#permission_select_all_permission').prop('checked', false);
                 loadUsers();
             }, error: e => {
                 getForm.find('button[type="submit"]').attr('disabled', false);
@@ -222,8 +228,9 @@ $('#formCreateUser').validate({
                     arrErrors.push(value);
                 });
 
-                if (!arrErrors.length && e.responseJSON.message !== undefined)
+                if (!arrErrors.length && e.responseJSON.message !== undefined) {
                     arrErrors.push('Você não tem permissão para fazer essa operação!');
+                }
 
                 Swal.fire({
                     icon: 'warning',
@@ -233,6 +240,14 @@ $('#formCreateUser').validate({
             }
         });
     }
+});
+
+$('.select-all-permission').on('change', function(){
+    const checked = $(this).is(':checked');
+
+    $(this).closest('.modal-body').find('.permissions input[type="checkbox"]').each(function (){
+        $(this).prop('checked', checked);
+    });
 });
 
 $('#users-tab').click(function (){
@@ -261,8 +276,9 @@ $('#formUpdatePermission').on('submit', function (){
                 title: response.message
             })
 
-            if (response.success)
+            if (response.success) {
                 $('#viewPermission').modal('hide');
+            }
 
         }, error: e => {
             getForm.find('button[type="submit"]').attr('disabled', false);
@@ -388,11 +404,12 @@ $(document).on('click', '.viewPermission', function (){
                 return false;
             }
 
-            $('#viewPermission .modal-body .d-flex').empty();
+            $('#viewPermission .modal-body .user-permission-update').empty();
 
             const htmlPermission = response.data + '<input type="hidden" name="user_id" value="'+user_id+'">'
 
-            $('#viewPermission').modal().find('.modal-body .d-flex').append(htmlPermission);
+            $('#viewPermission').modal().find('.modal-body .user-permission-update').append(htmlPermission);
+            $('#permission_select_all_permission_update').prop('checked', false);
         }, error: e => {
             console.log(e);
         }
@@ -618,6 +635,12 @@ $(document).on('click', '.updateUser', function (){
             console.log(e);
         }
     });
+});
+
+$('[name="type_user"]').on('change', function(){
+    const type = parseInt($(this).val());
+
+    $('.user-permission').css({ display: type === 0 ? 'block' : 'none' })
 });
 
 const loadUsers = (openPermissions = false, user_id = false) => {

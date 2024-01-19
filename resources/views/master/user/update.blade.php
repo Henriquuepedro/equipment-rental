@@ -89,6 +89,14 @@
             form.submit();
         }
     });
+
+    $('.select-all-permission').on('change', function(){
+        const checked = $(this).is(':checked');
+
+        $(this).closest('.card-body').find('input[name="permission[]"][type="checkbox"]').each(function (){
+            $(this).prop('checked', checked);
+        });
+    });
 </script>
 @stop
 
@@ -114,6 +122,13 @@
                                     <p class="card-description"> Preencha o formulário abaixo com as novas informações do usuário </p>
                                 </div>
                                 <div class="col-md-12 no-padding">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="alert alert-fill-primary" role="alert">
+                                                <i class="mdi mdi-alert-circle"></i> Após a criação do usuário, o mesmo deverá confirmar seu e-mail para acessar a plataforma.
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="form-group col-md-4">
                                             <label>Nome</label>
@@ -170,8 +185,17 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-12 mb-5 text-center">
+                                        <div class="col-md-12 mb-3 text-center">
                                             <h4 class="no-margin">Permissões de acesso</h4>
+                                            <small>Defina as permissão do usuário</small>
+                                            <br>
+                                            <div class="d-flex justify-content-center mt-4">
+                                                <div class="switch">
+                                                    <input type="checkbox" class="switch-input select-all-permission" id="permission_select_all_permission">
+                                                    <label for="permission_select_all_permission" class="switch-label"></label>
+                                                </div>
+                                                Selecionar Tudo
+                                            </div>
                                         </div>
                                     </div>
 

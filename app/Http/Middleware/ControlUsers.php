@@ -22,7 +22,7 @@ class ControlUsers
 
         if ($user) {
             // save last_access
-            $user->last_access_at = date(DATETIME_INTERNATIONAL);
+            //$user->last_access_at = date(DATETIME_INTERNATIONAL);
             $user->save();
 
             // user logout

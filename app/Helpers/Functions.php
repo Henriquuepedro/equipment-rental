@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\LogEvent;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 
 const DATETIME_INTERNATIONAL = 'Y-m-d H:i:s';
 const DATE_INTERNATIONAL = 'Y-m-d';
@@ -109,7 +111,7 @@ if (! function_exists('transformMoneyBr_En')) {
         $value = str_replace(',', '.', $value);
         $value = filter_var($value, FILTER_VALIDATE_FLOAT);
 
-        return (float)$value;
+        return roundDecimal($value);
     }
 }
 
@@ -610,7 +612,7 @@ if (!function_exists('subDate')) {
 if (!function_exists('roundDecimal')) {
     function roundDecimal(string|float $value, int $decimal = 2): float
     {
-        return (float)number_format($value, 2, '.', '');
+        return (float)number_format($value, $decimal, '.', '');
     }
 }
 
@@ -711,4 +713,42 @@ if (! function_exists('checkPathExistToCreate')) {
     }
 }
 
+if (! function_exists('createLogEvent')) {
+    /**
+     * Se o caminho não existir, será criado.
+     *
+     * @param string $event             Nome do evento.
+     * @param object $auditable_model   Entidade de log.
+     */
+    function createLogEvent(string $function_validation, string $event, object $auditable_model): void
+    {
+        try {
+            $details = null;
+            if ($function_validation === 'updated') {
+                $old_log = [];
+                foreach ($auditable_model->getDirty() as $dity_key => $dirty_value) {
+                    $old_log[$dity_key] = $auditable_model->getOriginal($dity_key);
+                }
 
+                $details = [
+                    'old' => $old_log,
+                    'new' => $auditable_model->getDirty()
+                ];
+            } elseif ($function_validation === 'deleted') {
+                $details = $auditable_model->toArray();
+            }
+
+            LogEvent::create([
+                'event'             => $event,
+                'user_id'           => auth()->id(),
+                'event_date'        => now(),
+                'ip'                => request()->ip(),
+                'auditable_id'      => $auditable_model->id,
+                'auditable_type'    => $auditable_model::class,
+                'details'           => $details
+            ]);
+        } catch (Throwable $exception) {
+            Log::emergency("Error to save log event. {$exception->getMessage()}", $exception->getTrace());
+        }
+    }
+}
