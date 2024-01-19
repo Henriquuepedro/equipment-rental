@@ -86,7 +86,6 @@ return [
         'web',
         'auth',
         'log-viewer',
-        \Opcodes\LogViewer\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         \Opcodes\LogViewer\Http\Middleware\AuthorizeLogViewer::class,
     ],
 
