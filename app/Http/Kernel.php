@@ -2,9 +2,11 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\AdminMaster;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\ControlUsers;
 use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\LogViewer;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\TrimStrings;
@@ -84,5 +86,7 @@ class Kernel extends HttpKernel
         'signed' => ValidateSignature::class,
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
+        'admin-master' => AdminMaster::class,
+        'log-viewer' => LogViewer::class
     ];
 }
