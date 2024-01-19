@@ -77,7 +77,7 @@ class EquipmentController extends Controller
             'name'          => $dataEquipment->name,
             'reference'     => $dataEquipment->reference,
             'stock'         => $dataEquipment->stock,
-            'value'         => $dataEquipment->value,
+            'value'         => roundDecimal($dataEquipment->value),
             'manufacturer'  => $dataEquipment->manufacturer,
             'volume'        => $dataEquipment->volume,
             'user_insert'   => $dataEquipment->user_id
@@ -133,10 +133,10 @@ class EquipmentController extends Controller
 
             $queryPeriods = $this->equipment_wallet->insert(array(
                 'company_id'    => $dataEquipment->company_id,
-                'equipment_id' => $equipmentId,
+                'equipment_id'  => $equipmentId,
                 'day_start'     => $dataPeriod->day_start,
                 'day_end'       => $dataPeriod->day_end,
-                'value'         => $dataPeriod->value_period,
+                'value'         => roundDecimal($dataPeriod->value_period),
                 'user_insert'   => $dataEquipment->user_id
             ));
             if (!$queryPeriods) {
@@ -186,7 +186,7 @@ class EquipmentController extends Controller
             $dataEquipmentWallet[] = [
                 'day_start' => $wallet->day_start,
                 'day_end'   => $wallet->day_end,
-                'value'     => number_format($wallet->value, 2, ',', '.')
+                'value'     => roundDecimal($wallet->value)
             ];
         }
 
@@ -227,7 +227,7 @@ class EquipmentController extends Controller
                 'name'          => $dataEquipment->name,
                 'reference'     => $dataEquipment->reference,
                 'stock'         => $dataEquipment->stock,
-                'value'         => $dataEquipment->value,
+                'value'         => roundDecimal($dataEquipment->value),
                 'manufacturer'  => $dataEquipment->manufacturer,
                 'volume'        => $dataEquipment->volume,
                 'user_update'   => $dataEquipment->user_id
@@ -277,7 +277,7 @@ class EquipmentController extends Controller
                 'equipment_id' => $dataEquipment->equipment_id,
                 'day_start'     => $dataPeriod->day_start,
                 'day_end'       => $dataPeriod->day_end,
-                'value'         => $dataPeriod->value_period,
+                'value'         => roundDecimal($dataPeriod->value_period),
                 'user_insert'   => $dataEquipment->user_id
             ));
 
@@ -443,7 +443,7 @@ class EquipmentController extends Controller
                 'name'      => $equipment->name ?? "Caçamba {$equipment->volume}m³",
                 'reference' => $equipment->reference,
                 'stock'     => $equipment->stock,
-                'value'     => number_format($equipment->value, 2, ',', '.')
+                'value'     => roundDecimal($equipment->value)
             ];
         }
 

@@ -31,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'username',
         'email',
+        'email_verified_at',
         'phone',
         'password',
         'company_id',
@@ -71,17 +72,17 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function edit($data, $user_id, $company_id)
     {
-        return $this->where(['id' => $user_id, 'company_id' => $company_id])->update($data);
+        return $this->where(['id' => $user_id, 'company_id' => $company_id])->first()->fill($data)->save();
     }
 
     public function updateById($data, $user_id)
     {
-        return $this->where('id', $user_id)->update($data);
+        return $this->where('id', $user_id)->first()->fill($data)->save();
     }
 
     public function remove($user_id, $company_id)
     {
-        return $this->where(['id' => $user_id, 'company_id' => $company_id])->delete();
+        return $this->getUser($user_id, $company_id)->delete();
     }
 
     public function getUser($user_id, $company_id)
@@ -120,6 +121,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $arrCheckUser = array_merge($arrCheckUser, $data);
 
-        return $this->where($arrCheckUser)->count() ? true : false;
+        return (bool)$this->where($arrCheckUser)->count();
     }
 }

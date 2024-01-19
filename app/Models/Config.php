@@ -44,7 +44,7 @@ class Config extends Model
 
     public function edit($data, $company_id)
     {
-        return $this->where('company_id', $company_id)->update($data);
+        return $this->where('company_id', $company_id)->first()->fill($data)->save();
     }
 
     public function insert(array $data)

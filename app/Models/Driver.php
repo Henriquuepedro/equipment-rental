@@ -39,12 +39,12 @@ class Driver extends Model
 
     public function remove($driver_id, $company_id)
     {
-        return $this->where(['id' => $driver_id, 'company_id' => $company_id])->delete();
+        return $this->getDriver($driver_id, $company_id)->delete();
     }
 
     public function edit($data, $driver_id)
     {
-        return $this->where('id', $driver_id)->update($data);
+        return $this->where('id', $driver_id)->first()->fill($data)->save();
     }
 
     public function getDrivers($company_id, $init = null, $length = null, $searchDriver = null, $orderBy = array(), $select = '*')

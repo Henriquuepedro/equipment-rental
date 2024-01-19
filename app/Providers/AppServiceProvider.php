@@ -2,8 +2,52 @@
 
 namespace App\Providers;
 
+use App\Models\Address;
+use App\Models\BillToPay;
+use App\Models\BillToPayPayment;
+use App\Models\Budget;
+use App\Models\BudgetEquipment;
+use App\Models\BudgetPayment;
+use App\Models\BudgetResidue;
+use App\Models\Client;
+use App\Models\Config;
+use App\Models\Driver;
+use App\Models\Equipment;
+use App\Models\EquipmentWallet;
+use App\Models\Plan;
+use App\Models\PlanHistory;
+use App\Models\PlanPayment;
+use App\Models\Provider;
+use App\Models\Rental;
+use App\Models\RentalEquipment;
+use App\Models\RentalPayment;
+use App\Models\RentalResidue;
+use App\Models\Residue;
+use App\Models\Vehicle;
 use App\Models\Permission;
 use App\Models\User;
+use App\Observers\AddressObserver;
+use App\Observers\BillToPayObserver;
+use App\Observers\BillToPayPaymentObserver;
+use App\Observers\BudgetObserver;
+use App\Observers\BudgetEquipmentObserver;
+use App\Observers\BudgetPaymentObserver;
+use App\Observers\BudgetResidueObserver;
+use App\Observers\ClientObserver;
+use App\Observers\ConfigObserver;
+use App\Observers\DriverObserver;
+use App\Observers\EquipmentObserver;
+use App\Observers\EquipmentWalletObserver;
+use App\Observers\PlanObserver;
+use App\Observers\PlanHistoryObserver;
+use App\Observers\PlanPaymentObserver;
+use App\Observers\ProviderObserver;
+use App\Observers\RentalObserver;
+use App\Observers\RentalEquipmentObserver;
+use App\Observers\RentalPaymentObserver;
+use App\Observers\RentalResidueObserver;
+use App\Observers\ResidueObserver;
+use App\Observers\VehicleObserver;
 use App\Observers\CompanyObserver;
 use App\Observers\UserObserver;
 use DateTime;
@@ -34,8 +78,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Company::observe(CompanyObserver::class);
-        User::observe(UserObserver::class);
+        $this->loadObservers();
         Schema::defaultStringLength(191);
 
         if (env('APP_ENV') !== 'local') {
@@ -103,5 +146,33 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('settings', $settings);
         });
+    }
+
+    private function loadObservers()
+    {
+        Address::observe(AddressObserver::class);
+        BillToPay::observe(BillToPayObserver::class);
+        BillToPayPayment::observe(BillToPayPaymentObserver::class);
+        Budget::observe(BudgetObserver::class);
+        BudgetEquipment::observe(BudgetEquipmentObserver::class);
+        BudgetPayment::observe(BudgetPaymentObserver::class);
+        BudgetResidue::observe(BudgetResidueObserver::class);
+        Client::observe(ClientObserver::class);
+        Company::observe(CompanyObserver::class);
+        Config::observe(ConfigObserver::class);
+        Driver::observe(DriverObserver::class);
+        Equipment::observe(EquipmentObserver::class);
+        EquipmentWallet::observe(EquipmentWalletObserver::class);
+        Plan::observe(PlanObserver::class);
+        PlanHistory::observe(PlanHistoryObserver::class);
+        PlanPayment::observe(PlanPaymentObserver::class);
+        Provider::observe(ProviderObserver::class);
+        Rental::observe(RentalObserver::class);
+        RentalEquipment::observe(RentalEquipmentObserver::class);
+        RentalPayment::observe(RentalPaymentObserver::class);
+        RentalResidue::observe(RentalResidueObserver::class);
+        Residue::observe(ResidueObserver::class);
+        Vehicle::observe(VehicleObserver::class);
+        User::observe(UserObserver::class);
     }
 }

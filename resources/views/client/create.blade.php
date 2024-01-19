@@ -56,11 +56,11 @@
         submitHandler: function(form) {
             $('#formCreateClient [type="submit"]').attr('disabled', true);
 
-            let verifyAddress = verifyAddressComplet();
+            let verifyAddress = verifyAddressComplet(true);
             if (!verifyAddress[0]) {
                 Toast.fire({
                     icon: 'warning',
-                    title: `Finalize o cadastro do ${verifyAddress[1]}º endereço, para finalizar o cadastro.`
+                    title: verifyAddress[2] ?? `Finalize o cadastro do ${verifyAddress[1]}º endereço, para finalizar o cadastro.`
                 });
                 $('#formCreateClient [type="submit"]').attr('disabled', false);
                 return false;

@@ -13,9 +13,11 @@ class CompanyObserver
      * @param Company $company
      * @return void
      */
-    public function created(Company $company)
+    public function created(Company $company): void
     {
         $company->notify(new RegisterCompanyNotification());
+
+        createLogEvent(__FUNCTION__, __METHOD__, $company);
     }
 
     /**
@@ -24,9 +26,9 @@ class CompanyObserver
      * @param Company $company
      * @return void
      */
-    public function updated(Company $company)
+    public function updated(Company $company): void
     {
-        //
+        createLogEvent(__FUNCTION__, __METHOD__, $company);
     }
 
     /**
@@ -35,9 +37,9 @@ class CompanyObserver
      * @param Company $company
      * @return void
      */
-    public function deleted(Company $company)
+    public function deleted(Company $company): void
     {
-        //
+        createLogEvent(__FUNCTION__, __METHOD__, $company);
     }
 
     /**

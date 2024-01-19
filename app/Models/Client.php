@@ -57,12 +57,12 @@ class Client extends Model
 
     public function remove($client_id, $company_id)
     {
-        return $this->where(['id' => $client_id, 'company_id' => $company_id])->delete();
+        return $this->getClient($client_id, $company_id)->delete();
     }
 
     public function edit($data, $client_id)
     {
-        return $this->where('id', $client_id)->update($data);
+        return $this->where('id', $client_id)->first()->fill($data)->save();
     }
 
     public function getClients($company_id, $init = null, $length = null, $searchUser = null, $orderBy = array(), $select = '*')

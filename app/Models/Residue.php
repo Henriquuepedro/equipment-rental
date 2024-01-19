@@ -49,12 +49,17 @@ class Residue extends Model
 
     public function remove(int $company_id, int $residue_id)
     {
-        return $this->where(['id' => $residue_id, 'company_id' => $company_id])->delete();
+        return $this->getById($company_id, $residue_id)->delete();
     }
 
     public function edit($data, $equipment_id)
     {
-        return $this->where('id', $equipment_id)->update($data);
+        return $this->where('id', $equipment_id)->first()->fill($data)->save();
+    }
+
+    public function getById(int $company_id, int $residue_id)
+    {
+        return $this->where(['company_id' => $company_id, 'id' => $residue_id])->first();
     }
 
     public function getResidues_In(int $company_id, array $resideus)

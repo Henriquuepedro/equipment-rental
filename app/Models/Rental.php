@@ -101,7 +101,7 @@ class Rental extends Model
 
     public function updateByRentalAndCompany(int $company_id, int $rental_id, array $data)
     {
-        return $this->where(array('id' => $rental_id, 'company_id' => $company_id))->update($data);
+        return $this->where(array('id' => $rental_id, 'company_id' => $company_id))->first()->fill($data)->save();
     }
 
     public function getLastCode(int $company_id)
@@ -213,7 +213,7 @@ class Rental extends Model
 
     public function remove(int $company_id, int $rental_id)
     {
-        return $this->where(['id' => $rental_id, 'company_id' => $company_id])->delete();
+        return $this->getRental($company_id, $rental_id)->delete();
     }
 
     public function getCountTypeRentals(int $company_id, int $client, string $start_date, string $end_date, string $date_filter_by, bool $no_date_to_withdraw): array

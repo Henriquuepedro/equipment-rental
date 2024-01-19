@@ -249,7 +249,7 @@ $('#add-new-address').on('click', function () {
     if (!verifyAddress[0] || $('.new-address-show').length || $('#tableAddressClient tr td[colspan="5"]:visible').length) {
         Toast.fire({
             icon: 'warning',
-            title: `Finalize o cadastro/alteração do endereço, para adicionar um novo.`
+            title: verifyAddress[2] ?? `Finalize o cadastro/alteração do endereço, para adicionar um novo.`
         });
         return false;
     }
@@ -353,7 +353,9 @@ $(document).on('click', '.edit-address', function(){
     }, 100);
 })
 $(document).on('click', '.save-address', function(){
-    if (!verifyAddressComplet()[0]) return false;
+    if (!verifyAddressComplet()[0]) {
+        return false;
+    }
 
     $(this).closest('tr').toggle('slow').find('.address').slideToggle('slow');
 })
@@ -373,7 +375,7 @@ $(document).on('click', '.save-address, .edit-address', function(event){
     if (!verifyAddress[0]) {
         Toast.fire({
             icon: 'warning',
-            title: `Complete o cadastro do endereço para retornar.`
+            title: verifyAddress[2] ?? `Complete o cadastro do endereço para retornar.`
         });
         return false;
     }
@@ -402,7 +404,7 @@ $(document).on('click', '.save-new-address', function(event){
     if (!verifyAddress[0]) {
         Toast.fire({
             icon: 'warning',
-            title: `Complete o cadastro do endereço para retornar.`
+            title: verifyAddress[2] ?? `Complete o cadastro do endereço para retornar.`
         });
         return false;
     }
@@ -445,7 +447,7 @@ $(document).on('click', '.confirm-map', function (){
     if (!verifyAddress[0]) {
         Toast.fire({
             icon: 'warning',
-            title: `Complete o cadastro do ${verifyAddress[1]}º endereço, para confirmar seu endereço.`
+            title: verifyAddress[2] ?? `Complete o cadastro do ${verifyAddress[1]}º endereço, para confirmar seu endereço.`
         });
         return false;
     }
@@ -468,7 +470,7 @@ $('#updateLocationMap').click(function (){
     updateLocation(element);
 })
 
-const verifyAddressComplet = () => {
+const verifyAddressComplet = (valid_form_opened = false) => {
     cleanBorderAddress();
 
     const addrCount = $('.address').length;
@@ -495,7 +497,9 @@ const verifyAddressComplet = () => {
         $('#state_new').css('border', '1px solid red');
         existError = true;
     }
-    if (existError) return [false, 1];
+    if (existError) {
+        return [false, 1];
+    }
 
     for (let countAddr = 0; countAddr < addrCount; countAddr++) {
 
@@ -527,6 +531,11 @@ const verifyAddressComplet = () => {
             return [false, (countAddr + 1)];
         }
     }
+
+    if (valid_form_opened && $('.new-address-show').is(':visible')) {
+        return [false, 0, 'Cancele ou adicione o endereço preenchido para continua.'];
+    }
+
     return [true];
 }
 

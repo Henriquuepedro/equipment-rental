@@ -66,12 +66,12 @@ class BillToPay extends Model
 
     public function edit($data, $id)
     {
-        return $this->where('id', $id)->update($data);
+        return $this->where('id', $id)->first()->fill($data)->save();
     }
 
     public function remove($company_id, $bill_to_pay_id)
     {
-        return $this->where(['id' => $bill_to_pay_id, 'company_id' => $company_id])->delete();
+        return $this->getBill($company_id, $bill_to_pay_id)->delete();
     }
 
     public function getCountTypePayments(int $company_id, int $provider, string $start_date, string $end_date): array
@@ -206,6 +206,6 @@ class BillToPay extends Model
 
     public function updateById(array $data, int $id)
     {
-        return $this->from('bill_to_pay_payments')->where('id', $id)->update($data);
+        return $this->from('bill_to_pay_payments')->where('id', $id)->first()->fill($data)->save();
     }
 }
