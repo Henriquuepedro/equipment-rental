@@ -22,6 +22,7 @@ return [
     'cancelled'     => 'Cancelado', // Either the payment was canceled by one of the parties or expired.
     'refunded'      => 'Devolvido', // The payment was returned to the user.
     'chargedback'   => 'Estornado', // A chargeback was placed on the buyer's credit card.
+    'in_process'    => 'Em processamento',
 
     'accredited'                            => 'Creditado', // credited payment.
     'pending_contingency'                   => 'Em processamento', // the payment is being processed.
@@ -42,6 +43,8 @@ return [
     'cc_rejected_card_error'                => 'Cartão com erro',
     'cc_rejected_card_type_not_allowed'     => 'Tipo de cartão não permitido',
     'pending_waiting_transfer'              => 'Aguardando transferência',
+    'pending_waiting_payment'               => 'Aguardando pagamento',
+    'expired'                               => 'Pagamento vencido',
 
     'account_money'     => 'Saldo Mercado Pago', // Money in the Mercado Pago account.
     'ticket'            => 'Boleto', // Boletos, Caixa Electronica Payment, PayCash, Efecty, Oxxo, etc.
