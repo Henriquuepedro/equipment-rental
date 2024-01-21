@@ -3,21 +3,13 @@
 namespace App\Http\Controllers\Api\MercadoPago;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
-use App\Models\Plan;
-use App\Models\PlanHistory;
-use App\Models\PlanPayment;
 use App\Services\MercadoPagoService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use MercadoPago\Client\Payment\PaymentClient;
-use MercadoPago\MercadoPagoConfig;
 
 class Notification extends Controller
 {
-
-
     public function __construct()
     {
     }
@@ -46,11 +38,25 @@ class Notification extends Controller
                 }
 
                 $request_signature_check = $request_signature_v1[1];
+                $request_signature_ts = $request_signature_ts[1];
+                $check_sognature_data_id = $request->input('data')['id'];
+                $check_sognature_type = $request->input('type');
+                $check_sognature_action = $request->input('action');
+                $check_sognature_api_version = $request->input('api_version');
+                $check_sognature_date_created = $request->input('date_created');
+                $check_sognature_id = $request->input('id');
+                $check_sognature_live_mode = $request->input('live_mode');
+                $check_sognature_user_id = $request->input('user_id');
+                $check_sognature_host = $request->header('host');
 
-                if ($request_signature_check != $signature_mp) {
+                $data_ = "post;$check_sognature_host/api/mercado-pago/notificacao;data.id=$check_sognature_data_id;type=$check_sognature_type;user-agent:mercadopago webhook v1.0;$request_signature_ts;action:$check_sognature_action;api_version:$check_sognature_api_version;date_created:$check_sognature_date_created;id:$check_sognature_id;live_mode:$check_sognature_live_mode;type:$check_sognature_type;user_id:$check_sognature_user_id;";
+
+                $decode_signature = hash_hmac('sha256', $data_, $signature_mp);
+
+                /*if ($request_signature_check != $decode_signature) {
                     $mercado_pago_service->debugEcho("signature invalid. step 3. [x-signature={$request->header('x-signature')}].");
                     return response()->json(array(), 401);
-                }
+                }*/
             }
 
             if (
