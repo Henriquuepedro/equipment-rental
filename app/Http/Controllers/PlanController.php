@@ -237,7 +237,7 @@ class PlanController extends Controller
             $this->validatePaymentResult($payment);
             Log::info("Payment created successfully to the company $company_id to the plan $plan.", [
                 'request'  => $createRequest,
-                'response' => $payment->getResponse()
+                'response' => $payment
             ]);
         } catch (MPApiException $exception) {
             $error_message = $exception->getApiResponse() ?? $exception->getMessage();
