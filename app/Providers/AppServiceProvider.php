@@ -57,7 +57,8 @@ use Illuminate\Contracts\View\View;
 use App\Models\Company;
 use Illuminate\Support\Facades\URL;
 
-class AppServiceProvider extends ServiceProvider
+class
+AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -84,7 +85,6 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') !== 'local') {
             URL::forceScheme('https');
         }
-
 
         // Variaveis para serem usadas em todas as views
         // Definir um array chamado settings contendo a suas
@@ -148,7 +148,7 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    private function loadObservers()
+    private function loadObservers(): void
     {
         Address::observe(AddressObserver::class);
         BillToPay::observe(BillToPayObserver::class);

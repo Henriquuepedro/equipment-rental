@@ -45,7 +45,6 @@ class Kernel extends HttpKernel
         ValidatePostSize::class,
         TrimStrings::class,
         ConvertEmptyStringsToNull::class,
-        HttpLogger::class
     ];
 
     /**
@@ -87,6 +86,7 @@ class Kernel extends HttpKernel
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
         'admin-master' => AdminMaster::class,
-        'log-viewer' => LogViewer::class
+        'log-viewer' => LogViewer::class,
+        'http-logger-api' => HttpLogger::class
     ];
 }

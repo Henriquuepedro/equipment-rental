@@ -1,23 +1,26 @@
 <?php
 
+use Spatie\HttpLogger\DefaultLogWriter;
+use Spatie\HttpLogger\LogNonGetRequests;
+
 return [
 
     /*
      * The log profile which determines whether a request should be logged.
      * It should implement `LogProfile`.
      */
-    'log_profile' => \Spatie\HttpLogger\LogNonGetRequests::class,
+    'log_profile' => LogNonGetRequests::class,
 
     /*
      * The log writer used to write the request to a log.
      * It should implement `LogWriter`.
      */
-    'log_writer' => \Spatie\HttpLogger\DefaultLogWriter::class,
+    'log_writer' => DefaultLogWriter::class,
 
     /*
      * The log channel used to write the request.
      */
-    'log_channel' => env('LOG_CHANNEL', 'stack'),
+    'log_channel' => env('LOG_CHANNEL_HTTPLOGGER', 'daily'),
 
     /*
      * The log level used to log the request.
