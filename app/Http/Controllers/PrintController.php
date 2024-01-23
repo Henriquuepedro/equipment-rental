@@ -150,6 +150,11 @@ class PrintController extends Controller
         $interval_dates         = explode(' - ', $request->input('intervalDates'));
         $data_filter_view_pdf   = array();
 
+        if (empty($company_id)) {
+            return redirect()->route('report.rental')
+                ->withErrors("Selecione uma empresa.");
+        }
+
         $date_start     = dateBrazilToDateInternational($interval_dates[0]);
         $date_end       = dateBrazilToDateInternational($interval_dates[1]);
 
@@ -228,7 +233,7 @@ class PrintController extends Controller
         $rentals = $this->rental->getRentalsToReportWithFilters($company_id, $filters, $type_report === 'synthetic');
         if (!$rentals) {
             return redirect()->route('report.rental')
-                ->with('warning', "Nenhum registro encontrado para o filtro aplicado!");
+                ->withErrors("Nenhum registro encontrado para o filtro aplicado!");
         }
 
         $company_data = $this->company->getCompany($company_id);
@@ -264,6 +269,11 @@ class PrintController extends Controller
         $interval_dates         = explode(' - ', $request->input('intervalDates'));
         $data_filter_view_pdf   = array();
 
+        if (empty($company_id)) {
+            return redirect()->route('report.bill')
+                ->withErrors("Selecione uma empresa.");
+        }
+
         $date_start     = dateBrazilToDateInternational($interval_dates[0]);
         $date_end       = dateBrazilToDateInternational($interval_dates[1]);
 
@@ -290,7 +300,7 @@ class PrintController extends Controller
         // Valida se foi enviado 'desc' ou 'asc' pelo usuário.
         if (!in_array($order_by_direction, array('desc', 'asc'))) {
             return redirect()->route('report.bill')
-                ->with('warning', "Ordenação do relatório incorreta.");
+                ->withErrors("Ordenação do relatório incorreta.");
         }
 
         // Recupera o campo correspondente para ordenar.
@@ -306,7 +316,7 @@ class PrintController extends Controller
                 break;
             default:
                 return redirect()->route('report.bill')
-                    ->with('warning', "Ordenação do relatório incorreta.");
+                    ->withErrors("Ordenação do relatório incorreta.");
         }
 
         $data_filter_view_pdf["Data de $date_filter_str"] = "de $interval_dates[0] até $interval_dates[1]";
@@ -358,7 +368,7 @@ class PrintController extends Controller
 
         if (!$bills) {
             return redirect()->route('report.bill')
-                ->with('warning', "Nenhum registro encontrado para o filtro aplicado!");
+                ->withErrors("Nenhum registro encontrado para o filtro aplicado!");
         }
 
         $company_data = $this->company->getCompany($company_id);

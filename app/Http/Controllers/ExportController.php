@@ -10,6 +10,7 @@ use App\Models\Equipment;
 use App\Models\Provider;
 use App\Models\Vehicle;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Lang;
@@ -40,11 +41,17 @@ class ExportController extends Controller
 
     /**
      * @param Request $request
-     * @return BinaryFileResponse|Response
+     * @return BinaryFileResponse|Response|RedirectResponse
      */
-    public function register(Request $request): BinaryFileResponse | Response
+    public function register(Request $request): BinaryFileResponse | Response | RedirectResponse
     {
         $company_id = hasAdminMaster() ? $request->input('company') : $request->user()->company_id;
+
+        if (empty($company_id)) {
+            return redirect()->route('report.register')
+                ->withErrors("Selecione uma empresa.");
+        }
+
         $dataToExport = new RegistersExport(
             $request->input('type'),
             $company_id,

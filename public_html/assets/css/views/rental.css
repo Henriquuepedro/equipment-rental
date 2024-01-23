@@ -127,6 +127,9 @@ i.fa.input-group-text.text-white {
 .wizard > .content > .body ul {
     padding-top: 5px;
 }
+.wizard > .content {
+    border: unset;
+}
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
     background-color: #2196f3 !important;
 }
