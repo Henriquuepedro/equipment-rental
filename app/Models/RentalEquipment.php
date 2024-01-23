@@ -74,9 +74,14 @@ class RentalEquipment extends Model
     public function remove(int $company_id, int $rental_id)
     {
         foreach ($this->where(['rental_id' => $rental_id, 'company_id' => $company_id])->orderBy('id', 'DESC')->get() as $equipment) {
-            $this->where('id', $equipment->id)->delete();
+            $this->getById($equipment->company_id, $equipment->id)->delete();
         }
         return true;
+    }
+
+    public function getById(int $company_id, int $id)
+    {
+        return $this->where(['id' => $id, 'company_id' => $company_id])->first();
     }
 
     public function getEquipments(int $company_id, int $rental_id)
@@ -106,7 +111,7 @@ class RentalEquipment extends Model
 
     public function updateByRentalAndRentalEquipmentId(int $rental_id, int $rental_equipment_id, array $data): bool
     {
-        return (bool)$this->where(array('id' => $rental_equipment_id, 'rental_id' => $rental_id))->update($data);
+        return (bool)$this->where(array('id' => $rental_equipment_id, 'rental_id' => $rental_id))->first()->fill($data)->save();
     }
 
     public function getEquipmentsInUse(int $company_id, int $equipment_id)

@@ -59,7 +59,7 @@ class PlanPayment extends Model
 
     public function edit($data, $company_id, $id)
     {
-        return $this->where(['company_id' => $company_id, 'id' => $id])->update($data);
+        return $this->where(['company_id' => $company_id, 'id' => $id])->first()->fill($data)->save();
     }
 
     public function getPaymentByTransaction(int $id_transaction)

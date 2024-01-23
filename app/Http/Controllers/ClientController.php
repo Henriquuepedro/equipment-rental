@@ -176,7 +176,7 @@ class ClientController extends Controller
         $user_id    = $request->user()->id;
         $company_id = $request->user()->company_id;
         // remover todos os endereços desse cliente
-        $this->address->deleteAddressClient($client_id);
+        $this->address->deleteAddressClient($company_id, $client_id);
         // data address
         $createAddress = array();
         $qtyAddress = isset($request->name_address) ? count($request->name_address) : 0;
@@ -240,7 +240,7 @@ class ClientController extends Controller
         $birth_date     = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $nationality    = filter_var($request->input('nationality'));
         $marital_status = filter_var($request->input('marital_status'));
-        $active         = (bool)$request->input('active');
+        $active         = $request->input('active') ? 1 : 0;
 
         if (empty($nationality)) {
             $nationality = null;

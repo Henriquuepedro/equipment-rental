@@ -62,7 +62,7 @@
 @stop
 
 @section('js')
-    <script src="http://sdk.mercadopago.com/js/v2"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
     <script src="https://www.mercadopago.com/v2/security.js" view="checkout"></script>
     <script>
 
@@ -82,7 +82,7 @@
                       "amount" é a quantia total a pagar por todos os meios de pagamento com exceção da Conta Mercado Pago e Parcelas sem cartão de crédito, que têm seus valores de processamento determinados no backend através do "preferenceId"
                     */
                     amount: $('[name="amount_plan"]').val(),
-                    preferenceId: "<PREFERENCE_ID>",
+                    // preferenceId: "<PREFERENCE_ID>",
                     payer: {
                         firstName: '{{ $company_data->first_company_name }}',
                         lastName: '{{ $company_data->last_company_name }}',
@@ -110,12 +110,12 @@
                     },
                     paymentMethods: {
                         creditCard: "all",
-                        debitCard: "all",
+                        //debitCard: "all",
                         ticket: "all",
                         bankTransfer: "all",
-                        atm: "all",
-                        onboarding_credits: "all",
-                        wallet_purchase: "all",
+                        //atm: "all",
+                        //onboarding_credits: "all",
+                        //wallet_purchase: "all",
                         maxInstallments: 12
                     },
                 },
@@ -123,7 +123,7 @@
                     onReady: () => {
                         /*
                          Callback chamado quando o Brick está pronto.
-                         Aqui, você pode ocultar seu site, por exemplo.
+                         Aqui, você pode ocultar o seu site, por exemplo.
                         */
                     },
                     onSubmit: ({ selectedPaymentMethod, formData }) => {
@@ -140,40 +140,48 @@
                                 },
                                 body: JSON.stringify(new_object),
                             })
-                                .then((response) => {
-                                    if (response.ok) {
-                                        return response.json().then((response) => {
-                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
-                                        });
-                                    }
-
-                                    reject();
-                                    return response.json().then(error => {
-                                        if (typeof error.payment_id !== "undefined") {
+                            .then((response) => {
+                                if (response.ok) {
+                                    return response.json().then((response) => {
+                                        if (typeof response.payment_id !== "undefined" && response.payment_id) {
                                             renderStatusScreenBrick(bricksBuilder, response.payment_id);
                                         } else {
                                             Swal.fire({
                                                 icon: 'error',
                                                 title: 'Pagamento não realizado',
-                                                html: error.errors
+                                                html: response.errors
                                             });
                                         }
                                     });
-                                })
-                                .then((response) => {
-                                    // receber o resultado do pagamento
-                                    resolve();
-                                })
-                                .catch((error) => {
-                                    // manejar a resposta de erro ao tentar criar um pagamento
-                                    reject();
+                                }
 
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Pagamento não realizado',
-                                        html: error.errors
-                                    });
+                                reject();
+                                return response.json().then(error => {
+                                    if (typeof error.payment_id !== "undefined" && error.payment_id) {
+                                        renderStatusScreenBrick(bricksBuilder, error.payment_id);
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Pagamento não realizado',
+                                            html: error.errors
+                                        });
+                                    }
                                 });
+                            })
+                            .then((response) => {
+                                // receber o resultado do pagamento
+                                resolve();
+                            })
+                            .catch((error) => {
+                                // manejar a resposta de erro ao tentar criar um pagamento
+                                reject();
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Pagamento não realizado',
+                                    html: error.errors
+                                });
+                            });
                         });
                     },
                     onError: (error) => {
@@ -199,10 +207,12 @@
                         hideStatusDetails: true,
                         hideTransactionDate: true,
                         style: {
-                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default",
-                            texts: {
-                                ctaReturnLabel: "Ver solicitações"
-                            }
+                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default"
+                        },
+                        texts: {
+                            //ctaGeneralErrorLabel: "",
+                            //ctaCardErrorLabel: "",
+                            ctaReturnLabel: "Ver solicitações",
                         }
                     },
                     backUrls: {

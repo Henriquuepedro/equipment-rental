@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Permission;
 use App\Models\Plan;
 use App\Models\User;
+use App\Notifications\RegisterUserNotification;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -102,19 +103,27 @@ class UserController extends Controller
 
         $dataUserUpdate = [
             'name'  => filter_var($request->input('name'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL),
-            'phone' => filter_var(onlyNumbers($request->input('phone')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL),
-            'style_template'  => $request->input('style_template')
+            'phone' => filter_var(onlyNumbers($request->input('phone')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL)
         ];
 
+        if ($request->has('style_template')) {
+            $dataUserUpdate['style_template'] = $request->input('style_template');
+        }
         if ($request->input('password')) {
             $dataUserUpdate['password'] = Hash::make($request->input('password'));
         }
 
-        if ($isAjax && $user->email != $request->input('email')) {
+        if ($isAjax && $request->has('email')) {
             $dataUserUpdate['email'] = $request->input('email') ? filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) : null;
 
             if (!$dataUserUpdate['email']) {
                 return response()->json(['success' => false, 'data' => 'Informe um endereço de e-mail válido!']);
+            }
+
+            if ($user->email != $request->input('email')) {
+                $dataUserUpdate['email_verified_at'] = null;
+                $dataUserUpdate['logout'] = 1;
+                $this->user->notify(new RegisterUserNotification());
             }
         }
 
@@ -171,6 +180,8 @@ class UserController extends Controller
         $company_id = $request->user()->company_id;
 
         $uploadPath = "assets/images/profile/$user_id"; // Faz o upload para o caminho 'admin/dist/images/autos/{ID}/'
+        checkPathExistToCreate($uploadPath);
+
         $extension = $file->getClientOriginalExtension(); // Recupera extensão da imagem
         $nameOriginal = $file->getClientOriginalName(); // Recupera nome da imagem
         $imageName = base64_encode($nameOriginal); // Gera um novo nome para a imagem.
@@ -207,6 +218,7 @@ class UserController extends Controller
         $email          = filter_var($request->input('email_modal'), FILTER_VALIDATE_EMAIL);
         $password       = Hash::make($request->input('password_modal'));
         $allowed_users  = 1;
+        $type_user      = filter_var($request->input('type_user', User::$TYPE_USER['user']), FILTER_SANITIZE_NUMBER_INT);
 
         $data_company = $this->company->getCompany($company_id);
         if ($data_company->plan_id) {
@@ -219,9 +231,9 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => "Limite de usuários atingidos. Seu plano permite cadastrar somente $allowed_users usuários."]);
         }
 
-        $permissions = array_map(function($permission) {
+        $permissions = $type_user === User::$TYPE_USER['user'] ? array_map(function($permission) {
             return (int)$permission;
-        }, $request->input('permission') ?? []);
+        }, $request->input('permission') ?? []) : [];
 
         if (!$email) {
             return response()->json(['success' => false, 'message' => 'Endereço de e-mail inválido.']);
@@ -233,7 +245,9 @@ class UserController extends Controller
             'phone'         => $phone,
             'password'      => $password,
             'permission'    => json_encode($permissions),
-            'company_id'    => $company_id
+            'company_id'    => $company_id,
+            'type_user'     => $type_user,
+            'style_template'=> User::$STYLE_TEMPLATE['black']
         ]);
 
         if (!$create) {
@@ -304,7 +318,7 @@ class UserController extends Controller
                 'email'         => $user['email'],
                 'phone'         => $user['phone'],
                 'active'        => $user['active'],
-                'image'         => asset($user['profile'] ? "assets/images/profile/{$user['id']}/{$user['profile']}" : "assets/images/profile/profile.png"),
+                'image'         => asset($user['profile'] ? "assets/images/profile/{$user['id']}/{$user['profile']}" : "assets/images/system/profile.png"),
                 'last_access'   => $user['last_access_at'] ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($user['last_access_at'])) : 'Sem registro',
                 'updated_at'    => $user['updated_at'] ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($user['updated_at'])) : 'Sem registro',
                 'last_login'    => $user['last_login_at'] ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($user['last_login_at'])) : 'Sem registro',
@@ -394,7 +408,7 @@ class UserController extends Controller
 
     public function deleteUser(UserDeletePost $request): JsonResponse
     {
-        return response()->json(['success' => false, 'message' => 'Você não tem permissão para fazer essa operação!']);
+//        return response()->json(['success' => false, 'message' => 'Você não tem permissão para fazer essa operação!']);
         $company_id     = $request->user()->company_id;
         $user_id_session= $request->user()->id;
         $user_id        = $request->input('user_id');

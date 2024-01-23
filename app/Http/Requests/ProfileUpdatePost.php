@@ -31,17 +31,18 @@ class ProfileUpdatePost extends FormRequest
             'password'  => 'nullable|confirmed|min:6',
             'email'     => [
                 'nullable',
-                function ($attribute, $value, $fail) {
-                    if (!empty($value)) {
-                        $exists = DB::table('users')
-                            ->where('email', $value)
-                            ->whereNotIn('id', [$this->input('user_id')])
-                            ->count();
-                        if ($exists) {
-                            $fail('Endereço de e-mail já está em uso.');
-                        }
-                    }
-                }
+                'unique:users,email,'.$this->input('user_id') ?? $this->input('update_user_id'),
+//                function ($attribute, $value, $fail) {
+//                    if (!empty($value)) {
+//                        $exists = DB::table('users')
+//                            ->where('email', $value)
+//                            ->whereNotIn('id', [])
+//                            ->count();
+//                        if ($exists) {
+//                            $fail('Endereço de e-mail já está em uso.');
+//                        }
+//                    }
+//                }
             ],
             'style_template'    => [Rule::in([1,3])]
         ];
@@ -55,6 +56,7 @@ class ProfileUpdatePost extends FormRequest
     {
         return [
             'name.required'         => 'Digite o seu nome.',
+            'email.unique'          => 'Endereço de e-mail já está em uso.',
             'phone.*'               => 'Digite um número de telefone válido.',
             'password.confirmed'    => 'As senhas não correspondem.',
             'password.min'          => 'A nova senha precisa ter no mínimo 6 caracteres'

@@ -63,7 +63,7 @@ class Budget extends Model
 
     public function updateByBudgetAndCompany(int $budget_id, int $company_id, array $data)
     {
-        return $this->where(array('id' => $budget_id, 'company_id' => $company_id))->update($data);
+        return $this->where(array('id' => $budget_id, 'company_id' => $company_id))->first()->fill($data)->save();
     }
 
     public function getNextCode(int $company_id)
@@ -133,6 +133,6 @@ class Budget extends Model
 
     public function remove($budget_id, $company_id)
     {
-        return $this->where(['id' => $budget_id, 'company_id' => $company_id])->delete();
+        return $this->getBudget($budget_id, $company_id)->delete();
     }
 }

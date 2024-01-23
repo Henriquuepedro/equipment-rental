@@ -279,9 +279,23 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="form-group col-md-12">
+                            <div class="col-md-12">
+                                <div class="alert alert-fill-primary" role="alert">
+                                    <i class="mdi mdi-alert-circle"></i> Após a criação do usuário, o mesmo deverá confirmar seu e-mail para acessar a plataforma.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-7">
                                 <label>Nome</label>
                                 <input type="text" class="form-control" name="name_modal">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label>Tipo de usuário</label>
+                                <select class="form-control" name="type_user">
+                                    <option value="0">Usuário</option>
+                                    <option value="1">Administrador</option>
+                                </select>
                             </div>
                         </div>
                         <div class="row">
@@ -298,6 +312,7 @@
                             <div class="form-group col-md-6">
                                 <label>Senha</label>
                                 <input type="password" class="form-control" name="password_modal" id="password_modal">
+                                <small>A senha deve conter no mínimo 8 dígitos.</small>
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Confirme a Senha</label>
@@ -309,15 +324,25 @@
                                 <hr>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-5 text-center">
-                                <h4 class="no-margin">Permissões de acesso</h4>
-                                <small>Defina as permissão do usuário</small>
+                        <div class="user-permission">
+                            <div class="row">
+                                <div class="col-md-12 mb-3 text-center">
+                                    <h4 class="no-margin">Permissões de acesso</h4>
+                                    <small>Defina as permissão do usuário</small>
+                                    <br>
+                                    <div class="d-flex justify-content-center mt-4">
+                                        <div class="switch">
+                                            <input type="checkbox" class="switch-input select-all-permission" id="permission_select_all_permission">
+                                            <label for="permission_select_all_permission" class="switch-label"></label>
+                                        </div>
+                                        Selecionar Tudo
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="d-flex flex-wrap justify-content-center">
-                            {!! $htmlPermissions !!}
+                            <div class="d-flex flex-wrap justify-content-center">
+                                {!! $htmlPermissions !!}
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
@@ -339,7 +364,14 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="d-flex flex-wrap justify-content-center"></div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <div class="switch">
+                                <input type="checkbox" class="switch-input select-all-permission" id="permission_select_all_permission_update">
+                                <label for="permission_select_all_permission_update" class="switch-label"></label>
+                            </div>
+                            Selecionar Tudo
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center user-permission-update"></div>
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
                         <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
@@ -370,6 +402,7 @@
                             <div class="form-group col-md-6">
                                 <label>E-mail</label>
                                 <input type="text" name="update_user_email" id="update_user_email" class="form-control">
+                                <small>Ao realizar a alteração de e-mail, o usuário deverá verificar o e-mail novamente.</small>
                             </div>
                             <div class="form-group col-md-6">
                                 <label>Telefone</label>

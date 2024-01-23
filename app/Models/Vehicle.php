@@ -39,12 +39,12 @@ class Vehicle extends Model
 
     public function remove($vehicle_id, $company_id)
     {
-        return $this->where(['id' => $vehicle_id, 'company_id' => $company_id])->delete();
+        return $this->getVehicle($vehicle_id, $company_id)->delete();
     }
 
     public function edit($data, $vehicle_id)
     {
-        return $this->where('id', $vehicle_id)->update($data);
+        return $this->where('id', $vehicle_id)->first()->fill($data)->save();
     }
 
     public function getVehicles($company_id, $init = null, $length = null, $searchVehicle = null, $orderBy = array(), $select = '*')

@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\LogEvent;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 
 const DATETIME_INTERNATIONAL = 'Y-m-d H:i:s';
 const DATE_INTERNATIONAL = 'Y-m-d';
@@ -109,7 +111,7 @@ if (! function_exists('transformMoneyBr_En')) {
         $value = str_replace(',', '.', $value);
         $value = filter_var($value, FILTER_VALIDATE_FLOAT);
 
-        return (float)$value;
+        return roundDecimal($value);
     }
 }
 
@@ -364,7 +366,7 @@ if (!function_exists('getImageCompanyBase64')) {
         if ($company->logo) {
             $image = "assets/images/company/$company->id/$company->logo";
         } else {
-            $image = "assets/images/company/company.png";
+            $image = "assets/images/system/company.png";
         }
 
         $extension = File::extension($image);
@@ -446,6 +448,8 @@ if (!function_exists('uploadFile')) {
             $imageName = base64_encode($nameOriginal); // Gera um novo nome para a imagem.
             $name_file = substr($imageName, 0, 15) . rand(0, 100) . ".$extension"; // Pega apenas o 15 primeiros e adiciona a extensão.
         }
+
+        checkPathExistToCreate($upload_path);
 
         $uploaded = $file->move($upload_path, $name_file);
 
@@ -608,7 +612,7 @@ if (!function_exists('subDate')) {
 if (!function_exists('roundDecimal')) {
     function roundDecimal(string|float $value, int $decimal = 2): float
     {
-        return (float)number_format($value, 2, '.', '');
+        return (float)number_format($value, $decimal, '.', '');
     }
 }
 
@@ -688,5 +692,63 @@ if (! function_exists('getNamePaymentType')) {
         }
 
         return $payment_type;
+    }
+}
+
+if (! function_exists('checkPathExistToCreate')) {
+    /**
+     * Se o caminho não existir, será criado.
+     *
+     * @param string $path
+     */
+    function checkPathExistToCreate(string $path): void
+    {
+        $path_validate = public_path();
+        foreach (explode('/', $path) as $p_) {
+            $path_validate .= "/$p_";
+            if (!is_dir($path_validate)) {
+                File::makeDirectory($path_validate);
+            }
+        }
+    }
+}
+
+if (! function_exists('createLogEvent')) {
+    /**
+     * Se o caminho não existir, será criado.
+     *
+     * @param string $event             Nome do evento.
+     * @param object $auditable_model   Entidade de log.
+     */
+    function createLogEvent(string $event, object $auditable_model): void
+    {
+        try {
+            $details = null;
+            if ($event === 'updated') {
+                $old_log = [];
+                foreach ($auditable_model->getDirty() as $dity_key => $dirty_value) {
+                    $old_log[$dity_key] = $auditable_model->getOriginal($dity_key);
+                }
+
+                $details = [
+                    'old' => $old_log,
+                    'new' => $auditable_model->getDirty()
+                ];
+            } elseif ($event === 'deleted') {
+                $details = $auditable_model->toArray();
+            }
+
+            LogEvent::create([
+                'event'             => $event,
+                'user_id'           => auth()->id(),
+                'event_date'        => now(),
+                'ip'                => request()->ip(),
+                'auditable_id'      => $auditable_model->id,
+                'auditable_type'    => $auditable_model::class,
+                'details'           => $details
+            ]);
+        } catch (Throwable $exception) {
+            Log::emergency("Error to save log event. {$exception->getMessage()}", $exception->getTrace());
+        }
     }
 }

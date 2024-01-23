@@ -1,8 +1,8 @@
 /node_modules
-/public/hot
-/public/storage
-/public/assets/images/company
-/public/assets/images/profile
+/public_html/hot
+/public_html/storage
+/public_html/assets/images/company
+/public_html/assets/images/profile
 /storage/*.key
 /vendor
 .env
@@ -14,3 +14,4 @@ npm-debug.log
 yarn-error.log
 rules.txt
 .idea/
+composer.lock

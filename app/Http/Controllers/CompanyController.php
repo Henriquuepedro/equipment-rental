@@ -38,7 +38,7 @@ class CompanyController extends Controller
         $company_id = Auth::user()->__get('company_id');
 
         $company = $this->company->getCompany($company_id);
-        $company->logo = asset($company->logo ? "assets/images/company/{$company_id}/{$company->logo}" : "assets/images/company/company.png");
+        $company->logo = asset($company->logo ? "assets/images/company/{$company_id}/{$company->logo}" : "assets/images/system/company.png");
 
         $htmlPermissions     = getFormPermission($this->permission->getAllPermissions());
 
@@ -133,6 +133,8 @@ class CompanyController extends Controller
     private function uploadLogoCompany($company_id, $file): bool|string
     {
         $uploadPath = "assets/images/company/$company_id";
+        checkPathExistToCreate($uploadPath);
+
         $extension = $file->getClientOriginalExtension(); // Recupera extensão da imagem
         $nameOriginal = $file->getClientOriginalName(); // Recupera nome da imagem
         $imageName = base64_encode($nameOriginal); // Gera um novo nome para a imagem.

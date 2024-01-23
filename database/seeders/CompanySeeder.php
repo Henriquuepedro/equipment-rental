@@ -17,15 +17,15 @@ class CompanySeeder extends Seeder
     {
         if (empty(Company::all()->toArray())) {
             Company::create([
-                'id'            => 1,
-                'name'          => Str::random(10),
-                'fantasy'       => Str::random(10),
-                'type_person'   => 'pj',
-                'cpf_cnpj'      => '00000000000099',
-                'email'         => Str::random(10) . '@gmail.com',
-                'phone_1'       => '11987654321',
-                'contact'       => 'Teste',
-                'plan_id'       => 4
+                'id'                    => 1,
+                'name'                  => 'Locaí',
+                'fantasy'               => 'Locaí',
+                'type_person'           => 'pj',
+                'cpf_cnpj'              => '00000000000001',
+                'email'                 => 'contato@locai.com.br',
+                'phone_1'               => '11987654321',
+                'contact'               => 'Locaí',
+                'plan_expiration_date'  => sumDate(dateNowInternational(), 10)
             ]);
         }
     }

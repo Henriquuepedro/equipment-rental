@@ -40,17 +40,22 @@ class EquipmentWallet extends Model
 
     public function remove($equipment_wallet_id)
     {
-        return $this->where(['id' => $equipment_wallet_id])->delete();
+        return $this->getById($equipment_wallet_id)->delete();
     }
 
     public function edit($data, $client_id)
     {
-        return $this->where('id', $client_id)->update($data);
+        return $this->where('id', $client_id)->first()->fill($data)->save();
+    }
+
+    public function getById($equipment_wallet_id)
+    {
+        return $this->find($equipment_wallet_id);
     }
 
     public function removeAllEquipment($equipment_id, $company_id)
     {
-        return $this->where(['equipment_id' => $equipment_id, 'company_id' => $company_id])->delete();
+        return $this->getWalletsEquipment($company_id, $equipment_id)->each(fn ($register) => $register->delete());
     }
 
     public function getWalletsEquipment($company_id, $equipment_id)

@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'title' => 'Sistema Locação',
+    'title' => env('APP_NAME', 'Laravel'),
     'title_prefix' => '',
     'title_postfix' => '',
 

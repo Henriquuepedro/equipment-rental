@@ -52,7 +52,7 @@ class BudgetResidue extends Model
 
     public function remove($budget_id, $company_id)
     {
-        return $this->where(['budget_id' => $budget_id, 'company_id' => $company_id])->delete();
+        return $this->getResidues($company_id, $budget_id)->each(fn ($register) => $register->delete());
     }
 
     public function getResidues($company_id, $budget_id)
