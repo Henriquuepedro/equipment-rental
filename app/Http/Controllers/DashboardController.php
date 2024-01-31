@@ -21,7 +21,6 @@ class DashboardController extends Controller
     private Client $client;
     private Vehicle $vehicle;
     private Equipment $equipment;
-    private Rental $rental;
     private Provider $provider;
     private RentalPayment $rental_payment;
     private BillToPayPayment $bill_to_pay_payment;
@@ -31,7 +30,6 @@ class DashboardController extends Controller
         $this->client               = new Client();
         $this->vehicle              = new Vehicle();
         $this->equipment            = new Equipment();
-        $this->rental               = new Rental();
         $this->provider             = new Provider();
         $this->rental_payment       = new RentalPayment();
         $this->bill_to_pay_payment  = new BillToPayPayment();

@@ -276,7 +276,7 @@ class BillsToPayController extends Controller
         $company_id                     = $request->user()->company_id;
         $user_id                        = $request->user()->id;
         $provider                       = (int)filter_var($request->input('provider'), FILTER_SANITIZE_NUMBER_INT);
-        $description                    = strip_tags($request->input('description'), ALLOWABLE_TAGS);
+        $description                    = strip_tags($request->input('description'), HALF_ALLOWABLE_TAGS);
         $value                          = transformMoneyBr_En(filter_var($request->input('value'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL));
         $form_payment                   = (int)filter_var($request->input('form_payment'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $calculate_net_amount_automatic = (bool)$request->input('calculate_net_amount_automatic');
