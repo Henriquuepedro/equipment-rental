@@ -190,6 +190,15 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
     });
 
+    // Fluxo de caixa
+    Route::group(['prefix' => '/atendimento', 'as' => 'support.'], function () {
+
+        Route::get('/', [App\Http\Controllers\SupportController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\SupportController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\SupportController::class, 'insert'])->name('insert');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -358,6 +367,18 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
             Route::get('/lancamentos-vencidos', [App\Http\Controllers\DashboardController::class, 'getBillingOpenLate'])->name('get-billing-open-late');
             Route::get('/pagamentos-por-mes/{months}', [App\Http\Controllers\DashboardController::class, 'getBillsForMonths'])->name('get-bills-for-month');
+
+        });
+
+        // Fluxo de caixa
+        Route::group(['prefix' => '/atendimento', 'as' => 'support.'], function () {
+
+            Route::post('/cadastro/salvar-imagem/{path?}', [App\Http\Controllers\SupportController::class, 'saveImageDescription'])->name('save_image_description');
+            Route::get('/listar-atendimentos', [App\Http\Controllers\SupportController::class, 'listSupports'])->name('listSupports');
+            Route::get('/visualizar-atendimento/{support_id?}', [App\Http\Controllers\SupportController::class, 'getSupport'])->name('get_support');
+            Route::post('/cadastrar-comentario/{support_id?}', [App\Http\Controllers\SupportController::class, 'registerComment'])->name('register_comment');
+            Route::post('/atualizar-prioridade/{support_id?}', [App\Http\Controllers\SupportController::class, 'updatePriority'])->name('update_priority');
+            Route::post('/atualizar-situacao/{support_id?}', [App\Http\Controllers\SupportController::class, 'updateStatus'])->name('update_status');
 
         });
     });

@@ -16,7 +16,8 @@ const DATE_BRAZIL = 'd/m/Y';
 const DATETIME_INTERNATIONAL_TIMEZONE = 'Y-m-d H:i:sP';
 const DATETIME_INTERNATIONAL_MICROSECOND = 'Y-m-d H:i:s.u';
 const TIMEZONE_DEFAULT = 'America/Fortaleza';
-const ALLOWABLE_TAGS = "<p><br><h1><h2><h3><h4><h5><h6><strong><b><em><i><u><small><ul><ol><li><div><span><a>";
+const HALF_ALLOWABLE_TAGS = "<p><br><h1><h2><h3><h4><h5><h6><strong><b><em><i><u><small><ul><ol><li><div><span><a>";
+const FULL_ALLOWABLE_TAGS = "<p><br><h1><h2><h3><h4><h5><h6><strong><b><em><i><u><s><small><ul><ol><li><div><span><a><img><iframe>";
 const MONTH_NAME_PT = [
     '01'    => 'Janeiro',
     '02'    => 'Fevereiro',
@@ -655,14 +656,14 @@ if (! function_exists('getKeyRandom')) {
     }
 }
 
-if (! function_exists('getColorStatus')) {
+if (! function_exists('getColorStatusMP')) {
     /**
      * Recuperar cor de acordo com o status.
      *
      * @param string $status
      * @return null|string
      */
-    function getColorStatus(string $status): ?string
+    function getColorStatusMP(string $status): ?string
     {
         if (in_array($status, array('pending','inprocess','inmediation'))) {
             return 'warning';
@@ -676,14 +677,14 @@ if (! function_exists('getColorStatus')) {
     }
 }
 
-if (! function_exists('getNamePaymentType')) {
+if (! function_exists('getNamePaymentTypeMP')) {
     /**
      * Recuperar o nome da forma de pagamento.
      *
      * @param object $payment
      * @return null|string
      */
-    function getNamePaymentType(object $payment): ?string
+    function getNamePaymentTypeMP(object $payment): ?string
     {
         $payment_type = __("mp.$payment->payment_type_id");
         $payment_type_complement = ucfirst(str_replace('mp.', '', __("mp.$payment->payment_method_id")));
@@ -750,5 +751,77 @@ if (! function_exists('createLogEvent')) {
         } catch (Throwable $exception) {
             Log::emergency("Error to save log event. {$exception->getMessage()}", $exception->getTrace());
         }
+    }
+}
+
+if (! function_exists('getStatusSupport')) {
+    /**
+     * Recuperar o nome do status de um atendimento.
+     *
+     * @param string $status
+     * @return string
+     */
+    function getStatusSupport(string $status): string
+    {
+        return match ($status) {
+            'open'              => 'Novo',
+            'ongoing'           => 'Em atendimento',
+            'awaiting_return'   => 'Aguardando retorno',
+            'closed'            => 'Finalizado',
+            default             => $status,
+        };
+    }
+}
+
+if (! function_exists('getPrioritySupport')) {
+    /**
+     * Recuperar o nome da prioridade de um atendimento.
+     *
+     * @param string $priority
+     * @return string
+     */
+    function getPrioritySupport(string $priority): string
+    {
+        return match ($priority) {
+            'new'       => 'Novo',
+            'low'       => 'Baixo',
+            'medium'    => 'Médio',
+            'high'      => 'Alto',
+            default     => $priority,
+        };
+    }
+}
+
+if (! function_exists('getColorPrioritySupport')) {
+    /**
+     * Recuperar a cor da prioridade de um atendimento.
+     *
+     * @param string $priority
+     * @return string
+     */
+    function getColorPrioritySupport(string $priority): string
+    {
+        return match ($priority) {
+            'low'       => 'primary',
+            'medium'    => 'warning',
+            'high'      => 'danger',
+            default     => 'success',
+        };
+    }
+}
+
+if (!function_exists('getArrayByValueIn')) {
+    function getArrayByValueIn(?array $array, string $fieldValidate, string $fieldArray)
+    {
+        if ($array === null) {
+            return array();
+        }
+
+        return current(array_filter($array, function($item) use ($fieldValidate, $fieldArray) {
+            if (($item->$fieldArray ?? $item[$fieldArray]) == $fieldValidate) {
+                return true;
+            }
+            return false;
+        }));
     }
 }

@@ -976,3 +976,6 @@ a[disabled] {
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
 }
+.tooltip.show {
+    z-index: 1030
+}

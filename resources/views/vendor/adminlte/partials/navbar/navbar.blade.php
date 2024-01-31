@@ -15,6 +15,11 @@
             {!! $settings['notices'] !!}
         </div>
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link count-indicator" id="messageDropdown" href="#" data-toggle="tooltip" title="Abrir Atendimento">
+                    <i class="mdi mdi-headset"></i>
+                </a>
+            </li>
             <li class="nav-item dropdown d-none d-xl-inline-block user-dropdown">
                 <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                     <img class="img-xs rounded-circle" src="{{ $settings['img_profile'] }}" alt="Profile image">
