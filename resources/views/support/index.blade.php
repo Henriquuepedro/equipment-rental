@@ -387,9 +387,9 @@
             </div>
             <div class="card mb-2 mt-2">
                 <div class="card-body">
-                @if (count($companies))
-                    <div class="row @if (count($companies) === 1) d-none @endif">
-                        <div class="form-group col-md-4">
+                    <div class="row">
+                        @if (count($companies))
+                        <div class="form-group col-md-4 @if (count($companies) === 1) d-none @endif">
                             <label for="company">Empresas</label>
                             <select class="form-control select2" id="company" name="company">
                                 @if (count($companies) !== 1)<option value="0">Selecione a empresa</option>@endif
@@ -398,6 +398,7 @@
                                 @endforeach
                             </select>
                         </div>
+                        @endif
                         <div class="form-group col-md-4">
                             <label for="company">Prioridade</label>
                             <select class="form-control select2" id="priority" name="priority">
@@ -413,7 +414,6 @@
                             <input type="text" name="intervalDates" id="intervalDates" class="form-control" value="{{ formatDateInternational(subDate(dateNowInternational(), 2), DATE_BRAZIL) . ' - ' . $settings['intervalDates']['finish'] }}" />
                         </div>
                     </div>
-                @endif
                 </div>
             </div>
             <div class="card">
