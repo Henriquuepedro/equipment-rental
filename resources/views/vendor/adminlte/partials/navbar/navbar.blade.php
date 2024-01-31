@@ -16,7 +16,7 @@
         </div>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item dropdown">
-                <a class="nav-link count-indicator" id="messageDropdown" href="#" data-toggle="tooltip" title="Abrir Atendimento">
+                <a class="nav-link count-indicator" id="messageDropdown" href="{{ route('support.index') }}" data-toggle="tooltip" title="Atendimentos">
                     <i class="mdi mdi-headset"></i>
                 </a>
             </li>
