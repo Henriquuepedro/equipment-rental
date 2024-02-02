@@ -132,7 +132,7 @@
             <tr>
                 <td class='info'>
                     <span>Número {{ $budget ? 'Orçamento' : 'Locação' }}</span>
-                    <p>{{ formatCodeRental($rental->code) }}</p>
+                    <p>{{ formatCodeIndex($rental->code) }}</p>
                 </td>
             </tr>
             <tr>

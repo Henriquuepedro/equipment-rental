@@ -166,7 +166,7 @@ class BillsToReceiveController extends Controller
         $permissionDelete = hasPermission('BillsToReceiveDeletePost');
 
         foreach ($data['data'] as $value) {
-            $rental_code = formatCodeRental($value->code);
+            $rental_code = formatCodeIndex($value->code);
             $data_prop_button = "data-rental-payment-id='$value->rental_payment_id' data-rental-code='$rental_code' data-name-client='$value->client_name' data-date-rental='" . date(DATETIME_BRAZIL_NO_SECONDS, strtotime($value->created_at)) . "' data-due-date='" . date(DATE_BRAZIL, strtotime($value->due_date)) . "' data-payment-id='$value->payment_id' data-payday='" . date(DATE_BRAZIL, strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "'";
 
             $txt_btn_paid = $type_rental == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
@@ -414,7 +414,7 @@ class BillsToReceiveController extends Controller
             }
 
             $result[] = array(
-                formatCodeRental($value->code),
+                formatCodeIndex($value->code),
                 $data_info_client,
                 formatMoney($value->due_value, 2, 'R$ '),
             );

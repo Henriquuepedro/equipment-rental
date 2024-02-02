@@ -197,7 +197,7 @@ class RentalController extends Controller
         foreach ($data['data'] as $value) {
             if ($response_simplified) {
                 $result[] = array(
-                    formatCodeRental($value->code),
+                    formatCodeIndex($value->code),
                     "<div class='d-flex flex-wrap'>
                         <span class='font-weight-bold w-100'>$value->client_name</span>
                         <span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span>
@@ -321,7 +321,7 @@ class RentalController extends Controller
             }
 
             $result[] = array(
-                formatCodeRental($value->code),
+                formatCodeIndex($value->code),
                 "<div class='d-flex flex-wrap'>
                     <div class='w-100 mb-2'>
                         $strDeliveryDate

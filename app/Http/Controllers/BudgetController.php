@@ -129,7 +129,7 @@ class BudgetController extends Controller
             $buttons = dropdownButtonsDataList($buttons, $value->id);
 
             $result[] = array(
-                formatCodeRental($value->code),
+                formatCodeIndex($value->code),
                 "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>$value->client_name</span><span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span></div>",
                 date(DATETIME_BRAZIL_NO_SECONDS, strtotime($value->created_at)),
                 $buttons

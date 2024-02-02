@@ -69,7 +69,7 @@ class Support extends Model
         $support = $this->select('supports.*', 'companies.name as company_name', 'users.name as user_name')
             ->join('companies', 'supports.company_id', '=', 'companies.id')
             ->join('users', 'supports.user_created', '=', 'users.id')
-            ->where('company_id', $company_id);
+            ->where('supports.company_id', $company_id);
 
         if (!empty($filter)) {
             $support->where($filter);

@@ -149,6 +149,7 @@ class SupportController extends Controller
 
         return response()->json(array_map(function($support) {
             return [
+                'code'          => formatCodeIndex($support['id'], 3),
                 'id'            => $support['id'],
                 'subject'       => $support['subject'],
                 'status'        => $support['status'],
@@ -285,9 +286,15 @@ class SupportController extends Controller
 
     public function updatePriority(Request $request, int $support_id): JsonResponse
     {
-        $company_id = $request->user()->company_id;
-        $support = hasAdminMaster() ? $this->support->getByid($support_id) : $this->support->getByCompany($company_id, $support_id);
-        $new_priority = $request->input('new_priority');
+        if (!hasAdminMaster()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sem autorização para fazer essa ação.'
+            ]);
+        }
+
+        $support        = $this->support->getByid($support_id);
+        $new_priority   = $request->input('new_priority');
 
         if (!$support) {
             return response()->json([
@@ -319,9 +326,7 @@ class SupportController extends Controller
             'priority' => $new_priority
         );
 
-        hasAdminMaster() ?
-            $this->support->updateBySupport($support_id, $data_priority):
-            $this->support->updateBySupportAndCompany($company_id, $support_id, $data_priority);
+        $this->support->updateBySupport($support_id, $data_priority);
 
         return response()->json([
             'success' => true,
@@ -331,8 +336,14 @@ class SupportController extends Controller
 
     public function updateStatus(Request $request, int $support_id): JsonResponse
     {
-        $company_id = $request->user()->company_id;
-        $support = hasAdminMaster() ? $this->support->getByid($support_id) : $this->support->getByCompany($company_id, $support_id);
+        if (!hasAdminMaster()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sem autorização para fazer essa ação.'
+            ]);
+        }
+
+        $support    = $this->support->getByid($support_id);
         $new_status = $request->input('new_status');
 
         if (!$support) {
@@ -372,9 +383,7 @@ class SupportController extends Controller
             $data_update['closed_at'] = null;
         }
 
-        hasAdminMaster() ?
-            $this->support->updateBySupport($support_id, $data_update) :
-            $this->support->updateBySupportAndCompany($company_id, $support_id, $data_update);
+        $this->support->updateBySupport($support_id, $data_update);
 
         return response()->json([
             'success' => true,
