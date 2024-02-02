@@ -123,7 +123,7 @@
             @foreach($bills as $bill)
                 <tr>
                     <td class='info' style='width: 10%'>
-                        {{ formatCodeRental($bill->code) }}
+                        {{ formatCodeIndex($bill->code) }}
                     </td>
                     <td class='info' style='width: {{ $bill_status === 'paid' && $type_report === 'analytic' ? '31' : '57' }}%'>
                         {{ $bill_type === 'receive' ? $bill->client_name : $bill->provider_name }}

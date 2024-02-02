@@ -48,15 +48,53 @@
             outline: 1px solid slategrey;
         }
 
+        @cannot('admin-master')
+        .board-wrapper .portlet-card {
+            cursor: default;
+        }
+        @endcannot
+
     </style>
 @stop
 
 @section('js')
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script src="{{ asset('assets/js/views/support/form.js') }}" type="application/javascript"></script>
     <script>
         $(function () {
             getListSupport();
             loadDaterangePickerInput($('input[name="intervalDates"]'), function () {});
+            @can('admin-master')
+            $('ul[id^="portlet-card-list-"]').sortable({
+                connectWith: 'ul[id^="portlet-card-list-"]',
+                items: ".portlet-card",
+                update:  function (event, ui) {
+                    if (this === ui.item.parent()[0]) {
+                        const code_support = $(ui.item[0]).find('h4.task-title').text();
+                        const id_support = $(ui.item[0]).data('supportId');
+                        const new_status_name = $(ui.item[0]).closest('.board-portlet').find('h4.portlet-heading').text();
+                        const new_status_code = $(ui.item[0]).closest('ul').data('status');
+                        Swal.fire({
+                            title: 'Alterar situação',
+                            html: `Deseja alterar a situação do atendimento: <br><br>${code_support} <br><br>para <b>${new_status_name}</b>?`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#19d895',
+                            cancelButtonColor: '#bbb',
+                            confirmButtonText: 'Sim, Alterar',
+                            cancelButtonText: 'Cancelar',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                updateStatus(id_support, new_status_code, false, false);
+                            } else {
+                                ui.sender.sortable("cancel");
+                            }
+                        });
+                    }
+                }
+            });
+            @endcan
         });
 
         const getListSupport = () => {
@@ -100,7 +138,7 @@
                         @can('admin-master') content_aditional += `<p class="text-info mb-0" style="grid-column-end: 2"><i class="fa-solid fa-user"></i> ${value.user_name}</p>` @endcan;
 
                         $(`#portlet-card-list-${value.status}`).append(
-                            `<li class="portlet-card">
+                            `<li class="portlet-card" data-status="${value.status}" data-support-id="${value.id}">
                                 <p class="task-date">${value.created_at}</p>
                                 <div class="action-dropdown dropdown">
                                     <button type="button" class="dropdown-toggle" id="portlet-action-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -110,7 +148,7 @@
                                         ${buttons}
                                     </div>
                                 </div>
-                                <h4 class="task-title">${value.subject}</h4>
+                                <h4 class="task-title">#${value.code} - ${value.subject}</h4>
                                 ${content_aditional}
                                 <div class="badge badge-inverse-${value.priority_color}">${value.priority_name}</div>
                             </li>`
@@ -181,7 +219,6 @@
                                    ${value.description}
                                 </div>
                                 <div class="sender-details">
-
                                     <img class="sender-avatar img-xs rounded-circle" src="${value.logo_message}" alt="profile image"><span class="font-weight-bold">&nbsp;${value.user_name}&nbsp;</span>
                                     <p class="seen-text pl-1 pr-0">${value.created_at}</p>
                                 </div>
@@ -218,20 +255,6 @@
                 }
             });
         }
-
-        $('#company, #priority, #intervalDates').on('change', function(){
-            getListSupport();
-        });
-
-        $(document).on('click', '.btnOpenUpdatePriority', function(){
-            const support_id = $(this).data('support-id');
-            loadModal('modalUpdatePriority', support_id, true);
-        });
-
-        $(document).on('click', '.btnOpenUpdateStatus', function(){
-            const support_id = $(this).data('support-id');
-            loadModal('modalUpdateStatus', support_id, true);
-        });
 
         $(document).on('click', '.btnViewSupport', function(){
             const support_id = $(this).data('support-id');
@@ -279,6 +302,21 @@
                     btn.attr('disabled', false);
                 }
             });
+        });
+
+        $('#company, #priority, #intervalDates').on('change', function(){
+            getListSupport();
+        });
+
+        @can('admin-master')
+        $(document).on('click', '.btnOpenUpdatePriority', function(){
+            const support_id = $(this).data('support-id');
+            loadModal('modalUpdatePriority', support_id, true);
+        });
+
+        $(document).on('click', '.btnOpenUpdateStatus', function(){
+            const support_id = $(this).data('support-id');
+            loadModal('modalUpdateStatus', support_id, true);
         });
 
         $('#btnUpdatePriority').on('click', function(){
@@ -339,7 +377,14 @@
 
             btn.attr('disabled', true);
 
-            $.ajax({
+            updateStatus(support_id, new_status).done(() => {
+                btn.attr('disabled', false);
+            });
+        });
+        @endcan
+
+        const updateStatus = (support_id, new_status, close_modal = true, reload_list = true) => {
+            return $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -355,15 +400,16 @@
                         title: response.message
                     });
                     if (response.success) {
-                        $('#modalUpdateStatus').modal('hide');
-                        getListSupport();
+                        if (close_modal) {
+                            $('#modalUpdateStatus').modal('hide');
+                        }
+                        if (reload_list) {
+                            getListSupport();
+                        }
                     }
-                },
-                complete: () => {
-                    btn.attr('disabled', false);
                 }
             });
-        });
+        }
     </script>
     @if(in_array('BillsToReceiveView', $permissions)) <script src="{{ asset('assets/js/views/bill_to_receive/index.js') }}" type="application/javascript"></script> @endif
 @stop
@@ -422,22 +468,22 @@
                         <div class="board-portlet">
                             <h4 class="portlet-heading">Novo</h4>
                             <p class="task-number" id="kanban-task-number-open">0 atendimentos</p>
-                            <ul id="portlet-card-list-open" class="portlet-card-list"></ul>
+                            <ul id="portlet-card-list-open" class="portlet-card-list" data-status="open"></ul>
                         </div>
                         <div class="board-portlet">
                             <h4 class="portlet-heading">Em atendimento</h4>
                             <p class="task-number" id="kanban-task-number-ongoing">0 atendimentos</p>
-                            <ul id="portlet-card-list-ongoing" class="portlet-card-list"></ul>
+                            <ul id="portlet-card-list-ongoing" class="portlet-card-list" data-status="ongoing"></ul>
                         </div>
                         <div class="board-portlet">
                             <h4 class="portlet-heading">Aguardando retorno</h4>
                             <p class="task-number" id="kanban-task-number-awaiting_return">0 atendimentos</p>
-                            <ul id="portlet-card-list-awaiting_return" class="portlet-card-list"></ul>
+                            <ul id="portlet-card-list-awaiting_return" class="portlet-card-list" data-status="awaiting_return"></ul>
                         </div>
                         <div class="board-portlet">
                             <h4 class="portlet-heading">Finalizado</h4>
                             <p class="task-number" id="kanban-task-number-closed">0 atendimentos</p>
-                            <ul id="portlet-card-list-closed" class="portlet-card-list"></ul>
+                            <ul id="portlet-card-list-closed" class="portlet-card-list" data-status="closed"></ul>
                         </div>
                     </div>
                 </div>
