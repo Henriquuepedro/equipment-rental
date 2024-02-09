@@ -9,6 +9,9 @@
 @section('css')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <style>
+        #descriptionDiv {
+            height: 150px;
+        }
         .board-wrapper .portlet-card .badge {
             grid-column-end: 3;
         }
@@ -47,6 +50,12 @@
             background-color: darkgrey;
             outline: 1px solid slategrey;
         }
+        #rolldownMessage {
+            position: absolute;
+            top: 30px;
+            right: 37%;
+            padding: 5px;
+        }
 
         @cannot('admin-master')
         .board-wrapper .portlet-card {
@@ -60,8 +69,70 @@
 @section('js')
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script src="{{ asset('assets/js/views/support/form.js') }}" type="application/javascript"></script>
+
+    <script src="//js.pusher.com/3.1/pusher.min.js"></script>
+
     <script>
         $(function () {
+            // Enable pusher logging - don't include this in production
+            Pusher.logToConsole = true;
+
+            var pusher = new Pusher('{{ $pusher_app_key }}', {
+                encrypted: true,
+                cluster: 'sa1'
+            });
+
+            // Subscribe to the channel we specified in our Laravel Event
+            var channel_support = pusher.subscribe('update-support-notification');
+            var channel_support_message = pusher.subscribe('update-support-message-notification');
+
+            // Bind a function to an Event (the full Laravel class)
+            channel_support.bind('App\\Events\\SupportEvent', function(data) {
+                if (data.user_message_sent != {{ $receive_user_id }}) {
+                    $('#btnRefreshSupports').closest('.row').show();
+                }
+            });
+
+            // Bind a function to an Event (the full Laravel class)
+            channel_support_message.bind('App\\Events\\SupportMessageEvent', function(data) {
+                if (
+                    $('.portlet-card').has(`[data-support-id="${data.support_id}"]`) &&
+                    $('#modalViewSupport').is(':visible') &&
+                    parseInt($(`#modalViewSupport input[name="support_id"]`).val()) === data.support_id
+                ) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: 'GET',
+                        url: $('[name="route_view_support_message"]').val() + `/${data.support_id}/${data.support_message_id}/${data.company_user}`,
+                        dataType: 'json',
+                        success: async response => {
+                            if (response) {
+                                let total_height = 0;
+                                await $('.chat-container-wrapper div.chat-bubble').each(function (k, v) {
+                                    total_height += $(this).height() + 30;
+                                });
+
+                                let scroll_height = $('.chat-container-wrapper').scrollTop() + $('.chat-container-wrapper').height();
+
+                                makeCommentUser(response);
+
+                                if (total_height === scroll_height) {
+                                    await goToEndOfTheMessagesPage(false);
+                                } else {
+                                    await goToEndOfTheMessagesPage(response.user_created != {{ $receive_user_id }});
+                                }
+
+                                $('#modalViewSupport .hidden-support-closed').css({display: data.mark_close ? 'none' : 'block'});
+                            }
+                        }, error: e => {
+                            console.log(e);
+                        }
+                    });
+                }
+            });
+
             getListSupport();
             loadDaterangePickerInput($('input[name="intervalDates"]'), function () {});
             @can('admin-master')
@@ -74,6 +145,7 @@
                         const id_support = $(ui.item[0]).data('supportId');
                         const new_status_name = $(ui.item[0]).closest('.board-portlet').find('h4.portlet-heading').text();
                         const new_status_code = $(ui.item[0]).closest('ul').data('status');
+
                         Swal.fire({
                             title: 'Alterar situação',
                             html: `Deseja alterar a situação do atendimento: <br><br>${code_support} <br><br>para <b>${new_status_name}</b>?`,
@@ -86,7 +158,7 @@
                             reverseButtons: true
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                updateStatus(id_support, new_status_code, false, false);
+                                updateStatus(id_support, new_status_code, false, false, ui);
                             } else {
                                 ui.sender.sortable("cancel");
                             }
@@ -97,11 +169,28 @@
             @endcan
         });
 
+        const makeCommentUser = value => {
+            const sent_by = value.sent_by === 'user' ? 'outgoing' : 'incoming';
+
+            $(`#modalViewSupport .chat-container-wrapper`).append(
+                `<div class="chat-bubble ${sent_by}-chat">
+                    <div class="chat-message">
+                       ${value.description}
+                    </div>
+                    <div class="sender-details">
+                        <img class="sender-avatar img-xs rounded-circle" src="${value.logo_message}" alt="profile image"><span class="font-weight-bold">&nbsp;${value.user_name}&nbsp;</span>
+                        <p class="seen-text pl-1 pr-0">${value.created_at}</p>
+                    </div>
+                </div>`
+            );
+        }
+
         const getListSupport = () => {
             $('.board-wrapper ul').empty();
             $(`#kanban-task-number-*`).text('0 atendimentos');
             $(`p[id^="kanban-task-number-"]`).html('<i class="fa fa-spin fa-spinner"></i> atendimentos');
             $(`ul[id^="portlet-card-list-"]`).append('<li class="portlet-card"><div class="col-md-12 d-flex justify-content-center"><i class="fa fa-spin fa-spinner"></i></div></li>');
+            $('#btnRefreshSupports').closest('.row').slideUp('slow');
 
             const company = $('#company').val();
             const priority = $('#priority').val();
@@ -187,6 +276,29 @@
             });
         }
 
+        const goToEndOfTheMessagesPage = async (rolldown = false, showBtn = true) => {
+            if (rolldown) {
+                let total_height = 0;
+                await $('.chat-container-wrapper div.chat-bubble').each(function (k, v) {
+                    total_height += $(this).height() + 30;
+                });
+
+                let scroll_height = $('.chat-container-wrapper').scrollTop() + $('.chat-container-wrapper').height();
+
+                if (total_height <= scroll_height) {
+                    $('#modalViewSupport #rolldownMessage').hide();
+                } else if (showBtn) {
+                    $('#modalViewSupport #rolldownMessage').show();
+                }
+            } else {
+                const support_messages = $('#modalViewSupport .chat-container-wrapper');
+                setTimeout(() => {
+                    support_messages.animate({scrollTop: support_messages[0].scrollHeight}, 500);
+                }, 250);
+                $('#modalViewSupport #rolldownMessage').hide();
+            }
+        }
+
         const loadModal = (idModal, support_id, open_modal = true, status = null) => {
             $.ajax({
                 headers: {
@@ -196,7 +308,6 @@
                 url: $('[name="route_view_support"]').val() + `/${support_id}`,
                 dataType: 'json',
                 success: response => {
-                    let sent_by;
 
                     $(`#${idModal} .modal-title`).text(response.support.subject);
                     $(`#${idModal} [name="support_id"]`).val(support_id);
@@ -204,6 +315,7 @@
 
                     if (idModal === 'modalViewSupport') {
                         $(`#${idModal} .chat-container-wrapper`).empty();
+                        $(`#${idModal} #rolldownMessage`).hide();
                         $(`#${idModal} [name="path_files"]`).val(response.support.path_files);
                         $(`#${idModal} [name="mark_close"]`).prop('checked', false);
                         editorQuill.deleteText(0,editorQuill.getLength());
@@ -211,19 +323,7 @@
                         $('#modalViewSupport .hidden-support-closed').css({display: status === 'closed' ? 'none' : 'block'});
 
                         $(response.support_message).each(function (key, value) {
-                            sent_by = value.sent_by === 'user' ? 'outgoing' : 'incoming';
-
-                            $(`#${idModal} .chat-container-wrapper`).append(
-                                `<div class="chat-bubble ${sent_by}-chat">
-                                <div class="chat-message">
-                                   ${value.description}
-                                </div>
-                                <div class="sender-details">
-                                    <img class="sender-avatar img-xs rounded-circle" src="${value.logo_message}" alt="profile image"><span class="font-weight-bold">&nbsp;${value.user_name}&nbsp;</span>
-                                    <p class="seen-text pl-1 pr-0">${value.created_at}</p>
-                                </div>
-                            </div>`
-                            );
+                            makeCommentUser(value);
                         });
 
                         if (!response.support_message.length) {
@@ -243,9 +343,7 @@
                         $(`#${idModal}`).modal();
                     }
 
-                    $('.chat-container-wrapper').animate({
-                        scrollTop: $(document).height()
-                    }, 500);
+                    goToEndOfTheMessagesPage();
                 }, error: e => {
                     console.log(e);
                     Swal.fire({
@@ -260,6 +358,14 @@
             const support_id = $(this).data('support-id');
             const status = $(this).data('status');
             loadModal('modalViewSupport', support_id, true, status);
+        });
+
+        $('#rolldownMessage').on('click', function () {
+            goToEndOfTheMessagesPage(false);
+        });
+
+        $('#btnRefreshSupports').on('click', function () {
+            getListSupport();
         });
 
         $('#sendComment').on('click', function(){
@@ -294,9 +400,12 @@
                     if (mark_close) {
                         $('#modalViewSupport').modal('hide');
                     } else {
-                        loadModal('modalViewSupport', support_id, false);
+                        editorQuill.deleteText(0,editorQuill.getLength());
                     }
-                    getListSupport();
+
+                    if (response.has_update) {
+                        getListSupport();
+                    }
                 },
                 complete: () => {
                     btn.attr('disabled', false);
@@ -306,6 +415,10 @@
 
         $('#company, #priority, #intervalDates').on('change', function(){
             getListSupport();
+        });
+
+        $('.chat-container-wrapper').on('scroll', function(){
+            goToEndOfTheMessagesPage(true, false);
         });
 
         @can('admin-master')
@@ -383,7 +496,7 @@
         });
         @endcan
 
-        const updateStatus = (support_id, new_status, close_modal = true, reload_list = true) => {
+        const updateStatus = (support_id, new_status, close_modal = true, reload_list = true, ui = null) => {
             return $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -405,6 +518,13 @@
                         }
                         if (reload_list) {
                             getListSupport();
+                        } else {
+                            $(`.portlet-card[data-support-id="${support_id}"]`).data('status', new_status);
+                            $(`.portlet-card[data-support-id="${support_id}"] .btnViewSupport[data-support-id="${support_id}"]`).data('status', new_status);
+                        }
+                    } else {
+                        if (ui !== null) {
+                            ui.sender.sortable("cancel");
                         }
                     }
                 }
@@ -464,6 +584,11 @@
             </div>
             <div class="card">
                 <div class="card-body">
+                    <div class="row" style="display: none">
+                        <div class="col-md-12 d-flex justify-content-center">
+                            <button class="btn btn-success" id="btnRefreshSupports"><i class="fa fa-sync"></i> Atualizar atendimentos</button>
+                        </div>
+                    </div>
                     <div class="board-wrapper pt-5">
                         <div class="board-portlet">
                             <h4 class="portlet-heading">Novo</h4>
@@ -531,6 +656,7 @@
                                         <div class="col-lg-12 col-md-12 px-0 d-flex flex-column">
                                             <h5 class="d-flex justify-content-center"><i class="fa-solid fa-arrow-down-long"></i>&nbsp;&nbsp;Comentários&nbsp;&nbsp;<i class="fa-solid fa-arrow-down-long"></i></h5>
                                             <div class="chat-container-wrapper"></div>
+                                            <button class="btn btn-success btn-sm col-md-3" id="rolldownMessage" title="Ver novas mensagens"><i class="fa-solid fa-angles-down"></i> Ver novas mensagens <i class="fa-solid fa-angles-down"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -671,6 +797,7 @@
 
     <input type="hidden" name="route_get_all_supports" value="{{ route('ajax.support.listSupports') }}">
     <input type="hidden" name="route_view_support" value="{{ route('ajax.support.get_support') }}">
+    <input type="hidden" name="route_view_support_message" value="{{ route('ajax.support.get_support_message') }}">
     <input type="hidden" name="route_to_save_image_support" value="{{ route('ajax.support.save_image_description') }}">
     <input type="hidden" name="route_create_comment" value="{{ route('ajax.support.register_comment') }}">
     <input type="hidden" name="route_support_update_priority" value="{{ route('ajax.support.update_priority') }}">

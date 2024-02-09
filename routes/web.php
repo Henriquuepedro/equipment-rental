@@ -376,6 +376,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/cadastro/salvar-imagem/{path?}', [App\Http\Controllers\SupportController::class, 'saveImageDescription'])->name('save_image_description');
             Route::get('/listar-atendimentos', [App\Http\Controllers\SupportController::class, 'listSupports'])->name('listSupports');
             Route::get('/visualizar-atendimento/{support_id?}', [App\Http\Controllers\SupportController::class, 'getSupport'])->name('get_support');
+            Route::get('/visualizar-mensagem-do-atendimento/{support_id?}/{support_message_id?}/{company_message_id?}', [App\Http\Controllers\SupportController::class, 'getSupportMessage'])->name('get_support_message');
             Route::post('/cadastrar-comentario/{support_id?}', [App\Http\Controllers\SupportController::class, 'registerComment'])->name('register_comment');
             Route::post('/atualizar-prioridade/{support_id?}', [App\Http\Controllers\SupportController::class, 'updatePriority'])->name('update_priority');
             Route::post('/atualizar-situacao/{support_id?}', [App\Http\Controllers\SupportController::class, 'updateStatus'])->name('update_status');

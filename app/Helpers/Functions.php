@@ -825,3 +825,10 @@ if (!function_exists('getArrayByValueIn')) {
         }));
     }
 }
+
+if (!function_exists('getLogoUser')) {
+    function getLogoUser(string $filename, int $user_id = null): string
+    {
+        return asset($filename ? "assets/images/profile/$user_id/$filename" : 'assets/images/system/profile.png');
+    }
+}

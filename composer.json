@@ -24,6 +24,7 @@
         "maatwebsite/excel": "^3.1",
         "mercadopago/dx-php": "3.0.0",
         "opcodesio/log-viewer": "^3.1",
+        "pusher/pusher-php-server": "^7.2",
         "sentry/sentry-laravel": "^3.7",
         "spatie/laravel-http-logger": "^1.10"
     },
