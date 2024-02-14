@@ -682,7 +682,7 @@
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-around">
-                    <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                    <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Fechar</button>
                 </div>
             </div>
         </div>
@@ -796,8 +796,6 @@
         </div>
         <input type="hidden" name="support_id">
     </div>
-
-
 
     <input type="hidden" name="route_get_all_supports" value="{{ route('ajax.support.listSupports') }}">
     <input type="hidden" name="route_view_support" value="{{ route('ajax.support.get_support') }}">
