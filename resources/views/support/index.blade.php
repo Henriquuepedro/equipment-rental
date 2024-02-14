@@ -96,7 +96,7 @@
             // Bind a function to an Event (the full Laravel class)
             channel_support_message.bind('App\\Events\\SupportMessageEvent', function(data) {
                 if (
-                    $('.portlet-card').has(`[data-support-id="${data.support_id}"]`) &&
+                    $('.portlet-card').has(`[data-support-id="${data.support_id}"]`).length &&
                     $('#modalViewSupport').is(':visible') &&
                     parseInt($(`#modalViewSupport input[name="support_id"]`).val()) === data.support_id
                 ) {
@@ -327,7 +327,7 @@
                         });
 
                         if (!response.support_message.length) {
-                            $(`#${idModal} .chat-container-wrapper`).append('<div class="row"><div class="col-md-12 d-flex justify-content-center mt-3"><h5>Atendimento sem comentários <i class="fa-solid fa-ban"></i></h5></div></div>')
+                            $(`#${idModal} .chat-container-wrapper`).append('<div class="row content-no-comment"><div class="col-md-12 d-flex justify-content-center mt-3"><h5>Atendimento sem comentários <i class="fa-solid fa-ban"></i></h5></div></div>')
                         }
                     } else if (idModal === 'modalUpdatePriority') {
                         $(`#${idModal} [name="old_priority"]`).val(response.support.priority_name);
@@ -400,6 +400,9 @@
                     if (mark_close) {
                         $('#modalViewSupport').modal('hide');
                     } else {
+                        if ($('.chat-container-wrapper').has('.content-no-comment').length) {
+                            $('#modalViewSupport .chat-container-wrapper').empty();
+                        }
                         editorQuill.deleteText(0,editorQuill.getLength());
                     }
 
