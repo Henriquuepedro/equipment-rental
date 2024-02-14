@@ -109,6 +109,10 @@
                         dataType: 'json',
                         success: async response => {
                             if (response) {
+                                if ($('.chat-container-wrapper').has('.content-no-comment').length) {
+                                    $('#modalViewSupport .chat-container-wrapper').empty();
+                                }
+
                                 let total_height = 0;
                                 await $('.chat-container-wrapper div.chat-bubble').each(function (k, v) {
                                     total_height += $(this).height() + 30;
@@ -400,9 +404,6 @@
                     if (mark_close) {
                         $('#modalViewSupport').modal('hide');
                     } else {
-                        if ($('.chat-container-wrapper').has('.content-no-comment').length) {
-                            $('#modalViewSupport .chat-container-wrapper').empty();
-                        }
                         editorQuill.deleteText(0,editorQuill.getLength());
                     }
 
