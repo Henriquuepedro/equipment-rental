@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SupportEvent;
+use App\Events\SupportMessageEvent;
 use App\Models\Company;
 use App\Models\Support;
 use App\Models\SupportMessage;
@@ -35,7 +37,7 @@ class SupportController extends Controller
             $companies = $this->company->getAllCompaniesActive();
         }
 
-        return view('support.index', ['companies' => $companies]);
+        return view('support.index', ['companies' => $companies, 'pusher_app_key' => env('PUSHER_APP_KEY'), 'receive_user_id' => Auth::user()->__get('id')]);
     }
 
     public function create()
@@ -48,6 +50,7 @@ class SupportController extends Controller
     public function insert(Request $request): RedirectResponse
     {
         $description = strip_tags($request->input('description'), FULL_ALLOWABLE_TAGS);
+        $company_id = $request->user()->company_id;
 
         $validator = Validator::make($request->all(),
             [
@@ -70,13 +73,15 @@ class SupportController extends Controller
         }
 
         $this->support->insert(array(
-            'company_id'    => $request->user()->company_id,
+            'company_id'    => $company_id,
             'user_created'  => $request->user()->id,
             'subject'       => $request->input('subject'),
             'description'   => $description,
             'path_files'    => $request->input('path_files'),
             'status'        => 'open'
         ));
+
+        event(new SupportEvent(true, $company_id));
 
         return redirect()->route('support.index')
             ->with('success', "Atendimento cadastrado com sucesso!");
@@ -178,8 +183,8 @@ class SupportController extends Controller
         $support_message = $this->support_message->getByCompany($support_id);
 
         $users = array_map(function($user) {
-                return $this->user->getUserById($user)->toArray();
-            },
+            return $this->user->getUserById($user)->toArray();
+        },
             array_unique(array_map(function($message) {
                 return $message['user_created'];
             }, $support_message->toArray()))
@@ -219,10 +224,41 @@ class SupportController extends Controller
         ));
     }
 
+    public function getSupportMessage(int $support_id, int $support_message_id, int $company_message_id): JsonResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+        $is_admin = hasAdminMaster();
+
+//        if ($company_message_id == $company_id) {
+//            return response()->json(array(), 206);
+//        }
+
+        $support = $is_admin ? $this->support->getByid($support_id) : $this->support->getByCompany($company_id, $support_id);
+
+        if (!$support) {
+            return response()->json(array('message' => 'Atendimento não localizado.'), 400);
+        }
+
+        $support_message = $this->support_message->getMessageByCompanyAndId($support_id, $support_message_id);
+
+        $comment_user = $this->user->getUserById($support_message->user_created)->toArray();
+
+        return response()->json(array(
+            'support_id'    => $support_message->support_id,
+            'user_created'  => $support_message->user_created,
+            'user_name'     => $comment_user['name'],
+            'description'   => $support_message->description,
+            'sent_by'       => $support_message->sent_by,
+            'logo_message'  => asset($support_message->sent_by == 'user' ? ($comment_user['profile'] ? "assets/images/profile/$comment_user[id]/$comment_user[profile]" : 'assets/images/system/profile.png') : 'assets/images/system/logo.png'),
+            'created_at'    => date('d', strtotime($support_message->created_at)) . ' de ' . MONTH_NAME_PT[date('m', strtotime($support_message->created_at))] . ' ' . date('H:i', strtotime($support_message->created_at))
+        ));
+    }
+
     public function registerComment(Request $request, int $support_id): JsonResponse
     {
         $company_id = $request->user()->company_id;
         $support = hasAdminMaster() ? $this->support->getByid($support_id) : $this->support->getByCompany($company_id, $support_id);
+        $has_update = false;
 
         if (!$support) {
             return response()->json(['Atendimento não localizado.'], 400);
@@ -235,7 +271,7 @@ class SupportController extends Controller
             return response()->json(['Descrição do atendimento é inválida.'], 400);
         }
 
-        $this->support_message->insert(array(
+        $support_message = $this->support_message->insert(array(
             'support_id'    => $support_id,
             'user_created'  => $request->user()->id,
             'company_id'    => $company_id,
@@ -243,9 +279,9 @@ class SupportController extends Controller
             'sent_by'       => hasAdminMaster() ? 'operator' : 'user'
         ));
 
-
         // Fechou o atendimento.
         if ($mark_close) {
+            $has_update = true;
             $data_support = array(
                 'status'    => 'closed',
                 'open'      => 0,
@@ -263,6 +299,7 @@ class SupportController extends Controller
             $support->status === 'awaiting_return' && !hasAdminMaster() ||
             $support->status === 'open' && hasAdminMaster()
         ) {
+            $has_update = true;
             $data_support = array(
                 'status'    => 'ongoing'
             );
@@ -273,6 +310,7 @@ class SupportController extends Controller
 
         // Administrador respondeu um atendimento em atendimento.
         if ($support->status === 'ongoing' && hasAdminMaster()) {
+            $has_update = true;
             $data_support = array(
                 'status'    => 'awaiting_return'
             );
@@ -281,7 +319,14 @@ class SupportController extends Controller
                 $this->support->updateBySupportAndCompany($company_id, $support_id, $data_support);
         }
 
-        return response()->json();
+        if ($has_update) {
+            event(new SupportEvent(false, $support->company_id));
+        }
+        event(new SupportMessageEvent($support_id, $support->company_id, $support_message->id, $mark_close));
+
+        return response()->json([
+            'has_update' => $has_update
+        ]);
     }
 
     public function updatePriority(Request $request, int $support_id): JsonResponse
@@ -327,6 +372,8 @@ class SupportController extends Controller
         );
 
         $this->support->updateBySupport($support_id, $data_priority);
+
+        event(new SupportEvent(false, $support->company_id));
 
         return response()->json([
             'success' => true,
@@ -384,6 +431,8 @@ class SupportController extends Controller
         }
 
         $this->support->updateBySupport($support_id, $data_update);
+
+        event(new SupportEvent(false, $support->company_id));
 
         return response()->json([
             'success' => true,

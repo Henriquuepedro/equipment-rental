@@ -46,6 +46,14 @@ class SupportMessage extends Model
         return $this->where('support_id', $support_id)->get();
     }
 
+    public function getMessageByCompanyAndId(int $support_id, int $support_message_id)
+    {
+        return $this->where([
+            'id' => $support_message_id,
+            'support_id' => $support_id
+        ])->first();
+    }
+
     public function getBySupportId(int $company_id, int $support_id)
     {
         return $this->where(['company_id' => $company_id, 'support_id' => $support_id])->get();
