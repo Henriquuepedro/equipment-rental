@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/views/dashboard/daily.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/views/dashboard/manage.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
     <style>
         #tabDashboard .nav-link {
             padding: 15px;
@@ -19,6 +20,7 @@
 
 @section('js')
     <script src="{{ asset('assets/vendors/justgage/raphael-2.1.4.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
     <script src="{{ asset('assets/vendors/justgage/justgage.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
@@ -26,11 +28,7 @@
     <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
     <script src="{{ asset('assets/js/views/dashboard/daily.js') }}"></script>
     <script src="{{ asset('assets/js/views/dashboard/manage.js') }}"></script>
-    <script>
-        $('#tabDashboard a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            initCharts();
-        });
-    </script>
+    <script src="{{ asset('assets/js/views/dashboard/index.js') }}"></script>
 @stop
 
 @section('content')

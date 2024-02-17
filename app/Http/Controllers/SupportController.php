@@ -296,6 +296,7 @@ class SupportController extends Controller
         // Usuário respondeu um atendimento que aguardava retorno.
         // Administrador respondeu um novo atendimento.
         if (
+            !$mark_close &&
             $support->status === 'awaiting_return' && !hasAdminMaster() ||
             $support->status === 'open' && hasAdminMaster()
         ) {
@@ -309,7 +310,7 @@ class SupportController extends Controller
         }
 
         // Administrador respondeu um atendimento em atendimento.
-        if ($support->status === 'ongoing' && hasAdminMaster()) {
+        if (!$mark_close && $support->status === 'ongoing' && hasAdminMaster()) {
             $has_update = true;
             $data_support = array(
                 'status'    => 'awaiting_return'
