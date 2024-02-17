@@ -20005,3 +20005,6 @@ div.dt-button-collection {
 .select2-container--default .select2-dropdown, .select2-container--default .select2-selection--multiple {
     border-color: #656565;
 }
+.introjs-tooltiptext {
+    color: #000
+}
