@@ -150,6 +150,16 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <p>Locações</p>
+                <div id="mapRentals"></div>
+            </div>
+        </div>
+    </div>
+</div>
 <input type="hidden" id="route_new_clients_for_month" value="{{ route('ajax.client.get-new-client-for-month', array('months' => 9)) }}">
 <input type="hidden" id="route_rentals_for_month" value="{{ route('ajax.rental.get-rentals-for-month', array('months' => 9)) }}">
 <input type="hidden" id="route_bills_for_month" value="{{ route('ajax.dashboard.get-bills-for-month', array('months' => 9)) }}">
@@ -162,3 +172,5 @@
 <input type="hidden" id="route_list_table_rental_to_delivery_late" value="{{ route('rental.index', array('filter_start_date' => '2020-01-01', 'filter_end_date' => subDate(dateNowInternational(null, DATE_INTERNATIONAL), null, null, 1), 'date_filter_by' => 'expected_delivery')) }}">
 <input type="hidden" id="route_list_table_rental_to_withdraw_late" value="{{ route('rental.index', array('filter_start_date' => '2020-01-01', 'filter_end_date' => subDate(dateNowInternational(null, DATE_INTERNATIONAL), null, null, 1), 'date_filter_by' => 'expected_withdraw')) }}#withdraw">
 <input type="hidden" id="route_list_table_rental_no_date_to_withdraw_late" value="{{ route('rental.index', array('filter_start_date' => '2020-01-01', 'filter_end_date' => subDate(dateNowInternational(null, DATE_INTERNATIONAL), null, null, 1), 'date_filter_by' => 'no_date_to_withdraw')) }}#withdraw">
+<input type="hidden" id="route_rentals_open" value="{{ route('ajax.rental.get-rentals-open') }}">
+<input type="hidden" id="route_lat_lng_my_company" value="{{ route('ajax.company.get-lat-lng-my-company') }}">

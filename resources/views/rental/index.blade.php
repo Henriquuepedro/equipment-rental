@@ -7,10 +7,10 @@
 @stop
 
 @section('css')
-    <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ asset('vendor/icheck/skins/all.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
-    <link rel="stylesheet" href="//unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" type="text/css">
+    <link rel="stylesheet" type="text/css" href="//unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css">
     <style>
         #tableRentals .badge.badge-lg {
             padding: 0.2rem 0.3rem;
@@ -76,9 +76,9 @@
 @stop
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr" type="application/javascript"></script>
-    <script src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js" type="application/javascript"></script>
-    <script src="//unpkg.com/leaflet-gesture-handling"></script>
+    <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script type="application/javascript" src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js"></script>
+    <script type="application/javascript" src="//unpkg.com/leaflet-gesture-handling"></script>
     <script>
         let tableRental;
 
@@ -87,18 +87,9 @@
             loadDaterangePickerInput($('input[name="intervalDates"]'), function () {});
 
             setTabRental();
-            $('#viewRental [name="state"]').select2();
-            $('#viewRental [name="city"]').select2();
-            $('#viewRental [name="residues[]"]').select2();
-            $('[name="type_rental"]').iCheck({
-                checkboxClass: 'icheckbox_square',
-                radioClass: 'iradio_square-blue',
-                increaseArea: '20%' // optional
-            });
             elementForm = $('#viewRental');
             draggableMap = false;
             gestureHandlingMap = true;
-            getLocationRental(true);
         });
 
         const setTabRental = () => {
@@ -823,4 +814,5 @@
         </div>
     </div>
     @include('includes.rental.modal-view')
+    <input type="hidden" id="route_lat_lng_my_company" value="{{ route('ajax.company.get-lat-lng-my-company') }}">
 @stop

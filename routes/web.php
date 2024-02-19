@@ -280,6 +280,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::get('/locacoes-por-mes/{months}', [App\Http\Controllers\RentalController::class, 'getRentalsForMonths'])->name('get-rentals-for-month');
             Route::get('/buscar-locacoes-por-data-e-cliente/{date?}/{type?}', [App\Http\Controllers\RentalController::class, 'getRentalsForDateAndClient'])->name('getRentalsForDateAndClient');
             Route::get('/locacoes-atrasadas-por-tipo', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsLateByRentalAndType'])->name('get-rentals-late-by-type');
+            Route::get('/locacoes-em-aberto', [App\Http\Controllers\RentalController::class, 'getRentalsOpen'])->name('get-rentals-open');
         });
         Route::group(['prefix' => '/orcamento', 'as' => 'budget.'], function () {
             Route::post('/novo-orcamento', [App\Http\Controllers\BudgetController::class, 'insert'])->name('new-rental');
@@ -334,7 +335,10 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
         Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
             Route::get('/fields/{option}', [App\Http\Controllers\ExportController::class, 'getFields'])->name('client_fields');
         });
-
+        Route::group(['prefix' => '/empresas', 'as' => 'company.'], function () {
+            Route::get('/minha-empresa', [App\Http\Controllers\CompanyController::class, 'getMyCompany'])->name('get-my-company');
+            Route::get('/lat-lng-minha-empresa', [App\Http\Controllers\CompanyController::class, 'getLatLngMyCompany'])->name('get-lat-lng-my-company');
+        });
 
         // Admin Master
         Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => 'admin-master'], function () {

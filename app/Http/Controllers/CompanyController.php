@@ -6,10 +6,14 @@ use App\Http\Requests\CompanyUpdatePost;
 use App\Models\Company;
 use App\Models\Config;
 use App\Models\Permission;
-use App\Models\User;
+use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,23 +21,22 @@ use Illuminate\Support\Facades\File;
 
 class CompanyController extends Controller
 {
-    private User $user;
     private Company $company;
     private Permission $permission;
     private Config $config;
 
-    public function __construct(User $user, Company $company, Permission $permission, Config $config)
+    public function __construct()
     {
-        $this->user         = $user;
-        $this->company      = $company;
-        $this->permission   = $permission;
-        $this->config       = $config;
+        $this->company      = new Company();
+        $this->permission   = new Permission();
+        $this->config       = new Config();
     }
 
     public function index(): View|Factory|RedirectResponse|Application
     {
-        if (!hasAdmin())
+        if (!hasAdmin()) {
             return redirect()->route('dashboard');
+        }
 
         $company_id = Auth::user()->__get('company_id');
 
@@ -71,30 +74,21 @@ class CompanyController extends Controller
         $user_id    = $request->user()->id;
         $company_id = $request->user()->company_id;
 
-        $name       = filter_var($request->name);
-        $fantasy    = $request->fantasy ? filter_var($request->fantasy, FILTER_DEFAULT) : null;
-        $email      = $request->email   ? filter_var($request->email, FILTER_VALIDATE_EMAIL) : null;
-        $phone_1    = $request->phone_1 ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_1), FILTER_SANITIZE_NUMBER_INT) : null;
-        $phone_2    = $request->phone_2 ? filter_var(preg_replace('/[^0-9]/', '', $request->phone_2), FILTER_SANITIZE_NUMBER_INT) : null;
-        $contact    = $request->contact ? filter_var($request->contact, FILTER_DEFAULT) : null;
+        $name       = filter_var($request->input('name'));
+        $fantasy    = filter_var($request->input('fantasy'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $email      = filter_var($request->input('email'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_1    = filter_var(onlyNumbers($request->input('phone_1')), FILTER_SANITIZE_NUMBER_INT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_2    = filter_var(onlyNumbers($request->input('phone_2')), FILTER_SANITIZE_NUMBER_INT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $contact    = filter_var($request->input('contact'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
 
-        $cep            = $request->cep ? filter_var(preg_replace('/[^0-9]/', '', $request->cep), FILTER_SANITIZE_NUMBER_INT) : null;
-        $address        = $request->address ? filter_var($request->address, FILTER_DEFAULT) : null;
-        $number         = $request->number ? filter_var($request->number, FILTER_DEFAULT) : null;
-        $complement     = $request->complement ? filter_var($request->complement, FILTER_DEFAULT) : null;
-        $reference      = $request->reference ? filter_var($request->reference, FILTER_DEFAULT) : null;
-        $neigh          = $request->neigh ? filter_var($request->neigh, FILTER_DEFAULT) : null;
-        $city           = $request->city ? filter_var($request->city, FILTER_DEFAULT) : null;
-        $state          = $request->state ? filter_var($request->state, FILTER_DEFAULT) : null;
-
-        if ($request->profile_logo) {
-            $uploadLogo = $this->uploadLogoCompany($company_id, $request->file('profile_logo'));
-            if ($uploadLogo === false) {
-                return redirect()->back()
-                    ->withErrors(['Não foi possível salvar a logo enviar. Tente novamente!'])
-                    ->withInput();
-            }
-        }
+        $cep        = filter_var(onlyNumbers($request->input('cep')), FILTER_SANITIZE_NUMBER_INT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $address    = filter_var($request->input('address'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $number     = filter_var($request->input('number'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $complement = filter_var($request->input('complement'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $reference  = filter_var($request->input('reference'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $neigh      = filter_var($request->input('neigh'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $city       = filter_var($request->input('city'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $state      = filter_var($request->input('state'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
 
         $arrDataCompany = array(
             'name'          => $name,
@@ -114,12 +108,20 @@ class CompanyController extends Controller
             'user_update'   => $user_id
         );
 
-        if ($request->profile_logo) $arrDataCompany['logo'] = $uploadLogo;
+        if ($request->has('profile_logo')) {
+            $uploadLogo = $this->uploadLogoCompany($company_id, $request->file('profile_logo'));
+            if ($uploadLogo === false) {
+                return redirect()->back()
+                    ->withErrors(['Não foi possível salvar a logo enviar. Tente novamente!'])
+                    ->withInput();
+            }
+
+            $arrDataCompany['logo'] = $uploadLogo;
+        }
 
         $updateCompany = $this->company->edit($arrDataCompany, $company_id);
 
-
-        if($updateCompany) {
+        if ($updateCompany) {
             return redirect()->route('config.index')
                 ->with('success', "Empresa atualizada com sucesso!");
         }
@@ -127,7 +129,6 @@ class CompanyController extends Controller
         return redirect()->back()
             ->withErrors(['Não foi possível atualizar a empresa, tente novamente!'])
             ->withInput();
-
     }
 
     private function uploadLogoCompany($company_id, $file): bool|string
@@ -141,5 +142,57 @@ class CompanyController extends Controller
         $imageName = substr($imageName, 0, 15) . rand(0, 100) . ".{$extension}"; // Pega apenas o 15 primeiros e adiciona a extensão
 
         return $file->move($uploadPath, $imageName) ? $imageName : false;
+    }
+
+    public function getMyCompany(): JsonResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+
+        if (!$company_id) {
+            return response()->json(array('message' => 'Empresa não localizada.'), 400);
+        }
+
+        $commpany = $this->company->getCompany($company_id);
+
+        if (!$commpany) {
+            return response()->json(array('message' => 'Empresa não localizada.'), 400);
+        }
+
+        return response()->json($commpany);
+    }
+
+    public function getLatLngMyCompany(): JsonResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+
+        if (!$company_id) {
+            return response()->json(array('message' => 'Empresa não localizada.'), 400);
+        }
+
+        $commpany = $this->company->getCompany($company_id);
+
+        if (!$commpany) {
+            return response()->json(array('message' => 'Empresa não localizada.'), 400);
+        }
+
+        try {
+            $client = new Client();
+            $address = "$commpany->address - $commpany->cep - $commpany->neigh - $commpany->city/$commpany->state";
+            $request = $client->get("https://dev.virtualearth.net/REST/v1/Locations?query=$address&key=" . env('VIRTUALEARTH_KEY'));
+            $response = json_decode($request->getBody()->getContents());
+
+            $coordinates = $response->resourceSets[0]->resources[0]->geocodePoints[0]->coordinates;
+
+            $address_lat = $coordinates[0];
+            $address_lng = $coordinates[1];
+        } catch (Exception | ClientException | ConnectException $exception) {
+            $address_lat = 0;
+            $address_lng = 0;
+        }
+
+        return response()->json([
+            'lat' => $address_lat,
+            'lng' => $address_lng
+        ]);
     }
 }

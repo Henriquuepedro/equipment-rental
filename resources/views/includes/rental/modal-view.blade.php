@@ -62,7 +62,7 @@
                         <div class="form-group mt-1">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="input-group col-md-12 no-padding">
-                                    <span class="col-md-1 font-weight-bold">&nbsp;</span>
+                                    <span class="col-md-1 font-weight-bold text-center">Situação</span>
                                     <span class="col-md-3 font-weight-bold text-center">Data do vencimento</span>
                                     <span class="col-md-2 font-weight-bold text-center">Valor do pagamento</span>
                                     <span class="col-md-3 font-weight-bold text-center">Data do pagamento</span>

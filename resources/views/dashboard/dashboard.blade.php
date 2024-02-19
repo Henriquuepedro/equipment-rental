@@ -7,28 +7,54 @@
 @stop
 
 @section('css')
+    <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/views/dashboard/daily.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/views/dashboard/manage.css') }}">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    <link rel="stylesheet" type="text/css" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" type="text/css" href="https://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" type="text/css" href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css" />
+    <link rel="stylesheet" type="text/css" href="//unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" type="text/css">
     <style>
         #tabDashboard .nav-link {
             padding: 15px;
+        }
+        #mapRentals {
+            height: 500px;
+        }
+        .equipments .card .card-header a:not([disabled="disabled"]){
+            background: #2196f3 !important;
+        }
+        div[id^="headingEquipmentToExchange-"] a[disabled="disabled"] {
+            background: #fb9678 !important;
+        }
+        div[id^="headingEquipmentToExchange-"][disabled="disabled"] {
+            cursor: not-allowed;
+        }
+        .equipments .card .card-header a:last-child {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            overflow: unset;
         }
     </style>
 @stop
 
 @section('js')
+    <script src="https://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
     <script src="{{ asset('assets/vendors/justgage/raphael-2.1.4.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
     <script src="{{ asset('assets/vendors/justgage/justgage.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
+    <script src="//unpkg.com/leaflet-gesture-handling"></script>
     <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap.min.js') }}"></script>
     <script src="{{ asset('assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js') }}"></script>
     <script src="{{ asset('assets/js/views/dashboard/daily.js') }}"></script>
     <script src="{{ asset('assets/js/views/dashboard/manage.js') }}"></script>
     <script src="{{ asset('assets/js/views/dashboard/index.js') }}"></script>
+    @include('includes.rental.modal-script')
 @stop
 
 @section('content')
@@ -50,4 +76,5 @@
             @include('dashboard.manage_dashboard')
         </div>
     </div>
+    @include('includes.rental.modal-view')
 @stop

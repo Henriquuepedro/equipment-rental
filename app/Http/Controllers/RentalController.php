@@ -1038,4 +1038,16 @@ class RentalController extends Controller
             )
         );
     }
+
+    public function getRentalsOpen(): JsonResponse
+    {
+        if (!hasPermission('RentalView')) {
+            return response()->json();
+        }
+
+        $company_id = Auth::user()->__get('company_id');
+
+        $rentals = $this->rental->getRentalsOpen($company_id);
+        return response()->json($rentals);
+    }
 }

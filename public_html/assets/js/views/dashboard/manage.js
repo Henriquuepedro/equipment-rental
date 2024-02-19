@@ -1,7 +1,21 @@
 let charts_started = false;
-$(function () {
-    /* ChartJS */
+let all_markers = [];
+let markers_dashboard;
+const element_dashboard = document.getElementById('mapRentals');
+let map_rentals_dashboard = L.map(element_dashboard, {
+    //fullscreenControl: true,
+    fullscreenControl: {
+        pseudoFullscreen: false
+    }
+});
+L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map_rentals_dashboard);
 
+$(function () {
+    elementForm = $('#viewRental');
+    draggableMap = false;
+    gestureHandlingMap = true;
     'use strict';
 });
 
@@ -18,6 +32,139 @@ const initCharts = () => {
     clientsTopRentals();
     rentalsLate();
     billingOpenLate();
+    loadMap();
+}
+
+onLocationError = async (e, zoom = 12) => {
+    if (parseInt(e.code) === 1) {
+        const latLng = await deniedLocation();
+        if (latLng) {
+            const latCenter = latLng.lat;
+            const lngCenter = latLng.lng;
+            const center    = L.latLng(latCenter, lngCenter);
+
+            map_rentals_dashboard.setView(center, zoom);
+        }
+    }
+}
+
+const onLocationFound = (map, zoom = 12) => {
+    map_rentals_dashboard.setView(map.latlng, zoom);
+}
+
+const removeAllMarkers = () => {
+    // Remove todos os marcadores que estão juntos.
+    map_rentals_dashboard.removeLayer(markers_dashboard);
+    // Remove todos os marcadores que não estão juntos.
+    for (let i = 0; i < all_markers.length; i++) {
+        map_rentals_dashboard.removeLayer(all_markers[i]);
+    }
+}
+
+const loadMap = () => {
+    // Remove marcadores.
+    if(all_markers.length !== 0) {
+        removeAllMarkers();
+    }
+
+    all_markers = []; // arcadores em branco.
+
+    markers_dashboard = L.markerClusterGroup({ disableClusteringAtZoom: 17 });
+    let bounds = []; // Coordenadas em branco.
+    let type_map = 0; // 0 - marcadores não juntos, 1 - marcadores juntos.
+    let lat, lng, client_name, address, content_info, target, created_at;
+
+    $.getJSON($('#route_rentals_open').val(), function(data) {
+        // Não existemm locações, deve pegar a localização da empresa.
+        if (data.length === 0) {
+            map_rentals_dashboard.on('locationfound', onLocationFound);
+            map_rentals_dashboard.on('locationerror', onLocationError);
+            map_rentals_dashboard.locate({setView: true, maxZoom: 12});
+            setTimeout(() => {
+                map_rentals_dashboard.invalidateSize();
+            }, 1000);
+            return false;
+        }
+
+        // Adiciona marcadores no mapa.
+        $(data).each(function(k, value){
+            lat         = value.address_lat;
+            lng         = value.address_lng;
+            client_name = value.client.name;
+            address     = `${value.address_name}, ${value.address_number} - ${value.address_zipcode} - ${value.address_neigh} - ${value.address_city}/${value.address_state}` ;
+            type_map    = 1;
+            created_at  = formatDate(value.created_at, FORMAT_DATETIME_BRAZIL_NO_SECONDS);
+
+            content_info = `
+                <div style="width: 450px">
+                    <div class="display-flex justify-center">
+                        <h4 class="text-center font-weight-bold mb-3">${client_name}</h4>
+                    </div>
+                    <div class="display-flex justify-center text-center mt-2">
+                        <span class="">
+                            <b>Endereço:</b> ${address}
+                        </span>
+                    </div>
+                    <div class="display-flex justify-center text-center mt-2">
+                        <span class="">
+                            <b>Criado em:</b> ${created_at}
+                        </span>
+                    </div>
+                    <div  class="display-flex justify-center text-center">
+                        <span class="text-black mt-1">
+                            <button class="btn btn-link btnViewRental" data-rental-id="${value.id}">Visualizar Locação</button>
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            target = L.latLng(lat, lng);
+
+            // Usuário visualizar marcadores juntos
+            if (type_map === 0) {
+                marker = L.marker(target).addTo(map_rentals_dashboard).bindPopup(content_info, {
+                    maxWidth: 560
+                });
+            }
+            // Usuário visualizar marcadores separados
+            if (type_map === 1) {
+                marker = L.marker(target).bindPopup(content_info, {
+                    maxWidth: 560
+                });
+            }
+
+            all_markers.push(marker);
+            markers_dashboard.addLayer(marker);
+            bounds.push(L.point(lat, lng));
+        });
+
+        // Lat e lng inicial.
+        let lat_center = 0;
+        let lng_center = 0;
+
+        // lat e lng do ponto central dos pontos
+        if (bounds.length === 1) {
+            lat_center = L.bounds(bounds).max.x;
+            lng_center = L.bounds(bounds).max.y;
+        }
+        if (bounds.length > 1) {
+            lat_center = L.bounds(bounds).getCenter().x;
+            lng_center = L.bounds(bounds).getCenter().y;
+        }
+
+        // Centraliza o mapa.
+        const center = L.latLng(lat_center, lng_center);
+        map_rentals_dashboard.setView(center, 12);
+        // Adicionar marcadores juntos.
+        if (type_map === 1) {
+            map_rentals_dashboard.addLayer(markers_dashboard);
+        }
+
+        // Aguardar um segundo para iniciar.
+        setTimeout(() => {
+            map_rentals_dashboard.invalidateSize();
+        }, 1000);
+    });
 }
 
 const newClientsForMonth = () => {

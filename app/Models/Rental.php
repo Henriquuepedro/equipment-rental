@@ -444,4 +444,14 @@ class Rental extends Model
     {
         return $this->where('company_id', $company_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->count();
     }
+
+    public function getRentalsOpen(int $company_id)
+    {
+        return $this->where([
+            'company_id'             => $company_id,
+            'actual_withdrawal_date' => null
+        ])->with([
+            'client'
+        ])->get();
+    }
 }
