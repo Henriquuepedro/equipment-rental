@@ -193,7 +193,7 @@ class RentalEquipmentController extends Controller
                 ));
             }
 
-            $date_withdraw_equipment = DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $date_withdraw[$count]);
+            $date_withdraw_equipment = dateBrazilToDateInternational($date_withdraw[$count].':00');
 
             $datas_update[] = array(
                 'actual_withdrawal_date'    => $date_withdraw_equipment,
@@ -281,7 +281,6 @@ class RentalEquipmentController extends Controller
                 $no_date_to_withdraw++;
             }
         }
-
 
         return response()->json(array(
             'to_delivery' => $to_delivery,

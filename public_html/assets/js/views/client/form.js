@@ -72,28 +72,6 @@ async function onLocationError(e){
         }
     }
 }
-// MOSTRAR MAP APÓS NAVEGAÇÃO DO BROWSER
-async function deniedLocation(){
-    return false;
-    const recusouLocalizacao = true;
-    const rsLocation = await $.getJSON('...',{ recusouLocalizacao }); // obter endereço empresa
-    if(rsLocation != null){
-        let address = rsLocation[0].address;
-        address += ` - ${rsLocation[0].zipcode}`;
-        address += ` - ${rsLocation[0].neighood}`;
-        address += ` - ${rsLocation[0].city}`;
-        address += ` - ${rsLocation[0].state}`;
-        return address;
-    }
-    if(rsLocation == null){
-        Swal.fire(
-            'Localização não encontrada',
-            'A solicitação para obter a localização atual foi negada pelo navegador ou occoreu um problema para encontra-la. \n\nPara obter a localização você precisa finalizar seu cadastro com o endereço da empresa para iniciarmos o mapa.',
-            'warning'
-        )
-        return false;
-    }
-}
 
 const startMarker = latLng => {
     target  = latLng;

@@ -61,6 +61,7 @@
     @yield('body')
 
     <input type="hidden" name="base_url" value="{{ url('/') }}">
+    <input type="hidden" name="route_my_company" value="{{ route('ajax.company.get-my-company') }}">
     <!-- plugins:js -->
     <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
     {{-- Libs --}}
