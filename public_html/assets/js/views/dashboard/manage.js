@@ -112,7 +112,7 @@ const loadMap = () => {
                     </div>
                     <div  class="display-flex justify-center text-center">
                         <span class="text-black mt-1">
-                            <button class="btn btn-link btnViewRental" data-rental-id="${value.id}">Visualizar Locação</button>
+                            <button class="btn btn-link btnViewRental" data-rental-id="${value.id}">Visualizar Locação #${formatCodeIndex(value.code)}</button>
                         </span>
                     </div>
                 </div>

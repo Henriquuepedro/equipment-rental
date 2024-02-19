@@ -341,9 +341,9 @@ if (! function_exists('formatMoney')) {
 }
 
 if (! function_exists('formatCodeIndex')) {
-    function formatCodeIndex(string $code, int $size__min = 5): string
+    function formatCodeIndex(string $code, int $size_min = 5): string
     {
-        return str_pad($code, $size__min, 0, STR_PAD_LEFT);
+        return str_pad($code, $size_min, 0, STR_PAD_LEFT);
     }
 }
 

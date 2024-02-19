@@ -637,6 +637,6 @@ const deniedLocation = async () => {
     };
 }
 
-// Recuperar lat e lng de um endereço.
-async function getLatLng(){
+const formatCodeIndex = (code, size_min = 5) => {
+    return code.toString().padStart(size_min, "0");
 }
