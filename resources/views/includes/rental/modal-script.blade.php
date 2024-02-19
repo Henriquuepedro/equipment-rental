@@ -168,11 +168,11 @@
                     }
                 }
                 if (driver_id_expected) {
-                    if (typeof data_vehicles[driver_id_expected] === "undefined") {
-                        data_driver_expected = await getDataRegister('vehicle', driver_id_expected);
-                        data_vehicles[driver_id_expected] = data_driver_expected;
+                    if (typeof data_drivers[driver_id_expected] === "undefined") {
+                        data_driver_expected = await getDataRegister('driver', driver_id_expected);
+                        data_drivers[driver_id_expected] = data_driver_expected;
                     } else {
-                        data_driver_expected = data_vehicles[driver_id_expected];
+                        data_driver_expected = data_drivers[driver_id_expected];
                     }
                 }
                 if (vehicle_id_delivery) {
