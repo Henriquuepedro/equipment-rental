@@ -1,51 +1,6 @@
 var searchEquipmentOld = '';
 var budget = !!$('#budget').val();
 
-const getIndexStep = step => {
-
-    switch (step) {
-        case 0:
-            return 0;
-        case 1:
-            return 1;
-        case 2:
-            return 2;
-        case 3:
-            return 3;
-        case 4:
-            return 4;
-        case 5:
-            return 5;
-    }
-}
-
-$("#formRental").validate({
-    rules: {
-
-    },
-    messages: {
-
-    },
-    invalidHandler: function(event, validator) {
-        $('html, body').animate({scrollTop:0}, 100);
-        let arrErrors = [];
-        $.each(validator.errorMap, function (key, val) {
-            arrErrors.push(val);
-        });
-        //setTimeout(() => {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Atenção',
-                html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
-            });
-        //}, 150);
-    },
-    submitHandler: function(form) {
-        $('#formRental [type="submit"]').attr('disabled', true);
-        form.submit();
-    }
-});
-
 $(function(){
     $('#formRental.wizard .actions a[href="#previous"]').attr('href', '#cancel').html('<i class="fa fa-times"></i> Cancelar').addClass('btn-danger').closest('li').removeClass('disabled');
     $('#searchEquipment').on('blur keyup', function (e){
@@ -270,11 +225,11 @@ $(function(){
     $('#extra_value, #discount_value, #net_value').on('keyup', () => {
         reloadTotalRental();
     })
-    .on('blur', function(){
-        if ($(this).val() === '') {
-            $(this).val('0,00');
-        }
-    });
+        .on('blur', function(){
+            if ($(this).val() === '') {
+                $(this).val('0,00');
+            }
+        });
 
     $(document).on('keyup', '#net_value', function() {
         let netAmount   = realToNumber($(this).val());
@@ -494,6 +449,57 @@ $(function(){
         $(`${modal} [name="element_to_load"]`).val(select_name);
     });
 });
+
+$("#formRental").validate({
+    rules: {
+
+    },
+    messages: {
+
+    },
+    invalidHandler: function(event, validator) {
+        $('html, body').animate({scrollTop:0}, 100);
+        let arrErrors = [];
+        $.each(validator.errorMap, function (key, val) {
+            arrErrors.push(val);
+        });
+        //setTimeout(() => {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atenção',
+            html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+        });
+        //}, 150);
+    },
+    submitHandler: function(form) {
+        $('#formRental [type="submit"]').attr('disabled', true);
+        form.submit();
+    }
+});
+
+$(document).on('change', '.show-address input, .show-address select', function(){
+    $('[name="lat"], [name="lng"]').val('');
+    $('.alert-mark-map').slideDown('slow');
+});
+
+const getIndexStep = step => {
+
+    switch (step) {
+        case 0:
+            return 0;
+        case 1:
+            return 1;
+        case 2:
+            return 2;
+        case 3:
+            return 3;
+        case 4:
+            return 4;
+        case 5:
+            return 5;
+    }
+}
+
 const setErrorStepWrong = step => {
 
     setTimeout(() => {
@@ -1066,7 +1072,6 @@ const setEquipmentRental = (
                     </div>
                 </div>
             </div>`;
-            console.log(regEquipment);
             $(`${content_equipments}`).append(regEquipment);
             $(`.load-equipment[id-equipment="${idEquipment}"]`).hide(300);
             showSeparatorEquipmentSelected();

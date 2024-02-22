@@ -78,7 +78,7 @@
                                     @include('includes.address.form')
                                     <div class="row">
                                         <div class="form-group col-md-12 mt-2">
-                                            <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa no cadastro do cliente, isso pode acarretar uma má precisão da localização. <br>Após a confirmação a geolocalização será atualizada no endereço do cliente.</div>
+                                            <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa no cadastro do cliente, isso pode acarretar uma má precisão da localização ou houve alguma alteração no endereço. <br>Após a confirmação a geolocalização será atualizada no endereço do cliente.</div>
                                         </div>
                                     </div>
                                 </div>
