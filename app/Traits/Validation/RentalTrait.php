@@ -136,7 +136,7 @@ trait RentalTrait
                 'net_value'                     => !$noCharged ? $responsePayment->netValue : null,
                 'calculate_net_amount_automatic'=> !$noCharged && $request->input('calculate_net_amount_automatic'),
                 'automatic_parcel_distribution' => !$noCharged && $request->input('automatic_parcel_distribution'),
-                'observation'                   => strip_tags($request->input('observation'), ALLOWABLE_TAGS),
+                'observation'                   => strip_tags($request->input('observation'), HALF_ALLOWABLE_TAGS),
                 $use_action                     => $request->user()->id
             )
         );

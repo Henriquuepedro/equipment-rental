@@ -372,9 +372,9 @@ class PlanController extends Controller
         foreach ($data['data'] as $value) {
             $result[] = array(
                 $value->name,
-                getNamePaymentType($value),
+                getNamePaymentTypeMP($value),
                 formatMoney($value->gross_amount, 2, 'R$ '),
-                "<div class='badge badge-pill badge-lg badge-".getColorStatus($value->status)."'>" . __("mp.$value->status") . "</div>",
+                "<div class='badge badge-pill badge-lg badge-".getColorStatusMP($value->status)."'>" . __("mp.$value->status") . "</div>",
                 formatDateInternational($value->created_at, DATETIME_BRAZIL),
                 "<a href='".route('plan.view', ['payment_id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Visualizar' ><i class='fas fa-eye'></i></a>"
             );

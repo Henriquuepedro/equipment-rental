@@ -17,7 +17,7 @@
         @foreach($rentals as $rental)
             <tr>
                 <td class='info' style='width: 10%'>
-                    {{ formatCodeRental($rental->code) }}
+                    {{ formatCodeIndex($rental->code) }}
                 </td>
                 <td class='info' style='width: 50%'>
                     {{ $rental->client_name }}

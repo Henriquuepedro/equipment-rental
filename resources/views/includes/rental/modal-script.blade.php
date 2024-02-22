@@ -2,6 +2,18 @@
 <script>
     let last_rental_id = 0;
 
+    $(() => {
+        $('#viewRental [name="state"]').select2();
+        $('#viewRental [name="city"]').select2();
+        $('#viewRental [name="residues[]"]').select2();
+        $('[name="type_rental"]').iCheck({
+            checkboxClass: 'icheckbox_square',
+            radioClass: 'iradio_square-blue',
+            increaseArea: '20%' // optional
+        });
+        getLocationRental(true);
+    });
+
     $(document).on('click', '.btnViewRental', function(){
         const rental_id = parseInt($(this).data('rental-id'));
         const modal = $('#viewRental');
@@ -21,66 +33,68 @@
             url: '{{ route('ajax.rental.get_full') }}/' + rental_id,
             dataType: 'json',
             success: response => {
-                //https://www.google.com/maps/place/27%C2%B040'04.0%22S+48%C2%B033'54.5%22W
-                //https://www.google.com/maps/dir//-27.6649878,-48.5241072
+                modal.modal();
+                setTimeout(() => {
+                    //https://www.google.com/maps/place/27%C2%B040'04.0%22S+48%C2%B033'54.5%22W
+                    //https://www.google.com/maps/dir//-27.6649878,-48.5241072
 
-                modal.find('[name="name_address"]').closest('.row').hide();
-                modal.find('#confirmAddressMap').closest('.row').hide();
+                    modal.find('[name="name_address"]').closest('.row').hide();
+                    modal.find('#confirmAddressMap').closest('.row').hide();
 
-                modal.find('[name="lat"]').val(response.address_lat);
-                modal.find('[name="lng"]').val(response.address_lng);
+                    modal.find('[name="lat"]').val(response.address_lat);
+                    modal.find('[name="lng"]').val(response.address_lng);
 
-                modal.find('[name="client"]').val(response.client.name).prop('disabled', true);
-                modal.find('[name="cep"]').val(response.address_zipcode).prop('disabled', true).mask('00.000-000');
-                modal.find('[name="address"]').val(response.address_name).prop('disabled', true);
-                modal.find('[name="number"]').val(response.address_number).prop('disabled', true);
-                modal.find('[name="complement"]').val(response.address_complement).prop('disabled', true);
-                modal.find('[name="reference"]').val(response.address_reference).prop('disabled', true);
-                modal.find('[name="neigh"]').val(response.address_neigh).prop('disabled', true);
-                modal.find('.observation').html(response.observation);
-                modal.find(`[name="type_rental"][value="${response.type_rental}"]`).iCheck('check');
-                modal.find('[name="type_rental"]').iCheck('disable');
+                    modal.find('[name="client"]').val(response.client.name).prop('disabled', true);
+                    modal.find('[name="cep"]').val(response.address_zipcode).prop('disabled', true).mask('00.000-000');
+                    modal.find('[name="address"]').val(response.address_name).prop('disabled', true);
+                    modal.find('[name="number"]').val(response.address_number).prop('disabled', true);
+                    modal.find('[name="complement"]').val(response.address_complement).prop('disabled', true);
+                    modal.find('[name="reference"]').val(response.address_reference).prop('disabled', true);
+                    modal.find('[name="neigh"]').val(response.address_neigh).prop('disabled', true);
+                    modal.find('.observation').html(response.observation);
+                    modal.find(`[name="type_rental"][value="${response.type_rental}"]`).iCheck('check');
+                    modal.find('[name="type_rental"]').iCheck('disable');
 
-                loadStates(modal.find('.show-address select[name="state"]').prop('disabled', true), response.address_state);
-                loadCities(modal.find('.show-address select[name="city"]').prop('disabled', true), response.address_state, response.address_city);
+                    loadStates(modal.find('.show-address select[name="state"]'), response.address_state);
+                    loadCities(modal.find('.show-address select[name="city"]'), response.address_state, response.address_city);
 
-                locationLatLngRental(response.address_lat, response.address_lng);
+                    locationLatLngRental(response.address_lat, response.address_lng);
 
-                modal.find('[name="residues[]"]').select2('destroy').empty();
+                    modal.find('[name="residues[]"]').select2('destroy').empty();
 
-                modal.find('.equipments, .payments').empty();
-                modal.find('.loading-equipments').show();
+                    modal.find('.equipments, .payments').empty();
+                    modal.find('.loading-equipments').show();
 
-                if (response.rental_equipment.length) {
-                    $(response.rental_equipment).each(function (k, v) {
-                        loadEquipment(modal, v, k);
-                    });
-                } else {
-                    modal.find('.loading-equipments').hide();
-                }
+                    if (response.rental_equipment.length) {
+                        $(response.rental_equipment).each(function (k, v) {
+                            loadEquipment(modal, v, k);
+                        });
+                    } else {
+                        modal.find('.loading-equipments').hide();
+                    }
 
-                if (response.rental_payment.length) {
-                    $(response.rental_payment).each(function (k, v) {
-                        loadPayment(modal, v, k, response.rental_payment.length);
-                    });
-                }
+                    if (response.rental_payment.length) {
+                        $(response.rental_payment).each(function (k, v) {
+                            loadPayment(modal, v, k, response.rental_payment.length);
+                        });
+                    }
 
-                if (response.rental_residue.length) {
-                    $(response.rental_residue).each(function (k, v) {
-                        modal.find('[name="residues[]"]').append(`<option value="${v.id}" selected>${v.name_residue}</option>`)
-                    });
-                    setTimeout(() => {
+                    if (response.rental_residue.length) {
+                        $(response.rental_residue).each(function (k, v) {
+                            modal.find('[name="residues[]"]').append(`<option value="${v.id}" selected>${v.name_residue}</option>`)
+                        });
+                        setTimeout(() => {
+                            modal.find('[name="residues[]"]').select2();
+                        }, 500);
+                    } else {
                         modal.find('[name="residues[]"]').select2();
-                    }, 500);
-                } else {
-                    modal.find('[name="residues[]"]').select2();
-                }
+                    }
 
-                modal.find('.content-equipments').css('display', response.rental_equipment.length === 0 ? 'none' : 'block')
-                modal.find('.content-payments').css('display', response.rental_payment.length === 0 ? 'none' : 'block')
-                modal.find('.content-observation').css('display', response.observation.replace(/<.*?>/g, '') === '' ? 'none' : 'block')
-                modal.find('.content-residues').css('display', response.rental_residue.length === 0 ? 'none' : 'block')
-
+                    modal.find('.content-equipments').css('display', response.rental_equipment.length === 0 ? 'none' : 'block')
+                    modal.find('.content-payments').css('display', response.rental_payment.length === 0 ? 'none' : 'block')
+                    modal.find('.content-observation').css('display', response.observation.replace(/<.*?>/g, '') === '' ? 'none' : 'block')
+                    modal.find('.content-residues').css('display', response.rental_residue.length === 0 ? 'none' : 'block')
+                }, 250);
             }, error: () => {
                 Swal.fire({
                     icon: 'warning',
@@ -89,8 +103,6 @@
                 });
             }
         });
-
-        modal.modal();
     });
 
     const loadResidues = (modal, residue, key, quantity) => {
@@ -115,7 +127,7 @@
         modal.find('.payments').append(`<div class="form-group mt-1 parcel">
             <div class="d-flex align-items-center justify-content-between payment-item">
                 <div class="input-group col-md-12 no-padding">
-                    <span class="col-md-1">${status}</span>
+                    <span class="col-md-1 text-center">${status}</span>
                     <span class="col-md-3 text-center">${transformDateForBr(payment.due_date)}</span>
                     <span class="col-md-2 text-center">${numberToReal(payment.due_value)}</span>
                     <span class="col-md-3 text-center">${formatDate(payment.payday ? payment.payday : null, FORMAT_DATE_BRAZIL, 'Não pago')}</span>
@@ -156,11 +168,11 @@
                     }
                 }
                 if (driver_id_expected) {
-                    if (typeof data_vehicles[driver_id_expected] === "undefined") {
-                        data_driver_expected = await getDataRegister('vehicle', driver_id_expected);
-                        data_vehicles[driver_id_expected] = data_driver_expected;
+                    if (typeof data_drivers[driver_id_expected] === "undefined") {
+                        data_driver_expected = await getDataRegister('driver', driver_id_expected);
+                        data_drivers[driver_id_expected] = data_driver_expected;
                     } else {
-                        data_driver_expected = data_vehicles[driver_id_expected];
+                        data_driver_expected = data_drivers[driver_id_expected];
                     }
                 }
                 if (vehicle_id_delivery) {
@@ -302,7 +314,9 @@
                 }
             }
         });
-
-
     }
+
+    $(document).on('click', '.hideEquipment', function (){
+        $(`#${$(this).closest('.collapse.show').attr('id')}`).collapse('hide');
+    });
 </script>

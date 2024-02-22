@@ -29,7 +29,7 @@
         @foreach($arrRentals as $rental)
             <tr class="rental-line">
                 <td style='width: 10%'>
-                    {{ formatCodeRental($rental[0]->code) }}
+                    {{ formatCodeIndex($rental[0]->code) }}
                 </td>
                 <td style='width: 30%'>
                     {{ $rental[0]->client_name }}

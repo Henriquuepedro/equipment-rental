@@ -139,7 +139,7 @@ class BillsToPayController extends Controller
         $permissionDelete = hasPermission('BillsToPayDeletePost');
 
         foreach ($data['data'] as $value) {
-            $bill_code = formatCodeRental($value->code);
+            $bill_code = formatCodeIndex($value->code);
             $data_prop_button = "data-bill-payment-id='$value->bill_payment_id' data-bill-code='$bill_code' data-name-provider='$value->provider_name' data-date-bill='" . date(DATETIME_BRAZIL_NO_SECONDS, strtotime($value->created_at)) . "' data-due-date='" . date(DATE_BRAZIL, strtotime($value->due_date)) . "' data-payment-id='{$value->payment_id}' data-payday='" . date(DATE_BRAZIL, strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "' data-description='$value->observation' ";
 
             $txt_btn_paid = $type_bill == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
@@ -276,7 +276,7 @@ class BillsToPayController extends Controller
         $company_id                     = $request->user()->company_id;
         $user_id                        = $request->user()->id;
         $provider                       = (int)filter_var($request->input('provider'), FILTER_SANITIZE_NUMBER_INT);
-        $description                    = strip_tags($request->input('description'), ALLOWABLE_TAGS);
+        $description                    = strip_tags($request->input('description'), HALF_ALLOWABLE_TAGS);
         $value                          = transformMoneyBr_En(filter_var($request->input('value'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL));
         $form_payment                   = (int)filter_var($request->input('form_payment'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
         $calculate_net_amount_automatic = (bool)$request->input('calculate_net_amount_automatic');
@@ -674,7 +674,7 @@ class BillsToPayController extends Controller
 
         foreach ($data['data'] as $value) {
             $result[] = array(
-                formatCodeRental($value->code),
+                formatCodeIndex($value->code),
                 $value->provider_name,
                 formatMoney($value->due_value, 2, 'R$ ')
             );

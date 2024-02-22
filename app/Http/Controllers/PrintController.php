@@ -26,21 +26,21 @@ use Illuminate\Support\Facades\File;
 
 class PrintController extends Controller
 {
-    private $pdf;
-    private $rental_equipment;
-    private $rental;
-    private $client;
-    private $provider;
-    private $company;
-    private $rental_payment;
-    private $budget;
-    private $budget_equipment;
-    private $budget_payment;
-    private $driver;
-    private $vehicle;
-    private $equipment;
-    private $form_payment;
-    private $bill_to_pay_payment;
+    private PDF $pdf;
+    private RentalEquipment $rental_equipment;
+    private Rental $rental;
+    private Client $client;
+    private Provider $provider;
+    private Company $company;
+    private RentalPayment $rental_payment;
+    private Budget $budget;
+    private BudgetEquipment $budget_equipment;
+    private BudgetPayment $budget_payment;
+    private Driver $driver;
+    private Vehicle $vehicle;
+    private Equipment $equipment;
+    private FormPayment $form_payment;
+    private BillToPayPayment $bill_to_pay_payment;
 
     public function __construct(PDF $pdf)
     {
@@ -65,7 +65,7 @@ class PrintController extends Controller
         define("DOMPDF_ENABLE_REMOTE", false);
     }
 
-    public function rental(int $rental)
+    public function rental(int $rental): Response|RedirectResponse
     {
         $contentRecibo = $this->getDataFormatBudgetRental($rental, false);
         if (!$contentRecibo) {
@@ -78,7 +78,7 @@ class PrintController extends Controller
         return $pdf->stream();
     }
 
-    public function budget(int $budget)
+    public function budget(int $budget): Response|RedirectResponse
     {
         $contentRecibo = $this->getDataFormatBudgetRental($budget, true);
         if (!$contentRecibo) {
@@ -91,7 +91,7 @@ class PrintController extends Controller
         return $pdf->stream();
     }
 
-    private function getDataFormatBudgetRental(int $code, bool $budget)
+    private function getDataFormatBudgetRental(int $code, bool $budget): false|array
     {
         $company_id = Auth::user()->__get('company_id');
 
@@ -135,7 +135,7 @@ class PrintController extends Controller
         ];
     }
 
-    public function reportRental(Request $request)
+    public function reportRental(Request $request): Response|RedirectResponse
     {
         $company_id             = hasAdminMaster() ? $request->input('company') : $request->user()->company_id;
         $type_report            = $request->input('type_report');
@@ -150,6 +150,11 @@ class PrintController extends Controller
         $interval_dates         = explode(' - ', $request->input('intervalDates'));
         $data_filter_view_pdf   = array();
 
+        if (empty($company_id)) {
+            return redirect()->route('report.rental')
+                ->withErrors("Selecione uma empresa.");
+        }
+
         $date_start     = dateBrazilToDateInternational($interval_dates[0]);
         $date_end       = dateBrazilToDateInternational($interval_dates[1]);
 
@@ -159,19 +164,12 @@ class PrintController extends Controller
             '_date_filter'   => $date_filter
         );
 
-        switch ($date_filter) {
-            case 'created':
-                $date_filter_str = 'Lançamento';
-                break;
-            case 'delivered':
-                $date_filter_str = 'Entregue';
-                break;
-            case 'withdrawn':
-                $date_filter_str = 'Retirado';
-                break;
-            default:
-                $date_filter_str = '';
-        }
+        $date_filter_str = match ($date_filter) {
+            'created'   => 'Lançamento',
+            'delivered' => 'Entregue',
+            'withdrawn' => 'Retirado',
+            default     => '',
+        };
 
         $data_filter_view_pdf["Data de $date_filter_str"] = "de $interval_dates[0] até $interval_dates[1]";
 
@@ -201,19 +199,12 @@ class PrintController extends Controller
 
         if (!empty($status)) {
             $filters['_status'] = $status;
-            switch ($status) {
-                case 'deliver':
-                    $status_str = 'Para Entregar';
-                    break;
-                case 'withdraw':
-                    $status_str = 'Para Retirar';
-                    break;
-                case 'finished':
-                    $status_str = 'Finalizada';
-                    break;
-                default:
-                    $status_str = '';
-            }
+            $status_str = match ($status) {
+                'deliver'   => 'Para Entregar',
+                'withdraw'  => 'Para Retirar',
+                'finished'  => 'Finalizada',
+                default     => '',
+            };
             $data_filter_view_pdf['Situação'] = $status_str;
         }
         if (!empty($state)) {
@@ -228,7 +219,7 @@ class PrintController extends Controller
         $rentals = $this->rental->getRentalsToReportWithFilters($company_id, $filters, $type_report === 'synthetic');
         if (!$rentals) {
             return redirect()->route('report.rental')
-                ->with('warning', "Nenhum registro encontrado para o filtro aplicado!");
+                ->withErrors("Nenhum registro encontrado para o filtro aplicado!");
         }
 
         $company_data = $this->company->getCompany($company_id);
@@ -264,6 +255,11 @@ class PrintController extends Controller
         $interval_dates         = explode(' - ', $request->input('intervalDates'));
         $data_filter_view_pdf   = array();
 
+        if (empty($company_id)) {
+            return redirect()->route('report.bill')
+                ->withErrors("Selecione uma empresa.");
+        }
+
         $date_start     = dateBrazilToDateInternational($interval_dates[0]);
         $date_end       = dateBrazilToDateInternational($interval_dates[1]);
 
@@ -273,24 +269,17 @@ class PrintController extends Controller
             '_date_filter'   => $date_filter
         );
 
-        switch ($date_filter) {
-            case 'created':
-                $date_filter_str = 'Lançamento';
-                break;
-            case 'due':
-                $date_filter_str = 'Vencimento';
-                break;
-            case 'pay':
-                $date_filter_str = 'Pagamento';
-                break;
-            default:
-                $date_filter_str = '';
-        }
+        $date_filter_str = match ($date_filter) {
+            'created'   => 'Lançamento',
+            'due'       => 'Vencimento',
+            'pay'       => 'Pagamento',
+            default     => '',
+        };
 
         // Valida se foi enviado 'desc' ou 'asc' pelo usuário.
         if (!in_array($order_by_direction, array('desc', 'asc'))) {
             return redirect()->route('report.bill')
-                ->with('warning', "Ordenação do relatório incorreta.");
+                ->withErrors("Ordenação do relatório incorreta.");
         }
 
         // Recupera o campo correspondente para ordenar.
@@ -306,7 +295,7 @@ class PrintController extends Controller
                 break;
             default:
                 return redirect()->route('report.bill')
-                    ->with('warning', "Ordenação do relatório incorreta.");
+                    ->withErrors("Ordenação do relatório incorreta.");
         }
 
         $data_filter_view_pdf["Data de $date_filter_str"] = "de $interval_dates[0] até $interval_dates[1]";
@@ -358,7 +347,7 @@ class PrintController extends Controller
 
         if (!$bills) {
             return redirect()->route('report.bill')
-                ->with('warning', "Nenhum registro encontrado para o filtro aplicado!");
+                ->withErrors("Nenhum registro encontrado para o filtro aplicado!");
         }
 
         $company_data = $this->company->getCompany($company_id);

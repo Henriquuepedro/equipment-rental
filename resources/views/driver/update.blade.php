@@ -85,7 +85,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-12 d-flex align-items-stretch grid-margin">
+        <div class="col-md-12 grid-margin">
             <div class="row flex-grow">
                 <div class="col-12">
                     @if ($errors->any())

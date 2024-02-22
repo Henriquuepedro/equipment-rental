@@ -108,41 +108,10 @@ const onLocationFoundRental = e => {
 }
 
 async function onLocationErrorRental(e){
-    if(e.code == 1){
-        const address = await deniedLocationRental();
-        if(address){
-            $.get(`https://dev.virtualearth.net/REST/v1/Locations?query=${address}&key=ApqqlD_Jap1C4pGj114WS4WgKo_YbBBY3yXu1FtHnJUdmCUOusnx67oS3M6UGhor`, latLng => {
-                latLng = latLng.resourceSets[0].resources[0].geocodePoints[0].coordinates;
-                latCenter = latLng[0];
-                lngCenter = latLng[1];
+    if (parseInt(e.code) === 1) {
+        const address = await deniedLocation();
 
-                const center = L.latLng(latCenter, lngCenter);
-                startMarkerRental(center);
-            });
-        } else {
-            startMarkerRental(L.latLng(0, 0));
-        }
-    }
-}
-
-async function deniedLocationRental(){
-    return false;
-    const recusouLocalizacao = true;
-    const rsLocation = await $.getJSON('...',{ recusouLocalizacao }); // obter endereço empresa
-    if(rsLocation != null){
-        let address = rsLocation[0].address;
-        address += ` - ${rsLocation[0].zipcode}`;
-        address += ` - ${rsLocation[0].neigh}`;
-        address += ` - ${rsLocation[0].city}`;
-        address += ` - ${rsLocation[0].state}`;
-        return address;
-    }
-    if(rsLocation == null){
-        Swal.fire(
-            'Localização não encontrada',
-            'A solicitação para obter a localização atual foi negada pelo navegador ou occoreu um problema para encontra-la. \n\nPara obter a localização você precisa finalizar seu cadastro com o endereço da empresa para iniciarmos o mapa.',
-            'warning'
-        )
-        return false;
+        const center = L.latLng(address.lat, address.lng);
+        startMarkerRental(center);
     }
 }

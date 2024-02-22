@@ -181,7 +181,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-12 d-flex align-items-stretch grid-margin">
+        <div class="col-md-12 grid-margin">
             <div class="row flex-grow">
                 <div class="col-12">
                     @if ($errors->any())
@@ -287,7 +287,7 @@
                                                 <button class="file-upload-browse btn btn-info" type="button">Alterar</button>
                                             </span>
                                             </div>
-                                            <small class="d-flex justify-content-center">Imagens em JPG, JPEG ou PNG até 2mb.</small>
+                                            <small class="d-flex justify-content-center">Imagens em JPG, JPEG ou PNG até 2mb. Proporção de 3:1.</small>
                                         </div>
                                     </div>
                                 </div>

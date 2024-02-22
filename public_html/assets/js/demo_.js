@@ -593,7 +593,7 @@ const getHtmlLoading = () => {
     $(this).closest('.dataTables_scrollBody').attr('style', 'overflow: visible !important');
 });*/
 
-function getWidth() {
+const getWidth = () => {
     return Math.max(
         document.body.scrollWidth,
         document.documentElement.scrollWidth,
@@ -603,7 +603,7 @@ function getWidth() {
     );
 }
 
-function getHeight() {
+const getHeight = () => {
     return Math.max(
         document.body.scrollHeight,
         document.documentElement.scrollHeight,
@@ -611,4 +611,32 @@ function getHeight() {
         document.documentElement.offsetHeight,
         document.documentElement.clientHeight
     );
+}
+
+const deniedLocation = async () => {
+    const company_address_lat_lng = await $.ajax({
+        type:'GET',
+        url:$('#route_lat_lng_my_company').val(),
+        dataType:'json',
+        async:true,
+        success:function(data){
+            return data;
+        }, error: e => {
+            console.log(e);
+            Swal.fire({
+                icon: 'warning',
+                title: 'Localização não encontrada',
+                html: "A solicitação para obter a localização atual foi negada pelo navegador ou occoreu um problema para identificar.<br><br>Para obter a sua localização você precisa finalizar o cadastro do endereço da empresa para iniciarmos o mapa."
+            });
+        }
+    });
+
+    return {
+        lat: company_address_lat_lng.lat,
+        lng: company_address_lat_lng.lng
+    };
+}
+
+const formatCodeIndex = (code, size_min = 5) => {
+    return code.toString().padStart(size_min, "0");
 }

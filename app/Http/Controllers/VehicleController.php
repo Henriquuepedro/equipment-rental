@@ -278,6 +278,11 @@ class VehicleController extends Controller
         $driver = false;
 
         $vehicles = $this->vehicle->getVehicle($id, $company_id);
+
+        if (!$vehicles) {
+            return response()->json();
+        }
+
         if ($vehicles->driver_id) {
             $driver = $this->driver->getDriver($vehicles->driver_id, $company_id);
         }

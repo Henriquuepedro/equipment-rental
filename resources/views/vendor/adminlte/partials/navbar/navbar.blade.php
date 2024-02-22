@@ -15,7 +15,12 @@
             {!! $settings['notices'] !!}
         </div>
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item dropdown d-none d-xl-inline-block user-dropdown">
+            <li class="nav-item dropdown" data-intro="Visualize e realize atendientos ao time de suporte" data-step="1" data-position="left">
+                <a class="nav-link count-indicator" id="messageDropdown" href="{{ route('support.index') }}" data-toggle="tooltip" title="Atendimentos">
+                    <i class="mdi mdi-headset"></i>
+                </a>
+            </li>
+            <li class="nav-item dropdown d-none d-xl-inline-block user-dropdown" data-intro="Visualize seu perfil, configurações e encerre a sessão." data-step="2" data-position="left">
                 <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                     <img class="img-xs rounded-circle" src="{{ $settings['img_profile'] }}" alt="Profile image">
                 </a>
