@@ -449,7 +449,6 @@
                             $('#createRental h3.code_rental strong').text(response.code);
                             $('#createRental a.rental_print').attr('href', response.urlPrint);
 
-                            console.log(response.payment_today);
                             if (response.payment_today) {
                                 $('#createRental .content-payment-today').show();
                                 $('#createRental [name="due_date"]').val(transformDateForBr(response.payment_today.due_date));

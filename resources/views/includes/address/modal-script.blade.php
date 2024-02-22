@@ -5,10 +5,10 @@
         getLocationRental();
     });
 
-    $(document).on('change', 'select[name="client"]', function() {
+    $('select[name="client"]').on('change', function() {
         let client_id = $(this).val();
 
-        if (client_id == 0) {
+        if (parseInt(client_id) === 0) {
             $('.show-address').slideUp('slow');
             $('.alert-mark-map').slideUp('slow');
             //setTimeout( () => { $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500) }, 750);
@@ -23,6 +23,8 @@
         let client_id   = parseInt($('select[name="client"]').val());
 
         if (!address_id || !client_id) {
+            $('.alert-mark-map').slideDown('slow');
+            setAddressValue({});
             return false;
         }
 
@@ -57,8 +59,9 @@
     });
 
     $("#confirmAddressRental").on("hidden.bs.modal", function () {
-        if ($('[name="lat"]').val() !== '' && $('[name="lng"]').val() !== '')
+        if ($('[name="lat"]').val() !== '' && $('[name="lng"]').val() !== '') {
             $('.alert-mark-map').slideUp('slow');
+        }
     });
 
     $(document).on('change', 'select[name="state"]', function(){
@@ -118,6 +121,7 @@
     const loadAddress = (address_id, client_id) => {
 
         disabledFieldAddress();
+        $('.alert-mark-map').addClass('d-none');
 
         $.ajax({
             headers: {
@@ -130,29 +134,10 @@
 
                 enabledFieldAddress();
 
-                $('.show-address input[name="cep"]').val(response.cep ?? '');
-                $('.show-address input[name="address"]').val(response.address ?? '');
-                $('.show-address input[name="number"]').val(response.number ?? '');
-                $('.show-address input[name="complement"]').val(response.complement ?? '');
-                $('.show-address input[name="reference"]').val(response.reference ?? '');
-                $('.show-address input[name="neigh"]').val(response.neigh ?? '');
-                //$('.show-address select[name="city"]').val(response.city ?? '');
-                //$('.show-address select[name="state"]').val(response.state ?? '');
-                $('input[name="lat"]').val(response.lat ?? '');
-                $('input[name="lng"]').val(response.lng ?? '');
-                checkLabelAnimate();
-                $('[name="cep"]').unmask().mask('00.000-000');
-
-                if (response.address != null && response.lat == null) {
-                    $('.alert-mark-map').slideDown('slow');
-                }
-
-                loadStates($('.show-address select[name="state"]'), response.state ?? '');
-                loadCities($('.show-address select[name="city"]'), response.state ?? '', response.city ?? '');
-
-                //setTimeout( () => { $('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500) }, 750);
+                setAddressValue(response);
 
             }, error: e => {
+                console.log(e);
 
                 enabledFieldAddress();
 
@@ -172,6 +157,36 @@
         });
     }
 
+    const setAddressValue = response => {
+        $('.show-address input[name="cep"]').val(response.cep ?? '');
+        $('.show-address input[name="address"]').val(response.address ?? '');
+        $('.show-address input[name="number"]').val(response.number ?? '');
+        $('.show-address input[name="complement"]').val(response.complement ?? '');
+        $('.show-address input[name="reference"]').val(response.reference ?? '');
+        $('.show-address input[name="neigh"]').val(response.neigh ?? '');
+        $('input[name="lat"]').val(response.lat ?? '');
+        $('input[name="lng"]').val(response.lng ?? '');
+        $('[name="cep"]').unmask().mask('00.000-000');
+
+        if (response.address != null && response.lat != null) {
+            setTimeout(() => { $('.alert-mark-map').removeClass('d-none') }, 1250);
+            $('.alert-mark-map').slideUp('slow');
+        }
+
+        loadStates($('.show-address select[name="state"]'), response.state ?? '');
+        loadCities($('.show-address select[name="city"]'), response.state ?? '', response.city ?? '');
+
+        if (response.state === '') {
+            $('[name="state"]').select2('val', '0')
+        }
+        if (response.city === '') {
+            $('[name="city"]').select2('val', '0')
+        }
+
+        checkLabelAnimate();
+        setTimeout(() => { $('.alert-mark-map').removeClass('d-none') }, 1250);
+    }
+
     const disabledFieldAddress = () => {
         $('select[name="name_address"], select[name="client"]').attr('disabled', true);
         $('.show-address input').each(function () {
@@ -179,7 +194,7 @@
                 $(this).val('').attr('disabled', true).parent().removeClass('label-animate').find('label').html('Aguarde... <i class="fa fa-spinner fa-spin"></i>');
             }
         });
-        $('.alert-mark-map').slideUp('slow');
+        //$('.alert-mark-map').slideUp('slow');
     }
 
     const enabledFieldAddress = () => {
