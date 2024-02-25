@@ -162,16 +162,16 @@
                             </ul>
                             <div class="tab-content tab-content-solid">
                                 <div class="tab-pane fade show active" id="monthly-plan" role="tabpanel" aria-labelledby="monthly-plan" data-month-time="1">
-                                    <div class="row pricing-table"></div>
+                                    <div class="row pricing-table d-flex justify-content-center"></div>
                                 </div>
                                 <div class="tab-pane fade" id="quarterly-plan" role="tabpanel" aria-labelledby="quarterly-plan" data-month-time="3">
-                                    <div class="row pricing-table"></div>
+                                    <div class="row pricing-table d-flex justify-content-center"></div>
                                 </div>
                                 <div class="tab-pane fade" id="semiannual-plan" role="tabpanel" aria-labelledby="semiannual-plan" data-month-time="6">
-                                    <div class="row pricing-table"></div>
+                                    <div class="row pricing-table d-flex justify-content-center"></div>
                                 </div>
                                 <div class="tab-pane fade" id="annual-plan" role="tabpanel" aria-labelledby="annual-plan" data-month-time="12">
-                                    <div class="row pricing-table"></div>
+                                    <div class="row pricing-table d-flex justify-content-center"></div>
                                 </div>
                             </div>
                         </div>
