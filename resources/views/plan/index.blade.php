@@ -76,39 +76,38 @@
         });
 
         const listPlans = type =>  {
-            const tag_plan = type === 1 ? 'mês' : (type === 3 ? 'trimestre' : (type === 6 ? 'semestre' : 'ano'));
+            const tag_plan = type === 1 ? 'mês' : (type !== 12 ? 'meses' : 'ano');
 
             $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).empty().append(getHtmlLoading());
             $.get(`{{ route('ajax.plan.get-plans') }}/${type}`, response => {
                 $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).empty();
 
-                const col_lg = response.length === 1 ? 12 : (response.length === 2 ? 6 : (response.length === 3 ? 4 : 3));
-
-                let price_from, description, alert_user, message_equipment_mmanager;
+                let price_from, description, alert_user, message_equipment_mmanager, percentage_off, discount_months;
 
                 $(response).each(function(key, value){
-                    price_from = value.from_value === null || parseFloat(value.from_value) === 0 ? '' : `<h4 class="fw-normal mb-0 text-primary" style="text-decoration:line-through;">R$ ${numberToReal(value.from_value)}</h4>`;
+                    percentage_off = type === 6 ? '10' : (type === 12 ? '20' : '');
+                    discount_months = type !== 1 ? `<p class="fw-normal mb-0">R$ ${numberToReal(value.value)} por ${type} ${tag_plan}</p><p class="fw-normal mb-0">valor equivalente mensal de</p>` : '';
+                    price_from = value.from_value === null || parseFloat(value.from_value) === 0 ? '' : `<div class="d-flex flex-wrap justify-content-center align-items-center mb-1"><p class="fw-normal mb-0 text-primary" style="text-decoration:line-through;">R$ ${numberToReal(value.from_value)}</p>&nbsp;<div class="badge badge-pill badge-lg badge-success">${percentage_off}% OFF</div></div>`;
                     description = value.description === '<p><br></p>' ? '' : value.description;
                     alert_user = value.allowed_users ? `Até <b>${value.allowed_users}</b> usuários` : 'Usuários ilimitados';
                     message_equipment_mmanager = value.quantity_equipment ? `Até <b>${value.quantity_equipment}</b> equipamentos` : 'Equipamentos ilimitados'
                     $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append(
-                        `<div class="col-lg-${col_lg} col-sm-12  grid-margin stretch-card pricing-card">
-                        <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body">
+                        `<div class="col-lg-3 col-sm-12 grid-margin stretch-card pricing-card">
+                        <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body pl-0 pr-0">
                             <div class="text-center pricing-card-head">
                                 <h3>${value.name}</h3>
-
-                                <p class="mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${message_equipment_mmanager}</p>
-                                <p class="mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${alert_user}</p>
-                                <p class="text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte via chamado</p>
+                                <p class="pr-2 pl-4 mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${message_equipment_mmanager}</p>
+                                <p class="pr-2 pl-4 mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${alert_user}</p>
+                                <p class="pr-2 pl-4 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte via chamado</p>
 
                                 ${price_from}
-                                <h1 class="fw-normal mb-0">R$ ${numberToReal(value.value)}</h1>
-                                <small>Parcele em até 12x</small>
+                                ${discount_months}
+                                <h1 class="fw-normal mb-0 text-primary font-weight-bold">R$ ${numberToReal(value.value / type)}/mês*</h1>
                             </div>
                             <div class="plan-features">
                                 ${description}
                             </div>
-                            <div class="wrapper d-flex justify-content-center">
+                            <div class="wrapper d-flex justify-content-center pl-4 pr-4">
                                 <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block col-md-10">Assinar</a>
                             </div>
                         </div>
