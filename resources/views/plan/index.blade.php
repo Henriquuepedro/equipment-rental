@@ -104,7 +104,7 @@
                                 ${discount_months}
                                 <h1 class="fw-normal mb-0 text-primary font-weight-bold">R$ ${numberToReal(value.value / type)}/mês*</h1>
                             </div>
-                            <div class="plan-features">
+                            <div class="pr-2 pl-4 text-center plan-features mb-2">
                                 ${description}
                             </div>
                             <div class="wrapper d-flex justify-content-center pl-4 pr-4">
