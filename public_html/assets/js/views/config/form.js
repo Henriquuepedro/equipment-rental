@@ -700,7 +700,7 @@ const loadUsers = (openPermissions = false, user_id = false) => {
                                             <div class="wrapper pl-0 pl-lg-4 w-100">
                                                 <div class="wrapper d-lg-flex align-items-center mb-2">
                                                     <h4 class="mb-0 font-weight-medium">${ value.name }</h4>
-                                                    <div class="badge badge-secondary text-dark mt-2 ml-lg-2">${identificationUser}</div>
+                                                    <div class="badge badge-secondary text-dark ml-lg-2">${identificationUser}</div>
                                                     ${statusUser}
                                                 </div>
                                                 <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
