@@ -55,6 +55,7 @@
     <script src="{{ asset('assets/js/views/dashboard/manage.js') }}"></script>
     <script src="{{ asset('assets/js/views/dashboard/index.js') }}"></script>
     @include('includes.rental.modal-script')
+    <script src="https://www.mercadopago.com/v2/security.js" view="home"></script>
 @stop
 
 @section('content')

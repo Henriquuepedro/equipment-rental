@@ -15,12 +15,12 @@
             {!! $settings['notices'] !!}
         </div>
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item dropdown" data-intro="Visualize e realize atendientos ao time de suporte" data-step="1" data-position="left">
+            <li class="nav-item dropdown">
                 <a class="nav-link count-indicator" id="messageDropdown" href="{{ route('support.index') }}" data-toggle="tooltip" title="Atendimentos">
                     <i class="mdi mdi-headset"></i>
                 </a>
             </li>
-            <li class="nav-item dropdown d-none d-xl-inline-block user-dropdown" data-intro="Visualize seu perfil, configurações e encerre a sessão." data-step="2" data-position="left">
+            <li class="nav-item dropdown d-none d-xl-inline-block user-dropdown">
                 <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                     <img class="img-xs rounded-circle" src="{{ $settings['img_profile'] }}" alt="Profile image">
                 </a>
@@ -32,8 +32,6 @@
                         <p class="font-weight-light text-muted mb-0">{{ auth()->user()->__get('email') }}</p>
                     </div>
                     <a class="dropdown-item d-flex justify-content-between" href="{{ route('profile.index') }}"><span><i class="dropdown-item-icon mdi mdi-account-outline text-primary"></i> Meu Perfil</span></a>
-{{--                    <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary"></i> Messages</a>--}}
-{{--                    <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary"></i> Activity</a>--}}
                     @if ($settings['type_user'] == 2 || $settings['type_user'] == 1)<a class="dropdown-item" href="{{ route('config.index') }}"><i class="dropdown-item-icon mdi mdi-cogs text-primary"></i> Configuração</a>@endif
                     <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="dropdown-item-icon mdi mdi-power text-primary"></i>Encerrar Sessão</a>
                 </div>
