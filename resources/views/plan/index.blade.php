@@ -76,7 +76,7 @@
         });
 
         const listPlans = type =>  {
-            const tag_plan = type === 1 ? 'mês' : (type !== 12 ? 'meses' : 'ano');
+            const tag_plan = type === 1 ? `${type} mês` : (type !== 12 ? `${type} meses` : `1 ano`);
 
             $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).empty().append(getHtmlLoading());
             $.get(`{{ route('ajax.plan.get-plans') }}/${type}`, response => {
@@ -86,7 +86,7 @@
 
                 $(response).each(function(key, value){
                     percentage_off = type === 6 ? '10' : (type === 12 ? '20' : '');
-                    discount_months = type !== 1 ? `<p class="fw-normal mb-0">R$ ${numberToReal(value.value)} por ${type} ${tag_plan}</p><p class="fw-normal mb-0">valor equivalente mensal de</p>` : '';
+                    discount_months = type !== 1 ? `<p class="fw-normal mb-0">R$ ${numberToReal(value.value)} por ${tag_plan}</p><p class="fw-normal mb-0">valor equivalente mensal de</p>` : '';
                     price_from = value.from_value === null || parseFloat(value.from_value) === 0 ? '' : `<div class="d-flex flex-wrap justify-content-center align-items-center mb-1"><p class="fw-normal mb-0 text-primary" style="text-decoration:line-through;">R$ ${numberToReal(value.from_value)}</p>&nbsp;<div class="badge badge-pill badge-lg badge-success">${percentage_off}% OFF</div></div>`;
                     description = value.description === '<p><br></p>' ? '' : value.description;
                     alert_user = value.allowed_users ? `Até <b>${value.allowed_users}</b> usuários` : 'Usuários ilimitados';
