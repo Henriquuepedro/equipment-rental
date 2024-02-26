@@ -4,6 +4,7 @@
 /public_html/assets/images/company
 /public_html/assets/images/profile
 /public_html/assets/images/support
+/public_html/assets/files/guides
 /storage/*.key
 /vendor
 .env

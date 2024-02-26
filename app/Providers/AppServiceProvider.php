@@ -14,6 +14,7 @@ use App\Models\Config;
 use App\Models\Driver;
 use App\Models\Equipment;
 use App\Models\EquipmentWallet;
+use App\Models\Guide;
 use App\Models\Plan;
 use App\Models\PlanHistory;
 use App\Models\PlanPayment;
@@ -38,6 +39,7 @@ use App\Observers\ConfigObserver;
 use App\Observers\DriverObserver;
 use App\Observers\EquipmentObserver;
 use App\Observers\EquipmentWalletObserver;
+use App\Observers\GuideObserver;
 use App\Observers\PlanObserver;
 use App\Observers\PlanHistoryObserver;
 use App\Observers\PlanPaymentObserver;
@@ -174,5 +176,6 @@ AppServiceProvider extends ServiceProvider
         Residue::observe(ResidueObserver::class);
         Vehicle::observe(VehicleObserver::class);
         User::observe(UserObserver::class);
+        Guide::observe(GuideObserver::class);
     }
 }

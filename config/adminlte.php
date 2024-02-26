@@ -252,6 +252,12 @@ return [
                     'text' => 'Planos',
                     'permissions'   => [],
                     'route_active'  => ['master.plan.edit']
+                ],
+                [
+                    'route' => 'master.guide.index',
+                    'text' => 'Manuais',
+                    'permissions'   => [],
+                    'route_active'  => ['master.guide.edit']
                 ]
             ]
         ],
