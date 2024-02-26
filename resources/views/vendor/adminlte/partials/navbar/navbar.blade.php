@@ -15,6 +15,11 @@
             {!! $settings['notices'] !!}
         </div>
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link count-indicator" id="messageDropdown" href="{{ route('support.index') }}" data-toggle="tooltip" title="Atendimentos">
+                    <i class="mdi mdi-headset"></i>
+                </a>
+            </li>
             <li class="nav-item dropdown d-none d-xl-inline-block user-dropdown">
                 <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
                     <img class="img-xs rounded-circle" src="{{ $settings['img_profile'] }}" alt="Profile image">
@@ -28,7 +33,6 @@
                     </div>
                     <a class="dropdown-item d-flex justify-content-between" href="{{ route('profile.index') }}"><span><i class="dropdown-item-icon mdi mdi-account-outline text-primary"></i> Meu Perfil</span></a>
                     @if ($settings['type_user'] == 2 || $settings['type_user'] == 1)<a class="dropdown-item" href="{{ route('config.index') }}"><i class="dropdown-item-icon mdi mdi-cogs text-primary"></i> Configuração</a>@endif
-                    <a class="dropdown-item d-flex justify-content-between" href="{{ route('support.index') }}"><span><i class="dropdown-item-icon mdi mdi-headset text-primary"></i> Atendimento</span></a>
                     <a class="dropdown-item d-flex justify-content-between" href="{{ route('guide.index') }}"><span><i class="dropdown-item-icon mdi mdi-book-open-variant text-primary"></i> Manuais</span></a>
                     <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="dropdown-item-icon mdi mdi-power text-primary"></i>Encerrar Sessão</a>
                 </div>
