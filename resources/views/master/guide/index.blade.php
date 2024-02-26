@@ -66,6 +66,7 @@
                         <thead>
                         <tr>
                             <th>Título</th>
+                            <th>Criado em</th>
                             <th>Ação</th>
                         </tr>
                         </thead>
@@ -74,6 +75,7 @@
                         <tfoot>
                         <tr>
                             <th>Título</th>
+                            <th>Criado em</th>
                             <th>Ação</th>
                         </tr>
                         </tfoot>

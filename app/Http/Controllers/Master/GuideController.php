@@ -35,7 +35,7 @@ class GuideController extends Controller
         try {
             $filters        = array();
             $filter_default = array();
-            $fields_order   = array('title', '');
+            $fields_order   = array('title', 'created_at', '');
 
             $query = array(
                 'from' => 'guides'
@@ -58,6 +58,7 @@ class GuideController extends Controller
         foreach ($data['data'] as $value) {
             $result[] = array(
                 $value->title,
+                formatDateInternational($value->created_at, DATETIME_BRAZIL_NO_SECONDS),
                 newDropdownButtonsDataList([
                     [
                         'tag'       => 'a',
