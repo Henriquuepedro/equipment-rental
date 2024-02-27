@@ -105,7 +105,7 @@
                 customization: {
                     visual: {
                         style: {
-                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default",
+                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "bootstrap",
                         },
                     },
                     paymentMethods: {
