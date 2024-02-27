@@ -31,6 +31,7 @@ use Lcobucci\JWT\UnencryptedToken;
 use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
 use Lcobucci\JWT\Validation\Constraint\PermittedFor;
 use Normalizer;
+use Ramsey\Uuid\Uuid;
 
 class PlanController extends Controller
 {
@@ -87,7 +88,9 @@ class PlanController extends Controller
         $company_data->first_company_name = explode(' ', $company_data->name)[0];
         $company_data->last_company_name  = str_replace("$company_data->first_company_name ", '', $company_data->name);
 
-        return view('plan.confirm', compact('plan', 'tokenStr', 'company_data'));
+        $idempotency_key = Uuid::uuid4()->toString();
+
+        return view('plan.confirm', compact('plan', 'tokenStr', 'company_data', 'idempotency_key'));
     }
 
     public function request(): Factory|View|Application
@@ -149,11 +152,11 @@ class PlanController extends Controller
                 return response()->json(['errors' => 'Plano não reconhecido.'], 400);
             }
 
-            $createRequest = $this->makeDataToPay($plan, $request);
+            $createRequest = $this->makeDataToPay($plan, $code_payment, $request);
 
             $client = new PaymentClient();
             $request_options = new RequestOptions();
-//            $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
+            $request_options->setCustomHeaders(["X-Idempotency-Key: {$request->input('idempotency_key')}"]);
             $request_options->setCustomHeaders(["X-meli-session-id: {$request->input('device_id')}"]);
             $payment = $client->create($createRequest, $request_options);
 
@@ -202,7 +205,7 @@ class PlanController extends Controller
             'id_transaction'    => $payment->id,
             'code_payment'      => $code_payment,
             'link_billet'       => $payment->transaction_details->external_resource_url ?? null,
-            'barcode_billet'    => $payment->barcode->content ?? null,
+            'barcode_billet'    => $payment->transaction_details->digitable_line ?? null,
             'date_of_expiration'=> $dateOfExpiration,
             'key_pix'           => $payment->point_of_interaction->transaction_data->qr_code ?? null,
             'base64_key_pix'    => $payment->point_of_interaction->transaction_data->qr_code_base64 ?? null,
@@ -329,7 +332,7 @@ class PlanController extends Controller
         return view('plan.view', compact('payment', 'company', 'user', 'plan_histories'));
     }
 
-    private function makeDataToPay(int $plan, Request $request): array
+    private function makeDataToPay(int $plan, string $code_payment, Request $request): array
     {
         $company_id             = $request->user()->company_id;
         $check_payment_method   = $request->input('payment_method_id');
@@ -337,7 +340,6 @@ class PlanController extends Controller
         $plan_data              = $this->plan->getById($plan);
         $first_company_name     = explode(' ', $company_data->name)[0];
         $last_company_name      = str_replace("$first_company_name ", '', $company_data->name);
-        $code_payment           = getKeyRandom();
         $system_name            = Normalizer::normalize(config('app.name'), Normalizer::NFD);
         $system_name            = preg_replace('/[\x{0300}-\x{036F}]/u', '', $system_name);
         $system_name            = str_replace(' ', '_', $system_name);
@@ -350,15 +352,30 @@ class PlanController extends Controller
             "payment_method_id"     => $request->input('payment_method_id'),
             'notification_url'      => route('mercadopago.notification'),
             "statement_descriptor"  => $system_name,
-            "items"                 => [
-                [
-                    "id"            => $plan,
-                    "title"         => $plan_data->name,
-                    "currency_id"   => "BRL",
-                    "description"   => $plan_data->name,
-                    "category_id"   => "plan",
-                    "quantity"      => 1,
-                    "unit_price"    => roundDecimal($plan_data->value)
+            "additional_info"       => [
+                "items"             => [
+                    [
+                        "id"            => $plan,
+                        "title"         => $plan_data->name,
+                        "currency_id"   => "BRL",
+                        "description"   => $plan_data->name,
+                        "category_id"   => "plan",
+                        "quantity"      => 1,
+                        "unit_price"    => roundDecimal($plan_data->value)
+                    ]
+                ],
+                "payer" => [
+                    "first_name"    => $first_company_name,
+                    "last_name"     => $last_company_name,
+                    "phone" => [
+                        "area_code" => extractDataPhone($company_data->phone_1)['ddd'],
+                        "number"    => extractDataPhone($company_data->phone_1)['phone']
+                    ],
+                    "address" => [
+                        "zip_code"      => $company_data->cep,
+                        "street_name"   => "$company_data->address - $company_data->city/$company_data->state",
+                        "street_number" => $company_data->number,
+                    ]
                 ]
             ]
         ];
@@ -371,6 +388,8 @@ class PlanController extends Controller
         switch ($check_payment_method) {
             case 'pix':
                 $createRequest["payer"] = array(
+                    "entity_type"    => "individual",
+                    "type"           => "customer",
                     "email"          => $payer['email'],
                     "first_name"     => $first_company_name,
                     "last_name"      => $last_company_name,
@@ -391,6 +410,8 @@ class PlanController extends Controller
             case 'bolbradesco':
             case 'pec':
                 $createRequest["payer"] = array(
+                    "entity_type"    => "individual",
+                    "type"           => "customer",
                     "email"          => $payer['email'],
                     "first_name"     => $payer['first_name'],
                     "last_name"      => $payer['last_name'],
@@ -413,6 +434,8 @@ class PlanController extends Controller
                 $createRequest["installments"]       = $request->input('installments');
                 $createRequest["issuer_id"]          = $request->input('issuer_id');
                 $createRequest["payer"] = array(
+                    "entity_type"    => "individual",
+                    "type"           => "customer",
                     "email"          => $payer['email'],
                     "identification" => array(
                         "type"       => $payer['identification']['type'],
