@@ -30,6 +30,7 @@ use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\UnencryptedToken;
 use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
 use Lcobucci\JWT\Validation\Constraint\PermittedFor;
+use Normalizer;
 
 class PlanController extends Controller
 {
@@ -129,10 +130,7 @@ class PlanController extends Controller
             MercadoPagoConfig::setAccessToken(env('MP_ACCESS_TOKEN'));
 
             $check_payment_method   = $request->input('payment_method_id');
-            $company_data           = $this->company->getCompany($company_id);
             $plan_data              = $this->plan->getById($plan);
-            $first_company_name     = explode(' ', $company_data->name)[0];
-            $last_company_name      = str_replace("$first_company_name ", '', $company_data->name);
             $code_payment           = getKeyRandom();
 
             // É cartão
@@ -151,82 +149,7 @@ class PlanController extends Controller
                 return response()->json(['errors' => 'Plano não reconhecido.'], 400);
             }
 
-            switch ($check_payment_method) {
-                case 'pix':
-                    $payer = $request->input('payer');
-                    $createRequest = [
-                        'external_reference' => $code_payment,
-                        "transaction_amount" => roundDecimal($plan_data->value),
-                        "description"        => $plan_data->name,
-                        "payment_method_id"  => $request->input('payment_method_id'),
-                        "payer" => array(
-                            "email"          => $payer['email'],
-                            "first_name"     => $first_company_name,
-                            "last_name"      => $last_company_name,
-                            "identification" => array(
-                                "type"       => $company_data->type_person === 'pf' ? "CPF" : "CNPJ",
-                                "number"     => onlyNumbers($company_data->cpf_cnpj)
-                            ),
-                            "address" => array(
-                                "zip_code"      => $company_data->cep,
-                                "street_name"   => $company_data->address,
-                                "street_number" => $company_data->number,
-                                "neighborhood"  => $company_data->neigh,
-                                "city"          => $company_data->city,
-                                "federal_unit"  => $company_data->state,
-                            )
-                        )
-                    ];
-                    break;
-                case 'bolbradesco':
-                case 'pec':
-                    $payer = $request->input('payer');
-                    $createRequest = [
-                        'external_reference' => $code_payment,
-                        "transaction_amount" => roundDecimal($plan_data->value),
-                        "description"        => $plan_data->name,
-                        "payment_method_id"  => $request->input('payment_method_id'),
-                        "payer" => array(
-                            "email"          => $payer['email'],
-                            "first_name"     => $payer['first_name'],
-                            "last_name"      => $payer['last_name'],
-                            "identification" => array(
-                                "type"       => $payer['identification']['type'],
-                                "number"     => onlyNumbers($payer['identification']['number'])
-                            ),
-                            "address" => array(
-                                "zip_code"      => $payer['address']['zip_code'],
-                                "street_name"   => $payer['address']['street_name'],
-                                "street_number" => $payer['address']['street_number'],
-                                "neighborhood"  => $payer['address']['neighborhood'],
-                                "city"          => $payer['address']['city'],
-                                "federal_unit"  => $payer['address']['federal_unit'],
-                            )
-                        )
-                    ];
-                    break;
-                case 'card':
-                    $payer = $request->input('payer');
-                    $createRequest = [
-                        'external_reference' => $code_payment,
-                        "transaction_amount" => roundDecimal($plan_data->value),
-                        "description"        => $plan_data->name,
-                        "payment_method_id"  => $request->input('payment_method_id'),
-                        "token"              => $request->input('token'),
-                        "installments"       => $request->input('installments'),
-                        "issuer_id"          => $request->input('issuer_id'),
-                        "payer" => array(
-                            "email"          => $payer['email'],
-                            "identification" => array(
-                                "type"       => $payer['identification']['type'],
-                                "number"     => onlyNumbers($payer['identification']['number'])
-                            )
-                        )
-                    ];
-                    break;
-                default:
-                    return response()->json(['errors' => 'Tipo de pagamento não encontrado.'], 400);
-            }
+            $createRequest = $this->makeDataToPay($plan, $request);
 
             $client = new PaymentClient();
             $request_options = new RequestOptions();
@@ -404,5 +327,98 @@ class PlanController extends Controller
         $plan_histories = $this->plan_history->getHistoryPayment($payment_id);
 
         return view('plan.view', compact('payment', 'company', 'user', 'plan_histories'));
+    }
+
+    private function makeDataToPay(int $plan, Request $request): array
+    {
+        $company_id             = $request->user()->company_id;
+        $check_payment_method   = $request->input('payment_method_id');
+        $company_data           = $this->company->getCompany($company_id);
+        $plan_data              = $this->plan->getById($plan);
+        $first_company_name     = explode(' ', $company_data->name)[0];
+        $last_company_name      = str_replace("$first_company_name ", '', $company_data->name);
+        $code_payment           = getKeyRandom();
+        $system_name            = Normalizer::normalize(config('app.name'), Normalizer::NFD);
+        $system_name            = preg_replace('/[\x{0300}-\x{036F}]/u', '', $system_name);
+        $system_name            = str_replace(' ', '_', $system_name);
+        $system_name            = strtoupper($system_name);
+        $payer                  = $request->input('payer');
+        $createRequest          = [
+            'external_reference'    => $code_payment,
+            "transaction_amount"    => roundDecimal($plan_data->value),
+            "description"           => $plan_data->name,
+            "payment_method_id"     => $request->input('payment_method_id'),
+            'notification_url'      => route('mercadopago.notification'),
+            "statement_descriptor"  => $system_name,
+            "items"                 => [
+                [
+                    "id"            => $plan,
+                    "title"         => $plan_data->name,
+                    "currency_id"   => "BRL",
+                    "description"   => $plan_data->name,
+                    "category_id"   => "plan",
+                    "quantity"      => 1,
+                    "unit_price"    => roundDecimal($plan_data->value)
+                ]
+            ]
+        ];
+
+        switch ($check_payment_method) {
+            case 'pix':
+                $createRequest["payer"] = array(
+                    "email"          => $payer['email'],
+                    "first_name"     => $first_company_name,
+                    "last_name"      => $last_company_name,
+                    "identification" => array(
+                        "type"       => $company_data->type_person === 'pf' ? "CPF" : "CNPJ",
+                        "number"     => onlyNumbers($company_data->cpf_cnpj)
+                    ),
+                    "address" => array(
+                        "zip_code"      => $company_data->cep,
+                        "street_name"   => $company_data->address,
+                        "street_number" => $company_data->number,
+                        "neighborhood"  => $company_data->neigh,
+                        "city"          => $company_data->city,
+                        "federal_unit"  => $company_data->state,
+                    )
+                );
+                break;
+            case 'bolbradesco':
+            case 'pec':
+                $createRequest["payer"] = array(
+                    "email"          => $payer['email'],
+                    "first_name"     => $payer['first_name'],
+                    "last_name"      => $payer['last_name'],
+                    "identification" => array(
+                        "type"       => $payer['identification']['type'],
+                        "number"     => onlyNumbers($payer['identification']['number'])
+                    ),
+                    "address" => array(
+                        "zip_code"      => $payer['address']['zip_code'],
+                        "street_name"   => $payer['address']['street_name'],
+                        "street_number" => $payer['address']['street_number'],
+                        "neighborhood"  => $payer['address']['neighborhood'],
+                        "city"          => $payer['address']['city'],
+                        "federal_unit"  => $payer['address']['federal_unit'],
+                    )
+                );
+                break;
+            case 'card':
+                $createRequest["token"]              = $request->input('token');
+                $createRequest["installments"]       = $request->input('installments');
+                $createRequest["issuer_id"]          = $request->input('issuer_id');
+                $createRequest["payer"] = array(
+                    "email"          => $payer['email'],
+                    "identification" => array(
+                        "type"       => $payer['identification']['type'],
+                        "number"     => onlyNumbers($payer['identification']['number'])
+                    )
+                );
+                break;
+            default:
+                throw new Exception('Tipo de pagamento não encontrado.');
+        }
+
+        return $createRequest;
     }
 }
