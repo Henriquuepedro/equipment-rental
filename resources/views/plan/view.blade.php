@@ -267,7 +267,7 @@
                                         <a href="{{ $payment->link_billet }}" class="billet_link_billet btn btn-primary col-md-12 mt-4" target="_blank" >Visualizar PDF</a>
                                     </div>
                                     <div class="form-group col-md-4 label-animate">
-                                        <label>Chave Boleto</label>
+                                        <label>Linha Digitável</label>
                                         <div class="input-group label-animate">
                                             <input type='text' class='form-control' name="billet_barcode" value="{{ $payment->barcode_billet }}" readonly>
                                             <button type='button' class='btn btn-primary btn-flat copy-input'>

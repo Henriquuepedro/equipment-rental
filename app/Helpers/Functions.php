@@ -832,3 +832,16 @@ if (!function_exists('getLogoUser')) {
         return asset($filename ? "assets/images/profile/$user_id/$filename" : 'assets/images/system/profile.png');
     }
 }
+
+if (!function_exists('extractDataPhone')) {
+    function extractDataPhone(string $phone_number): array
+    {
+        $ddd = substr($phone_number, 0, 2);
+        $phone = substr($phone_number, 2);
+
+        return [
+            'ddd' => $ddd,
+            'phone' => $phone
+        ];
+    }
+}

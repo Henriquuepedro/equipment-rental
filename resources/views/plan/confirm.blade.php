@@ -292,4 +292,5 @@
     <input type="hidden" name="amount_plan" value="{{ $plan->value }}">
     <input type="hidden" name="token_plan" value="{{ $tokenStr }}">
     <input type="hidden" name="device_id" id="deviceId">
+    <input type="hidden" name="idempotency_key" id="idempotency_key" value="{{ $idempotency_key }}">
 @stop
