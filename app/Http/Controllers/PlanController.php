@@ -363,6 +363,11 @@ class PlanController extends Controller
             ]
         ];
 
+        // É cartão
+        if ($request->input('token') && $request->input('issuer_id')) {
+            $check_payment_method = 'card';
+        }
+
         switch ($check_payment_method) {
             case 'pix':
                 $createRequest["payer"] = array(
