@@ -166,13 +166,14 @@ class PlanController extends Controller
                 'response' => $payment
             ]);
         } catch (MPApiException $exception) {
-            $error_message = $exception->getApiResponse() ?? $exception->getMessage();
+            $error_message = $exception->getApiResponse()->getContent();
+
             Log::error("[MPApiException] Payment doesn't created to the company $company_id to the plan $plan.", [
                 'request'   => $createRequest ?? [],
                 'response'  => $error_message,
                 'trace'     => $exception->getTraceAsString()
             ]);
-            return response()->json(['errors' => $error_message], 400);
+            return response()->json(['errors' => $error_message['message']], 400);
         } catch (Exception $exception) {
             $error_message = $exception->getMessage();
             Log::error("[Exception] Payment doesn't created to the company $company_id to the plan $plan.", [
@@ -357,7 +358,6 @@ class PlanController extends Controller
                     [
                         "id"            => $plan,
                         "title"         => $plan_data->name,
-                        "currency_id"   => "BRL",
                         "description"   => $plan_data->name,
                         "category_id"   => "plan",
                         "quantity"      => 1,
