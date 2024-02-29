@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -109,7 +110,7 @@ class RegisterController extends Controller
             'plan_expiration_date'  => sumDate(dateNowInternational(), null, null, 15)
         ]);
 
-        $this->user->create([
+        return $this->user->create([
             'name'          => $data['contact'],
             'email'         => $data['email'],
             'phone'         => onlyNumbers($data['phone_1']),
