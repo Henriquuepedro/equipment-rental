@@ -37,15 +37,6 @@ class AuthServiceProvider extends ServiceProvider
             return $user->type_user == 2;
         });
 
-        VerifyEmail::toMailUsing(function ($notifiable, $url) {
-            return (new MailMessage)
-                ->greeting('Olá,')
-                ->subject('Verifique seu endereço de e-mail')
-                ->line('Por favor, clique no botão abaixo para verificar seu endereço de e-mail.')
-                ->action('Verificar endereço de e-mail', $url)
-                ->line('Se você não criou uma conta, nenhuma ação adicional será necessária.');
-        });
-
         ResetPassword::toMailUsing(function ($notifiable, $url) {
             $rest_url = url(route('password.reset', [
                 'token' => $url,
@@ -54,7 +45,7 @@ class AuthServiceProvider extends ServiceProvider
 
             return (new MailMessage)
                 ->greeting('Olá,')
-                ->subject('Notificação de redefinição de senha')
+                ->subject('Redefinição de senha')
                 ->line('Você está recebendo este e-mail porque recebemos uma solicitação de redefinição de senha para sua conta.')
                 ->action('Redefinir senha', $rest_url)
                 ->line('Este link de redefinição de senha irá expirar em '.config('auth.passwords.'.config('auth.defaults.passwords').'.expire').' minutos.')
