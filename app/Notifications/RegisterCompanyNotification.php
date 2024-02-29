@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class RegisterCompanyNotification extends Notification
 {
@@ -41,11 +42,14 @@ class RegisterCompanyNotification extends Notification
     public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->greeting('Olá,')
-            ->subject('Bem-vindo ao ' . env('APP_NAME'))
-            ->line('Fique por dentro de tudo')
-            ->line('A cada nova atualização, será enviado uma nova mensagem via e-mail. Não perca nada!')
-            ->action('Acessar minha conta', url('/'));
+            ->greeting('Caro, ' . $notifiable->contact)
+            ->subject('Boas-vindas ao sistema ' . env('APP_NAME'))
+            ->line('É com grande prazer que damos as boas-vindas a você ao nosso novo sistema! Estamos entusiasmados por tê-lo(a) a bordo e esperamos que esta plataforma torne sua experiência ainda mais satisfatória e produtiva.')
+            ->line('Neste sistema, você encontrará uma variedade de recursos projetados para simplificar suas tarefas diárias, otimizar processos e melhorar a comunicação interna sobre as locações.')
+            ->line('Para ajudá-lo(a) a começar, fornecemos um breve guia de uso, que inclui instruções sobre como fazer a primeira locação. Além disso, nossa equipe de suporte estará disponível para ajudá-lo(a) sempre que necessário. Sinta-se à vontade para entrar em contato conosco através do ícone de atendimento no canto superior direito.')
+            ->line('Estamos comprometidos em garantir sua satisfação e em fornecer um ambiente de trabalho eficiente e colaborativo. Esperamos que você aproveite ao máximo esta nova ferramenta e que ela contribua significativamente para o seu sucesso e o de nossa organização.')
+            ->line('Mais uma vez, seja bem-vindo(a) ao nosso novo sistema! Estamos ansiosos para trabalhar juntos e alcançar grandes conquistas.')
+            ->action('Acessar manual do usuário', route('guide.index'));
     }
 
     /**
