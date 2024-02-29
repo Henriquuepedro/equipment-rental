@@ -258,6 +258,12 @@ return [
                     'text' => 'Manuais',
                     'permissions'   => [],
                     'route_active'  => ['master.guide.edit']
+                ],
+                [
+                    'route' => 'master.log_file',
+                    'text' => 'Log File',
+                    'permissions'   => [],
+                    'route_active'  => []
                 ]
             ]
         ],
