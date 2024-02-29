@@ -451,5 +451,9 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
         });
 
+        Route::get('/log-viewer-redirect', function () {
+            return redirect('/log-viewer');
+        })->name('log_file');
+
     });
 });
