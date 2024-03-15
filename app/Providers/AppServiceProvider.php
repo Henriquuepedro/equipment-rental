@@ -118,7 +118,7 @@ AppServiceProvider extends ServiceProvider
                         $color_alert_plan_expiration = 'danger';
                     }
 
-                    $settings['notices'] .= "<div class='alert alert-fill-$color_alert_plan_expiration mt-3 text-center' role='alert'><i class='mdi mdi-alert-circle'></i> Seu plano vence em: $settings[plan_expiration_date]. <a href='".route('plan.index')."' class='ml-2 btn btn-rounded btn-fw btn-sm btn-light'>Renovar</a> </div>";
+                    $settings['notices'] .= "<div class='alert alert-outline-$color_alert_plan_expiration mt-3 text-center' role='alert'><i class='mdi mdi-alert-circle'></i> Seu plano vence em: $settings[plan_expiration_date]. <a href='".route('plan.index')."' class='ml-2 btn btn-rounded btn-fw btn-sm btn-light'>Renovar</a> </div>";
                 }
 
                 $months = 2;
