@@ -10622,9 +10622,9 @@ pre {
               border-bottom-left-radius: 5px; }
             .sidebar-icon-only .sidebar .nav .nav-item.hover-open .nav-link .menu-title:after {
               display: none; }
-          .sidebar-icon-only .sidebar .nav .nav-item.hover-open .nav-link[data-toggle=collapse] .menu-title {
+          .sidebar-icon-only .sidebar .nav .nav-item.hover-open .nav-link[data-bs-toggle=collapse] .menu-title {
             border-bottom-right-radius: 0; }
-            .rtl.sidebar-icon-only .sidebar .nav .nav-item.hover-open .nav-link[data-toggle=collapse] .menu-title {
+            .rtl.sidebar-icon-only .sidebar .nav .nav-item.hover-open .nav-link[data-bs-toggle=collapse] .menu-title {
               border-bottom-left-radius: 0; }
         .sidebar-icon-only .sidebar .nav .nav-item.hover-open .collapse,
         .sidebar-icon-only .sidebar .nav .nav-item.hover-open .collapse,
@@ -19927,7 +19927,7 @@ div.dataTables_wrapper div.dataTables_filter input {
     background-color: #eee;
 }
 #payment .input-group-text {
-    background-color: #eee;
+    /*background-color: #eee;*/
 }
 .wizard > .steps .disabled a {
     background: #131725 !important;

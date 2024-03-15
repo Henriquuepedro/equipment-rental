@@ -37,7 +37,7 @@
                     }
                 },
                 "initComplete": function( settings, json ) {
-                    $('[data-toggle="tooltip"]').tooltip();
+                    $('[data-bs-toggle="tooltip"]').tooltip();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
@@ -70,7 +70,7 @@
                         data: { budget_id },
                         dataType: 'json',
                         success: response => {
-                            $('[data-toggle="tooltip"]').tooltip('dispose')
+                            $('[data-bs-toggle="tooltip"]').tooltip('dispose')
                             tableBudget.destroy();
                             $("#tableBudgets tbody").empty();
                             tableBudget = getTable();
@@ -96,7 +96,7 @@
         });
 
         $(document).on('click', '.btnApproveBudget', function (){
-            $('#confirmBudget').modal();
+            $('#confirmBudget').modal('show');
         });
 
         $(document).on('click', '.btnApproveBudget', function (){
@@ -124,7 +124,7 @@
                         data: { budget_id },
                         dataType: 'json',
                         success: response => {
-                            $('[data-toggle="tooltip"]').tooltip('dispose')
+                            $('[data-bs-toggle="tooltip"]').tooltip('dispose')
                             tableBudget.destroy();
                             $("#tableBudgets tbody").empty();
                             tableBudget = getTable();
@@ -178,7 +178,7 @@
                         <a href="{{ route('budget.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Orçamento</a>
                         @endif
                     </div>
-                    <table id="tableBudgets" class="table table-bordered">
+                    <table id="tableBudgets" class="table">
                         <thead>
                             <tr>
                                 <th>Código</th>

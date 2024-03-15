@@ -1,10 +1,10 @@
-<div class="modal fade" id="newDriverModal" tabindex="1" role="dialog" aria-labelledby="newDriverModalLabel" aria-hidden="true">
+<div class="modal fade" id="newDriverModal" tabindex="1" role="dialog" aria-labelledby="newDriverModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <form action="{{ route('ajax.driver.new-driver') }}" method="POST" id="formCreateDriverModal">
                 <div class="modal-header">
                     <h5 class="modal-title" id="newDriverModalLabel">Cadastro de novo motorista</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -49,7 +49,7 @@
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-around">
-                    <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                    <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                     <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Cadastrar</button>
                 </div>
             </form>

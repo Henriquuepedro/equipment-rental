@@ -158,8 +158,9 @@
                     arrErrors.push(value);
                 });
 
-                if (!arrErrors.length && e.responseJSON.message !== undefined)
+                if (!arrErrors.length && e.responseJSON.message !== undefined) {
                     arrErrors.push('Você não tem permissão para fazer essa operação!');
+                }
 
                 Swal.fire({
                     icon: 'warning',
@@ -173,7 +174,9 @@
     $('select[name="client"]').on('change', function() {
         let client_id = parseInt($(this).val());
 
-        if (client_id === 0) return false;
+        if (client_id === 0) {
+            return false;
+        }
 
         $.ajax({
             headers: {
@@ -183,7 +186,6 @@
             url: '{{ route('ajax.client.get-client') }}' + `/${client_id}`,
             dataType: 'json',
             success: response => {
-
                 if (response.observation) {
                     Swal.fire({
                         icon: 'info',
@@ -191,9 +193,6 @@
                         html: '<hr><h5>'+response.observation+'</h5>'
                     });
                 }
-
-
-
             }, error: e => {
                 $.each(e.responseJSON.errors, function( index, value ) {
                     arrErrors.push(value);

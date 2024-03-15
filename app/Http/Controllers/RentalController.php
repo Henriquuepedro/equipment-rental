@@ -238,7 +238,7 @@ class RentalController extends Controller
                 }
             }
 
-            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='$value->id'><i class='fas fa-trash'></i> Excluir Locação</button>" : '';
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='$value->id'><i class='fas fa-trash-o'></i> Excluir Locação</button>" : '';
             $buttons .= "<a href='".route('print.rental', ['rental' => $value->id])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
 
             $buttons = dropdownButtonsDataList($buttons, $value->id);

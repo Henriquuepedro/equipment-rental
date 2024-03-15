@@ -435,7 +435,7 @@ $(document).on('click', '.confirm-map', function (){
     } else {
         setTimeout(() => { locationLatLng($(this).parents('td, .box-body').find('[name="lat[]"], #lat_new').val(), $(this).parents('td, .box-body').find('[name="lng[]"], #lng_new').val()) }, 500);
     }
-    $('#confirmAddress').modal();
+    $('#confirmAddress').modal('show');
     $(this).attr('data-map-active','true');
 });
 

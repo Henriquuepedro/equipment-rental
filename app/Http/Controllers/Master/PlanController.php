@@ -72,7 +72,7 @@ class PlanController extends Controller
         }
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('master.plan.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Atualizar' ><i class='fas fa-edit'></i></a>";
+            $buttons = "<a href='".route('master.plan.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-bs-toggle='tooltip' title='Atualizar' ><i class='fas fa-edit'></i></a>";
 
             $highlight = $value->highlight ? ' <i class="fa fa-star text-warning"></i>' : '';
             $month_time = $value->month_time == 1 ? ' mês' : ' meses';

@@ -37,7 +37,7 @@
                     }
                 },
                 "initComplete": function( settings, json ) {
-                    $('[data-toggle="tooltip"]').tooltip();
+                    $('[data-bs-toggle="tooltip"]').tooltip();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
@@ -70,7 +70,7 @@
                         data: { vehicle_id },
                         dataType: 'json',
                         success: response => {
-                            $('[data-toggle="tooltip"]').tooltip('dispose')
+                            $('[data-bs-toggle="tooltip"]').tooltip('dispose')
                             tableVehicle.destroy();
                             $("#tableVehicles tbody").empty();
                             tableVehicle = getTable();
@@ -132,7 +132,7 @@
                         <a href="{{ route('vehicle.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
                         @endif
                     </div>
-                    <table id="tableVehicles" class="table table-bordered">
+                    <table id="tableVehicles" class="table">
                         <thead>
                         <tr>
                             <th>#</th>

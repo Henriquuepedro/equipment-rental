@@ -154,7 +154,7 @@
       return prefix;
     },
     getSelectorFromElement: function getSelectorFromElement(element) {
-      var selector = element.getAttribute('data-target');
+      var selector = element.getAttribute('data-bs-target');
 
       if (!selector || selector === '#') {
         var hrefAttr = element.getAttribute('href');
@@ -437,10 +437,10 @@
     FOCUS: 'focus'
   };
   var Selector$1 = {
-    DATA_TOGGLE_CARROT: '[data-toggle^="button"]',
-    DATA_TOGGLES: '[data-toggle="buttons"]',
-    DATA_TOGGLE: '[data-toggle="button"]',
-    DATA_TOGGLES_BUTTONS: '[data-toggle="buttons"] .btn',
+    DATA_TOGGLE_CARROT: '[data-bs-toggle^="button"]',
+    DATA_TOGGLES: '[data-bs-toggle="buttons"]',
+    DATA_TOGGLE: '[data-bs-toggle="button"]',
+    DATA_TOGGLES_BUTTONS: '[data-bs-toggle="buttons"] .btn',
     INPUT: 'input:not([type="hidden"])',
     ACTIVE: '.active',
     BUTTON: '.btn'
@@ -579,7 +579,7 @@
   });
   $(window).on(Event$1.LOAD_DATA_API, function () {
     // ensure correct active class is set to match the controls' actual values/states
-    // find all checkboxes/readio buttons inside data-toggle groups
+    // find all checkboxes/readio buttons inside data-bs-toggle groups
     var buttons = [].slice.call(document.querySelectorAll(Selector$1.DATA_TOGGLES_BUTTONS));
 
     for (var i = 0, len = buttons.length; i < len; i++) {
@@ -1257,7 +1257,7 @@
   };
   var Selector$3 = {
     ACTIVES: '.show, .collapsing',
-    DATA_TOGGLE: '[data-toggle="collapse"]'
+    DATA_TOGGLE: '[data-bs-toggle="collapse"]'
   };
   /**
    * ------------------------------------------------------------------------
@@ -1272,7 +1272,7 @@
       this._isTransitioning = false;
       this._element = element;
       this._config = this._getConfig(config);
-      this._triggerArray = [].slice.call(document.querySelectorAll("[data-toggle=\"collapse\"][href=\"#" + element.id + "\"]," + ("[data-toggle=\"collapse\"][data-target=\"#" + element.id + "\"]")));
+      this._triggerArray = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"collapse\"][href=\"#" + element.id + "\"]," + ("[data-bs-toggle=\"collapse\"][data-bs-target=\"#" + element.id + "\"]")));
       var toggleList = [].slice.call(document.querySelectorAll(Selector$3.DATA_TOGGLE));
 
       for (var i = 0, len = toggleList.length; i < len; i++) {
@@ -1325,7 +1325,7 @@
       if (this._parent) {
         actives = [].slice.call(this._parent.querySelectorAll(Selector$3.ACTIVES)).filter(function (elem) {
           if (typeof _this._config.parent === 'string') {
-            return elem.getAttribute('data-parent') === _this._config.parent;
+            return elem.getAttribute('data-bs-parent') === _this._config.parent;
           }
 
           return elem.classList.contains(ClassName$3.COLLAPSE);
@@ -1477,7 +1477,7 @@
         parent = document.querySelector(this._config.parent);
       }
 
-      var selector = "[data-toggle=\"collapse\"][data-parent=\"" + this._config.parent + "\"]";
+      var selector = "[data-bs-toggle=\"collapse\"][data-bs-parent=\"" + this._config.parent + "\"]";
       var children = [].slice.call(parent.querySelectorAll(selector));
       $(children).each(function (i, element) {
         _this3._addAriaAndCollapsedClass(Collapse._getTargetFromElement(element), [element]);
@@ -1623,7 +1623,7 @@
     POSITION_STATIC: 'position-static'
   };
   var Selector$4 = {
-    DATA_TOGGLE: '[data-toggle="dropdown"]',
+    DATA_TOGGLE: '[data-bs-toggle="dropdown"]',
     FORM_CHILD: '.dropdown form',
     MENU: '.dropdown-menu',
     NAVBAR_NAV: '.navbar-nav',
@@ -2161,7 +2161,7 @@
   var Selector$5 = {
     DIALOG: '.modal-dialog',
     MODAL_BODY: '.modal-body',
-    DATA_TOGGLE: '[data-toggle="modal"]',
+    DATA_TOGGLE: '[data-bs-toggle="modal"]',
     DATA_DISMISS: '[data-dismiss="modal"]',
     FIXED_CONTENT: '.fixed-top, .fixed-bottom, .is-fixed, .sticky-top',
     STICKY_CONTENT: '.sticky-top'
@@ -3950,7 +3950,7 @@
       this._clear();
 
       var queries = this._selector.split(',').map(function (selector) {
-        return selector + "[data-target=\"" + target + "\"]," + selector + "[href=\"" + target + "\"]";
+        return selector + "[data-bs-target=\"" + target + "\"]," + selector + "[href=\"" + target + "\"]";
       });
 
       var $link = $([].slice.call(document.querySelectorAll(queries.join(','))));
@@ -4079,7 +4079,7 @@
     NAV_LIST_GROUP: '.nav, .list-group',
     ACTIVE: '.active',
     ACTIVE_UL: '> li > .active',
-    DATA_TOGGLE: '[data-toggle="tab"], [data-toggle="pill"], [data-toggle="list"]',
+    DATA_TOGGLE: '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]',
     DROPDOWN_TOGGLE: '.dropdown-toggle',
     DROPDOWN_ACTIVE_CHILD: '> .dropdown-menu .active'
   };

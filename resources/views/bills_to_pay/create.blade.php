@@ -83,7 +83,7 @@
                                 <div class="row">
                                     <div class="col-md-12 d-flex justify-content-end mt-4">
                                         <div class="form-group">
-                                            <button type="button" class="btn btn-success" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
+                                            <button type="button" class="btn btn-primary" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
                                         </div>
                                     </div>
                                     <div class="col-md-12">

@@ -116,12 +116,13 @@
                     @endif
                     <form action="{{ route(empty($user) ? 'master.user.insert' : 'master.user.update', empty($user) ? [] : array('id' => $user->id)) }}" method="POST" enctype="multipart/form-data" id="formUpdateUser">
                         <div class="card">
-                            <div class="card-body d-flex flex-wrap">
+                            <div class="card-body">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Usuário</h4>
                                     <p class="card-description"> Preencha o formulário abaixo com as novas informações do usuário </p>
                                 </div>
                                 <div class="col-md-12 no-padding">
+                                    @if(empty($user))
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="alert alert-fill-primary" role="alert">
@@ -129,6 +130,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @endif
                                     <div class="row">
                                         <div class="form-group col-md-4">
                                             <label>Nome</label>
@@ -205,7 +207,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card">
+                        <div class="card mt-2">
                             <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('master.user.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
                                 <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-sync"></i> Atualizar</button>

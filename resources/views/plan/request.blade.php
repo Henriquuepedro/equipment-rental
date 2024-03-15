@@ -38,7 +38,7 @@
                     }
                 },
                 "initComplete": function( settings, json ) {
-                    $('[data-toggle="tooltip"]').tooltip();
+                    $('[data-bs-toggle="tooltip"]').tooltip();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
@@ -61,7 +61,7 @@
                 <div class="card-body">
                     <h4 class="card-title">Solicitações</h4>
                     <p class="card-description">Solicitações realizadas.</p>
-                    <table id="plans_table" class="table table-bordered">
+                    <table id="plans_table" class="table">
                         <thead>
                             <tr>
                                 <th>Plano</th>

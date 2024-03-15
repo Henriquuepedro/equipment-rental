@@ -37,7 +37,7 @@
                     }
                 },
                 "initComplete": function( settings, json ) {
-                    $('[data-toggle="tooltip"]').tooltip();
+                    $('[data-bs-toggle="tooltip"]').tooltip();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
@@ -61,7 +61,7 @@
                     <div class="header-card-body justify-content-between flex-wrap">
                         <h4 class="card-title no-border">Manuais Cadastrados</h4>
                     </div>
-                    <table id="tableGuides" class="table table-bordered">
+                    <table id="tableGuides" class="table">
                         <thead>
                             <tr>
                                 <th>Título</th>

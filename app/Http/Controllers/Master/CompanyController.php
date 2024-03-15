@@ -80,8 +80,8 @@ class CompanyController extends Controller
         }
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('master.company.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Atualizar' ><i class='fas fa-edit'></i></a>";
-            $buttons .= "<button data-company-id='".$value->id."' class='btn btn-success btn-sm btn-rounded btn-action btn-add-expiration-time ml-1' data-toggle='tooltip' title='Adicionar dias de expiração' ><i class='fa-regular fa-calendar-plus'></i></a>";
+            $buttons = "<a href='".route('master.company.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-bs-toggle='tooltip' title='Atualizar' ><i class='fas fa-edit'></i></a>";
+            $buttons .= "<button data-company-id='".$value->id."' class='btn btn-success btn-sm btn-rounded btn-action btn-add-expiration-time ml-1' data-bs-toggle='tooltip' title='Adicionar dias de expiração' ><i class='fa-regular fa-calendar-plus'></i></a>";
 
             $result[] = array(
                 $value->name,

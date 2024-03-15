@@ -222,7 +222,7 @@
                 },
                 callbacks: {
                     onReady: () => {
-                        $('#resultPayment').modal()
+                        $('#resultPayment').modal('show')
                     },
                     onError: (error) => {
                         // Callback called for all Brick error cases

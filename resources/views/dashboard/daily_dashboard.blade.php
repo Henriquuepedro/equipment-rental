@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-12 grid-margin">
-        <div class="card card-statistics">
+        <div class="card-statistics">
             <div class="row">
                 {{-- Entregar hoje --}}
                 <div class="col-md-6 grid-margin stretch-card content-graph">

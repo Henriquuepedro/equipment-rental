@@ -44,18 +44,23 @@ var MaskPhoneBehavior = function (val) {
         var sidebar = $('#sidebar');
 
         //Add active class to nav-link based on url dynamically
-        $('.nav-item.active').find('a:first').attr('aria-expanded',true);
+        // $('.nav-item.active').find('a:first').attr('aria-expanded',true);
         $('.nav-item.active').find('.collapse').addClass('show');
 
         //Close other submenu in sidebar on opening any
-        $("#sidebar > .nav > .nav-item > a[data-toggle='collapse']").on("click", function () {
+        $("#sidebar > .nav > .nav-item > a[data-bs-toggle='collapse']").on("click", function () {
             $("#sidebar > .nav > .nav-item").find('.collapse.show').collapse('hide');
         });
 
         //checkbox and radios
         $(".form-check label,.form-radio label").append('<i class="input-helper"></i>');
 
-        setTimeout(() => { $('.block-screen-load').hide() }, 500 );
+        setTimeout(() => {
+            $('.block-screen-load').slideUp(500);
+            setTimeout(() => {
+                $('.block-screen-load').remove();
+            }, 450);
+        }, 500);
 
         $(".form-control").click(function() {
             $(this).parent().addClass("label-animate");
@@ -108,8 +113,8 @@ var MaskPhoneBehavior = function (val) {
 
         checkLabelAnimate();
 
-        if ($('[data-toggle="tooltip"]').length)
-            $('[data-toggle="tooltip"]').tooltip();
+        if ($('[data-bs-toggle="tooltip"]').length)
+            $('[data-bs-toggle="tooltip"]').tooltip();
 
         if ($('.select2').length)
             $('.select2').select2();
@@ -122,11 +127,12 @@ $(document).on('click', '[data-widget="collapse"]', function (){
 });
 
 const checkLabelAnimate = () => {
-    $(".form-control").each(function() {
-        if ($(this).val() !== '')
-            $(this).parent().addClass("label-animate");
-        else
-            $(this).parent().removeClass("label-animate");
+    $("input[type='text'].form-control, input[type='tel'].form-control, input[type='number'].form-control, select.form-control").each(function() {
+        if ($(this).val() !== '') {
+            $(this).parents('.form-group').addClass("label-animate");
+        } else {
+            $(this).parents('.form-group').removeClass("label-animate");
+        }
     });
 }
 
@@ -586,7 +592,7 @@ const loadSearchZipcode = (selector, contentElement) => {
 }
 
 const getHtmlLoading = () => {
-    return `<div class="jumping-dots-loader"><span></span><span></span><span></span></div>`;
+    return `<div class="row loader-demo-box"><div class="circle-loader"></div></div>`;
 }
 
 /*$(document).on('shown.bs.dropdown', '.dropdown', function () {

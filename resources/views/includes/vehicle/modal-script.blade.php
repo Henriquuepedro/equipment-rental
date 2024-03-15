@@ -146,7 +146,9 @@
                     $(el).append(`<option value='${value.id}' ${selected}>${value.name}</option>`);
                 });
                 // so executo o trigger se for um equipamento que está ativo
-                if ($(el).closest('[id^=collapseEquipment-]').hasClass('show')) $(el).trigger('change');
+                if ($(el).closest('[id^=collapseEquipment-]').hasClass('show')) {
+                    $(el).trigger('change');
+                }
 
             }, error: e => {
                 $.each(e.responseJSON.errors, function( index, value ) {
