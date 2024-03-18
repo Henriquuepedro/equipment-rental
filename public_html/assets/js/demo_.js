@@ -161,7 +161,7 @@ $(document).on('click', '[data-widget="collapse"]', function (){
 });
 
 const checkLabelAnimate = () => {
-    $("input[type='text'].form-control, input[type='tel'].form-control, input[type='number'].form-control, select.form-control").each(function() {
+    $("input[type='text'].form-control, input[type='email'].form-control, input[type='date'].form-control, input[type='tel'].form-control, input[type='number'].form-control, select.form-control").each(function() {
         if ($(this).val() !== '') {
             $(this).parents('.form-group').addClass("label-animate");
         } else {

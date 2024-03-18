@@ -24,6 +24,7 @@
                 checkboxClass: 'icheckbox_minimal-blue',
                 increaseArea: '20%'
             });
+            checkLabelAnimate()
         })
     </script>
 @stop
