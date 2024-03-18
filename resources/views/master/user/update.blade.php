@@ -125,7 +125,7 @@
                                     @if(empty($user))
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <div class="alert alert-outline-primary" role="alert">
+                                            <div class="alert alert-primary" role="alert">
                                                 <i class="mdi mdi-alert-circle"></i> Após a criação do usuário, o mesmo deverá confirmar seu e-mail para acessar a plataforma.
                                             </div>
                                         </div>

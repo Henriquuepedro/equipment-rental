@@ -64,7 +64,7 @@
                 </div>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link count-indicator" href="{{ route('support.index') }}" data-bs-toggle="tooltip" title="Atendimentos">
+                <a class="nav-link count-indicator" href="{{ route('support.index') }}">
                     <i class="icon-earphones-alt"></i>
                 </a>
             </li>

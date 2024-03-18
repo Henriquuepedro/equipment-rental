@@ -32702,7 +32702,7 @@ div.tagsinput span.tag a {
   font-weight: 500;
   padding: 0;
   width: 237px;
-  z-index: 11;
+  z-index: 1032;
   transition: width 0.25s ease, background 0.25s ease;
   -webkit-transition: width 0.25s ease, background 0.25s ease;
   -moz-transition: width 0.25s ease, background 0.25s ease;
@@ -33095,7 +33095,7 @@ div.tagsinput span.tag a {
   text-align: center;
 }
 .navbar .navbar-brand-wrapper .brand-logo-mini img {
-  width: calc(70px - 30px);
+  /*width: calc(70px - 30px);*/
   max-width: 100%;
   margin: auto;
 }
@@ -33155,7 +33155,7 @@ div.tagsinput span.tag a {
 }
 @media (max-width: 991px) {
   .navbar .navbar-menu-wrapper {
-    width: calc(100% - 55px);
+    width: calc(100% - 105px);
     padding-top: 12px;
     padding-left: 15px;
     padding-right: 11px;
@@ -34517,7 +34517,7 @@ div.tagsinput span.tag a {
     flex-direction: row;
   }
   .navbar .navbar-brand-wrapper {
-    width: 55px;
+    width: 105px;
   }
   .navbar .navbar-brand-wrapper .navbar-brand.brand-logo {
     display: none;
@@ -34534,7 +34534,7 @@ div.tagsinput span.tag a {
 }
 @media (max-width: 480px) {
   .navbar .navbar-brand-wrapper {
-    width: 55px;
+    width: 105px;
   }
   .navbar .navbar-brand-wrapper .brand-logo-mini {
     padding-top: 0px;

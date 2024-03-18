@@ -35,7 +35,7 @@
         .btns-profile-image{
             display: none;
             position: absolute;
-            top: 120px;
+            top: 28%;
         }
         #src-profile-image {
             border: 3px solid #fff;
@@ -199,10 +199,10 @@
             @endif
             <div class="card">
                 <div class="card-body">
-                    <div class="profile-header text-white">
-                        <div class="d-flex justify-content-center justify-content-md-between mx-4 mx-xl-5 px-xl-5 flex-wrap">
+                    <div class="profile-header" style="background-image: linear-gradient(to right, rgb(58 97 246), rgba(255, 0, 0, 0));border-radius: 5px">
+                        <div class="d-flex justify-content-center justify-content-md-between mx-4 mx-xl-5 px-xl-5 flex-wrap mb-2">
                             <div class="profile-info d-flex align-items-center justify-content-center flex-wrap mr-sm-3">
-                                <div class="profile-edit">
+                                <div class="profile-edit mt-3">
                                     <img class="rounded-circle img-lg mb-3 mb-sm-0" src="{{ $settings['img_profile'] }}" id="src-profile-image" alt="profile image">
                                     <form method="POST" action="" enctype="multipart/form-data" id="updateProfileImage">
                                         <input type="file" name="profile-image" id="profile-image" class="display-none">
@@ -214,9 +214,9 @@
                                     </div>
                                 </div>
                                 <div class="wrapper ml-3">
-                                    <h5 class="profile-user-name text-center text-black text-sm-left">{{ auth()->user()->__get('name') }}</h5>
+                                    <h5 class="profile-user-name text-center text-white text-sm-left">{{ auth()->user()->__get('name') }}</h5>
                                     <div class="wrapper d-flex align-items-center justify-content-start flex-wrap">
-                                        <p class="profile-user-designation text-center text-md-left my-2 my-md-0 text-uppercase text-black">{{ $settings['name_company'] }}</p>
+                                        <p class="profile-user-designation text-center text-md-left my-2 my-md-0 text-uppercase text-white">{{ $settings['name_company'] }}</p>
                                     </div>
                                 </div>
                             </div>

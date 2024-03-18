@@ -43,6 +43,40 @@ var MaskPhoneBehavior = function (val) {
         var footer = $('.footer');
         var sidebar = $('#sidebar');
 
+        $(document).on('mouseenter mouseleave', '.sidebar .nav-item', function(ev) {
+            let body = $('body');
+            let sidebarIconOnly = body.hasClass("sidebar-icon-only");
+            let sidebarFixed = body.hasClass("sidebar-fixed");
+            if (!('ontouchstart' in document.documentElement)) {
+                if (sidebarIconOnly) {
+                    if (sidebarFixed) {
+                        if (ev.type === 'mouseenter') {
+                            body.removeClass('sidebar-icon-only');
+                        }
+                    } else {
+                        var $menuItem = $(this);
+                        if (ev.type === 'mouseenter') {
+                            $menuItem.addClass('hover-open')
+                        } else {
+                            $menuItem.removeClass('hover-open')
+                        }
+                    }
+                }
+            }
+        });
+
+        $('[data-bs-toggle="minimize"]').on("click", function () {
+            if ((body.hasClass('sidebar-toggle-display')) || (body.hasClass('sidebar-absolute'))) {
+                body.toggleClass('sidebar-hidden');
+            } else {
+                body.toggleClass('sidebar-icon-only');
+            }
+        });
+
+        $('[data-bs-toggle="offcanvas"]').on("click", function() {
+            $('.sidebar-offcanvas').toggleClass('active')
+        });
+
         //Add active class to nav-link based on url dynamically
         // $('.nav-item.active').find('a:first').attr('aria-expanded',true);
         $('.nav-item.active').find('.collapse').addClass('show');

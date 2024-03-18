@@ -979,7 +979,7 @@ a[disabled] {
     border-bottom-right-radius: 3px;
 }
 .tooltip.show {
-    z-index: 1031
+    z-index: 1030
 }
 .pagination .page-item.active .page-link {
     border-color: var(--bs-pagination-disabled-border-color);
