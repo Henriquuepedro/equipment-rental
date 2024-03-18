@@ -99,17 +99,16 @@
             <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
                 <div class="row flex-grow">
                     <div class="col-lg-6 d-flex align-items-center justify-content-center">
-
-                        @if ($errors->any())
-                            <div class="alert alert-animate alert-warning">
-                                <ol>
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ol>
-                            </div>
-                        @endif
                         <div class="auth-form-transparent text-left p-3">
+                            @if ($errors->any())
+                                <div class="alert alert-animate alert-warning">
+                                    <ol>
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ol>
+                                </div>
+                            @endif
                             <div class="brand-logo d-flex justify-content-center">
                                 <img src="{{ asset('assets/images/system/logotipo.png') }}" alt="logo">
                             </div>

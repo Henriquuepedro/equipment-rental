@@ -7,32 +7,32 @@
         <div class="container-fluid page-body-wrapper full-page-wrapper">
             <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
                 <div class="row flex-grow">
-                    @if($errors->has('email'))
-                        <div class="invalid-feedback">
-                            <strong>{{ $errors->first('email') }}</strong>
-                        </div>
-                    @endif
-                    @if($errors->has('password'))
-                        <div class="invalid-feedback">
-                            <strong>{{ $errors->first('password') }}</strong>
-                        </div>
-                    @endif
-                    @if ($errors->any())
-                        <div class="alert alert-warning">
-                            <ol>
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ol>
-                        </div>
-                    @endif
-                    @if(session('resent'))
-                        <div class="alert alert-success" role="alert">
-                            {{ __('adminlte::adminlte.verify_email_sent') }}
-                        </div>
-                    @endif
                     <div class="col-lg-12 d-flex align-items-center justify-content-center flex-wrap">
                         <div class="auth-form-transparent col-md-6 p-2">
+                            @if($errors->has('email'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('email') }}</strong>
+                                </div>
+                            @endif
+                            @if($errors->has('password'))
+                                <div class="invalid-feedback">
+                                    <strong>{{ $errors->first('password') }}</strong>
+                                </div>
+                            @endif
+                            @if ($errors->any())
+                                <div class="alert alert-warning">
+                                    <ol>
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ol>
+                                </div>
+                            @endif
+                            @if(session('resent'))
+                                <div class="alert alert-success" role="alert">
+                                    {{ __('adminlte::adminlte.verify_email_sent') }}
+                                </div>
+                            @endif
                             <div class="brand-logo d-flex justify-content-center">
                                 <img src="{{ asset('assets/images/system/logotipo.png') }}" alt="logo">
                             </div>
