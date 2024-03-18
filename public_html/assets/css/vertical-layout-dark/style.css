@@ -32608,3 +32608,6 @@ div.dt-button-collection {
 .board-wrapper .board-portlet {
     background: #151724;
 }
+select option {
+    color: #D8D9E3
+}
