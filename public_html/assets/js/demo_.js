@@ -26,12 +26,12 @@ var FORMAT_DATETIME_BRAZIL_NO_SECONDS = 'DD/MM/YYYY HH:mm';
 var FORMAT_DATE_BRAZIL = 'DD/MM/YYYY';
 
 var MaskPhoneBehavior = function (val) {
-        return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
-    },
-    maskPhoneOptions = {
-    onKeyPress: function(val, e, field, options) {
-        field.mask(MaskPhoneBehavior.apply({}, arguments), options);
-    }
+    return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+},
+maskPhoneOptions = {
+onKeyPress: function(val, e, field, options) {
+    field.mask(MaskPhoneBehavior.apply({}, arguments), options);
+}
 };
 
 (function ($) {
@@ -653,7 +653,7 @@ const getHeight = () => {
     );
 }
 
-const deniedLocation = async () => {
+const deniedLocation = async (show_alert = false) => {
     const company_address_lat_lng = await $.ajax({
         type:'GET',
         url:$('#route_lat_lng_my_company').val(),
@@ -663,18 +663,36 @@ const deniedLocation = async () => {
             return data;
         }, error: e => {
             console.log(e);
-            Swal.fire({
-                icon: 'warning',
-                title: 'Localização não encontrada',
-                html: "A solicitação para obter a localização atual foi negada pelo navegador ou occoreu um problema para identificar.<br><br>Para obter a sua localização você precisa finalizar o cadastro do endereço da empresa para iniciarmos o mapa."
-            });
+            if (show_alert) {
+                alertCompanyWithoutAddress();
+            }
         }
     });
+
+    if ((company_address_lat_lng.lat === 0 || company_address_lat_lng.lng === 0) && show_alert) {
+        alertCompanyWithoutAddress();
+    }
 
     return {
         lat: company_address_lat_lng.lat,
         lng: company_address_lat_lng.lng
     };
+}
+
+const alertCompanyWithoutAddress = () => {
+    Swal.fire({
+        title: 'Localização não encontrada',
+        html: "A solicitação para obter a localização atual foi negada pelo navegador ou ocorreu um problema para identificar.<br><br>Para obter a sua localização você precisa finalizar o cadastro do endereço da empresa para iniciarmos o mapa.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Atualizar cadastro",
+        cancelButtonText: "Fechar",
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = $('[name="base_url"]').val() + '/configurar'
+        }
+    });
 }
 
 const formatCodeIndex = (code, size_min = 5) => {

@@ -37,7 +37,7 @@ const initCharts = () => {
 
 onLocationError = async (e, zoom = 12) => {
     if (parseInt(e.code) === 1) {
-        const latLng = await deniedLocation();
+        const latLng = await deniedLocation(true);
         if (latLng) {
             const latCenter = latLng.lat;
             const lngCenter = latLng.lng;
