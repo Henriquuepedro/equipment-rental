@@ -1,0 +1,13 @@
+.c3-legend-item {
+    fill: $body-color;
+  }
+  .c3 line, 
+  .c3 path {
+    stroke: $border-color;
+  }
+  .c3 {
+      text {
+      fill: $body-color;
+    }
+  }
+  

@@ -40,7 +40,7 @@
                     }
                 },
                 "initComplete": function( settings, json ) {
-                    $('[data-toggle="tooltip"]').tooltip();
+                    $('[data-bs-toggle="tooltip"]').tooltip();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
@@ -81,7 +81,7 @@
                             </select>
                         </div>
                     </div>
-                    <table id="tableUsers" class="table table-bordered">
+                    <table id="tableUsers" class="table">
                         <thead>
                             <tr>
                                 <th>Nome</th>

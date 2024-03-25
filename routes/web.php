@@ -410,6 +410,10 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
                 Route::post('/buscar', [App\Http\Controllers\Master\GuideController::class, 'fetch'])->name('fetch');
             });
 
+            Route::group(['prefix' => '/log-de-auditori', 'as' => 'audit_log.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\AuditLogController::class, 'fetch'])->name('fetch');
+            });
+
         });
     });
 
@@ -451,9 +455,16 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
         });
 
+        // Log Viewer
         Route::get('/log-viewer-redirect', function () {
             return redirect('/log-viewer');
         })->name('log_file');
+
+        // Log de auditoria
+        Route::group(['prefix' => '/log-de-auditoria', 'as' => 'audit_log.'], function () {
+            Route::get('/', [App\Http\Controllers\Master\AuditLogController::class, 'index'])->name('index');
+            Route::get('/view/{id}', [App\Http\Controllers\Master\AuditLogController::class, 'view'])->name('view');
+        });
 
     });
 });

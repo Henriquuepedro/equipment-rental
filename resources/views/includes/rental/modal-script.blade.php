@@ -19,7 +19,7 @@
         const modal = $('#viewRental');
 
         if (last_rental_id === rental_id) {
-            modal.modal();
+            modal.modal('show');
             return;
         }
 
@@ -33,7 +33,7 @@
             url: '{{ route('ajax.rental.get_full') }}/' + rental_id,
             dataType: 'json',
             success: response => {
-                modal.modal();
+                modal.modal('show');
                 setTimeout(() => {
                     //https://www.google.com/maps/place/27%C2%B040'04.0%22S+48%C2%B033'54.5%22W
                     //https://www.google.com/maps/dir//-27.6649878,-48.5241072
@@ -219,13 +219,13 @@
                     <div class="card mb-0">
                         <div class="card-header" role="tab" id="headingEquipment-${equipment_id_fake}">
                             <h5 class="mb-0">
-                                <a class="collapsed" data-toggle="collapse" href="#collapseEquipment-${equipment_id_fake}" aria-expanded="false" aria-controls="collapseEquipment-${equipment_id_fake}">
+                                <a class="collapsed" data-bs-toggle="collapse" href="#collapseEquipment-${equipment_id_fake}" aria-expanded="false" aria-controls="collapseEquipment-${equipment_id_fake}">
                                     ${response.data.name}
                                 </a>
                                 <span class=""></span>
                             </h5>
                         </div>
-                        <div id="collapseEquipment-${equipment_id_fake}" class="collapse" role="tabpanel" aria-labelledby="headingEquipment-${equipment_id_fake}" data-parent=".equipments">
+                        <div id="collapseEquipment-${equipment_id_fake}" class="collapse" role="tabpanel" aria-labelledby="headingEquipment-${equipment_id_fake}" data-bs-parent=".equipments">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-8">
@@ -297,7 +297,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-12 mt-2">
-                                        <button type="button" class="btn btn-primary pull-right hideEquipment"><i class="fa fa-angle-up"></i> Ocultar</button>
+                                        <button type="button" class="btn btn-primary btn-sm pull-right hideEquipment"><i class="fa fa-angle-up"></i> Ocultar</button>
                                     </div>
                                 </div>
                             </div>

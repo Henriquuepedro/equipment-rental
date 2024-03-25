@@ -100,7 +100,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Fornecedor</h4>
@@ -172,7 +172,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="form-group col-md-3">
@@ -214,7 +214,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('provider.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
                                 <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Cadastrar</button>

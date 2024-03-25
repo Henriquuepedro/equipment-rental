@@ -109,16 +109,26 @@ AppServiceProvider extends ServiceProvider
                 $settings['notices'] = '';
 
                 if (strtotime($dataCompany->plan_expiration_date) < strtotime(sumDate(dateNowInternational(), null, null, 4))) {
-                    $datetime_plan_expiration_date = new DateTime($dataCompany->plan_expiration_date);
-                    $datetime_now = new DateTime(dateNowInternational());
-                    $interval_plan_expiration = $datetime_plan_expiration_date->diff($datetime_now);
+                    $datetime_plan_expiration_date = new DateTime(formatDateInternational($dataCompany->plan_expiration_date, DATE_INTERNATIONAL));
+                    $datetime_now = new DateTime(dateNowInternational(null, DATE_INTERNATIONAL));
+                    $interval_plan_expiration = $datetime_now->diff($datetime_plan_expiration_date);
+                    $diff_date_plan_expiration = (int)$interval_plan_expiration->format("%r%a");
 
                     $color_alert_plan_expiration = 'warning';
-                    if ($interval_plan_expiration->d <= 1) {
+                    $message_pre_alert_plan_expiration = "Seu plano vence em: $settings[plan_expiration_date].";
+                    if ($diff_date_plan_expiration <= 1) {
                         $color_alert_plan_expiration = 'danger';
                     }
+                    if ($diff_date_plan_expiration == 0) {
+                        $color_alert_plan_expiration = 'danger';
+                        $message_pre_alert_plan_expiration = "Seu plano vence hoje.";
+                    }
+                    if ($diff_date_plan_expiration < 0) {
+                        $color_alert_plan_expiration = 'danger';
+                        $message_pre_alert_plan_expiration = "Seu plano venceu em: $settings[plan_expiration_date].";
+                    }
 
-                    $settings['notices'] .= "<div class='alert alert-fill-$color_alert_plan_expiration mt-3 text-center' role='alert'><i class='mdi mdi-alert-circle'></i> Seu plano vence em: $settings[plan_expiration_date]. <a href='".route('plan.index')."' class='ml-2 btn btn-rounded btn-fw btn-sm btn-light'>Renovar</a> </div>";
+                    $settings['notices'] .= "<div class='alert alert-$color_alert_plan_expiration mt-3 text-center' role='alert'><i class='mdi mdi-alert-circle'></i> $message_pre_alert_plan_expiration <a href='".route('plan.index')."' class='ml-2 btn btn-rounded btn-fw btn-sm btn-light'>Renovar</a> </div>";
                 }
 
                 $months = 2;

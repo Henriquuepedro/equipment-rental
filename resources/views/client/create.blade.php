@@ -87,7 +87,7 @@
                     </div>
                     @endif
                     <form action="{{ route(('client.insert')) }}" method="POST" enctype="multipart/form-data" id="formCreateClient">
-                        <div class="card">
+                        <div class="card mt-2">
                             <div class="card-body d-flex justify-content-around">
                                 <div class="form-radio form-radio-flat">
                                     <label class="form-check-label">
@@ -101,7 +101,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Cliente</h4>
@@ -179,7 +179,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Endereço</h4>
@@ -271,12 +271,12 @@
                                     </tbody>
                                 </table>
                                 <div id="new-addressses"></div>
-                                <div class="col-md-12 text-center pt-4" style="border-top: 1px solid #dee2e6">
+                                <div class="col-md-12 text-center pt-4">
                                     <button type="button" class="btn btn-primary" id="add-new-address">Adicionar Novo Endereço</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('client.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
                                 <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Cadastrar</button>
@@ -292,7 +292,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Confirmar Endereço no Mapa</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -307,7 +307,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary col-md-3" data-dismiss="modal">Confirmar</button>
+                        <button type="button" class="btn btn-primary col-md-3" data-bs-dismiss="modal">Confirmar</button>
                     </div>
                 </div>
             </div>

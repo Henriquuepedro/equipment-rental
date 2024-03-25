@@ -22,18 +22,6 @@
         .dropdown-menu .dropdown-item:hover {
             background: rgba(33, 150, 243, 0.35);
         }
-        .flatpickr a.input-button,
-        .flatpickr button.input-button{
-            height: calc(1.5em + 0.75rem + 3px);
-            width: 50%;
-            /*text-align: center;*/
-            /*padding-top: 13%;*/
-            cursor: pointer;
-            border: 1px solid transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         .flatpickr a.input-button:last-child,
         .flatpickr button.input-button:last-child{
             border-bottom-right-radius: 5px;
@@ -48,9 +36,6 @@
         }
         .equipmentsRentalTable tr.selected {
             background-color: rgba(27,255,0,.1);
-        }
-        .equipments .card .card-header a:not([disabled="disabled"]){
-            background: #2196f3 !important;
         }
         div[id^="headingEquipmentToExchange-"] a[disabled="disabled"] {
             background: #fb9678 !important;
@@ -90,6 +75,7 @@
             elementForm = $('#viewRental');
             draggableMap = false;
             gestureHandlingMap = true;
+            checkLabelAnimate()
         });
 
         const setTabRental = () => {
@@ -112,11 +98,11 @@
         }
 
         const disabledLoadData = () => {
-            $('a[data-toggle="tab"], input[name="intervalDates"], select[name="clients"], #no_date_to_withdraw').prop('disabled', true);
+            $('a[data-bs-toggle="tab"], input[name="intervalDates"], select[name="clients"], #no_date_to_withdraw').prop('disabled', true);
         }
 
         const enabledLoadData = () => {
-            $('a[data-toggle="tab"], input[name="intervalDates"]:not([data-can-enable="false"]), select[name="clients"], #no_date_to_withdraw').prop('disabled', false);
+            $('a[data-bs-toggle="tab"], input[name="intervalDates"]:not([data-can-enable="false"]), select[name="clients"], #no_date_to_withdraw').prop('disabled', false);
         }
 
         const getCountsTabRentals = () => {
@@ -165,13 +151,13 @@
             }
 
             if (typeRentals === null) {
-                typeRentals = $('[data-toggle="tab"].active').attr('id').replace('-tab','');
+                typeRentals = $('[data-bs-toggle="tab"].active').attr('id').replace('-tab','');
             }
 
             loadCountsTabRental();
             disabledLoadData();
 
-            $('[data-toggle="tooltip"]').tooltip('dispose');
+            $('[data-bs-toggle="tooltip"]').tooltip('dispose');
 
             if (typeof tableRental !== 'undefined') {
                 tableRental.destroy();
@@ -283,10 +269,10 @@
                                 <div class="form-group flatpickr d-flex no-margin">
                                     <input type="tel" class="form-control flatpickr-input" name="date[]" value="${getTodayDateBr(true, false)}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input readonly>
                                     <div class="input-button-calendar col-md-3 no-padding">
-                                        <a class="input-button pull-left btn-primary" title="toggle" data-toggle disabled>
+                                        <a class="input-button pull-left btn-primary btn btn-sm" title="toggle" data-toggle disabled>
                                             <i class="fa fa-calendar text-white"></i>
                                         </a>
-                                        <a class="input-button pull-right btn-primary" title="clear" data-clear disabled>
+                                        <a class="input-button pull-right btn-primary btn btn-sm" title="clear" data-clear disabled>
                                             <i class="fa fa-times text-white"></i>
                                         </a>
                                     </div>
@@ -309,7 +295,7 @@
                     $(`${modal_id} .equipmentsRentalTable tbody`).empty().append(equipments);
 
                     if ($(modal_id).is(':not(:visible)')) {
-                        $(modal_id).modal();
+                        $(modal_id).modal('show');
                     }
 
                     $.each(response.data, function( index, value ) {
@@ -436,7 +422,7 @@
             $(this).closest('tr').toggleClass('noSelected selected');
         });
 
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             getTable(e.target.id.replace('-tab',''), false);
         });
 
@@ -646,7 +632,7 @@
                     <div class="row">
                         <div class="col-md-8 form-group">
                             <label>Cliente</label>
-                            <select class="form-control" name="clients">
+                            <select class="form-control select2" name="clients">
                                 <option value="0">Todos</option>
                                 @foreach($clients as $client)
                                     <option value="{{ $client->id }}" {{ ($client_id ?? 0) == $client->id ? 'selected' : '' }}>{{ $client->name }}</option>
@@ -654,20 +640,24 @@
                             </select>
                         </div>
 
-                        <div class="form-group col-md-4 d-flex mt-4">
-                            <label class="label-date-btns" for="date_filter_by">Filtrar por data de</label>
-                            <select class="form-control select2 col-md-6" id="date_filter_by" name="date_filter_by">
-                                <option value="created_at" {{ $date_filter_by == 'created_at' ? 'selected' : '' }}>Criação</option>
-                                <option value="delivery" {{ $date_filter_by == 'delivery' ? 'selected' : '' }}>Entrega</option>
-                                <option value="withdraw" {{ $date_filter_by == 'withdraw' ? 'selected' : '' }}>Retirada</option>
-                                <option value="expected_delivery" {{ $date_filter_by == 'expected_delivery' ? 'selected' : '' }}>Previsão de Entrega</option>
-                                <option value="expected_withdraw" {{ $date_filter_by == 'expected_withdraw' || $date_filter_by == 'no_date_to_withdraw' ? 'selected' : '' }}>Previsão de Retirada</option>
-                            </select>
-                            <input type="text" name="intervalDates" class="form-control col-md-6"
-                                   value="{{ (formatDateInternational($filter_start_date, DATE_BRAZIL) ?? $settings['intervalDates']['start']) . ' - ' . (formatDateInternational($filter_end_date, DATE_BRAZIL) ?? $settings['intervalDates']['finish']) }}"
-                                   data-can-enable="{{ $date_filter_by == 'no_date_to_withdraw' ? 'false' : 'true' }}"
-                                   {{ $date_filter_by == 'no_date_to_withdraw' ? 'disabled' : '' }}
-                                   style="text-decoration: {{ $date_filter_by == 'no_date_to_withdraw' ? 'line-through' : 'unset' }}; color: {{ $date_filter_by == 'no_date_to_withdraw' ? 'rgb(81, 39, 39)' : 'unset' }}"/>
+                        <div class="form-group col-md-4">
+                            <label class="label-date-btns" for="date_filter_by">Filtre por</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend col-md-5">
+                                    <select class="form-control" id="date_filter_by" name="date_filter_by">
+                                        <option value="created_at" {{ $date_filter_by == 'created_at' ? 'selected' : '' }}>Criação</option>
+                                        <option value="delivery" {{ $date_filter_by == 'delivery' ? 'selected' : '' }}>Entrega</option>
+                                        <option value="withdraw" {{ $date_filter_by == 'withdraw' ? 'selected' : '' }}>Retirada</option>
+                                        <option value="expected_delivery" {{ $date_filter_by == 'expected_delivery' ? 'selected' : '' }}>Previsão de Entrega</option>
+                                        <option value="expected_withdraw" {{ $date_filter_by == 'expected_withdraw' || $date_filter_by == 'no_date_to_withdraw' ? 'selected' : '' }}>Previsão de Retirada</option>
+                                    </select>
+                                </div>
+                                <input type="text" name="intervalDates" class="form-control col-md-7"
+                                       value="{{ (formatDateInternational($filter_start_date, DATE_BRAZIL) ?? $settings['intervalDates']['start']) . ' - ' . (formatDateInternational($filter_end_date, DATE_BRAZIL) ?? $settings['intervalDates']['finish']) }}"
+                                       data-can-enable="{{ $date_filter_by == 'no_date_to_withdraw' ? 'false' : 'true' }}"
+                                       {{ $date_filter_by == 'no_date_to_withdraw' ? 'disabled' : '' }}
+                                       style="text-decoration: {{ $date_filter_by == 'no_date_to_withdraw' ? 'line-through' : 'unset' }}; color: {{ $date_filter_by == 'no_date_to_withdraw' ? 'rgb(81, 39, 39)' : 'unset' }}"/>
+                            </div>
                         </div>
                         <div class="form-group col-md-12 mt-1 {{ $date_filter_by == 'expected_withdraw' || $date_filter_by == 'no_date_to_withdraw' ? '' : 'display-none' }}">
                             <div class="d-flex justify-content-end mr-3">
@@ -681,18 +671,18 @@
                     <div class="nav-scroller mt-3">
                         <ul class="nav nav-tabs tickets-tab-switch" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="deliver-tab" data-toggle="tab" href="#deliver" role="tab" aria-controls="deliver" aria-selected="true">Para Entregar<div class="badge">13</div></a>
+                                <a class="nav-link active" id="deliver-tab" data-bs-toggle="tab" href="#deliver" role="tab" aria-controls="deliver" aria-selected="true">Para Entregar<div class="badge">13</div></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="withdraw-tab" data-toggle="tab" href="#withdraw" role="tab" aria-controls="withdraw" aria-selected="false">Para Retirar<div class="badge">50 </div></a>
+                                <a class="nav-link" id="withdraw-tab" data-bs-toggle="tab" href="#withdraw" role="tab" aria-controls="withdraw" aria-selected="false">Para Retirar<div class="badge">50 </div></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="finished-tab" data-toggle="tab" href="#finished" role="tab" aria-controls="finished" aria-selected="false">Finalizados<div class="badge">29 </div>
+                                <a class="nav-link" id="finished-tab" data-bs-toggle="tab" href="#finished" role="tab" aria-controls="finished" aria-selected="false">Finalizados<div class="badge">29 </div>
                                 </a>
                             </li>
                         </ul>
                     </div>
-                    <div class="tab-content tab-content-basic">
+                    <div class="tab-content tab-content-basic d-none">
                         <div class="tab-pane fade show active" id="deliver" role="tabpanel" aria-labelledby="deliver">
 
                         </div>
@@ -706,7 +696,7 @@
 
                     <div class="row mt-3">
                         <div class="col-md-12">
-                            <table id="tableRentals" class="table table-bordered mt-2">
+                            <table id="tableRentals" class="table mt-2">
                                 <thead>
                                 <tr>
                                     <th>Código</th>
@@ -737,7 +727,7 @@
                 <form action="{{ route('ajax.rental.delivery_equipment') }}" method="POST" id="formUpdateDeliver">
                     <div class="modal-header">
                         <h5 class="modal-title">Confirmar entrega do equipamento</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -765,7 +755,7 @@
                         </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
-                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                         <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-check"></i> Confirmar</button>
                     </div>
                 </form>
@@ -778,7 +768,7 @@
                 <form action="{{ route('ajax.rental.withdrawal_equipment') }}" method="POST" id="formUpdateWithdraw">
                     <div class="modal-header">
                         <h5 class="modal-title">Confirmar retirada do equipamento</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -806,7 +796,7 @@
                         </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
-                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                         <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-check"></i> Confirmar</button>
                     </div>
                 </form>

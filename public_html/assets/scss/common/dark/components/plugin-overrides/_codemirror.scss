@@ -1,0 +1,18 @@
+/* CodeMirror */
+
+.CodeMirror {
+  height: auto;
+  text-align: left;
+  min-height: auto;
+  background: transparent !important;
+  color: $white;
+}
+.CodeMirror-scroll {
+  min-height: auto;
+}
+
+.editor-toolbar {
+  a {
+    color: $gray !important;
+  }
+}

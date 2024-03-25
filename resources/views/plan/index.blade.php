@@ -8,6 +8,13 @@
 
 @section('css')
     <style>
+        .nav-tabs .nav-link.active {
+            background-color: #1e3bb3;
+            color: #fff;
+        }
+        .nav-tabs .nav-link {
+            border-radius: 5px !important;
+        }
         .nav.nav-tabs {
             border: 1px solid;
             padding: 5px 0;
@@ -47,17 +54,17 @@
         }
 
         .tooltip >.tooltip-inner {
-            background-color: #2196f3;
+            background-color: #1e3bb3;
             color: #fff;
-            border: 2px solid #0c83e2;
+            border: 2px solid #0d6efd;
         }
 
         .tooltip.show {
-            top: -10px !important;
+            margin-bottom: 8px !important;
         }
 
-        .bs-tooltip-top .arrow::before {
-            border-top-color: #0c83e2
+        .bs-tooltip-auto .tooltip-arrow::before {
+            border-top-color: #0d6efd !important;
         }
     </style>
 @stop
@@ -66,12 +73,12 @@
     <script src="https://www.mercadopago.com/v2/security.js" view="search"></script>
     <script>
         $(function(){
-            listPlans($('[data-toggle="tab"].active').data('month-time'));
-            $('[data-toggle-second="tooltip"]').tooltip('show');
+            listPlans($('[data-bs-toggle="tab"].active').data('month-time'));
+            $('[data-bs-toggle-second="tooltip"]').tooltip('show');
         });
 
 
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             listPlans($(e.target).data('month-time'));
         });
 
@@ -92,31 +99,32 @@
                     alert_user = value.allowed_users ? `Até <b>${value.allowed_users}</b> usuários` : 'Usuários ilimitados';
                     message_equipment_mmanager = value.quantity_equipment ? `Até <b>${value.quantity_equipment}</b> equipamentos` : 'Equipamentos ilimitados'
                     $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append(
-                        `<div class="col-lg-3 col-sm-12 grid-margin stretch-card pricing-card">
-                        <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body pl-0 pr-0">
-                            <div class="text-center pricing-card-head">
-                                <h3>${value.name}</h3>
-                                <p class="pr-2 pl-4 mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${message_equipment_mmanager}</p>
-                                <p class="pr-2 pl-4 mb-0 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;${alert_user}</p>
-                                <p class="pr-2 pl-4 text-left"><i class="fa fa-check text-success"></i>&nbsp;&nbsp;Suporte via chamado</p>
-
-                                ${price_from}
-                                ${discount_months}
-                                <h1 class="fw-normal mb-0 text-primary font-weight-bold">R$ ${numberToReal(value.value / type)}/mês*</h1>
+                        `<div class="col-md-3 col-xl-3 grid-margin stretch-card pricing-card">
+                            <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body">
+                                <div class="text-center pricing-card-head">
+                                    <h3>${value.name}</h3>
+                                    ${price_from}
+                                    ${discount_months}
+                                    <h1 class="fw-normal mb-0 text-primary font-weight-bold">R$ ${numberToReal(value.value / type)}/mês*</h1>
+                                </div>
+                                <ul class="list-unstyled plan-features mt-4">
+                                    <li class="p-0">${message_equipment_mmanager}</li>
+                                    <li class="p-0">${alert_user}</li>
+                                    <li class="p-0">Suporte via chamado</li>
+                                </ul>
+                                <div class="pr-2 pl-4 text-center plan-features mb-2">
+                                    ${description}
+                                </div>
+                                <div class="wrapper d-flex justify-content-center">
+                                    <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block col-md-10">Assinar</a>
+                                </div>
                             </div>
-                            <div class="pr-2 pl-4 text-center plan-features mb-2">
-                                ${description}
-                            </div>
-                            <div class="wrapper d-flex justify-content-center pl-4 pr-4">
-                                <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block col-md-10">Assinar</a>
-                            </div>
-                        </div>
-                    </div>`
+                        </div>`
                     );
                 });
 
                 if (!response.length) {
-                    $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append('<div class="col-md-12"><div class="alert alert-fill-warning" role="alert"><i class="mdi mdi-alert-circle"></i> Nenhum plano encontrado para essa categoria.</div></div>');
+                    $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append('<div class="col-md-12"><div class="alert alert-warning" role="alert"><i class="mdi mdi-alert-circle"></i> Nenhum plano encontrado para essa categoria.</div></div>');
                 }
             });
         }
@@ -140,27 +148,27 @@
                         <div class="col-md-12">
                             <ul class="nav nav-tabs tab-solid tab-solid-primary d-flex justify-content-around border-primary" role="tablist">
                                 <li class="col-md-2 nav-item">
-                                    <a class="d-flex justify-content-center nav-link active" id="monthly" data-toggle="tab" href="#monthly-plan" data-month-time="1" role="tab" aria-controls="monthly-plan" aria-selected="true">
+                                    <a class="d-flex justify-content-center nav-link active" id="monthly" data-bs-toggle="tab" href="#monthly-plan" data-month-time="1" role="tab" aria-controls="monthly-plan" aria-selected="true">
                                         Mensal
                                     </a>
                                 </li>
 {{--                                <li class="col-md-2 nav-item">--}}
-{{--                                    <a class="d-flex justify-content-center nav-link" id="quarterly" data-toggle="tab" href="#quarterly-plan" data-month-time="3" role="tab" aria-controls="quarterly-plan" aria-selected="false">--}}
+{{--                                    <a class="d-flex justify-content-center nav-link" id="quarterly" data-bs-toggle="tab" href="#quarterly-plan" data-month-time="3" role="tab" aria-controls="quarterly-plan" aria-selected="false">--}}
 {{--                                        Trimestral--}}
 {{--                                    </a>--}}
 {{--                                </li>--}}
                                 <li class="col-md-2 nav-item">
-                                    <a class="d-flex justify-content-center nav-link" id="semiannual" data-toggle="tab" href="#semiannual-plan" data-month-time="6" role="tab" aria-controls="semiannual-plan" aria-selected="false" data-toggle-second="tooltip" data-placement="top" title="10% OFF" data-trigger="manual">
+                                    <a class="d-flex justify-content-center nav-link" id="semiannual" data-bs-toggle="tab" href="#semiannual-plan" data-month-time="6" role="tab" aria-controls="semiannual-plan" aria-selected="false" data-bs-toggle-second="tooltip" data-bs-placement="top" title="10% OFF" data-bs-trigger="manual">
                                         Semestral
                                     </a>
                                 </li>
                                 <li class="col-md-2 nav-item">
-                                    <a class="d-flex justify-content-center nav-link" id="annual" data-toggle="tab" href="#annual-plan" data-month-time="12" role="tab" aria-controls="annual-plan" aria-selected="false" data-toggle-second="tooltip" data-placement="top" title="20% OFF" data-trigger="manual">
+                                    <a class="d-flex justify-content-center nav-link" id="annual" data-bs-toggle="tab" href="#annual-plan" data-month-time="12" role="tab" aria-controls="annual-plan" aria-selected="false" data-bs-toggle-second="tooltip" data-bs-placement="top" title="20% OFF" data-bs-trigger="manual">
                                         Anual
                                     </a>
                                 </li>
                             </ul>
-                            <div class="tab-content tab-content-solid">
+                            <div class="tab-content tab-content-solid border-0">
                                 <div class="tab-pane fade show active" id="monthly-plan" role="tabpanel" aria-labelledby="monthly-plan" data-month-time="1">
                                     <div class="row pricing-table d-flex justify-content-center"></div>
                                 </div>

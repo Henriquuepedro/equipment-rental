@@ -1,5 +1,5 @@
 $(function(){
-    $('#tabDashboard a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    $('#tabDashboard a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
         initCharts();
     });
 

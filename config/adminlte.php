@@ -233,35 +233,42 @@ return [
             'permissions'   => [],
             'text'          => 'Administração',
             'can'           => 'admin-master',
-            'class'         => 'bg-primary',
+            'icon'          => 'menu-icon mdi mdi-security',
+            'class'         => '',
             'list'          => [
                 [
                     'route' => 'master.company.index',
                     'text' => 'Empresas',
                     'permissions'   => [],
-                    'route_active'  => ['master.company.edit']
+                    'route_active'  => ['master.company.create', 'master.company.edit']
                 ],
                 [
                     'route' => 'master.user.index',
                     'text' => 'Usuários',
                     'permissions'   => [],
-                    'route_active'  => ['master.user.edit']
+                    'route_active'  => ['master.user.create', 'master.user.edit']
                 ],
                 [
                     'route' => 'master.plan.index',
                     'text' => 'Planos',
                     'permissions'   => [],
-                    'route_active'  => ['master.plan.edit']
+                    'route_active'  => ['master.plan.create', 'master.plan.edit']
                 ],
                 [
                     'route' => 'master.guide.index',
                     'text' => 'Manuais',
                     'permissions'   => [],
-                    'route_active'  => ['master.guide.edit']
+                    'route_active'  => ['master.guide.create', 'master.guide.edit']
+                ],
+                [
+                    'route' => 'master.audit_log.index',
+                    'text' => 'Logs de Auditoria',
+                    'permissions'   => [],
+                    'route_active'  => ['master.audit_log.view']
                 ],
                 [
                     'route' => 'master.log_file',
-                    'text' => 'Log File',
+                    'text' => 'Logs File',
                     'permissions'   => [],
                     'route_active'  => []
                 ]
@@ -272,6 +279,7 @@ return [
             'route'         => 'dashboard',
             'text'          => 'Dashboard',
             'permissions'   => [],
+            'icon'          => 'menu-icon mdi mdi-grid-large'
         ],
         [
             'type'          => 'level',
@@ -279,6 +287,7 @@ return [
             'permissions'   => [],
             'text'          => 'Cadastro',
             'can'           => null,
+            'icon'          => 'menu-icon mdi mdi-plus-box-multiple',
             'list'          => [
                 [
                     'permissions' => [
@@ -286,7 +295,7 @@ return [
                     ],
                     'route' => 'client.index',
                     'text' => 'Cliente',
-                    'route_active'  => ['client.edit']
+                    'route_active'  => ['client.create', 'client.edit']
                 ],
                 [
                     'permissions' => [
@@ -294,7 +303,7 @@ return [
                     ],
                     'route' => 'equipment.index',
                     'text' => 'Equipamento',
-                    'route_active'  => ['equipment.edit']
+                    'route_active'  => ['equipment.create', 'equipment.edit']
                 ],
                 [
                     'permissions' => [
@@ -302,7 +311,7 @@ return [
                     ],
                     'route' => 'driver.index',
                     'text' => 'Motorista',
-                    'route_active'  => ['driver.edit']
+                    'route_active'  => ['driver.create', 'driver.edit']
                 ],
                 [
                     'permissions' => [
@@ -310,7 +319,7 @@ return [
                     ],
                     'route' => 'vehicle.index',
                     'text' => 'Veículo',
-                    'route_active'  => ['vehicle.edit']
+                    'route_active'  => ['vehicle.create', 'vehicle.edit']
                 ],
                 [
                     'permissions' => [
@@ -325,7 +334,7 @@ return [
                     ],
                     'route' => 'provider.index',
                     'text' => 'Fornecedor',
-                    'route_active'  => ['provider.edit']
+                    'route_active'  => ['provider.create', 'provider.edit']
                 ]
             ]
         ],
@@ -335,6 +344,7 @@ return [
             'permissions'   => [],
             'text'          => 'Controle',
             'can'           => null,
+            'icon'          => 'menu-icon mdi mdi-cog-outline',
             'list'          => [
                 [
                     'permissions' => [
@@ -342,7 +352,7 @@ return [
                     ],
                     'route' => 'rental.index',
                     'text' => 'Locação',
-                    'route_active'  => ['rental.edit', 'rental.exchange']
+                    'route_active'  => ['rental.create', 'rental.edit', 'rental.exchange']
                 ],
                 [
                     'permissions' => [
@@ -350,7 +360,7 @@ return [
                     ],
                     'route' => 'budget.index',
                     'text' => 'Orçamento',
-                    'route_active'  => ['budget.edit']
+                    'route_active'  => ['budget.create', 'budget.edit']
                 ],
                 [
                     'permissions' => [
@@ -365,7 +375,7 @@ return [
                     ],
                     'route' => 'bills_to_pay.index',
                     'text' => 'Contas a Pagar',
-                    'route_active'  => ['bills_to_pay.edit']
+                    'route_active'  => ['bills_to_pay.create', 'bills_to_pay.edit']
                 ],
                 [
                     'permissions' => [
@@ -384,6 +394,7 @@ return [
             'permissions'   => ['ReportView'],
             'text'          => 'Relatório',
             'can'           => null,
+            'icon'          => 'menu-icon mdi mdi-file-chart',
             'list'          => [
                 [
                     'route' => 'report.rental',
@@ -405,6 +416,7 @@ return [
             'permissions'   => ['PlanView'],
             'text'          => 'Plano',
             'can'           => null,
+            'icon'          => 'menu-icon mdi mdi-calendar-clock',
             'list'          => [
                 [
                     'route'         => 'plan.index',

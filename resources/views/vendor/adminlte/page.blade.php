@@ -26,7 +26,7 @@
 
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="row block-screen-load"><img src="{{ asset('assets/images/system/load.gif') }}" alt="loading..."/></div>
+                    <div class="row block-screen-load loader-demo-box"><div class="circle-loader"></div></div>
                     @yield('content')
                 </div>
                 @include('adminlte::partials.footer.footer')

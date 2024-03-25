@@ -5,6 +5,9 @@
 .wizard > .content > .body {
     height: unset;
 }
+.wizard > .content {
+    background: unset !important;
+}
 .show-address {
     display: none;
 }
@@ -58,10 +61,16 @@
     position: unset;
 }
 .accordion .card .card-header a:not([disabled="disabled"]){
-    background: #2196f3 !important;
+    background: #3A61F6 !important;
+    color: #ffeefc !important;
+}
+.equipments-selected .card-header .remove-equipment {
+    background: #3A61F6;
+    color: #ffeefc;
 }
 div[id^="headingEquipmentToExchange-"] a[disabled="disabled"] {
     background: #fb9678 !important;
+    color: #fff !important;
 }
 div[id^="headingEquipmentToExchange-"][disabled="disabled"] {
     cursor: not-allowed;
@@ -96,7 +105,7 @@ i.fa.input-group-text.text-white {
     background-color: #52a4e5;
 }
 .calendar_equipment a {
-    height: calc(1.5em + 0.75rem + 4px) !important;
+    height: calc(1.5em + 1.25rem + 3px) !important;
 }
 .calendar_equipment i {
     font-size: 14px !important;
@@ -104,12 +113,14 @@ i.fa.input-group-text.text-white {
 .list-equipments-payment li.one-li-list-equipments-payment:after{
     display: none;
 }
+.list-equipments-payment li.one-li-list-equipments-payment{
+    list-style-type: none;
+}
 .btn-view-price-period-equipment {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-bottom: 5px;
-    height: calc(1.5em + 0.75rem + 3px);
+    height: calc(1.5em + 1rem + 3px) !important;
 }
 .btn-view-price-period-equipment i {
     font-size: 18px !important;
@@ -153,4 +164,10 @@ ul[id^="select2-residues"] li[aria-selected="true"] {
 }
 .accordion.accordion-multiple-filled .card {
     border-bottom: 1px solid #383e5d !important;
+}
+.table.list-equipment.d-table tbody tr.equipment td:first-child {
+    height: 38px;
+}
+.table.list-equipment tbody tr td {
+    background: unset;
 }

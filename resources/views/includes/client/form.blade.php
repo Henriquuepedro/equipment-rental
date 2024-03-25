@@ -5,12 +5,12 @@
 @endphp
 <label>Cliente @if($required)<sup>*</sup>@endif</label>
 @if($show_btn_create)
-<div class="input-group client-load d-flex flex-nowrap" data-target="#timepicker-example" data-toggle="datetimepicker">
+<div class="input-group client-load d-flex flex-nowrap" data-bs-target="#timepicker-example" data-bs-toggle="datetimepicker">
 @endif
     <select {{ $disabled ?? '' }} class="form-control label-animate {{ $required }}" name="client" {{ $required }}></select>
     @if($show_btn_create)
     <div class="input-group-addon input-group-append">
-        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newClientModal" title="Novo Cliente" {{ in_array('ClientCreatePost', $permissions) ? '' : 'disabled' }}><i class="fa fa-user-plus"></i></button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newClientModal" title="Novo Cliente" {{ in_array('ClientCreatePost', $permissions) ? '' : 'disabled' }}><i class="fa fa-user-plus"></i></button>
     </div>
     @endif
 @if($show_btn_create)

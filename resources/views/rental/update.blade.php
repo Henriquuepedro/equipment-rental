@@ -60,7 +60,7 @@
                 await checkLabelAnimate();
 
                 if ($('[name="residues"]').val().split(',').length) {
-                    $('.container-residues').show();
+                    // $('.container-residues').show();
                     $('[name="residues[]"]').val($('[name="residues"]').val().split(',')).select2('destroy').select2();
                 }
 
@@ -209,7 +209,7 @@
                             <form action="{{ route($budget ? 'ajax.budget.update-rental' : 'ajax.rental.update-rental', ['id' => $rental->id]) }}" method="POST" enctype="multipart/form-data" id="formRental" class="pb-2">
                                 <h3>Tipo de {{ $budget ? 'Orçamento' : 'Locação' }}</h3>
                                 <div class="stepRental">
-                                    <h6 class="title-step">Tipo de {!! $budget ? 'Orçamento' : 'Locação <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
+                                    <h6 class="title-step">Tipo de {!! $budget ? 'Orçamento' : 'Locação <i class="fa fa-info-circle" data-bs-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
                                             <div class="">
@@ -254,28 +254,28 @@
                                     <h6 class="title-step">Datas</h6>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="form-group flatpickr d-flex">
+                                            <div class="form-group flatpickr">
                                                 <label class="label-date-btns">Data Prevista de Entrega <sup>*</sup></label>
-                                                <input type="tel" name="date_delivery" class="form-control col-md-9" value="{{ date(DATETIME_BRAZIL_NO_SECONDS, strtotime($rental->expected_delivery_date)) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
-                                                <div class="input-button-calendar col-md-3 no-padding">
-                                                    <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
+                                                <input type="tel" name="date_delivery" class="form-control col-md-9 pull-left" value="{{ date(DATETIME_BRAZIL_NO_SECONDS, strtotime($rental->expected_delivery_date)) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 no-padding pull-right">
+                                                    <a class="input-button pull-left btn-primary btn btn-sm" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
-                                                    <a class="input-button pull-right btn-primary" title="clear" data-clear>
+                                                    <a class="input-button pull-right btn-primary btn btn-sm" title="clear" data-clear>
                                                         <i class="fa fa-times text-white"></i>
                                                     </a>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="form-group flatpickr d-flex">
+                                            <div class="form-group flatpickr">
                                                 <label class="label-date-btns">Data Prevista de Retirada</label>
-                                                <input type="tel" name="date_withdrawal" class="form-control col-md-9" value="{{ !$rental->not_use_date_withdrawal ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($rental->expected_withdrawal_date)) : '' }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
-                                                <div class="input-button-calendar col-md-3 no-padding">
-                                                    <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
+                                                <input type="tel" name="date_withdrawal" class="form-control col-md-9 pull-left" value="{{ !$rental->not_use_date_withdrawal ? date(DATETIME_BRAZIL_NO_SECONDS, strtotime($rental->expected_withdrawal_date)) : '' }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 no-padding pull-right">
+                                                    <a class="input-button pull-left btn-primary btn btn-sm" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
-                                                    <a class="input-button pull-right btn-primary" title="clear" data-clear>
+                                                    <a class="input-button pull-right btn-primary btn btn-sm" title="clear" data-clear>
                                                         <i class="fa fa-times text-white"></i>
                                                     </a>
                                                 </div>
@@ -293,17 +293,17 @@
                                 <div class="stepRental">
                                     <h6 class="title-step">Equipamentos</h6>
                                     <div class="row">
-                                        <div class="form-group col-md-12 mt-2 label-animate container-residues display-none">
+                                        <div class="form-group col-md-12 mt-2 label-animate container-residues">
                                             <label>Resíduos a serem utilizados</label>
                                             <div class="input-group label-animate">
                                                 <select class="select2 form-control" multiple="multiple" name="residues[]"></select>
                                                 <div class="input-group-addon input-group-append">
-                                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo" @if(!in_array('ResidueCreatePost', $permissions)) disabled @endif><i class="fas fa-plus-circle"></i></button>
+                                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newResidueModal" title="Novo Resíduo" @if(!in_array('ResidueCreatePost', $permissions)) disabled @endif><i class="fas fa-plus-circle"></i></button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-12 mt-2 equipments-selected">
-                                            <div class="accordion accordion-multiple-filled" id="equipments-selected" role="tablist">
+                                        <div class="col-md-12 mt-2 equipments-selected">
+                                            <div class="accordion accordion-solid-header" id="equipments-selected" role="tablist">
                                             </div>
                                             <hr class="separator-dashed mt-4 display-none">
                                         </div>
@@ -316,7 +316,7 @@
                                                 <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipment">
                                                     <i class="fa fa-times input-group-text text-white"></i>
                                                 </div>
-                                                <div class="input-group-addon input-group-append btn-success" @if(in_array('EquipmentCreatePost', $permissions))id="newEquipment" data-toggle="modal" data-target="#newEquipmentModal"@else disabled @endif>
+                                                <div class="input-group-addon input-group-append btn-success" @if(in_array('EquipmentCreatePost', $permissions))id="newEquipment" data-bs-toggle="modal" data-bs-target="#newEquipmentModal"@else disabled @endif>
                                                     <i class="fa fa-plus input-group-text text-white"></i>
                                                 </div>
                                             </div>
@@ -346,7 +346,7 @@
                                             <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 payment-hidden">
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Valor Bruto</label>
+                                                    <label class="mb-0 mr-2">Valor Bruto</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -355,7 +355,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Acréscimo</label>
+                                                    <label class="mb-0 mr-2">Acréscimo</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -364,7 +364,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Desconto</label>
+                                                    <label class="mb-0 mr-2">Desconto</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -376,7 +376,7 @@
                                             <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 payment-hidden">
                                                 <div class="d-flex justify-content-end align-items-center mb-2 flex-wrap">
-                                                    <label class="mb-0 mr-md-2">Valor Líquido</label>
+                                                    <label class="mb-0 mr-2">Valor Líquido</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -402,7 +402,7 @@
                                             <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 d-flex justify-content-end payment-hidden">
                                                 <div class="form-group">
-                                                    <button type="button" class="btn btn-success display-none" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
+                                                    <button type="button" class="btn btn-primary display-none" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
                                                 </div>
                                             </div>
                                             <div class="col-md-12 payment-hidden">
@@ -457,7 +457,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Confirmar Endereço no Mapa</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -474,7 +474,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary col-md-3" data-dismiss="modal">Confirmar</button>
+                    <button type="button" class="btn btn-primary col-md-3" data-bs-dismiss="modal">Confirmar</button>
                 </div>
             </div>
         </div>
@@ -484,7 +484,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ $budget ? 'Orçamento criado' : 'Locação criada' }} com sucesso</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>

@@ -37,7 +37,7 @@ const initCharts = () => {
 
 onLocationError = async (e, zoom = 12) => {
     if (parseInt(e.code) === 1) {
-        const latLng = await deniedLocation();
+        const latLng = await deniedLocation(true);
         if (latLng) {
             const latCenter = latLng.lat;
             const lngCenter = latLng.lng;
@@ -173,6 +173,7 @@ const newClientsForMonth = () => {
         let data = [];
         let max_registers = 0;
         let step_size = 0;
+        const rgb_color_primary = '62, 173, 114';
 
         for (const property in response) {
             labels.push(property);
@@ -185,15 +186,36 @@ const newClientsForMonth = () => {
 
         step_size = getStepSizeChart(max_registers);
 
+        let newClientsChartCanvas = $("#newClientsChart").get(0).getContext("2d");
+        let saleGradientBg = newClientsChartCanvas.createLinearGradient(5, 0, 5, 100);
+        saleGradientBg.addColorStop(0, `rgba(${rgb_color_primary}, 0.25)`);
+        saleGradientBg.addColorStop(1, `rgba(${rgb_color_primary}, 0.03)`);
+
         let lineData = {
             labels,
             datasets: [{
                 data,
-                backgroundColor: ChartColor[0],
-                borderColor: ChartColor[0],
-                borderWidth: 3,
-                fill: 'false',
-                label: "Clientes"
+                label: "Clientes",
+                backgroundColor: saleGradientBg,
+                borderColor: [
+                    `rgb(${rgb_color_primary})`
+                ],
+                fill: true, // 3: no fill
+                borderWidth: 1.5,
+                pointBorderWidth: 1,
+                pointRadius: [4, 4, 4, 4, 4, 4, 4, 4, 4],
+                pointHoverRadius: [3, 3, 3, 3, 3, 3, 3, 3, 3],
+                pointBackgroundColor: [
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`
+                ],
+                pointBorderColor: ['#252730', '#252730', '#252730', '#252730', '#252730', '#252730', '#252730', '#252730', '#252730'],
             }]
         };
         let lineOptions = {
@@ -231,7 +253,7 @@ const newClientsForMonth = () => {
                 }
             },
         }
-        let newClientsChartCanvas = $("#newClientsChart").get(0).getContext("2d");
+
         new Chart(newClientsChartCanvas, {
             type: 'line',
             data: lineData,
@@ -246,6 +268,7 @@ const rentalsForMonth = () => {
         let data = [];
         let max_registers = 0;
         let step_size = 0;
+        const rgb_color_primary = '17,65,152';
 
         for (const property in response) {
             labels.push(property);
@@ -259,18 +282,35 @@ const rentalsForMonth = () => {
         step_size = getStepSizeChart(max_registers);
 
         let rentalsDoneChartCanvas = $("#rentalsDoneChart").get(0).getContext("2d");
-        let gradientStrokeFill_1 = rentalsDoneChartCanvas.createLinearGradient(1, 2, 1, 280);
-        gradientStrokeFill_1.addColorStop(0, "rgba(20, 88, 232, 0.37)");
-        gradientStrokeFill_1.addColorStop(1, "rgba(255,255,255,0.4)")
+        let saleGradientBg = rentalsDoneChartCanvas.createLinearGradient(5, 0, 5, 100);
+        saleGradientBg.addColorStop(0, `rgba(${rgb_color_primary}, 0.25)`);
+        saleGradientBg.addColorStop(1, `rgba(${rgb_color_primary}, 0.03)`);
+
         let lineData = {
             labels,
             datasets: [{
                 data,
-                backgroundColor: gradientStrokeFill_1,
-                borderColor: ChartColor[0],
-                borderWidth: 3,
-                fill: true,
-                label: "Locações"
+                label: "Locações",
+                backgroundColor: saleGradientBg,
+                borderColor: [
+                    `rgb(${rgb_color_primary})`,
+                ],
+                fill: true, // 3: no fill
+                borderWidth: 1.5,
+                pointBorderWidth: 1,
+                pointRadius: [4, 4, 4, 4, 4, 4, 4, 4, 4],
+                pointHoverRadius: [3, 3, 3, 3, 3, 3, 3, 3, 3],
+                pointBackgroundColor: [
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`,
+                    `rgb(${rgb_color_primary})`
+                ],
+                pointBorderColor: ['#252730', '#252730', '#252730', '#252730', '#252730', '#252730', '#252730', '#252730', '#252730'],
             }]
         };
         let lineOptions = {
@@ -354,16 +394,18 @@ const billsForMonth = () => {
                     {
                         label: 'Faturamento',
                         data: data_receive,
-                        backgroundColor: ChartColor[1],
-                        borderColor: ChartColor[1],
-                        borderWidth: 0
+                        backgroundColor: 'rgba(84, 195, 190, 0.5)',
+                        borderColor: 'rgba(84, 195, 190, 1)',
+                        borderWidth: 1.5,
+                        fill: false
                     },
                     {
                         label: 'Despesas',
                         data: data_pay,
-                        backgroundColor: ChartColor[2],
-                        borderColor: ChartColor[2],
-                        borderWidth: 0
+                        backgroundColor: 'rgba(239, 114, 111, 0.5)',
+                        borderColor: 'rgba(239, 114, 111, 1)',
+                        borderWidth: 1.5,
+                        fill: false
                     }
                 ]
             },
@@ -427,7 +469,7 @@ const clientsTopRentals = () => {
                 `<li>
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex">
-                        <div class="ml-3">
+                        <div>
                             <h6 class="mb-0"><a href="${$('#route_update_client').val()}/${value.client_id}">${value.name}</a></h6>
                             <small class="text-muted">${value.email ?? '&nbsp;'}</small>
                         </div>
@@ -455,13 +497,14 @@ const rentalsLate = () => {
             labels: ["Para entregar atrasado", "Para retirar atrasado", "Sem data de retirada"],
             datasets: [{
                 data,
-                backgroundColor: [ChartColor[0], ChartColor[1], ChartColor[3]],
-                borderColor: [ChartColor[0], ChartColor[1], ChartColor[3]],
-                borderWidth: 1,
+                backgroundColor: ["rgba(93, 98, 180, 0.5)", "rgba(84, 195, 190, 0.5)", "rgba(249, 196, 70, 0.5)"],
+                borderColor: ["rgba(93, 98, 180, 1)", "rgba(84, 195, 190, 1)", "rgba(249, 196, 70, 1)"],
                 label: "Locações atrasadas",
                 parsing: {
                     yAxisKey: 'total'
-                }
+                },
+                borderWidth: 2,
+                fill: false
             }]
         };
         let lineOptions = {
@@ -546,9 +589,9 @@ const billingOpenLate = () => {
             labels: ["Receber atrasado", "Pagar atrasado"],
             datasets: [{
                 data,
-                backgroundColor: [ChartColor[1], ChartColor[2]],
-                borderColor: [ChartColor[1], ChartColor[2]],
-                borderWidth: 1,
+                backgroundColor: ["rgba(84, 195, 190, 0.5)", "rgba(239, 114, 111, 0.5)"],
+                borderColor: ["rgba(84, 195, 190, 1)", "rgba(239, 114, 111, 1)"],
+                borderWidth: 2,
                 label: "Pagamentos atrasadas",
                 parsing: {
                     yAxisKey: 'total_value'

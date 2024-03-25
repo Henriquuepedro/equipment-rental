@@ -51,7 +51,7 @@
             }, 250);
         }
 
-        $('#confirmAddressRental').modal();
+        $('#confirmAddressRental').modal('show');
     });
 
     $(document).on('click', '#updateLocationMapRental', function (){
@@ -72,7 +72,10 @@
 
         let can_selected = !$('[name="rental_id"]').length;
         $('.show-address').css('display', 'flex');
-        //$('.wizard .content').animate({ 'min-height': $('.wizard .content .body:visible').height()+40 }, 500);
+        if (can_selected) {
+            loadStates($('.show-address select[name="state"]'), '');
+            loadCities($('.show-address select[name="city"]'), '', '');
+        }
         disabledFieldAddress();
         $('select[name="name_address"]').empty().append('<option>Carregando ...</option>');
 
@@ -188,10 +191,10 @@
     }
 
     const disabledFieldAddress = () => {
-        $('select[name="name_address"], select[name="client"]').attr('disabled', true);
-        $('.show-address input').each(function () {
+        $('select[name="name_address"], select[name="client"]').prop('disabled', true);
+        $('.show-address input, .show-address select:not([name="name_address"], [name="client"])').each(function () {
             if (!$('[name="first_load_page"]').val()) {
-                $(this).val('').attr('disabled', true).parent().removeClass('label-animate').find('label').html('Aguarde... <i class="fa fa-spinner fa-spin"></i>');
+                $(this).val('').prop('disabled', true).parent().removeClass('label-animate').find('label').html('Aguarde... <i class="fa fa-spinner fa-spin"></i>');
             }
         });
         //$('.alert-mark-map').slideUp('slow');
@@ -199,15 +202,15 @@
 
     const enabledFieldAddress = () => {
 
-        $('select[name="name_address"], select[name="client"]').attr('disabled', false);
-        $('.show-address input[name="cep"]').attr('disabled', false).parent().find('label').text('CEP');
-        $('.show-address input[name="address"]').attr('disabled', false).parent().find('label').html('Endereço <sup>*</sup>');
-        $('.show-address input[name="number"]').attr('disabled', false).parent().find('label').html('Número <sup>*</sup>');
-        $('.show-address input[name="complement"]').attr('disabled', false).parent().find('label').text('Complemento');
-        $('.show-address input[name="reference"]').attr('disabled', false).parent().find('label').text('Referência');
-        $('.show-address input[name="neigh"]').attr('disabled', false).parent().find('label').html('Bairro <sup>*</sup>');
-        $('.show-address select[name="city"]').attr('disabled', false).parent().find('label').html('Cidade <sup>*</sup>');
-        $('.show-address select[name="state"]').attr('disabled', false).parent().find('label').html('Estado <sup>*</sup>');
+        $('select[name="name_address"], select[name="client"]').prop('disabled', false);
+        $('.show-address input[name="cep"]').prop('disabled', false).parent().find('label').text('CEP');
+        $('.show-address input[name="address"]').prop('disabled', false).parent().find('label').html('Endereço <sup>*</sup>');
+        $('.show-address input[name="number"]').prop('disabled', false).parent().find('label').html('Número <sup>*</sup>');
+        $('.show-address input[name="complement"]').prop('disabled', false).parent().find('label').text('Complemento');
+        $('.show-address input[name="reference"]').prop('disabled', false).parent().find('label').text('Referência');
+        $('.show-address input[name="neigh"]').prop('disabled', false).parent().find('label').html('Bairro <sup>*</sup>');
+        $('.show-address select[name="city"]').prop('disabled', false).parent().find('label').html('Cidade <sup>*</sup>');
+        $('.show-address select[name="state"]').prop('disabled', false).parent().find('label').html('Estado <sup>*</sup>');
     }
 
     const verifyAddressCompleteRental = () => {

@@ -131,7 +131,7 @@ $("#formUpdateCompany").validate({
 });
 
 $('#new-user').on('click', function (){
-    $('#newUserModal').modal();
+    $('#newUserModal').modal('show');
 });
 
 $('#formCreateUser').validate({
@@ -408,7 +408,7 @@ $(document).on('click', '.viewPermission', function (){
 
             const htmlPermission = response.data + '<input type="hidden" name="user_id" value="'+user_id+'">'
 
-            $('#viewPermission').modal().find('.modal-body .user-permission-update').append(htmlPermission);
+            $('#viewPermission').modal('show').find('.modal-body .user-permission-update').append(htmlPermission);
             $('#permission_select_all_permission_update').prop('checked', false);
         }, error: e => {
             console.log(e);
@@ -628,7 +628,7 @@ $(document).on('click', '.updateUser', function (){
             $('#updateUser input[name="update_user_phone"]').val(response.data.phone);
             $('#updateUser input[name="update_user_id"]').val(user_id);
 
-            $('#updateUser').modal();
+            $('#updateUser').modal('show');
             checkLabelAnimate();
             $('[name="update_user_phone"]').unmask().mask('(00) 000000000');
         }, error: e => {
@@ -697,10 +697,10 @@ const loadUsers = (openPermissions = false, user_id = false) => {
                                             <div class="user-avatar mb-auto">
                                                 <img src="${ value.image }" alt="profile image" class="profile-img img-lg rounded-circle">
                                             </div>
-                                            <div class="wrapper pl-0 pl-lg-4 w-100">
+                                            <div class="wrapper pl-0 pl-lg-4 w-100 ml-3">
                                                 <div class="wrapper d-lg-flex align-items-center mb-2">
                                                     <h4 class="mb-0 font-weight-medium">${ value.name }</h4>
-                                                    <div class="badge badge-secondary text-dark ml-lg-2">${identificationUser}</div>
+                                                    <div class="badge badge-secondary text-dark ml-lg-2 ml-2">${identificationUser}</div>
                                                     ${statusUser}
                                                 </div>
                                                 <div class="wrapper d-flex align-items-center font-weight-medium text-muted">
@@ -716,7 +716,7 @@ const loadUsers = (openPermissions = false, user_id = false) => {
                                         <div class="col-md-2">
                                             <div class="wrapper text-right ${viewBtnConfig}">
                                                 <div class="dropdown dropleft">
-                                                    <button type="button" class="btn btn-primary icon-btn dropdown-toggle pull-right" id="dropdownConfigUser" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <button type="button" class="btn btn-primary icon-btn dropdown-toggle pull-right" id="dropdownConfigUser" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                         <i class="fa fa-cog"></i>
                                                     </button>
                                                     <div class="dropdown-menu" aria-labelledby="dropdownConfigUser">`;

@@ -161,16 +161,16 @@
                                         <div class="text-center col-md-12" id="load-equipment-to-exchange">
                                             <h4><i class="fa fa-spin fa-spinner"></i> Carregando</h4>
                                         </div>
-                                        <div class="form-group col-md-12 mt-2 equipments-selected-to-exchange">
-                                            <div class="accordion accordion-multiple-filled" id="equipments-selected-to-exchange" role="tablist">
+                                        <div class="col-md-12 mt-2 equipments-selected-to-exchange">
+                                            <div class="accordion accordion-solid-header" id="equipments-selected-to-exchange" role="tablist">
                                             </div>
                                             <hr class="separator-dashed mt-4 display-none">
                                         </div>
                                     </div>
                                     <h6 class="title-step mt-4">Equipamentos selecionados para trocar</h6>
                                     <div class="row">
-                                        <div class="form-group col-md-12 mt-2 equipments-selected">
-                                            <div class="accordion accordion-multiple-filled" id="equipments-selected" role="tablist">
+                                        <div class="col-md-12 mt-2 equipments-selected">
+                                            <div class="accordion accordion-solid-header" id="equipments-selected" role="tablist">
                                             </div>
                                         </div>
                                     </div>
@@ -189,7 +189,7 @@
                                             <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 payment-hidden">
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Valor Bruto</label>
+                                                    <label class="mb-0 mr-2">Valor Bruto</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -198,7 +198,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Acréscimo</label>
+                                                    <label class="mb-0 mr-2">Acréscimo</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -207,7 +207,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Desconto</label>
+                                                    <label class="mb-0 mr-2">Desconto</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -216,7 +216,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2 flex-wrap">
-                                                    <label class="mb-0 mr-md-2">Valor Líquido</label>
+                                                    <label class="mb-0 mr-2">Valor Líquido</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -267,7 +267,7 @@
                                             </div>
                                             <div class="col-md-12 d-flex justify-content-end payment-hidden">
                                                 <div class="form-group">
-                                                    <button type="button" class="btn btn-success" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
+                                                    <button type="button" class="btn btn-primary" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
                                                 </div>
                                             </div>
                                             <div class="col-md-12 payment-hidden">
@@ -319,24 +319,28 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Locação criada com sucesso</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h3 class="text-center code_rental">Locação código <strong></strong> atualizada com sucesso!</h3>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mt-3 text-center">
-                            <a href="" target="_blank" class="col-md-4 btn btn-primary rental_print"> <i class="fa fa-print"></i> Imprimir Recibo</a>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 d-flex justify-content-around flex-wrap mt-5">
-                            <a href="{{ route('rental.index') }}" class="btn btn-primary col-md-4">Listagem de Locações</a>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3 class="text-center code_rental">Locação código <strong></strong> atualizada com sucesso!</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mt-3 text-center">
+                                    <a href="" target="_blank" class="col-md-4 btn btn-primary rental_print"> <i class="fa fa-print"></i> Imprimir Recibo</a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 d-flex justify-content-around flex-wrap mt-5">
+                                    <a href="{{ route('rental.index') }}" class="btn btn-primary col-md-4">Listagem de Locações</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -348,38 +352,42 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Troca de equipamento</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <label>Selecione o equipamento a ser trocado.</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="searchEquipment" placeholder="Pesquise por nome, referência ou código">
-                        <div class="input-group-addon input-group-append btn-primary">
-                            <i class="fa fa-search input-group-text text-white"></i>
-                        </div>
-                        <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipment">
-                            <i class="fa fa-times input-group-text text-white"></i>
-                        </div>
-                        <div class="input-group-addon input-group-append btn-success" @if(in_array('EquipmentCreatePost', $permissions))id="newEquipment" data-toggle="modal" data-target="#newEquipmentModal"@else disabled @endif>
-                            <i class="fa fa-plus input-group-text text-white"></i>
+                    <div class="card">
+                        <div class="card-body">
+                            <label>Selecione o equipamento a ser trocado.</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="searchEquipment" placeholder="Pesquise por nome, referência ou código">
+                                <div class="input-group-addon input-group-append btn-primary">
+                                    <i class="fa fa-search input-group-text text-white"></i>
+                                </div>
+                                <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipment">
+                                    <i class="fa fa-times input-group-text text-white"></i>
+                                </div>
+                                <div class="input-group-addon input-group-append btn-success" @if(in_array('EquipmentCreatePost', $permissions))id="newEquipment" data-bs-toggle="modal" data-bs-target="#newEquipmentModal"@else disabled @endif>
+                                    <i class="fa fa-plus input-group-text text-white"></i>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12 mt-2 table-responsive content-equipment">
+                                <table class="table list-equipment d-table">
+                                    <tbody>
+                                    <tr>
+                                        <td class="text-left"><h6 class="text-center"><i class="fas fa-search"></i> Pesquise por um equipamento</h6></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <input type="hidden" name="equipment-to-exchange">
+                            <input type="hidden" name="rental-equipment-to-exchange">
                         </div>
                     </div>
-                    <div class="form-group col-md-12 mt-2 table-responsive content-equipment">
-                        <table class="table list-equipment d-table">
-                            <tbody>
-                            <tr>
-                                <td class="text-left"><h6 class="text-center"><i class="fas fa-search"></i> Pesquise por um equipamento</h6></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <input type="hidden" name="equipment-to-exchange">
-                    <input type="hidden" name="rental-equipment-to-exchange">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar troca</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar troca</button>
                 </div>
             </div>
         </div>

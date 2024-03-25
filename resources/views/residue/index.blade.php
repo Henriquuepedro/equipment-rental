@@ -28,10 +28,10 @@
                     <div class="header-card-body justify-content-between flex-wrap">
                         <h4 class="card-title no-border">Resíduos Cadastrados</h4>
                         @if(in_array('ResidueCreatePost', $permissions))
-                        <button data-toggle="modal" data-target="#newResidueModal" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</button>
+                        <button data-bs-toggle="modal" data-bs-target="#newResidueModal" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</button>
                         @endif
                     </div>
-                    <table id="tableResidues" class="table table-bordered">
+                    <table id="tableResidues" class="table">
                         <thead>
                             <tr>
                                 <th>Nome</th>
@@ -63,20 +63,24 @@
                 <form action="{{ route('ajax.residue.edit-residue') }}" method="POST" id="formUpdateResidueModal">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editResidueModalLabel">Atualizar resíduo</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="form-group col-md-12">
-                                <label for="name">Nome do Resíduo <sup>*</sup></label>
-                                <input type="text" class="form-control" name="name" autocomplete="nope" required>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="form-group col-md-12">
+                                        <label for="name">Nome do Resíduo <sup>*</sup></label>
+                                        <input type="text" class="form-control" name="name" autocomplete="nope" required>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
-                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                         <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Atualizar</button>
                     </div>
                         <input type="hidden" name="residue_id">

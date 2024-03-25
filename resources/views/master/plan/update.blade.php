@@ -101,7 +101,7 @@
                     @endif
                     <form action="{{ route(empty($plan) ? 'master.plan.insert' : 'master.plan.update', empty($plan) ? [] : array('id' => $plan->id)) }}" method="POST" enctype="multipart/form-data" id="formUpdatePlan">
                         <div class="card">
-                            <div class="card-body d-flex flex-wrap">
+                            <div class="card-body">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Plano</h4>
                                     <p class="card-description"> Preencha o formulário abaixo com as informações do plano </p>
@@ -159,7 +159,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card">
+                        <div class="card mt-2">
                             <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('master.plan.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
                                 <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-sync"></i> Atualizar</button>

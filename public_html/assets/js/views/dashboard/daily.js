@@ -400,7 +400,7 @@ const loadTableGraph = (id_list_table, url, data_action_button_go_list, pageLeng
         dom: 'Bfrtip',
         buttons: [
             {
-                className: 'btn btn-primary',
+                className: 'btn btn-primary btn-sm',
                 text: '<i class="fa-solid fa-rotate-left"></i> Retornar ao Gráfico',
                 action: () => {
                     const cards = id_list_table.closest('.content-graph')
@@ -412,7 +412,7 @@ const loadTableGraph = (id_list_table, url, data_action_button_go_list, pageLeng
                 }
             },
             {
-                className: 'btn btn-secondary',
+                className: 'btn btn-secondary btn-sm',
                 text: `<i class="fa-solid fa-arrow-up-right-from-square"></i> ${data_action_button_go_list.button_name}`,
                 action: () => {
                     window.location.href = data_action_button_go_list.href;

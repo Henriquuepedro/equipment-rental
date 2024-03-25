@@ -41,7 +41,7 @@
                     }
                 },
                 "initComplete": function( settings, json ) {
-                    $('[data-toggle="tooltip"]').tooltip();
+                    $('[data-bs-toggle="tooltip"]').tooltip();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
@@ -74,7 +74,7 @@
                         data: { provider_id },
                         dataType: 'json',
                         success: response => {
-                            $('[data-toggle="tooltip"]').tooltip('dispose')
+                            $('[data-bs-toggle="tooltip"]').tooltip('dispose')
                             tableProvider.destroy();
                             $("#tableProviders tbody").empty();
                             tableProvider = getTableProvider();
@@ -123,7 +123,7 @@
 
             $('#contentListBillToPay [name="providers"]').empty().append(`<option value="${providers_id}">${providers_name}</option>`);
 
-            $('#modalFinancialStatement').modal();
+            $('#modalFinancialStatement').modal('show');
 
             $('#contentListBillToPay [name="providers"]').trigger('change');
             $('#contentListBillToPay #without_pay-tab').trigger('click');
@@ -149,7 +149,7 @@
                         <a href="{{ route('provider.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
                         @endif
                     </div>
-                    <table id="tableProviders" class="table table-bordered">
+                    <table id="tableProviders" class="table">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -181,7 +181,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Ficha Financeira</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -189,7 +189,7 @@
                         @include('includes.bill_to_pay.content', ['show_select_provider' => false, 'card_title' => false, 'billStartFilterDate' => '01/01/2020', 'billEndFilterDate' => dateInternationalToDateBrazil(dateNowInternational(), DATE_BRAZIL)])
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
-                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                     </div>
                 </div>
             </div>

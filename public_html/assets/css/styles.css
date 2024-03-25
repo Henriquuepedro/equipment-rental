@@ -20,7 +20,7 @@ select[readonly] {
 
 /* inputs */
 .form-group>label {
-    top: 35px;
+    top: 42px;
     left: 10px;
     position: relative;
     padding: 0 5px 0 5px;
@@ -34,7 +34,7 @@ select[readonly] {
     top: 18px;
     left: 5px;
     font-size: 0.75em;
-    z-index: 4;
+    z-index: 6;
 }
 
 table td .form-group>label {
@@ -256,6 +256,7 @@ table.dataTable tr td:last-child{
     align-items: center;
     padding: 0;
     margin: 0;
+    border-bottom: 0 !important;
 }
 .block-screen-load img{
     width: 100px;
@@ -494,7 +495,7 @@ label sup{
     right: 10px;
     top: 5px;
 }
-.box-header > .box-tools [data-toggle="tooltip"] {
+.box-header > .box-tools [data-bs-toggle="tooltip"] {
     position: relative;
 }
 .box-header > .box-tools.pull-right .dropdown-menu {
@@ -648,12 +649,12 @@ div.dataTables_wrapper div.dataTables_processing{
     font-weight: 400;
 }
 select.form-control {
-    height: 37px;
+    height: 42px;
     margin-top: 1px;
     font-size: 1em;
 }
 .input-group select.form-control{
-    margin-top: 0;
+    /*margin-top: 0;*/
 }
 .alert-animate.alert-success,
 .alert-animate.alert-warning,
@@ -822,14 +823,14 @@ label.check-md:after {
     height: 20px;
 }
 .label-date-btns {
-    top: 12px !important;
-    left: 20px !important;
-    position: absolute !important;
+    /*left: 0 !important;*/
+    /*top: 20% !important;;*/
+    position: relative !important;;
     font-size: 1em;
 }
 
 .label-animate .label-date-btns {
-    top: -5px !important;
+    /*top: -5px !important;*/
 }
 .btr-r-0 {
     border-top-right-radius: 0 !important;
@@ -899,11 +900,11 @@ a[disabled] {
     padding: 1px 0 0 0;
 }
 
-.select2-container--default .select2-selection--single {
+.select2-container--default .select2-selection--single, {
     border-radius: 5px;
 }
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-    height: 34px;
+    //height: 34px;
 }
 .sidebar > .nav .nav-item:not(.hover-open) .collapse .sub-menu .nav-item:first-child .nav-link {
     padding-top: 10px;
@@ -913,9 +914,6 @@ a[disabled] {
 }
 .bullet-line-list li::marker {
     left: 10px;
-}
-.bullet-line-list li:before {
-    left: -23px
 }
 #payment .list-equipments-payment li[id-equipment] small.text-muted {
     font-size: 0.7em;
@@ -959,11 +957,12 @@ a[disabled] {
 }
 
 .buttons-collection.buttons-page-length {
-    background-color: #2196f3;
+    background-color: #1F3BB3;
     color: #fff;
     border-radius: 5px;
     height: 35px;
-    border: 1px solid #000;
+    border: 1px solid var(--bs-btn-hover-border-color);
+    font-size: 0.812rem;
 }
 .dataTables_wrapper .dataTables_info {
     float: left;
@@ -978,4 +977,336 @@ a[disabled] {
 }
 .tooltip.show {
     z-index: 1030
+}
+.pagination .page-item.active .page-link {
+    border-color: var(--bs-pagination-disabled-border-color);
+}
+.circle-loader:before {
+    border-top-color: #2196f3;
+}
+.input-group .input-group-append .btn,
+.input-group .input-group-prepend .btn,
+.flatpickr .input-button-calendar .input-button.btn {
+    height: 44px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+textarea.form-control {
+    min-height: unset;
+    height: unset;
+}
+/* tab switch */
+.tickets-tab-switch {
+    border-bottom: none;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    margin-left: -10px;
+    margin-right: -10px;
+}
+.tickets-tab-switch .nav-item {
+    display: block;
+    width: 33.33%;
+    padding: 0 10px;
+}
+.tickets-tab-switch .nav-item .nav-link.active {
+    background: #2196f3;
+    color: #222437;
+    border: none;
+    border-radius: 5px;
+}
+.tickets-tab-switch .nav-item .nav-link {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    border-radius: 4px;
+    background: #383e5d;
+    padding: 20px;
+    text-align: left;
+    font-weight: 600;
+    border: none;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-timing-function: ease-in;
+    transition-timing-function: ease-in;
+    -webkit-transition-property: "background", "color";
+    transition-property: "background", "color";
+}
+.tickets-tab-switch .nav-item .nav-link .badge {
+    margin-left: auto;
+    border-radius: 4px;
+    background: #2196f3;
+    color: #fff;
+    -webkit-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -webkit-transition-timing-function: ease-in;
+    transition-timing-function: ease-in;
+    -webkit-transition-property: "background", "color";
+    transition-property: "background", "color";
+}
+.tickets-tab-switch .nav-item .nav-link.active .badge {
+    background: #fff;
+    color: #2196f3;
+}
+/* end tab switch */
+.input-group .input-group-prepend select {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-top: 1px;
+}
+.accordion.accordion-solid-header .card .card-header a {
+    padding: 1rem 4.5rem 1rem 2rem;
+}
+.input-group .select2-container--default .select2-selection--single,
+.input-group .select2-container--default .select2-selection--multiple {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.form-group.flatpickr.d-flex .label-date-btns {
+    position: absolute !important;
+    left: 5px !important;
+}
+.flatpickr a.input-button, .flatpickr button.input-button {
+    height: calc(1.5em + 1.25rem + 3px);
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+}
+.btn-flat {
+    border-radius: 0;
+}
+
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    height: 44px
+}
+.dataTable tr.selected button[id^="dropActionsDataList"] i.fa-cog,
+.dataTable tr.selected button[id^="dropActionsDataList"].dropdown-toggle:after{
+    color: #fff
+}
+.dataTables_wrapper.dt-bootstrap4 .dt-buttons .btn.btn-primary.btn-sm {
+    border-radius: 5px;
+}
+.user-dropdown img.profile-user {
+    width: 50px;
+}
+ul, ol, dl {
+    font-size: 0.875rem;
+}
+p {
+    font-size: 0.875rem;
+}
+.navbar {
+    z-index: 1031;
+}
+
+/* Kanban */
+.board-wrapper {
+    overflow-x: auto;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+}
+
+.board-wrapper .board-portlet {
+    margin: 0px 15px;
+    padding: 22px 20px;
+    min-width: 350px;
+    width: 350px;
+    border-radius: 4px;
+}
+
+.board-wrapper .portlet-heading {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.board-wrapper .task-number {
+    color: var(--bs-heading-color);
+}
+
+.board-wrapper .portlet-card-list {
+    padding-left: 0;
+    list-style: none;
+    min-height: 70px;
+}
+
+.board-wrapper .portlet-card {
+    width: 100%;
+    border-radius: 4px;
+    padding: 20px 20px 20px 20px;
+    display: grid;
+    grid-template-rows: 5;
+    grid-template-columns: 2;
+    border-radius: 6px;
+    position: relative;
+    margin-bottom: 15px;
+    cursor: grab;
+}
+.board-wrapper .portlet-card p {
+    width: 245px;
+}
+
+.board-wrapper .portlet-card .progress {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    border-radius: 6px 6px 0px 0px;
+    height: 4px;
+}
+
+.board-wrapper .portlet-card .progress .progress-bar {
+    border-radius: 0px;
+}
+
+.board-wrapper .portlet-card .task-date {
+    margin-bottom: 5px;
+    grid-row-start: 1;
+    grid-column-start: 1;
+}
+
+.board-wrapper .portlet-card .action-dropdown {
+    grid-row-start: 1;
+    grid-column-start: 2;
+    margin-left: auto;
+}
+
+.board-wrapper .portlet-card .action-dropdown .dropdown-toggle {
+    border: none;
+}
+
+.board-wrapper .portlet-card .action-dropdown .dropdown-toggle i {
+    font-size: 20px;
+    line-height: 20px;
+}
+
+.board-wrapper .portlet-card .action-dropdown .dropdown-toggle i:before {
+    margin-right: -10px;
+}
+
+.board-wrapper .portlet-card .action-dropdown .dropdown-toggle:after {
+    display: none;
+}
+
+.board-wrapper .portlet-card .action-dropdown .dropdown-menu-right {
+    left: 0 !important;
+}
+
+.board-wrapper .portlet-card .task-title {
+    font-weight: 500;
+    grid-row-start: 2;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.board-wrapper .portlet-card .image-grouped {
+    grid-row-start: 3;
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.board-wrapper .portlet-card .portlet-image {
+    width: 100%;
+    display: block;
+    grid-row-start: 4;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    margin-top: 5px;
+    margin-left: -20px;
+    margin-right: -20px;
+    width: calc(100% + 40px);
+}
+
+.board-wrapper .portlet-card .badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-row-start: 5;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    margin-top: 20px;
+}
+
+.kanban-toolbar {
+    .btn {
+        margin-left: 10px;
+    }
+}
+/* chat */
+
+.chat-app-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-app-wrapper .chat-search-input {
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+
+.chat-app-wrapper .sidebar-spacer {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.chat-app-wrapper .chat-container-wrapper {
+    height: 100%;
+    /*min-height: 100vh;*/
+    max-height: 450px !important;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 0 15px 30px 15px;
+}
+
+.chat-app-wrapper .chat-container-wrapper .chat-bubble {
+    margin-top: 30px;
+}
+
+.chat-app-wrapper .chat-container-wrapper .chat-bubble .chat-message {
+    border-radius: 4px;
+    padding: 20px;
+}
+
+.chat-app-wrapper .chat-container-wrapper .chat-bubble .chat-message p:last-child {
+        margin-bottom: 0;
+}
+
+.chat-app-wrapper .chat-container-wrapper .chat-bubble .sender-details {
+    display: flex;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.chat-app-wrapper .chat-container-wrapper .chat-bubble.incoming-chat .chat-message {
+    margin-left: 45px;
+}
+
+.chat-app-wrapper .chat-container-wrapper .chat-bubble.outgoing-chat .chat-message {
+    margin-left: auto;
+    max-width: 290px;
+    margin-right: 45px;
+}
+
+.chat-app-wrapper .chat-container-wrapper .chat-bubble.outgoing-chat .sender-details {
+    flex-direction: row-reverse;
+}
+
+.chat-app-wrapper .chat-container-wrapper .chat-bubble .sender-details .seen-text {
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+.daterangepicker select.hourselect option {
+    color: #333
 }
