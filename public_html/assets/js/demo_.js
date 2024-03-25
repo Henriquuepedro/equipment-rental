@@ -466,10 +466,11 @@ const availableStock = (el, id = null) => {
     });
 }
 
-const loadDaterangePickerInput = (el, event) => {
+const loadDaterangePickerInput = (el, event, format = FORMAT_DATE_BRAZIL, timePicker = false) => {
     el.daterangepicker({
+        timePicker,
         locale: {
-            format: FORMAT_DATE_BRAZIL,
+            format,
             separator: " - ",
             applyLabel: "Aplicar",
             cancelLabel: "Cancelar",

@@ -469,7 +469,7 @@ const clientsTopRentals = () => {
                 `<li>
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex">
-                        <div class="ml-3">
+                        <div>
                             <h6 class="mb-0"><a href="${$('#route_update_client').val()}/${value.client_id}">${value.name}</a></h6>
                             <small class="text-muted">${value.email ?? '&nbsp;'}</small>
                         </div>

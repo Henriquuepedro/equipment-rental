@@ -741,7 +741,8 @@ if (! function_exists('createLogEvent')) {
 
             LogEvent::create([
                 'event'             => $event,
-                'user_id'           => auth()->id(),
+                'user_id'           => is_null(auth()->user()) ? null : auth()->id(),
+                'company_id'        => is_null(auth()->user()) ? null : auth()->user()->__get('company_id'),
                 'event_date'        => now(),
                 'ip'                => request()->ip(),
                 'auditable_id'      => $auditable_model->id,

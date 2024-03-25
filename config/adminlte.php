@@ -261,8 +261,14 @@ return [
                     'route_active'  => ['master.guide.create', 'master.guide.edit']
                 ],
                 [
+                    'route' => 'master.audit_log.index',
+                    'text' => 'Logs de Auditoria',
+                    'permissions'   => [],
+                    'route_active'  => ['master.audit_log.view']
+                ],
+                [
                     'route' => 'master.log_file',
-                    'text' => 'Log File',
+                    'text' => 'Logs File',
                     'permissions'   => [],
                     'route_active'  => []
                 ]

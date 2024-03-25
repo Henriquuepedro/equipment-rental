@@ -915,9 +915,6 @@ a[disabled] {
 .bullet-line-list li::marker {
     left: 10px;
 }
-.bullet-line-list li:before {
-    left: 0px
-}
 #payment .list-equipments-payment li[id-equipment] small.text-muted {
     font-size: 0.7em;
 }
@@ -1308,4 +1305,8 @@ p {
 .chat-app-wrapper .chat-container-wrapper .chat-bubble .sender-details .seen-text {
     margin-bottom: 0;
     color: #6c757d;
+}
+
+.daterangepicker select.hourselect option {
+    color: #333
 }
