@@ -23,7 +23,7 @@
         }
 
         .pricing-card-head h1.fw-normal {
-            font-size: 1.75rem
+            font-size: 1.3rem
         }
 
         .pricing-table .pricing-card .pricing-card-body {

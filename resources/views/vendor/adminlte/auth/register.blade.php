@@ -110,7 +110,7 @@
                                 </div>
                             @endif
                             <div class="brand-logo d-flex justify-content-center">
-                                <img src="{{ asset('assets/images/system/logotipo.png') }}" alt="logo">
+                                <img src="{{ asset('assets/images/system/logotipo-horizontal-white.png') }}" alt="logo">
                             </div>
                             <form action="{{ $register_url }}" method="post">
                                 {{ csrf_field() }}

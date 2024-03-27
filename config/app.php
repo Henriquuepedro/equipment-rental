@@ -15,7 +15,9 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
-    'logotipo' => env('APP_LOGO', 'assets/images/system/logotipo.png'),
+    'logotipo' => env('APP_LOGO', 'assets/images/system/logotipo-horizontal-white.png'),
+
+    'logotipo_mail' => env('APP_LOGO_MAIL', 'assets/images/system/logotipo-horizontal-black.png'),
 
     /*
     |--------------------------------------------------------------------------

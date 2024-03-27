@@ -95,11 +95,13 @@ AppServiceProvider extends ServiceProvider
             $settings = array('style_template' => User::$STYLE_TEMPLATE['black']);
 
             if (auth()->user()) {
+                $logo_company_no_logotipo = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-white.png' : 'assets/images/system/logotipo-horizontal-black.png';
+
                 $company = new Company();
                 $dataCompany = $company->getCompany(auth()->user()->__get('company_id'));
 
                 $settings['img_profile'] = asset(auth()->user()->__get('profile') ? "assets/images/profile/" . auth()->user()->__get('id') . "/" . auth()->user()->__get('profile') : "assets/images/system/profile.png");
-                $settings['img_company'] = asset($dataCompany->logo ? "assets/images/company/$dataCompany->id/$dataCompany->logo" : "assets/images/system/company.png");
+                $settings['img_company'] = asset($dataCompany->logo ? "assets/images/company/$dataCompany->id/$dataCompany->logo" : $logo_company_no_logotipo);
                 $settings['name_company'] = $dataCompany->name;
                 $settings['type_user'] = auth()->user()->__get('type_user');
                 $settings['style_template'] = auth()->user()->__get('style_template');

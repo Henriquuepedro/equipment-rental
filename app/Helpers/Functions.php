@@ -367,7 +367,11 @@ if (!function_exists('getImageCompanyBase64')) {
         if ($company->logo) {
             $image = "assets/images/company/$company->id/$company->logo";
         } else {
-            $image = "assets/images/system/company.png";
+            if (auth()->user()) {
+                $image = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-white.png' : 'assets/images/system/logotipo-horizontal-black.png';
+            } else {
+                $image = "assets/images/system/company.png";
+            }
         }
 
         $extension = File::extension($image);

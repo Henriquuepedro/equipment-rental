@@ -8,6 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" sizes="150x150" href="{{ asset('assets/images/system/favicon-blue.png') }}">
     @yield('adminlte_css_pre')
 
     <!-- plugins:css -->

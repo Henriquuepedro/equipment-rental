@@ -27,7 +27,7 @@
                     <div class="col-lg-12 d-flex align-items-center justify-content-center flex-wrap">
                         <div class="auth-form-transparent col-md-4 p-2 d-flex justify-content-center flex-wrap text-center">
                             <div class="brand-logo d-flex justify-content-center col-md-12">
-                                <img src="{{ asset('assets/images/system/logotipo.png') }}" alt="logo">
+                                <img src="{{ asset('assets/images/system/logotipo-horizontal-white.png') }}" alt="logo">
                             </div>
                             <p class="text-uppercase mb-0 col-md-12">{{ $settings['name_company'] }}</p>
                             <p class="col-md-12">{{ auth()->user()->__get('email') }}</p>
