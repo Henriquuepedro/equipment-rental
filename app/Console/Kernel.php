@@ -25,7 +25,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->job(new PaymentJob)->dailyAt('03:00')->timezone(TIMEZONE_DEFAULT);
+         $schedule->job(new PaymentJob)
+             ->dailyAt('03:00')
+             ->timezone(TIMEZONE_DEFAULT)
+             ->sentryMonitor('mercado-pago-payment');
     }
 
     /**
