@@ -41,6 +41,9 @@
                                     </div>
                                 @endif
                                 {{ csrf_field() }}
+                                <div class="brand-logo d-flex justify-content-center">
+                                    <img src="{{ asset('assets/images/system/logotipo-horizontal-white.png') }}" alt="logo">
+                                </div>
 
                                 <div class="form-group">
                                     <label class="label">E-mail</label>

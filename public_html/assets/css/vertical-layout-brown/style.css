@@ -30784,7 +30784,7 @@ div.tagsinput span.tag a {
 }
 @media (min-width: 768px) {
   .auth.auth-img-bg .auth-form-transparent {
-    width: 55%;
+    width: 65%;
     margin: auto;
   }
 }
@@ -31173,7 +31173,7 @@ div.tagsinput span.tag a {
   -webkit-transition: width 0.25s ease, background 0.25s ease;
   -moz-transition: width 0.25s ease, background 0.25s ease;
   -ms-transition: width 0.25s ease, background 0.25s ease;
-  width: 220px;
+  width: 291px;
   height: 97px;
   padding: 20px 35px;
 }
@@ -31269,7 +31269,7 @@ div.tagsinput span.tag a {
   padding-right: 2.187rem;
   padding-top: 30px;
   padding-bottom: 25px;
-  width: calc(100% - 220px);
+  width: calc(100% - 291px);
   height: 97px;
 }
 @media (max-width: 991px) {
