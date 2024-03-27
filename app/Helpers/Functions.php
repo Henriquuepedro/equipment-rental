@@ -368,7 +368,7 @@ if (!function_exists('getImageCompanyBase64')) {
             $image = "assets/images/company/$company->id/$company->logo";
         } else {
             if (auth()->user()) {
-                $image = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-white.png' : 'assets/images/system/logotipo-horizontal-black.png';
+                $image = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-black.png' : 'assets/images/system/logotipo-horizontal-white.png';
             } else {
                 $image = "assets/images/system/company.png";
             }

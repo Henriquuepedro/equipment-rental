@@ -95,7 +95,7 @@ AppServiceProvider extends ServiceProvider
             $settings = array('style_template' => User::$STYLE_TEMPLATE['black']);
 
             if (auth()->user()) {
-                $logo_company_no_logotipo = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-white.png' : 'assets/images/system/logotipo-horizontal-black.png';
+                $logo_company_no_logotipo = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-black.png' : 'assets/images/system/logotipo-horizontal-white.png';
 
                 $company = new Company();
                 $dataCompany = $company->getCompany(auth()->user()->__get('company_id'));
