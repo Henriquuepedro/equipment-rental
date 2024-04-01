@@ -53,7 +53,7 @@
                             <form action="{{ route($budget ? 'ajax.budget.new-rental' : 'ajax.rental.new-rental') }}" method="POST" enctype="multipart/form-data" id="formRental" class="pb-2">
                                 <h3>Tipo de {{ $budget ? 'Orçamento' : 'Locação' }}</h3>
                                 <div class="stepRental">
-                                    <h6>Tipo de {!! $budget ? 'Orçamento' : 'Locação <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
+                                    <h6>Tipo de {!! $budget ? 'Orçamento' : 'Locação <i class="fa fa-info-circle" data-bs-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
                                             <div class="">
@@ -78,7 +78,7 @@
                                     @include('includes.address.form')
                                     <div class="row">
                                         <div class="form-group col-md-12 mt-2">
-                                            <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa no cadastro do cliente, isso pode acarretar uma má precisão da localização. <br>Após a confirmação a geolocalização será atualizada no endereço do cliente.</div>
+                                            <div class="alert alert-warning alert-mark-map text-center display-none">O endereço selecionado não foi confirmado no mapa no cadastro do cliente, isso pode acarretar uma má precisão da localização ou houve alguma alteração no endereço. <br>Após a confirmação a geolocalização será atualizada no endereço do cliente.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -87,28 +87,28 @@
                                     <h6>Datas</h6>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="form-group flatpickr d-flex">
+                                            <div class="form-group flatpickr">
                                                 <label class="label-date-btns">Data Prevista de Entrega <sup>*</sup></label>
-                                                <input type="tel" name="date_delivery" class="form-control col-md-9" value="{{ date(DATETIME_BRAZIL_NO_SECONDS) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
-                                                <div class="input-button-calendar col-md-3 no-padding">
-                                                    <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
+                                                <input type="tel" name="date_delivery" class="form-control col-md-9 pull-left" value="{{ date(DATETIME_BRAZIL_NO_SECONDS) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 no-padding pull-right">
+                                                    <a class="input-button pull-left btn-primary btn btn-sm" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
-                                                    <a class="input-button pull-right btn-primary" title="clear" data-clear>
+                                                    <a class="input-button pull-right btn-primary btn btn-sm" title="clear" data-clear>
                                                         <i class="fa fa-times text-white"></i>
                                                     </a>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <div class="form-group flatpickr d-flex">
+                                            <div class="form-group flatpickr">
                                                 <label class="label-date-btns">Data Prevista de Retirada</label>
-                                                <input type="tel" name="date_withdrawal" class="form-control col-md-9" value="{{ date(DATETIME_BRAZIL_NO_SECONDS, strtotime('+1 minute', time())) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
-                                                <div class="input-button-calendar col-md-3 no-padding">
-                                                    <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
+                                                <input type="tel" name="date_withdrawal" class="form-control col-md-9 pull-left" value="{{ date(DATETIME_BRAZIL_NO_SECONDS, strtotime('+1 minute', time())) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 no-padding pull-right">
+                                                    <a class="input-button pull-left btn-primary btn btn-sm" title="toggle" data-toggle>
                                                         <i class="fa fa-calendar text-white"></i>
                                                     </a>
-                                                    <a class="input-button pull-right btn-primary" title="clear" data-clear>
+                                                    <a class="input-button pull-right btn-primary btn btn-sm" title="clear" data-clear>
                                                         <i class="fa fa-times text-white"></i>
                                                     </a>
                                                 </div>
@@ -126,17 +126,17 @@
                                 <div class="stepRental">
                                     <h6>Equipamentos</h6>
                                     <div class="row">
-                                        <div class="form-group col-md-12 mt-2 label-animate container-residues display-none">
+                                        <div class="form-group col-md-12 mt-2 label-animate container-residues">
                                             <label>Resíduos a serem utilizados</label>
                                             <div class="input-group label-animate">
                                                 <select class="select2 form-control" multiple="multiple" name="residues[]"></select>
                                                 <div class="input-group-addon input-group-append">
-                                                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newResidueModal" title="Novo Resíduo" @if(!in_array('ResidueCreatePost', $permissions)) disabled @endif><i class="fas fa-plus-circle"></i></button>
+                                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newResidueModal" title="Novo Resíduo" @if(!in_array('ResidueCreatePost', $permissions)) disabled @endif><i class="fas fa-plus-circle"></i></button>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-12 mt-2 equipments-selected">
-                                            <div class="accordion accordion-multiple-filled" id="equipments-selected" role="tablist">
+                                        <div class="col-md-12 mt-2 equipments-selected">
+                                            <div class="accordion accordion-solid-header" id="equipments-selected" role="tablist">
                                             </div>
                                             <hr class="separator-dashed mt-4 display-none">
                                         </div>
@@ -149,7 +149,7 @@
                                                 <div class="input-group-addon input-group-append btn-danger" id="cleanSearchEquipment">
                                                     <i class="fa fa-times input-group-text text-white"></i>
                                                 </div>
-                                                <div class="input-group-addon input-group-append btn-success" @if(in_array('EquipmentCreatePost', $permissions))id="newEquipment" data-toggle="modal" data-target="#newEquipmentModal"@else disabled @endif>
+                                                <div class="input-group-addon input-group-append btn-success" @if(in_array('EquipmentCreatePost', $permissions))id="newEquipment" data-bs-toggle="modal" data-bs-target="#newEquipmentModal"@else disabled @endif>
                                                     <i class="fa fa-plus input-group-text text-white"></i>
                                                 </div>
                                             </div>
@@ -179,7 +179,7 @@
                                             <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 payment-hidden">
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Valor Bruto</label>
+                                                    <label class="mb-0 mr-2">Valor Bruto</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -188,7 +188,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Acréscimo</label>
+                                                    <label class="mb-0 mr-2">Acréscimo</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -197,7 +197,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="d-flex justify-content-end align-items-center mb-2">
-                                                    <label class="mb-0 mr-md-2">Desconto</label>
+                                                    <label class="mb-0 mr-2">Desconto</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -209,7 +209,7 @@
                                             <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 payment-hidden">
                                                 <div class="d-flex justify-content-end align-items-center mb-2 flex-wrap">
-                                                    <label class="mb-0 mr-md-2">Valor Líquido</label>
+                                                    <label class="mb-0 mr-2">Valor Líquido</label>
                                                     <div class="input-group col-md-4 no-padding">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text"><strong>R$</strong></span>
@@ -235,7 +235,7 @@
                                             <hr class="separator-dashed payment-hidden">
                                             <div class="col-md-12 d-flex justify-content-end payment-hidden">
                                                 <div class="form-group">
-                                                    <button type="button" class="btn btn-success" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
+                                                    <button type="button" class="btn btn-primary" id="add_parcel"><i class="fa fa-plus"></i> Nova Parcela</button>
                                                 </div>
                                             </div>
                                             <div class="col-md-12 payment-hidden">
@@ -296,7 +296,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Confirmar Endereço no Mapa</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -313,7 +313,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary col-md-3" data-dismiss="modal">Confirmar</button>
+                    <button type="button" class="btn btn-primary col-md-3" data-bs-dismiss="modal">Confirmar</button>
                 </div>
             </div>
         </div>
@@ -323,62 +323,70 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ $budget ? 'Orçamento criado' : 'Locação criada' }} com sucesso</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h3 class="text-center code_rental">{{ $budget ? 'Orçamento' : 'Locação' }} código <strong></strong> criada com sucesso!</h3>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mt-3 text-center">
-                            <a href="" target="_blank" class="col-md-4 btn btn-primary rental_print"> <i class="fa fa-print"></i> Imprimir Recibo</a>
-                        </div>
-                    </div>
-                    @if (!$budget)
-                    <div class="row content-payment-today display-none">
-                        <div class="form-group col-md-12 mt-5 text-center">
-                            <h4>Foi identificado pagamento para hoje, deseja realizar o pagamento?</h4>
-                        </div>
-                        <div class="form-group col-md-12 text-center">
-                            <div class="switch pt-1 d-flex justify-content-center">
-                                <input type="checkbox" class="check-style check-xs" name="do_payment_today" id="do_payment_today" value="1">
-                                <label for="do_payment_today" class="check-style check-xs"></label>&nbsp;Sim, fazer o pagamento hoje
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3 class="text-center code_rental">{{ $budget ? 'Orçamento' : 'Locação' }} código <strong></strong> criada com sucesso!</h3>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row display-payment-today display-none">
-                        <div class="form-group col-md-3">
-                            <label>Data de Vencimento</label>
-                            <input type="text" class="form-control" name="due_date" value="" disabled>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label>Valor</label>
-                            <input type="text" class="form-control" name="due_value" value="" disabled>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label>Forma de Pagamento</label>
-                            <select class="form-control" name="form_payment"></select>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label>Data de Pagamento</label>
-                            <input type="date" class="form-control" name="date_payment" value="{{ dateNowInternational(null, DATE_INTERNATIONAL) }}">
-                        </div>
-                        <input type="hidden" class="form-control" name="payment_id">
-                    </div>
-                    <div class="row mt-2 display-payment-today display-none">
-                        <div class="form-group col-md-12 d-flex justify-content-center">
-                            <button class="btn btn-success col-md-3" id="confirm_payment_today">Realizar pagamento</button>
-                        </div>
-                    </div>
-                    @endif
-                    <div class="row">
-                        <div class="col-md-12 d-flex justify-content-around flex-wrap mt-5">
-                            <a href="{{ route($budget ? 'budget.index' : 'rental.index') }}" class="btn btn-primary col-md-4">Listagem de {{ $budget ? 'Orçamentos' : 'Locações' }}</a>
-                            <a href="{{ route($budget ? 'budget.create' : 'rental.create') }}" class="btn btn-secondary col-md-4">Realizar {{ $budget ? 'novo Orçamento' : 'nova Locação' }}</a>
+                            <div class="row">
+                                <div class="col-md-12 mt-3 text-center">
+                                    <a href="" target="_blank" class="col-md-4 btn btn-primary rental_print"> <i class="fa fa-print"></i> Imprimir Recibo</a>
+                                </div>
+                            </div>
+                            @if (!$budget)
+                            <div class="row content-payment-today display-none">
+                                <div class="form-group col-md-12 mt-5 text-center">
+                                    <h4>Foi identificado pagamento para hoje, deseja realizar o pagamento?</h4>
+                                </div>
+                                <div class="form-group col-md-12 text-center">
+                                    <div class="switch pt-1 d-flex justify-content-center">
+                                        <input type="checkbox" class="check-style check-xs" name="do_payment_today" id="do_payment_today" value="1">
+                                        <label for="do_payment_today" class="check-style check-xs"></label>&nbsp;Sim, fazer o pagamento hoje
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card display-payment-today display-none">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="form-group col-md-3">
+                                            <label>Data de Vencimento</label>
+                                            <input type="text" class="form-control" name="due_date" value="" disabled>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>Valor</label>
+                                            <input type="text" class="form-control" name="due_value" value="" disabled>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>Forma de Pagamento</label>
+                                            <select class="form-control" name="form_payment"></select>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label>Data de Pagamento</label>
+                                            <input type="date" class="form-control" name="date_payment" value="{{ dateNowInternational(null, DATE_INTERNATIONAL) }}">
+                                        </div>
+                                        <input type="hidden" class="form-control" name="payment_id">
+                                    </div>
+                                    <div class="row mt-2 display-payment-today display-none">
+                                        <div class="form-group col-md-12 d-flex justify-content-center">
+                                            <button class="btn btn-success col-md-3" id="confirm_payment_today">Realizar pagamento</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                            <div class="row">
+                                <div class="col-md-12 d-flex justify-content-around flex-wrap mt-5">
+                                    <a href="{{ route($budget ? 'budget.index' : 'rental.index') }}" class="btn btn-primary col-md-4">Listagem de {{ $budget ? 'Orçamentos' : 'Locações' }}</a>
+                                    <a href="{{ route($budget ? 'budget.create' : 'rental.create') }}" class="btn btn-secondary col-md-4">Realizar {{ $budget ? 'novo Orçamento' : 'nova Locação' }}</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -40,7 +40,7 @@
                     }
                 },
                 "initComplete": function( settings, json ) {
-                    $('[data-toggle="tooltip"]').tooltip();
+                    $('[data-bs-toggle="tooltip"]').tooltip();
                 },
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
@@ -61,7 +61,7 @@
             $('#addExpirationTime [name="company_id"]').val(company_id);
             $('#addExpirationTime .expiration_date').text(expiration_date);
             $('#addExpirationTime .company_name').text(company_name);
-            $('#addExpirationTime').modal();
+            $('#addExpirationTime').modal('show');
         });
 
         $('#formAddExpirationTime').submit(function(){
@@ -136,7 +136,7 @@
                             </select>
                         </div>
                     </div>
-                    <table id="tableCompanies" class="table table-bordered">
+                    <table id="tableCompanies" class="table">
                         <thead>
                             <tr>
                                 <th>Nome</th>
@@ -175,35 +175,39 @@
                 <form action="{{ route('ajax.master.company.add-expiration-time') }}" method="POST" id="formAddExpirationTime">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addExpirationTimeLabel">Adicionar tempo de expiração</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h5>Informe o tempo de expiração adicional para a empresa: <span class="font-weight-bold company_name"></span></h5>
-                                <p>Atualmente a data de expiração é para: <span class="font-weight-bold expiration_date"></span></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-md-4">
-                                <label>Tipo de tempo</label>
-                                <select class="form-control label-animate" name="type">
-                                    <option value="">Selecione</option>
-                                    <option value="day">Dia</option>
-                                    <option value="month">Mês</option>
-                                    <option value="year">Ano</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label>Quantidade de tempo</label>
-                                <input type="number" class="form-control" name="time">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5>Informe o tempo de expiração adicional para a empresa: <b class="font-weight-bold company_name"></b></h5>
+                                        <p>Atualmente a data de expiração é para: <b class="font-weight-bold expiration_date"></b></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label>Tipo de tempo</label>
+                                        <select class="form-control label-animate" name="type">
+                                            <option value="">Selecione</option>
+                                            <option value="day">Dia</option>
+                                            <option value="month">Mês</option>
+                                            <option value="year">Ano</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label>Quantidade de tempo</label>
+                                        <input type="number" class="form-control" name="time">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-around">
-                        <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                         <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Atualizar</button>
                     </div>
                     <input type="hidden" name="company_id" value="">

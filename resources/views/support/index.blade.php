@@ -234,7 +234,7 @@
                             `<li class="portlet-card" data-status="${value.status}" data-support-id="${value.id}">
                                 <p class="task-date">${value.created_at}</p>
                                 <div class="action-dropdown dropdown">
-                                    <button type="button" class="dropdown-toggle" id="portlet-action-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <button type="button" class="dropdown-toggle" id="portlet-action-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="mdi mdi-dots-vertical"></i>
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="portlet-action-dropdown">
@@ -243,7 +243,7 @@
                                 </div>
                                 <h4 class="task-title">#${value.code} - ${value.subject}</h4>
                                 ${content_aditional}
-                                <div class="badge badge-inverse-${value.priority_color}">${value.priority_name}</div>
+                                <div class="badge badge-outline-${value.priority_color}">${value.priority_name}</div>
                             </li>`
                         );
                     });
@@ -344,7 +344,7 @@
                     }
 
                     if (open_modal) {
-                        $(`#${idModal}`).modal();
+                        $(`#${idModal}`).modal('show');
                     }
 
                     goToEndOfTheMessagesPage();
@@ -547,13 +547,9 @@
             @if(session('warning'))
                 <div class="alert alert-animate alert-danger mt-2">{{session('warning')}}</div>
             @endif
-            <div class="d-flex flex-column flex-md-row">
+            <div class="d-flex flex-column flex-md-row justify-content-between">
                 <h4 class="">Atendimento ao cliente</h4>
-                <div class="wrapper ml-md-auto d-flex flex-column flex-md-row kanban-toolbar ml-n2 ml-md-0 mt-md-0">
-                    <div class="d-flex mt-md-0">
                         <a type="button" class="btn btn-success" href="{{ route('support.create') }}"><i class="fa fa-plus"></i> Novo Atendimento</a>
-                    </div>
-                </div>
             </div>
             <div class="card mb-2 mt-2">
                 <div class="card-body">
@@ -628,7 +624,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">...</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -637,12 +633,12 @@
                         <div class="card">
                             <div class="card-header" role="tab" id="headingDescription">
                                 <h6 class="mb-0">
-                                    <a data-toggle="collapse" href="#collapseDescription" aria-expanded="false" aria-controls="collapseDescription">
+                                    <a data-bs-toggle="collapse" href="#collapseDescription" aria-expanded="false" aria-controls="collapseDescription">
                                         <i class="fa-regular fa-file-lines"></i> Desccrição
                                     </a>
                                 </h6>
                             </div>
-                            <div id="collapseDescription" class="collapse" role="tabpanel" aria-labelledby="headingDescription" data-parent="#accordion">
+                            <div id="collapseDescription" class="collapse" role="tabpanel" aria-labelledby="headingDescription" data-bs-parent="#accordion">
                                 <div class="card-body">
                                     <div class="description"></div>
                                 </div>
@@ -658,7 +654,7 @@
                                 <div class="card chat-app-wrapper">
                                     <div class="row mx-0">
                                         <div class="col-lg-12 col-md-12 px-0 d-flex flex-column">
-                                            <h5 class="d-flex justify-content-center"><i class="fa-solid fa-arrow-down-long"></i>&nbsp;&nbsp;Comentários&nbsp;&nbsp;<i class="fa-solid fa-arrow-down-long"></i></h5>
+                                            <h5 class="d-flex justify-content-center mt-2"><i class="fa-solid fa-arrow-down-long"></i>&nbsp;&nbsp;Comentários&nbsp;&nbsp;<i class="fa-solid fa-arrow-down-long"></i></h5>
                                             <div class="chat-container-wrapper"></div>
                                             <button class="btn btn-success btn-sm col-md-3" id="rolldownMessage" title="Ver novas mensagens"><i class="fa-solid fa-angles-down"></i> Ver novas mensagens <i class="fa-solid fa-angles-down"></i></button>
                                         </div>
@@ -666,23 +662,27 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row hidden-support-closed">
-                            <div class="form-group col-md-12 mt-3">
-                                <h5>Comentário</h5>
-                                <div id="descriptionDiv" class="quill-container"></div>
-                                <textarea type="hidden" class="d-none" name="description" id="description"></textarea>
-                            </div>
-                        </div>
-                        <div class="row hidden-support-closed">
-                            <div class="card-body d-flex justify-content-between">
-                                <label><input type="checkbox" name="mark_close"> Marcar como concluído</label>
-                                <button type="button" class="btn btn-success col-md-3" id="sendComment"><i class="fa fa-save"></i> Adicionar comentário</button>
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <div class="row hidden-support-closed">
+                                    <div class="form-group col-md-12 mt-3">
+                                        <h5>Comentário</h5>
+                                        <div id="descriptionDiv" class="quill-container"></div>
+                                        <textarea type="hidden" class="d-none" name="description" id="description"></textarea>
+                                    </div>
+                                </div>
+                                <div class="row hidden-support-closed">
+                                    <div class="card-body d-flex justify-content-between">
+                                        <label><input type="checkbox" name="mark_close"> Marcar como concluído</label>
+                                        <button type="button" class="btn btn-success col-md-3" id="sendComment"><i class="fa fa-save"></i> Adicionar comentário</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-around">
-                    <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Fechar</button>
+                    <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Fechar</button>
                 </div>
             </div>
         </div>
@@ -698,7 +698,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Alterar Prioridade</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -707,36 +707,40 @@
                         <div class="card">
                             <div class="card-header" role="tab" id="headingDescription">
                                 <h6 class="mb-0">
-                                    <a data-toggle="collapse" href="#collapseDescription" aria-expanded="false" aria-controls="collapseDescription">
+                                    <a data-bs-toggle="collapse" href="#collapseDescription" aria-expanded="false" aria-controls="collapseDescription">
                                         <i class="fa-regular fa-file-lines"></i> Desccrição
                                     </a>
                                 </h6>
                             </div>
-                            <div id="collapseDescription" class="collapse" role="tabpanel" aria-labelledby="headingDescription" data-parent="#accordion">
+                            <div id="collapseDescription" class="collapse" role="tabpanel" aria-labelledby="headingDescription" data-bs-parent="#accordion">
                                 <div class="card-body">
                                     <div class="description"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row d-flex justify-content-center">
-                        <div class="form-group col-md-4">
-                            <label>Prioridade Atual</label>
-                            <input type="text" class="form-control" name="old_priority" disabled />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label>Nova Prioridade</label>
-                            <select class="form-control" name="new_priority">
-                                <option value="new">Novo</option>
-                                <option value="low">Baixo</option>
-                                <option value="medium">Médio</option>
-                                <option value="high">Alto</option>
-                            </select>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row d-flex justify-content-center">
+                                <div class="form-group col-md-4">
+                                    <label>Prioridade Atual</label>
+                                    <input type="text" class="form-control" name="old_priority" disabled />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Nova Prioridade</label>
+                                    <select class="form-control" name="new_priority">
+                                        <option value="new">Novo</option>
+                                        <option value="low">Baixo</option>
+                                        <option value="medium">Médio</option>
+                                        <option value="high">Alto</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-around">
-                    <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                    <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                     <button type="button" class="btn btn-success col-md-3" id="btnUpdatePriority"><i class="fa fa-save"></i> Alterar Prioridade</button>
                 </div>
             </div>
@@ -751,7 +755,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Alterar Situação</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -760,36 +764,40 @@
                         <div class="card">
                             <div class="card-header" role="tab" id="headingDescription">
                                 <h6 class="mb-0">
-                                    <a data-toggle="collapse" href="#collapseDescription" aria-expanded="false" aria-controls="collapseDescription">
+                                    <a data-bs-toggle="collapse" href="#collapseDescription" aria-expanded="false" aria-controls="collapseDescription">
                                         <i class="fa-regular fa-file-lines"></i> Desccrição
                                     </a>
                                 </h6>
                             </div>
-                            <div id="collapseDescription" class="collapse" role="tabpanel" aria-labelledby="headingDescription" data-parent="#accordion">
+                            <div id="collapseDescription" class="collapse" role="tabpanel" aria-labelledby="headingDescription" data-bs-parent="#accordion">
                                 <div class="card-body">
                                     <div class="description"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row d-flex justify-content-center">
-                        <div class="form-group col-md-4">
-                            <label>Situação Atual</label>
-                            <input type="text" class="form-control" name="old_status" disabled />
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label>Nova Situação</label>
-                            <select class="form-control" name="new_status">
-                                <option value="open">Novo</option>
-                                <option value="ongoing">Em atendimento</option>
-                                <option value="awaiting_return">Aguardando retorno</option>
-                                <option value="closed">Finalizado</option>
-                            </select>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row d-flex justify-content-center">
+                                <div class="form-group col-md-4">
+                                    <label>Situação Atual</label>
+                                    <input type="text" class="form-control" name="old_status" disabled />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Nova Situação</label>
+                                    <select class="form-control" name="new_status">
+                                        <option value="open">Novo</option>
+                                        <option value="ongoing">Em atendimento</option>
+                                        <option value="awaiting_return">Aguardando retorno</option>
+                                        <option value="closed">Finalizado</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-around">
-                    <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                    <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                     <button type="button" class="btn btn-success col-md-3" id="btnUpdateStatus"><i class="fa fa-save"></i> Alterar Situação</button>
                 </div>
             </div>

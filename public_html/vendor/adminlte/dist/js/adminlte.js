@@ -1552,7 +1552,7 @@
       NAVBAR: '.navbar',
       DROPDOWN_MENU: '.dropdown-menu',
       DROPDOWN_MENU_ACTIVE: '.dropdown-menu.show',
-      DROPDOWN_TOGGLE: '[data-toggle="dropdown"]'
+      DROPDOWN_TOGGLE: '[data-bs-toggle="dropdown"]'
     };
     var ClassName = {
       DROPDOWN_HOVER: 'dropdown-hover',

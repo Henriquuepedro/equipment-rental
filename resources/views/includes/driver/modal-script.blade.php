@@ -7,6 +7,13 @@
     $('#newDriverModal').on('hidden.bs.modal', function(e){
         $("body").addClass("modal-open");
     });
+    $('#btnModalNewDriverModal').on('click', function(e){
+        $('#newDriverModal').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show: true
+        }).modal("show");
+    });
     // Validar dados
     $("#formCreateDriverModal").validate({
         rules: {

@@ -14,6 +14,7 @@ use App\Models\Config;
 use App\Models\Driver;
 use App\Models\Equipment;
 use App\Models\EquipmentWallet;
+use App\Models\Guide;
 use App\Models\Plan;
 use App\Models\PlanHistory;
 use App\Models\PlanPayment;
@@ -38,6 +39,7 @@ use App\Observers\ConfigObserver;
 use App\Observers\DriverObserver;
 use App\Observers\EquipmentObserver;
 use App\Observers\EquipmentWalletObserver;
+use App\Observers\GuideObserver;
 use App\Observers\PlanObserver;
 use App\Observers\PlanHistoryObserver;
 use App\Observers\PlanPaymentObserver;
@@ -93,11 +95,13 @@ AppServiceProvider extends ServiceProvider
             $settings = array('style_template' => User::$STYLE_TEMPLATE['black']);
 
             if (auth()->user()) {
+                $logo_company_no_logotipo = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-black.png' : 'assets/images/system/logotipo-horizontal-white.png';
+
                 $company = new Company();
                 $dataCompany = $company->getCompany(auth()->user()->__get('company_id'));
 
                 $settings['img_profile'] = asset(auth()->user()->__get('profile') ? "assets/images/profile/" . auth()->user()->__get('id') . "/" . auth()->user()->__get('profile') : "assets/images/system/profile.png");
-                $settings['img_company'] = asset($dataCompany->logo ? "assets/images/company/$dataCompany->id/$dataCompany->logo" : "assets/images/system/company.png");
+                $settings['img_company'] = asset($dataCompany->logo ? "assets/images/company/$dataCompany->id/$dataCompany->logo" : $logo_company_no_logotipo);
                 $settings['name_company'] = $dataCompany->name;
                 $settings['type_user'] = auth()->user()->__get('type_user');
                 $settings['style_template'] = auth()->user()->__get('style_template');
@@ -107,16 +111,26 @@ AppServiceProvider extends ServiceProvider
                 $settings['notices'] = '';
 
                 if (strtotime($dataCompany->plan_expiration_date) < strtotime(sumDate(dateNowInternational(), null, null, 4))) {
-                    $datetime_plan_expiration_date = new DateTime($dataCompany->plan_expiration_date);
-                    $datetime_now = new DateTime(dateNowInternational());
-                    $interval_plan_expiration = $datetime_plan_expiration_date->diff($datetime_now);
+                    $datetime_plan_expiration_date = new DateTime(formatDateInternational($dataCompany->plan_expiration_date, DATE_INTERNATIONAL));
+                    $datetime_now = new DateTime(dateNowInternational(null, DATE_INTERNATIONAL));
+                    $interval_plan_expiration = $datetime_now->diff($datetime_plan_expiration_date);
+                    $diff_date_plan_expiration = (int)$interval_plan_expiration->format("%r%a");
 
                     $color_alert_plan_expiration = 'warning';
-                    if ($interval_plan_expiration->d <= 1) {
+                    $message_pre_alert_plan_expiration = "Seu plano vence em: $settings[plan_expiration_date].";
+                    if ($diff_date_plan_expiration <= 1) {
                         $color_alert_plan_expiration = 'danger';
                     }
+                    if ($diff_date_plan_expiration == 0) {
+                        $color_alert_plan_expiration = 'danger';
+                        $message_pre_alert_plan_expiration = "Seu plano vence hoje.";
+                    }
+                    if ($diff_date_plan_expiration < 0) {
+                        $color_alert_plan_expiration = 'danger';
+                        $message_pre_alert_plan_expiration = "Seu plano venceu em: $settings[plan_expiration_date].";
+                    }
 
-                    $settings['notices'] .= "<div class='alert alert-fill-$color_alert_plan_expiration mt-3 text-center' role='alert'><i class='mdi mdi-alert-circle'></i> Seu plano vence em: $settings[plan_expiration_date]. <a href='".route('plan.index')."' class='ml-2 btn btn-rounded btn-fw btn-sm btn-light'>Renovar</a> </div>";
+                    $settings['notices'] .= "<div class='alert alert-$color_alert_plan_expiration mt-3 text-center' role='alert'><i class='mdi mdi-alert-circle'></i> $message_pre_alert_plan_expiration <a href='".route('plan.index')."' class='ml-2 btn btn-rounded btn-fw btn-sm btn-light'>Renovar</a> </div>";
                 }
 
                 $months = 2;
@@ -174,5 +188,6 @@ AppServiceProvider extends ServiceProvider
         Residue::observe(ResidueObserver::class);
         Vehicle::observe(VehicleObserver::class);
         User::observe(UserObserver::class);
+        Guide::observe(GuideObserver::class);
     }
 }

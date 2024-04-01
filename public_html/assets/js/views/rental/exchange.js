@@ -3,6 +3,13 @@
     var form = $("#formRental");
     var budget = $('#budget').val() ? true : false;
     form.steps({
+        labels: {
+            current: "current step:",
+            finish: "Finalizar <i class='fa fa-save'></i>",
+            next: "Próximo <i class='fa fa-arrow-right'></i>",
+            previous: "<i class='fa fa-arrow-left'></i> Antrior",
+            loading: "Carregando ..."
+        },
         headerTag: "h3",
         bodyTag: "div.stepRental",
         transitionEffect: "slideLeft",
@@ -344,7 +351,7 @@
                 data: $('#formRental').serialize(),
                 success: response => {
                     if (response.success) {
-                        $('#createRental').modal();
+                        $('#createRental').modal('show');
                         $('#createRental h3.code_rental strong').text(response.code);
                         $('#createRental a.rental_print').attr('href', response.urlPrint);
                     } else {
@@ -456,7 +463,7 @@ $(document).on('click', '.exchange-equipment', function(){
 
     $('#exchangeEquipment [name="equipment-to-exchange"]').val(equipment_id);
     $('#exchangeEquipment [name="rental-equipment-to-exchange"]').val(rental_equipment_id);
-    $('#exchangeEquipment').modal();
+    $('#exchangeEquipment').modal('show');
 
 });
 

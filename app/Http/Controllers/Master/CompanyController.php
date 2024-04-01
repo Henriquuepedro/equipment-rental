@@ -34,7 +34,8 @@ class CompanyController extends Controller
         if (!$company) {
             return redirect()->route('master.company.index');
         }
-        $company->logo = asset($company->logo ? "assets/images/company/$id/$company->logo" : "assets/images/system/company.png");
+        $logo_company_no_logotipo = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-black.png' : 'assets/images/system/logotipo-horizontal-white.png';
+        $company->logo = asset($company->logo ? "assets/images/company/$id/$company->logo" : $logo_company_no_logotipo);
 
         return view('master.company.update', compact('company'));
     }
@@ -80,8 +81,11 @@ class CompanyController extends Controller
         }
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('master.company.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Atualizar' ><i class='fas fa-edit'></i></a>";
-            $buttons .= "<button data-company-id='".$value->id."' class='btn btn-success btn-sm btn-rounded btn-action btn-add-expiration-time ml-1' data-toggle='tooltip' title='Adicionar dias de expiração' ><i class='fa-regular fa-calendar-plus'></i></a>";
+            $buttons = "<a href='".route('master.company.edit', ['id' => $value->id])."' class='dropdown-item' data-rental-id='$value->id'><i class='fas fa-edit'></i> Atualizar Empresa</a>";
+            $buttons .= "<button data-company-id='".$value->id."' class='dropdown-item btn-add-expiration-time'><i class='fa-regular fa-calendar-plus'></i> Adicionar dias de expiração</a>";
+
+            $buttons = dropdownButtonsDataList($buttons, $value->id);
+
 
             $result[] = array(
                 $value->name,

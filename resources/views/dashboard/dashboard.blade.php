@@ -37,6 +37,11 @@
             padding-right: 1rem;
             overflow: unset;
         }
+        .dataTables_wrapper .dataTable thead .sorting_asc:before,
+        .dataTables_wrapper .dataTable thead .sorting_desc:before,
+        .dataTables_wrapper .dataTable thead .sorting:before {
+            right: 1.2em;
+        }
     </style>
 @stop
 
@@ -55,25 +60,38 @@
     <script src="{{ asset('assets/js/views/dashboard/manage.js') }}"></script>
     <script src="{{ asset('assets/js/views/dashboard/index.js') }}"></script>
     @include('includes.rental.modal-script')
+    <script src="https://www.mercadopago.com/v2/security.js" view="home"></script>
 @stop
 
 @section('content')
-    <div class="nav-scroller mb-3">
-        <ul class="nav nav-tabs tickets-tab-switch d-flex justify-content-center" role="tablist" id="tabDashboard">
-            <li class="nav-item col-md-3">
-                <a class="nav-link d-flex justify-content-center active" id="daily-tab" data-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="true">DIÁRIO</a>
-            </li>
-            <li class="nav-item col-md-3">
-                <a class="nav-link d-flex justify-content-center" id="manage-tab" data-toggle="tab" href="#manage" role="tab" aria-controls="manage" aria-selected="false">GERENCIAL</a>
-            </li>
-        </ul>
-    </div>
-    <div class="tab-content tab-content-basic">
-        <div class="tab-pane fade show active" id="daily" role="tabpanel" aria-labelledby="daily-tab">
-            @include('dashboard.daily_dashboard')
-        </div>
-        <div class="tab-pane fade" id="manage" role="tabpanel" aria-labelledby="manage-tab">
-            @include('dashboard.manage_dashboard')
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="nav-scroller">
+                        <ul class="nav nav-pills nav-pills-success d-flex justify-content-center border-bottom-0 pb-0" role="tablist" id="tabDashboard">
+                            <li class="nav-item col-md-3">
+                                <a class="nav-link d-flex justify-content-center active" id="daily-tab" data-bs-toggle="tab" href="#daily" role="tab" aria-controls="daily" aria-selected="true">DIÁRIO</a>
+                            </li>
+                            <li class="nav-item col-md-3">
+                                <a class="nav-link d-flex justify-content-center" id="manage-tab" data-bs-toggle="tab" href="#manage" role="tab" aria-controls="manage" aria-selected="false">GERENCIAL</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+{{--            <div class="card mt-2">--}}
+{{--                <div class="card-body">--}}
+                    <div class="tab-content border-0 p-0 mt-3">
+                        <div class="tab-pane fade show active" id="daily" role="tabpanel" aria-labelledby="daily-tab">
+                            @include('dashboard.daily_dashboard')
+                        </div>
+                        <div class="tab-pane fade" id="manage" role="tabpanel" aria-labelledby="manage-tab">
+                            @include('dashboard.manage_dashboard')
+                        </div>
+{{--                    </div>--}}
+{{--                </div>--}}
+            </div>
         </div>
     </div>
     @include('includes.rental.modal-view')

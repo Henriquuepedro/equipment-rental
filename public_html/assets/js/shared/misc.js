@@ -174,7 +174,7 @@ if ($('body').hasClass("dark-theme")) {
     });
 
     //Close other submenu in sidebar on opening any
-    $("#sidebar > .nav > .nav-item > a[data-toggle='collapse']").on("click", function () {
+    $("#sidebar > .nav > .nav-item > a[data-bs-toggle='collapse']").on("click", function () {
       $("#sidebar > .nav > .nav-item").find('.collapse.show').collapse('hide');
     });
 
@@ -202,7 +202,7 @@ if ($('body').hasClass("dark-theme")) {
       }
     }
 
-    $('[data-toggle="minimize"]').on("click", function () {
+    $('[data-bs-toggle="minimize"]').on("click", function () {
       if ((body.hasClass('sidebar-toggle-display')) || (body.hasClass('sidebar-absolute'))) {
         body.toggleClass('sidebar-hidden');
       } else {
@@ -214,7 +214,7 @@ if ($('body').hasClass("dark-theme")) {
     $(".form-check label,.form-radio label").append('<i class="input-helper"></i>');
   });
 
-  $('[data-toggle="tooltip"]').tooltip();
+  $('[data-bs-toggle="tooltip"]').tooltip();
 
   $(".sidebar .sidebar-inner > .nav > .nav-item").not(".brand-logo").attr('toggle-status', 'closed');
   $(".sidebar .sidebar-inner > .nav > .nav-item").on('click', function () {

@@ -123,7 +123,7 @@ class BudgetController extends Controller
         foreach ($data['data'] as $value) {
             $buttons = "<button class='dropdown-item btnApproveBudget' budget-id='$value->id'><i class='fas fa-check'></i> Aprovar Orçamento</button>";
             $buttons .= $permissionUpdate ? "<a href='".route('budget.update', ['id' => $value->id])."' class='dropdown-item'><i class='fas fa-edit'></i> Alterar Orçamento</a>" : '';
-            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveBudget' budget-id='$value->id'><i class='fas fa-trash'></i> Excluir Orçamento</button>" : '';
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveBudget' budget-id='$value->id'><i class='fas fa-trash-o'></i> Excluir Orçamento</button>" : '';
             $buttons .= "<a href='".route('print.budget', ['budget' => $value->id])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Orçamento</a>";
 
             $buttons = dropdownButtonsDataList($buttons, $value->id);

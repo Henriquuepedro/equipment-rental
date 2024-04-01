@@ -105,7 +105,7 @@
                 customization: {
                     visual: {
                         style: {
-                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "default",
+                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "bootstrap",
                         },
                     },
                     paymentMethods: {
@@ -222,7 +222,7 @@
                 },
                 callbacks: {
                     onReady: () => {
-                        $('#resultPayment').modal()
+                        $('#resultPayment').modal('show')
                     },
                     onError: (error) => {
                         // Callback called for all Brick error cases
@@ -260,6 +260,18 @@
                     <h4 class="card-title">Solicitações</h4>
                     <p class="card-description">Solicitações realizadas.</p>
                     <div id="paymentBrick_container"></div>
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3 mt-3 mb-3">
+                            <img src="https://imgmp.mlstatic.com/org-img/MLB/MP/BANNERS/tipo2_575X40.jpg?v=1"
+                                 alt="Mercado Pago - Meios de pagamento" title="Mercado Pago - Meios de pagamento"
+                                 style="width: 100%; height: 45px"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3 mt-3 mb-3 text-center">
+                            <a href="https://www.mercadopago.com.br/ajuda/322" target="_blank">Veja os juros de parcelamentos!</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -280,4 +292,5 @@
     <input type="hidden" name="amount_plan" value="{{ $plan->value }}">
     <input type="hidden" name="token_plan" value="{{ $tokenStr }}">
     <input type="hidden" name="device_id" id="deviceId">
+    <input type="hidden" name="idempotency_key" id="idempotency_key" value="{{ $idempotency_key }}">
 @stop

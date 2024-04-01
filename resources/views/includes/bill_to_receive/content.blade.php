@@ -23,15 +23,15 @@
         <div class="nav-scroller mt-3">
             <ul class="nav nav-tabs tickets-tab-switch justify-content-center" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="without_pay-tab" data-toggle="tab" href="#without_pay" role="tab" aria-controls="without_pay" aria-selected="false">Não Pago<div class="badge">50 </div></a>
+                    <a class="nav-link active" id="without_pay-tab" data-bs-toggle="tab" href="#without_pay" role="tab" aria-controls="without_pay" aria-selected="false">Não Pago<div class="badge">50 </div></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="paid-tab" data-toggle="tab" href="#paid" role="tab" aria-controls="paid" aria-selected="false">Pago<div class="badge">29 </div>
+                    <a class="nav-link" id="paid-tab" data-bs-toggle="tab" href="#paid" role="tab" aria-controls="paid" aria-selected="false">Pago<div class="badge">29 </div>
                     </a>
                 </li>
             </ul>
         </div>
-        <div class="tab-content tab-content-basic">
+        <div class="tab-content tab-content-basic d-none">
             <div class="tab-pane fade show active" id="without_pay" role="tabpanel" aria-labelledby="without_pay">
 
             </div>
@@ -42,7 +42,7 @@
 
         <div class="row mt-3">
             <div class="col-md-12">
-                <table id="tableBillsToReceive" class="table table-bordered mt-2">
+                <table id="tableBillsToReceive" class="table mt-2">
                     <thead>
                     <tr>
                         <th>Locação</th>

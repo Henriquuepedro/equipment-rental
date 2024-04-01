@@ -146,17 +146,23 @@
                                         <label for="form_payment">Forma de Pagamento</label>
                                         <select class="form-control select2" id="form_payment" name="form_payment" required></select>
                                     </div>
-                                    <div class="form-group col-md-4 d-flex mt-4">
+
+
+                                    <div class="form-group col-md-4">
                                         <label class="label-date-btns" for="order_by_field">Ordenar por</label>
-                                        <select class="form-control select2 col-md-7" id="order_by_field" name="order_by_field">
-                                            <option value="rental_bill_to_pay">Locação</option>
-                                            <option value="client_provider">Cliente</option>
-                                            <option value="due_date">Data de vencimento</option>
-                                        </select>
-                                        <select class="form-control select2 col-md-5" id="order_by_direction" name="order_by_direction">
-                                            <option value="desc">Decrescente</option>
-                                            <option value="asc">Crescente</option>
-                                        </select>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend col-md-7">
+                                                <select class="form-control" id="order_by_field" name="order_by_field">
+                                                    <option value="rental_bill_to_pay">Locação</option>
+                                                    <option value="client_provider">Cliente</option>
+                                                    <option value="due_date">Data de vencimento</option>
+                                                </select>
+                                            </div>
+                                            <select class="form-control col-md-5" id="order_by_direction" name="order_by_direction">
+                                                <option value="desc">Decrescente</option>
+                                                <option value="asc">Crescente</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

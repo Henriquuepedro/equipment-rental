@@ -3,6 +3,13 @@
     const form = $("#formRental");
     const budget = !!$('#budget').val();
     form.steps({
+        labels: {
+            current: "current step:",
+            finish: "Finalizar <i class='fa fa-save'></i>",
+            next: "Próximo <i class='fa fa-arrow-right'></i>",
+            previous: "<i class='fa fa-arrow-left'></i> Antrior",
+            loading: "Carregando ..."
+        },
         headerTag: "h3",
         bodyTag: "div.stepRental",
         transitionEffect: "slideLeft",
@@ -445,11 +452,10 @@
                                 }
                             })
                         } else {
-                            $('#createRental').modal();
+                            $('#createRental').modal('show');
                             $('#createRental h3.code_rental strong').text(response.code);
                             $('#createRental a.rental_print').attr('href', response.urlPrint);
 
-                            console.log(response.payment_today);
                             if (response.payment_today) {
                                 $('#createRental .content-payment-today').show();
                                 $('#createRental [name="due_date"]').val(transformDateForBr(response.payment_today.due_date));

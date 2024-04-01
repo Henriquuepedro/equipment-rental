@@ -367,7 +367,11 @@ if (!function_exists('getImageCompanyBase64')) {
         if ($company->logo) {
             $image = "assets/images/company/$company->id/$company->logo";
         } else {
-            $image = "assets/images/system/company.png";
+            if (auth()->user()) {
+                $image = auth()->user()->__get('style_template') == 1 ? 'assets/images/system/logotipo-horizontal-black.png' : 'assets/images/system/logotipo-horizontal-white.png';
+            } else {
+                $image = "assets/images/system/company.png";
+            }
         }
 
         $extension = File::extension($image);
@@ -381,7 +385,7 @@ if (!function_exists('dropdownButtonsDataList')) {
     function dropdownButtonsDataList(string $data_buttons, int $index = 0, string $direction = 'left'): string
     {
         return "<div class='row'><div class='col-12'><div class='dropdown drop$direction'>
-            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsDataList-$index' data-toggle='dropdown' data-boundary='window' aria-haspopup='true' aria-expanded='false'>
+            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsDataList-$index' data-bs-toggle='dropdown' data-boundary='window' aria-haspopup='true' aria-expanded='false'>
               <i class='fa fa-cog'></i>
             </button>
             <div class='dropdown-menu' aria-labelledby='dropActionsRental-$index'>$data_buttons</div</div>
@@ -410,7 +414,7 @@ if (!function_exists('newDropdownButtonsDataList')) {
         }
 
         return "<div class='row'><div class='col-12'><div class='dropdown drop$direction'>
-            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsDataList-$index' data-toggle='dropdown' data-boundary='window' aria-haspopup='true' aria-expanded='false'>
+            <button class='btn btn-outline-primary icon-btn dropdown-toggle' type='button' id='dropActionsDataList-$index' data-bs-toggle='dropdown' data-boundary='window' aria-haspopup='true' aria-expanded='false'>
               <i class='fa fa-cog'></i>
             </button>
             <div class='dropdown-menu' aria-labelledby='dropActionsRental-$index'>$data_buttons</div</div>
@@ -475,7 +479,7 @@ if (!function_exists('getFormPermission')) {
         foreach ($group_name as $group => $permissions) {
 
             $htmlPermissions .= '
-            <div class="col-md-4 grid-margin stretch-card permissions">
+            <div class="col-md-4 grid-margin stretch-card permissions p-2">
                 <div class="card">
                   <div class="card-body">
                     <h4 class="card-title text-uppercase">'.$group.'</h4>
@@ -741,7 +745,8 @@ if (! function_exists('createLogEvent')) {
 
             LogEvent::create([
                 'event'             => $event,
-                'user_id'           => auth()->id(),
+                'user_id'           => is_null(auth()->user()) ? null : auth()->id(),
+                'company_id'        => is_null(auth()->user()) ? null : auth()->user()->__get('company_id'),
                 'event_date'        => now(),
                 'ip'                => request()->ip(),
                 'auditable_id'      => $auditable_model->id,
@@ -830,5 +835,18 @@ if (!function_exists('getLogoUser')) {
     function getLogoUser(string $filename, int $user_id = null): string
     {
         return asset($filename ? "assets/images/profile/$user_id/$filename" : 'assets/images/system/profile.png');
+    }
+}
+
+if (!function_exists('extractDataPhone')) {
+    function extractDataPhone(string $phone_number): array
+    {
+        $ddd = substr($phone_number, 0, 2);
+        $phone = substr($phone_number, 2);
+
+        return [
+            'ddd' => $ddd,
+            'phone' => $phone
+        ];
     }
 }

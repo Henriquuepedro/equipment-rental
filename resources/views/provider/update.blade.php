@@ -105,7 +105,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body">
                                 <div class="header-card-body">
                                     <h4 class="card-title">Dados do Fornecedor</h4>
@@ -177,7 +177,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="form-group col-md-3">
@@ -219,7 +219,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('provider.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
                                 @if($btns)<button type="submit" class="btn btn-success col-md-3"><i class="fa fa-sync"></i> Atualizar</button>@endif
@@ -241,7 +241,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Confirmar Endereço no Mapa</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -256,7 +256,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary col-md-3" data-dismiss="modal">Confirmar</button>
+                        <button type="button" class="btn btn-primary col-md-3" data-bs-dismiss="modal">Confirmar</button>
                     </div>
                 </div>
             </div>

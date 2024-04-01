@@ -26,12 +26,12 @@ var FORMAT_DATETIME_BRAZIL_NO_SECONDS = 'DD/MM/YYYY HH:mm';
 var FORMAT_DATE_BRAZIL = 'DD/MM/YYYY';
 
 var MaskPhoneBehavior = function (val) {
-        return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
-    },
-    maskPhoneOptions = {
-    onKeyPress: function(val, e, field, options) {
-        field.mask(MaskPhoneBehavior.apply({}, arguments), options);
-    }
+    return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+},
+maskPhoneOptions = {
+onKeyPress: function(val, e, field, options) {
+    field.mask(MaskPhoneBehavior.apply({}, arguments), options);
+}
 };
 
 (function ($) {
@@ -43,19 +43,58 @@ var MaskPhoneBehavior = function (val) {
         var footer = $('.footer');
         var sidebar = $('#sidebar');
 
+        $(document).on('mouseenter mouseleave', '.sidebar .nav-item', function(ev) {
+            let body = $('body');
+            let sidebarIconOnly = body.hasClass("sidebar-icon-only");
+            let sidebarFixed = body.hasClass("sidebar-fixed");
+            if (!('ontouchstart' in document.documentElement)) {
+                if (sidebarIconOnly) {
+                    if (sidebarFixed) {
+                        if (ev.type === 'mouseenter') {
+                            body.removeClass('sidebar-icon-only');
+                        }
+                    } else {
+                        var $menuItem = $(this);
+                        if (ev.type === 'mouseenter') {
+                            $menuItem.addClass('hover-open')
+                        } else {
+                            $menuItem.removeClass('hover-open')
+                        }
+                    }
+                }
+            }
+        });
+
+        $('[data-bs-toggle="minimize"]').on("click", function () {
+            if ((body.hasClass('sidebar-toggle-display')) || (body.hasClass('sidebar-absolute'))) {
+                body.toggleClass('sidebar-hidden');
+            } else {
+                body.toggleClass('sidebar-icon-only');
+            }
+        });
+
+        $('[data-bs-toggle="offcanvas"]').on("click", function() {
+            $('.sidebar-offcanvas').toggleClass('active')
+        });
+
         //Add active class to nav-link based on url dynamically
-        $('.nav-item.active').find('a:first').attr('aria-expanded',true);
+        // $('.nav-item.active').find('a:first').attr('aria-expanded',true);
         $('.nav-item.active').find('.collapse').addClass('show');
 
         //Close other submenu in sidebar on opening any
-        $("#sidebar > .nav > .nav-item > a[data-toggle='collapse']").on("click", function () {
+        $("#sidebar > .nav > .nav-item > a[data-bs-toggle='collapse']").on("click", function () {
             $("#sidebar > .nav > .nav-item").find('.collapse.show').collapse('hide');
         });
 
         //checkbox and radios
         $(".form-check label,.form-radio label").append('<i class="input-helper"></i>');
 
-        setTimeout(() => { $('.block-screen-load').hide() }, 500 );
+        setTimeout(() => {
+            $('.block-screen-load').slideUp(500);
+            setTimeout(() => {
+                $('.block-screen-load').remove();
+            }, 450);
+        }, 500);
 
         $(".form-control").click(function() {
             $(this).parent().addClass("label-animate");
@@ -108,8 +147,8 @@ var MaskPhoneBehavior = function (val) {
 
         checkLabelAnimate();
 
-        if ($('[data-toggle="tooltip"]').length)
-            $('[data-toggle="tooltip"]').tooltip();
+        if ($('[data-bs-toggle="tooltip"]').length)
+            $('[data-bs-toggle="tooltip"]').tooltip();
 
         if ($('.select2').length)
             $('.select2').select2();
@@ -122,11 +161,12 @@ $(document).on('click', '[data-widget="collapse"]', function (){
 });
 
 const checkLabelAnimate = () => {
-    $(".form-control").each(function() {
-        if ($(this).val() !== '')
-            $(this).parent().addClass("label-animate");
-        else
-            $(this).parent().removeClass("label-animate");
+    $("input[type='text'].form-control, input[type='email'].form-control, input[type='date'].form-control, input[type='tel'].form-control, input[type='number'].form-control, select.form-control").each(function() {
+        if ($(this).val() !== '') {
+            $(this).parents('.form-group').addClass("label-animate");
+        } else {
+            $(this).parents('.form-group').removeClass("label-animate");
+        }
     });
 }
 
@@ -426,10 +466,11 @@ const availableStock = (el, id = null) => {
     });
 }
 
-const loadDaterangePickerInput = (el, event) => {
+const loadDaterangePickerInput = (el, event, format = FORMAT_DATE_BRAZIL, timePicker = false) => {
     el.daterangepicker({
+        timePicker,
         locale: {
-            format: FORMAT_DATE_BRAZIL,
+            format,
             separator: " - ",
             applyLabel: "Aplicar",
             cancelLabel: "Cancelar",
@@ -586,7 +627,7 @@ const loadSearchZipcode = (selector, contentElement) => {
 }
 
 const getHtmlLoading = () => {
-    return `<div class="jumping-dots-loader"><span></span><span></span><span></span></div>`;
+    return `<div class="row loader-demo-box"><div class="circle-loader"></div></div>`;
 }
 
 /*$(document).on('shown.bs.dropdown', '.dropdown', function () {
@@ -613,7 +654,7 @@ const getHeight = () => {
     );
 }
 
-const deniedLocation = async () => {
+const deniedLocation = async (show_alert = false) => {
     const company_address_lat_lng = await $.ajax({
         type:'GET',
         url:$('#route_lat_lng_my_company').val(),
@@ -623,18 +664,36 @@ const deniedLocation = async () => {
             return data;
         }, error: e => {
             console.log(e);
-            Swal.fire({
-                icon: 'warning',
-                title: 'Localização não encontrada',
-                html: "A solicitação para obter a localização atual foi negada pelo navegador ou occoreu um problema para identificar.<br><br>Para obter a sua localização você precisa finalizar o cadastro do endereço da empresa para iniciarmos o mapa."
-            });
+            if (show_alert) {
+                alertCompanyWithoutAddress();
+            }
         }
     });
+
+    if ((company_address_lat_lng.lat === 0 || company_address_lat_lng.lng === 0) && show_alert) {
+        alertCompanyWithoutAddress();
+    }
 
     return {
         lat: company_address_lat_lng.lat,
         lng: company_address_lat_lng.lng
     };
+}
+
+const alertCompanyWithoutAddress = () => {
+    Swal.fire({
+        title: 'Localização não encontrada',
+        html: "A solicitação para obter a localização atual foi negada pelo navegador ou ocorreu um problema para identificar.<br><br>Para obter a sua localização você precisa finalizar o cadastro do endereço da empresa para iniciarmos o mapa.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Atualizar cadastro",
+        cancelButtonText: "Fechar",
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = $('[name="base_url"]').val() + '/configurar'
+        }
+    });
 }
 
 const formatCodeIndex = (code, size_min = 5) => {

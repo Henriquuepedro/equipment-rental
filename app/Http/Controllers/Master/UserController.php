@@ -93,7 +93,8 @@ class UserController extends Controller
         }
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('master.user.edit', ['id' => $value->id])."' class='btn btn-primary btn-sm btn-rounded btn-action' data-toggle='tooltip' title='Atualizar' ><i class='fas fa-edit'></i></a>";
+            $buttons = "<a href='".route('master.user.edit', ['id' => $value->id])."' class='dropdown-item' data-rental-id='$value->id'><i class='fas fa-edit'></i> Atualizar Usuário</a>";
+            $buttons = dropdownButtonsDataList($buttons, $value->id);
 
             $result[] = array(
                 $value->name,

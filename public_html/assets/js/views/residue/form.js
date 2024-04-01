@@ -9,7 +9,7 @@ $(document).on('click', '.editResidueModal', function(){
 
     $('#editResidueModal input[name="name"]').val(name);
     $('#editResidueModal input[name="residue_id"]').val(residue_id);
-    $('#editResidueModal').modal();
+    $('#editResidueModal').modal('show');
     checkLabelAnimate();
 })
 
@@ -180,7 +180,7 @@ const getTable = (stateSave = true) => {
             }
         },
         "initComplete": function( settings, json ) {
-            $('[data-toggle="tooltip"]').tooltip();
+            $('[data-bs-toggle="tooltip"]').tooltip();
         },
         "language": {
             "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
@@ -189,7 +189,7 @@ const getTable = (stateSave = true) => {
 }
 
 const reloadTable = () => {
-    $('[data-toggle="tooltip"]').tooltip('dispose')
+    $('[data-bs-toggle="tooltip"]').tooltip('dispose')
     tableResidue.destroy();
     $("#tableResidues tbody").empty();
     tableResidue = getTable();

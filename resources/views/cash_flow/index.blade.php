@@ -186,11 +186,10 @@
                         <h4 class="card-title no-border">Fluxo de Caixa</h4>
                     </div>
                     <div class="row">
-                        <div class="form-group flatpickr col-md-3 d-flex">
-                            <label class="label-date-btns">Data</label>
-                            <input type="tel" name="date_filter" class="form-control col-md-8" value="{{ date(DATE_BRAZIL) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy" im-insert="false" data-input>
-                            <div class="input-button-calendar col-md-4 no-padding">
-                                <a class="input-button pull-left btn-primary" title="toggle" data-toggle>
+                        <div class="form-group flatpickr col-md-3">
+                            <input type="tel" name="date_filter" class="form-control col-md-8 pull-left" value="{{ date(DATE_BRAZIL) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy" im-insert="false" data-input>
+                            <div class="input-button-calendar col-md-4 no-padding pull-right">
+                                <a class="input-button pull-left btn btn-primary" title="toggle" data-toggle>
                                     <i class="fa fa-calendar text-white"></i>
                                 </a>
                             </div>
@@ -201,16 +200,16 @@
                             <div class="card border-success">
                                 <div class="card-header" role="tab" id="headingReceived">
                                     <h6 class="mb-0">
-                                        <a data-toggle="collapse" href="#collapseReceived" aria-expanded="false" aria-controls="collapseReceived">
+                                        <a data-bs-toggle="collapse" href="#collapseReceived" aria-expanded="false" aria-controls="collapseReceived">
                                             <i class="fa fa-plus text-success"></i> Entradas <span style="padding-left: 2.25em" id="received">R$ 0,00</span>
                                         </a>
                                     </h6>
                                 </div>
-                                <div id="collapseReceived" class="collapse" role="tabpanel" aria-labelledby="headingReceived" data-parent="#accordion">
+                                <div id="collapseReceived" class="collapse" role="tabpanel" aria-labelledby="headingReceived" data-bs-parent="#accordion">
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <table id="tableReceived" class="table table-bordered">
+                                                <table id="tableReceived" class="table">
                                                     <thead>
                                                         <tr>
                                                             <th>Código</th>
@@ -235,16 +234,16 @@
                             <div class="card border-danger">
                                 <div class="card-header" role="tab" id="headingPaid">
                                     <h6 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" href="#collapsePaid" aria-expanded="false" aria-controls="collapsePaid">
+                                        <a class="collapsed" data-bs-toggle="collapse" href="#collapsePaid" aria-expanded="false" aria-controls="collapsePaid">
                                             <i class="fa fa-minus text-danger"></i> Saídas <span style="padding-left: 3.2em" id="paid">R$ 0,00</span>
                                         </a>
                                     </h6>
                                 </div>
-                                <div id="collapsePaid" class="collapse" role="tabpanel" aria-labelledby="headingPaid" data-parent="#accordion">
+                                <div id="collapsePaid" class="collapse" role="tabpanel" aria-labelledby="headingPaid" data-bs-parent="#accordion">
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <table id="tablePaid" class="table table-bordered">
+                                                <table id="tablePaid" class="table">
                                                     <thead>
                                                         <tr>
                                                             <th>Código</th>
@@ -269,7 +268,7 @@
                             <div class="card border-primary" id="card-liquid">
                                 <div class="card-header" role="tab" id="headingEqual">
                                     <h6 class="mb-0">
-                                        <a class="collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="collapseEqual" style="cursor: default">
+                                        <a class="collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseEqual" style="cursor: default">
                                             <i class="fa fa-equals text-primary"></i> Resultado <span style="padding-left: 1.75em" id="liquid">R$ 0,00</span>
                                         </a>
                                     </h6>

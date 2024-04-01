@@ -35,10 +35,13 @@
         .btns-profile-image{
             display: none;
             position: absolute;
-            top: 200px;
+            top: 28%;
         }
         #src-profile-image {
             border: 3px solid #fff;
+        }
+        .tab-content .tab-pane:not(.active) {
+            display: none;
         }
     </style>
 @stop
@@ -196,41 +199,49 @@
             @endif
             <div class="card">
                 <div class="card-body">
-                    <div class="profile-header text-white">
-                        <div class="d-flex justify-content-center justify-content-md-between mx-4 mx-xl-5 px-xl-5 flex-wrap">
+                    <div class="profile-header" style="background-image: linear-gradient(to right, rgb(58 97 246), rgba(255, 0, 0, 0));border-radius: 5px">
+                        <div class="d-flex justify-content-center justify-content-md-between mx-4 mx-xl-5 px-xl-5 flex-wrap mb-2">
                             <div class="profile-info d-flex align-items-center justify-content-center flex-wrap mr-sm-3">
-                                <div class="profile-edit">
+                                <div class="profile-edit mt-3">
                                     <img class="rounded-circle img-lg mb-3 mb-sm-0" src="{{ $settings['img_profile'] }}" id="src-profile-image" alt="profile image">
                                     <form method="POST" action="" enctype="multipart/form-data" id="updateProfileImage">
                                         <input type="file" name="profile-image" id="profile-image" class="display-none">
                                         <label for="profile-image"><i class="mdi mdi-camera"></i></label>
                                     </form>
                                     <div class="btns-profile-image">
-                                        <button class="btn btn-danger" id="cancel-profile-img"><i class="fa fa-times"></i></button>
-                                        <button class="btn btn-success" id="save-profile-img"><i class="fa fa-check"></i></button>
+                                        <button class="btn btn-danger btn-sm" id="cancel-profile-img"><i class="fa fa-times"></i></button>
+                                        <button class="btn btn-success btn-sm" id="save-profile-img"><i class="fa fa-check"></i></button>
                                     </div>
                                 </div>
-                                <div class="wrapper pl-sm-4">
-                                    <h5 class="profile-user-name text-center text-sm-left">{{ auth()->user()->__get('name') }}</h5>
+                                <div class="wrapper ml-3">
+                                    <h5 class="profile-user-name text-center text-white text-sm-left">{{ auth()->user()->__get('name') }}</h5>
                                     <div class="wrapper d-flex align-items-center justify-content-start flex-wrap">
-                                        <p class="profile-user-designation text-center text-md-left my-2 my-md-0 text-uppercase">{{ $settings['name_company'] }}</p>
+                                        <p class="profile-user-designation text-center text-md-left my-2 my-md-0 text-uppercase text-white">{{ $settings['name_company'] }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="profile-body">
-                        <ul class="nav tab-switch" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="user-profile-info-tab" data-toggle="pill" href="#user-profile-info" role="tab" aria-controls="user-profile-info" aria-selected="true">Perfil</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="user-config-info-tab" data-toggle="pill" href="#user-config" role="tab" aria-controls="user-config" aria-selected="true">Configurações</a>
-                            </li>
-                        </ul>
-                        <form action="{{ route('profile.update') }}" method="POST" class="row" id="formUpdateProfile">
-                            <div class="col-md-12">
-                                <div class="tab-content tab-body" id="profile-log-switch">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="user-profile-info-tab" data-bs-toggle="tab" href="#user-profile-info"
+                                       role="tab" aria-controls="user-profile-info" aria-selected="true">
+                                        <i class="ti-user text-danger ms-2"></i> Perfil
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="user-config-info-tab" data-bs-toggle="tab" href="#user-config"
+                                       role="tab" aria-controls="user-config" aria-selected="false">
+                                        <i class="ti-settings text-success ms-2"></i> Configurações
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-8">
+                            <div class="tab-content tab-content-vertical">
+                                <form action="{{ route('profile.update') }}" method="POST" class="row" id="formUpdateProfile">
                                     <div class="tab-pane fade show active" id="user-profile-info" role="tabpanel" aria-labelledby="user-profile-info-tab">
                                         <div class="row pb-4">
                                             <div class="form-group col-md-4">
@@ -251,12 +262,12 @@
                                                 <div class="card border-bottom">
                                                     <div class="card-header" role="tab" id="headingThree">
                                                         <h6 class="mb-0">
-                                                            <a class="collapsed" data-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                            <a class="collapsed" data-bs-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                                                                 <i class="card-icon mdi mdi-lock"></i>Deseja alterar sua senha?
                                                             </a>
                                                         </h6>
                                                     </div>
-                                                    <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                                                    <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-bs-parent="#accordion">
                                                         <div class="card-body row">
                                                             <div class="form-group col-md-4">
                                                                 <label>Senha Atual</label>
@@ -276,7 +287,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="tab-pane fade" id="user-config" role="tabpanel" aria-labelledby="user-config-tab">
+                                    <div class="tab-pane fade" id="user-config" role="tabpanel" aria-labelledby="user-config-info-tab">
                                         <div class="row pb-4">
                                             <div class="form-group col-md-4">
                                                 <label>Tema</label>
@@ -287,13 +298,13 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="col-md-12 d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Salvar</button>
+                                    </div>
+                                    {{ csrf_field() }}
+                                </form>
                             </div>
-                            <div class="col-md-12 d-flex justify-content-end">
-                                <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Salvar</button>
-                            </div>
-                            {{ csrf_field() }}
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>

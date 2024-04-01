@@ -12,7 +12,7 @@
         </div>
     </div>
 </div>
-<div class="card display-none">
+<div class="card mt-2 display-none">
     <div class="card-body">
         <div class="header-card-body">
             <h4 class="card-title">Dados do Equipamento</h4>
@@ -59,7 +59,7 @@
         </div>
     </div>
 </div>
-<div class="card display-none">
+<div class="card mt-2 display-none">
     <div class="card-body">
         <div class="header-card-body">
             <h4 class="card-title">Valores</h4>

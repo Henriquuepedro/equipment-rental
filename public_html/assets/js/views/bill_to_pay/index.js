@@ -3,7 +3,7 @@ let rows_selected = [];
 
 $(function () {
     loadDaterangePickerInput($('#contentListBillToPay input[name="intervalDates"]'), function () {
-        getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''));
+        getTable($('[data-bs-toggle="tab"].active').attr('id').replace('-tab',''));
     });
     setTabBill();
     getOptionsForm('form-of-payment', $('#modalReopenPayment [name="form_payment"], #modalConfirmPayment [name="form_payment"], #modalViewPayment [name="form_payment"]'));
@@ -48,12 +48,12 @@ const loadCountsTabBill = () => {
 }
 
 const disabledLoadData = () => {
-    $('#contentListBillToPay a[data-toggle="tab"], #contentListBillToPay select[name="providers"]').prop('disabled', true);
+    $('#contentListBillToPay a[data-bs-toggle="tab"], #contentListBillToPay select[name="providers"]').prop('disabled', true);
     $('#contentListBillToPay .table.dataTable thead tr th[aria-controls="tableBillsToPay"]:eq(3), #contentListBillToPay .dataTables_scrollFoot .table.dataTable tfoot tr th:eq(3)').html('<div class="col-md-12"><i class="fa fa-spin fa-spinner text-center"></i></div>');
 }
 
 const enabledLoadData = () => {
-    $('#contentListBillToPay a[data-toggle="tab"], #contentListBillToPay select[name="providers"]').prop('disabled', false);
+    $('#contentListBillToPay a[data-bs-toggle="tab"], #contentListBillToPay select[name="providers"]').prop('disabled', false);
 }
 
 const getCountsTabBills = () => {
@@ -98,7 +98,7 @@ const getTable = typeBills => {
     disabledLoadData();
     const provider_id = parseInt($('#contentListBillToPay [name="providers"]').val());
 
-    $('#contentListBillToPay [data-toggle="tooltip"]').tooltip('dispose');
+    $('#contentListBillToPay [data-bs-toggle="tooltip"]').tooltip('dispose');
 
     if (typeof tableBillsToPay !== 'undefined') {
         tableBillsToPay.destroy();
@@ -146,12 +146,12 @@ const getTable = typeBills => {
         buttons: [
             'pageLength',
             {
-                className: typeBills === 'without_pay' ? 'btn btn-primary' : 'd-none',
+                className: typeBills === 'without_pay' ? 'btn btn-primary btn-sm' : 'd-none',
                 text: '<i class="fa-solid fa-list-check"></i> Selecionado todos',
                 enabled: parseInt($('#contentListBillToPay [name="providers"]').val()) !== 0 && typeBills === 'without_pay',
                 attr: {
                     title: parseInt($('#contentListBillToPay [name="providers"]').val()) === 0 ? 'Selecione um fornecedor para efetuar múltiplos pagamentos' : '',
-                    "data-toggle": "tooltip"
+                    "data-bs-toggle": "tooltip"
                 },
                 action: function ( e, dt, node, config ) {
                     if (tableBillsToPay.rows('.selected').data().length === tableBillsToPay.rows().data().length) {
@@ -167,13 +167,13 @@ const getTable = typeBills => {
                 }
             },
             {
-                className: typeBills === 'without_pay' ? 'btn btn-primary' : 'd-none',
+                className: typeBills === 'without_pay' ? 'btn btn-primary btn-sm' : 'd-none',
                 text: '<i class="fa-solid fa-check"></i> Pagar selecionados',
                 enabled: parseInt($('#contentListBillToPay [name="providers"]').val()) !== 0 && typeBills === 'without_pay',
                 attr:  {
                     id: 'pay_all_parcels',
                     title: parseInt($('#contentListBillToPay [name="providers"]').val()) === 0 ? 'Selecione um fornecedor para efetuar múltiplos pagamentos' : '',
-                    "data-toggle": "tooltip"
+                    "data-bs-toggle": "tooltip"
                 },
                 action: function ( e, dt, node, config ) {
                     if (parseInt($('#contentListBillToPay [name="providers"]').val()) === 0) {
@@ -206,7 +206,7 @@ const getTable = typeBills => {
                     $('#modalConfirmPayment').find('[name="date_payment"]').val((new Date()).toJSON().slice(0, 10));
                     $('#modalConfirmPayment').find('[name="form_payment"]').val("");
                     $('#modalConfirmPayment').find('[type="submit"]').attr('disabled', false);
-                    $('#modalConfirmPayment').modal()
+                    $('#modalConfirmPayment').modal('show')
                     checkLabelAnimate();
                 }
             }
@@ -243,7 +243,7 @@ const getTable = typeBills => {
             tableBillsToPay.processing(false);
             enabledLoadData();
             $('#contentListBillToPay #tableBillsToPay_wrapper .dt-buttons button.dt-button').removeClass('dt-button');
-            $('#contentListBillToPay [data-toggle="tooltip"]').tooltip();
+            $('#contentListBillToPay [data-bs-toggle="tooltip"]').tooltip();
             $('#contentListBillToPay .table.dataTable thead tr th[aria-controls="tableBillsToPay"]:eq(3), #contentListBillToPay .dataTables_scrollFoot .table.dataTable tfoot tr th:eq(3)').text(typeBills === 'paid' ? 'Pagamento' : 'Vencimento');
             recalculateTotals();
         }
@@ -282,13 +282,13 @@ const setFieldsToPayment = (btn, modal) => {
     modal.find('[name="due_value"]').val(due_value);
     modal.find('#observationDiv').html(description);
 
-    modal.modal();
+    modal.modal('show');
 
     checkLabelAnimate();
     new Quill('#observationDiv').enable(false);
 }
 
-$('#contentListBillToPay a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+$('#contentListBillToPay a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
     getTable(e.target.id.replace('-tab',''));
 });
 
@@ -318,7 +318,7 @@ $(document).on('click', '#contentListBillToPay .btnConfirmPayment', function() {
     $('#modalConfirmPayment').find('[name="form_payment"]').val("");
     $('#modalConfirmPayment').find('[type="submit"]').attr('disabled', false);
     checkLabelAnimate();
-    $('#modalConfirmPayment').modal();
+    $('#modalConfirmPayment').modal('show');
 });
 
 $('#formConfirmPayment').on('submit', function(e) {
@@ -360,7 +360,7 @@ $('#formConfirmPayment').on('submit', function(e) {
                 title: response.message
             });
 
-            getTable($('[data-toggle="tab"].active').attr('id').replace('-tab',''));
+            getTable($('[data-bs-toggle="tab"].active').attr('id').replace('-tab',''));
         }, error: e => {
             console.log(e);
             let arrErrors = [];
@@ -419,7 +419,7 @@ $('#formReopenPayment').on('submit', function(e) {
                 title: response.message
             });
 
-            getTable($('#contentListBillToPay [data-toggle="tab"].active').attr('id').replace('-tab',''));
+            getTable($('#contentListBillToPay [data-bs-toggle="tab"].active').attr('id').replace('-tab',''));
         }, error: e => {
             console.log(e);
             let arrErrors = [];
@@ -444,5 +444,5 @@ $('#formReopenPayment').on('submit', function(e) {
 });
 
 $('#contentListBillToPay [name="providers"]').on('change', function(){
-    getTable($('#contentListBillToPay [data-toggle="tab"].active').attr('id').replace('-tab',''));
+    getTable($('#contentListBillToPay [data-bs-toggle="tab"].active').attr('id').replace('-tab',''));
 });

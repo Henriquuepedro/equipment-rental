@@ -15,8 +15,8 @@
         @if(empty($route_permissions) || count(array_diff($route_permissions, $permissions)) == 0)
             @if (empty($route['can']) || Auth::user()->can($route['can']))
                 <li class="nav-item {{$route['class'] ?? ''}} {{ $active ? 'active' : '' }}">
-                    <a class="nav-link" @if($route['type'] === 'single') href="{{ route($route['route']) }}" @else data-toggle="collapse" href="#level{{$key}}-dropdown" aria-expanded="false" aria-controls="level{{$key}}-dropdown" @endif>
-                        <i class="menu-icon typcn typcn-device-desktop"></i>
+                    <a class="nav-link" @if($route['type'] === 'single') href="{{ route($route['route']) }}" @else data-bs-toggle="collapse" href="#level{{$key}}-dropdown" aria-expanded="false" aria-controls="level{{$key}}-dropdown" @endif>
+                        <i class="{{ $route['icon'] ?? 'mdi mdi-subdirectory-arrow-right' }}"></i>
                         <span class="menu-title">{{ $route['text'] }}</span>
                         @if($route['type'] === 'level') <i class="menu-arrow"></i> @endif
                     </a>

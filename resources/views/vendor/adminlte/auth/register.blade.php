@@ -14,6 +14,14 @@
 @section('adminlte_css_pre')
     <link rel="stylesheet" href="{{ asset('vendor/icheck-bootstrap/icheck-bootstrap.min.css') }}">
     <link href="{{ asset('vendor/icheck/skins/all.css') }}" rel="stylesheet">
+    <style>
+        .form-group label {
+            background-color: #1f2127 !important;
+        }
+        .auth form .form-group {
+            margin-bottom: 0 !important;
+        }
+    </style>
 @stop
 @section('adminlte_js')
     <script>
@@ -88,11 +96,10 @@
 @section('auth_body')
     <div class="container-scroller">
         <div class="container-fluid page-body-wrapper full-page-wrapper">
-            <div class="content-wrapper d-flex align-items-center auth auth-bg-1 theme-one">
-                <div class="row w-100">
-                    <div class="col-lg-4 mx-auto">
-                        <div class="auto-form-wrapper">
-
+            <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
+                <div class="row flex-grow">
+                    <div class="col-lg-6 d-flex align-items-center justify-content-center">
+                        <div class="auth-form-transparent text-left p-3">
                             @if ($errors->any())
                                 <div class="alert alert-animate alert-warning">
                                     <ol>
@@ -102,11 +109,11 @@
                                     </ol>
                                 </div>
                             @endif
-
+                            <div class="brand-logo d-flex justify-content-center">
+                                <img src="{{ asset('assets/images/system/logotipo-horizontal-white.png') }}" alt="logo">
+                            </div>
                             <form action="{{ $register_url }}" method="post">
                                 {{ csrf_field() }}
-
-
                                 <div class="d-flex justify-content-around">
                                     <div class="form-radio form-radio-flat mb-0">
                                         <label>
@@ -119,7 +126,6 @@
                                         </label>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="form-group col-md-12">
                                         <label for="name">Nome Completo <sup>*</sup></label>
@@ -168,20 +174,28 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-block btn-primary mt-4">
-                                    <i class="fas fa-user-plus"></i> Registrar
-                                </button>
+                                <div class="mt-3 d-grid gap-2">
+                                    <button type="submit" class="btn btn-block btn-primary btn-lg fw-medium auth-form-btn">
+                                        <i class="fas fa-user-plus"></i> Registrar
+                                    </button>
+                                </div>
 
-                                <div class="text-block text-center my-3">
-                                    <span class="text-small font-weight-semibold">Já é membro?</span>
-                                    <a href="{{ route('login') }}" class="text-small">Entre.</a>
+                                <div class="ttext-center mt-4 fw-light">
+                                    <span class="font-weight-semibold">Já é membro?</span>
+                                    <a href="{{ route('login') }}" class="text-primary">Entre.</a>
                                 </div>
                             </form>
                         </div>
                     </div>
+                    <div class="col-lg-6 register-half-bg d-flex flex-row">
+                        <p class="text-white fw-medium text-center flex-grow align-self-end">Copyright &copy; 2021 All rights
+                            reserved.</p>
+                    </div>
                 </div>
             </div>
+            <!-- content-wrapper ends -->
         </div>
+        <!-- page-body-wrapper ends -->
     </div>
 @stop
 

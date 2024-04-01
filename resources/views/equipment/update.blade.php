@@ -94,7 +94,7 @@
 
                         @include('includes.equipment.form-create')
 
-                        <div class="card display-none">
+                        <div class="card mt-2 display-none">
                             <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('equipment.index') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Cancelar</a>
                                 @if ($btns)<button type="submit" class="btn btn-success col-md-3"><i class="fa fa-sync"></i> Atualizar</button>@endif

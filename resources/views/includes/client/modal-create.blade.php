@@ -4,7 +4,7 @@
             <form action="{{ route('ajax.client.new-client') }}" method="POST" id="formCreateClientModal">
                 <div class="modal-header">
                     <h5 class="modal-title" id="newClientModalLabel">Cadastro de novo cliente</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -23,7 +23,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card display-none">
+                    <div class="card mt-2 display-none">
                         <div class="card-body">
                             <div class="header-card-body">
                                 <h4 class="card-title">Dados do Cliente</h4>
@@ -101,7 +101,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card display-none">
+                    <div class="card mt-2 display-none">
                         <div class="card-body">
                             <div class="header-card-body">
                                 <h4 class="card-title">Dados do Endereço</h4>
@@ -126,9 +126,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card display-none">
+                    <div class="card mt-2 display-none">
                         <div class="card-body d-flex justify-content-between">
-                            <button type="button" class="btn btn-secondary col-md-3" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                            <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                             <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-save"></i> Cadastrar</button>
                         </div>
                     </div>
@@ -142,7 +142,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Confirmar Endereço no Mapa</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -157,7 +157,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary col-md-3" data-dismiss="modal">Confirmar</button>
+                <button type="button" class="btn btn-primary col-md-3" data-bs-dismiss="modal">Confirmar</button>
             </div>
         </div>
     </div>

@@ -182,7 +182,7 @@
             <div class="row flex-grow">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-body d-flex flex-wrap">
+                        <div class="card-body">
                             <div class="header-card-body">
                                 <h4 class="card-title">Informações do Pagamento</h4>
                                 <p class="card-description"> Visualize todos os dados sobre o pagamento do plano.</p>
@@ -237,13 +237,18 @@
                                     <div class='col-md-12 d-flex justify-content-center'>
                                         <img width="250px" class="mt-2" src="data:image/jpeg;base64,{{ $payment->base64_key_pix }}" alt="QR Code"/>
                                     </div>
-                                    <div class='input-group col-md-8 mt-2'>
-                                        <input type='text' class='form-control' name="pix_copy_paste" value="{{ $payment->key_pix }}" readonly>
-                                        <span class='input-group-btn'>
-                                            <button type='button' class='btn btn-primary btn-flat copy-input'>
-                                                <i class='fas fa-copy'></i>
-                                            </button>
-                                        </span>
+
+
+
+                                    <div class="form-group col-md-8 flatpickr mt-2">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control col-md-10 flatpickr-input bbr-r-0 btr-r-0 pull-left" name="pix_copy_paste" value="{{ $payment->key_pix }}" readonly>
+                                            <div class="input-button-calendar col-md-2 no-padding pull-right">
+                                                <button type='button' class='input-button btn btn-primary btn-flat copy-input col-md-12 bbr-r-5 btr-r-5'>
+                                                    <i class='fas fa-copy'></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 @elseif (in_array($payment->payment_type_id, array('credit_card', 'debit_card', 'prepaid_card')))
@@ -266,13 +271,15 @@
                                     <div class="form-group col-md-4">
                                         <a href="{{ $payment->link_billet }}" class="billet_link_billet btn btn-primary col-md-12 mt-4" target="_blank" >Visualizar PDF</a>
                                     </div>
-                                    <div class="form-group col-md-4 label-animate">
-                                        <label>Chave Boleto</label>
-                                        <div class="input-group label-animate">
-                                            <input type='text' class='form-control' name="billet_barcode" value="{{ $payment->barcode_billet }}" readonly>
-                                            <button type='button' class='btn btn-primary btn-flat copy-input'>
-                                                <i class='fas fa-copy'></i>
-                                            </button>
+                                    <div class="form-group col-md-4 flatpickr label-animate">
+                                        <label>Linha Digitável</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control col-md-9 flatpickr-input bbr-r-0 btr-r-0 pull-left" name="billet_barcode" value="{{ $payment->barcode_billet }}" readonly>
+                                            <div class="input-button-calendar col-md-3 no-padding pull-right">
+                                                <button type='button' class='input-button btn btn-primary btn-flat copy-input col-md-12 bbr-r-5 btr-r-5'>
+                                                    <i class='fas fa-copy'></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4">
@@ -312,7 +319,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card">
+                    <div class="card mt-2">
                         <div class="card-body d-flex justify-content-between">
                             <a href="{{ route('plan.request') }}" class="btn btn-secondary col-md-3"><i class="fa fa-arrow-left"></i> Voltar</a>
                         </div>

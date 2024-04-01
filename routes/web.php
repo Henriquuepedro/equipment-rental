@@ -199,6 +199,20 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
     });
 
+    // Exportação
+    Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
+
+        Route::post('/cadastro', [App\Http\Controllers\ExportController::class, 'register'])->name('register');
+
+    });
+
+    // Manuais
+    Route::group(['prefix' => '/manual', 'as' => 'guide.'], function () {
+
+        Route::get('/', [App\Http\Controllers\GuideController::class, 'index'])->name('index');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -340,24 +354,6 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::get('/lat-lng-minha-empresa', [App\Http\Controllers\CompanyController::class, 'getLatLngMyCompany'])->name('get-lat-lng-my-company');
         });
 
-        // Admin Master
-        Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => 'admin-master'], function () {
-
-            Route::group(['prefix' => '/empresas', 'as' => 'company.'], function () {
-                Route::post('/buscar', [App\Http\Controllers\Master\CompanyController::class, 'fetch'])->name('fetch');
-                Route::post('/adicionar-tempo-de-expiracao', [App\Http\Controllers\Master\CompanyController::class, 'addExpirationTime'])->name('add-expiration-time');
-            });
-
-            Route::group(['prefix' => '/usuarios', 'as' => 'user.'], function () {
-                Route::post('/buscar', [App\Http\Controllers\Master\UserController::class, 'fetch'])->name('fetch');
-            });
-
-            Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
-                Route::post('/buscar', [App\Http\Controllers\Master\PlanController::class, 'fetch'])->name('fetch');
-            });
-
-        });
-
         // Relatório
         Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
 
@@ -386,13 +382,39 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/atualizar-situacao/{support_id?}', [App\Http\Controllers\SupportController::class, 'updateStatus'])->name('update_status');
 
         });
-    });
 
-    // Exportação
-    Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
+        // Relatório
+        Route::group(['prefix' => '/manual', 'as' => 'guide.'], function () {
 
-        Route::post('/cadastro', [App\Http\Controllers\ExportController::class, 'register'])->name('register');
+            Route::post('/buscar', [App\Http\Controllers\GuideController::class, 'fetch'])->name('fetch');
 
+        });
+
+        // Admin Master
+        Route::group(['prefix' => '/master', 'as' => 'master.', 'middleware' => 'admin-master'], function () {
+
+            Route::group(['prefix' => '/empresas', 'as' => 'company.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\CompanyController::class, 'fetch'])->name('fetch');
+                Route::post('/adicionar-tempo-de-expiracao', [App\Http\Controllers\Master\CompanyController::class, 'addExpirationTime'])->name('add-expiration-time');
+            });
+
+            Route::group(['prefix' => '/usuarios', 'as' => 'user.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\UserController::class, 'fetch'])->name('fetch');
+            });
+
+            Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\PlanController::class, 'fetch'])->name('fetch');
+            });
+
+            Route::group(['prefix' => '/manual', 'as' => 'guide.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\GuideController::class, 'fetch'])->name('fetch');
+            });
+
+            Route::group(['prefix' => '/log-de-auditori', 'as' => 'audit_log.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\AuditLogController::class, 'fetch'])->name('fetch');
+            });
+
+        });
     });
 
     // Admin Master
@@ -420,6 +442,28 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/atualizar/{id}', [App\Http\Controllers\Master\PlanController::class, 'update'])->name('update');
             Route::get('/novo', [App\Http\Controllers\Master\PlanController::class, 'create'])->name('create');
             Route::post('/novo', [App\Http\Controllers\Master\PlanController::class, 'insert'])->name('insert');
+        });
+
+        // Manuais
+        Route::group(['prefix' => '/manual', 'as' => 'guide.'], function () {
+
+            Route::get('/', [App\Http\Controllers\Master\GuideController::class, 'index'])->name('index');
+            Route::get('/atualizar/{id}', [App\Http\Controllers\Master\GuideController::class, 'edit'])->name('edit');
+            Route::post('/atualizar/{id}', [App\Http\Controllers\Master\GuideController::class, 'update'])->name('update');
+            Route::get('/novo', [App\Http\Controllers\Master\GuideController::class, 'create'])->name('create');
+            Route::post('/novo', [App\Http\Controllers\Master\GuideController::class, 'insert'])->name('insert');
+
+        });
+
+        // Log Viewer
+        Route::get('/log-viewer-redirect', function () {
+            return redirect('/log-viewer');
+        })->name('log_file');
+
+        // Log de auditoria
+        Route::group(['prefix' => '/log-de-auditoria', 'as' => 'audit_log.'], function () {
+            Route::get('/', [App\Http\Controllers\Master\AuditLogController::class, 'index'])->name('index');
+            Route::get('/view/{id}', [App\Http\Controllers\Master\AuditLogController::class, 'view'])->name('view');
         });
 
     });
