@@ -24,32 +24,18 @@
 
             const active = $('#active').val();
 
-            return $("#tableClients").DataTable({
-                "responsive": true,
-                "processing": true,
-                "autoWidth": false,
-                "serverSide": true,
-                "sortable": true,
-                "searching": true,
-                "stateSave": stateSave,
-                "serverMethod": "post",
-                "order": [[ 0, 'desc' ]],
-                "ajax": {
-                    url: '{{ route('ajax.client.fetch') }}',
-                    pages: 2,
-                    type: 'POST',
-                    data: { "_token": $('meta[name="csrf-token"]').attr('content'), active },
-                    error: function(jqXHR, ajaxOptions, thrownError) {
-                        console.log(jqXHR, ajaxOptions, thrownError);
-                    }
-                },
-                "initComplete": function( settings, json ) {
+            return getTableList(
+                '{{ route('ajax.client.fetch') }}',
+                { active },
+                'tableClients',
+                stateSave,
+                [ 0, 'desc' ],
+                'POST',
+                () => {},
+                () => {
                     $('[data-bs-toggle="tooltip"]').tooltip();
-                },
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
                 }
-            });
+            );
         }
 
         $(document).on('click', '.btnRemoveClient', function (){
@@ -170,14 +156,14 @@
                     </div>
                     <table id="tableClients" class="table">
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>Situação</th>
-                            <th>Ação</th>
-                        </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Telefone</th>
+                                <th>Situação</th>
+                                <th>Ação</th>
+                            </tr>
                         </thead>
                         <tbody>
                         </tbody>
