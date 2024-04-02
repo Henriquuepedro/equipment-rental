@@ -70,7 +70,7 @@
                                 </div>
                                 <div class="my-2 d-flex justify-content-between align-items-center">
                                     <div class="form-check">
-                                        <label class="form-check-label text-muted">
+                                        <label class="text-muted">
                                             <input type="checkbox" name="remember"> {{ __('adminlte::adminlte.remember_me') }}
                                         </label>
                                     </div>

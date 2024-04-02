@@ -30680,8 +30680,8 @@ body.avgrund-active {
 .dataTables_wrapper .dataTable thead .sorting_desc:before,
 .dataTables_wrapper .dataTable thead .sorting_asc_disabled:before,
 .dataTables_wrapper .dataTable thead .sorting_desc_disabled:before {
-  content: "\e64b";
-  right: 1.2em;
+  content: "\e627";
+  right: 2.2em;
   bottom: 0;
 }
 .dataTables_wrapper .dataTable thead .sorting:after,
@@ -30689,8 +30689,8 @@ body.avgrund-active {
 .dataTables_wrapper .dataTable thead .sorting_desc:after,
 .dataTables_wrapper .dataTable thead .sorting_asc_disabled:after,
 .dataTables_wrapper .dataTable thead .sorting_desc_disabled:after {
-  content: "\e648";
-  right: 1.2em;
+  content: "\e62a";
+  right: 0.2em;
   top: 0;
 }
 .dataTables_wrapper .dataTables_paginate {
