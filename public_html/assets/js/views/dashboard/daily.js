@@ -392,7 +392,7 @@ const loadTableGraph = (id_list_table, url, data_action_button_go_list, pageLeng
             }
         },
         "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
+            "url": "https://cdn.datatables.net/plug-ins/1.13.7/i18n/pt-BR.json"
         },
         "initComplete": () => {
             id_list_table.closest('.dataTables_wrapper').find('.dt-buttons button.dt-button').removeClass('dt-button');

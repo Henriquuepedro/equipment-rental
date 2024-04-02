@@ -699,3 +699,66 @@ const alertCompanyWithoutAddress = () => {
 const formatCodeIndex = (code, size_min = 5) => {
     return code.toString().padStart(size_min, "0");
 }
+
+const getTableList = (
+    uri,
+    dataRequest = {},
+    varTable = 'dataTableList',
+    stateSave = false,
+    order = [0,'desc'],
+    type = 'POST',
+    complete = function() { $('[data-toggle="tooltip"]').tooltip() },
+    initComplete = function( settings, json ) {},
+    createdRow = function(row, data, index, cells) {},
+    object_external = {}
+) => {
+
+    $('[data-toggle="tooltip"]').tooltip('dispose');
+
+    if ($.fn.DataTable.isDataTable( '#tableClients' )) {
+        eval(varTable).destroy();
+        $(`#${varTable} tbody`).empty();
+    }
+
+    let dataPre = {
+        _token: $('meta[name="csrf-token"]').attr('content')
+    };
+
+    let data = {...dataPre, ...dataRequest};
+
+    let url = `${window.location.origin}/${uri}`;
+    if (uri.match(/http/)) {
+        url = uri;
+    }
+
+    let object_default = {
+        responsive      : true,
+        processing      : true,
+        autoWidth       : false,
+        serverSide      : true,
+        sortable        : true,
+        searching       : true,
+        stateSave       : stateSave,
+        serverMethod    : 'post',
+        order           : [order],
+        ajax            : {
+            url,
+            pages: 2,
+            type,
+            data,
+            error: function(jqXHR, ajaxOptions, thrownError) {
+                console.log(jqXHR, ajaxOptions, thrownError);
+            },
+            complete
+        },
+        language: {
+            url: $('[name="base_url"]').val() + "/vendor/datatables/json/language/pt-BR.json"
+        },
+        initComplete,
+        createdRow
+    };
+
+    let object = {...object_default, ...object_external};
+
+    return $(`#${varTable}`).DataTable(object);
+}
