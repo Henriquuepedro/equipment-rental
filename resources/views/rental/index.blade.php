@@ -172,7 +172,7 @@
             const date_filter_by = $('#date_filter_by').val();
 
             tableRental = $("#tableRentals").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

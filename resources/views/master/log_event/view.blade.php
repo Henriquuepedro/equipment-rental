@@ -15,7 +15,7 @@
         $('[name="value"], [name="from_value"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
 
         $("#tableLogs").DataTable({
-            "scrollX": true,
+            "responsive": true,
             "autoWidth": false,
             "sortable": true,
             "searching": true
