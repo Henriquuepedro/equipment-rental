@@ -18,7 +18,7 @@
 
         const getTable = (stateSave = true) => {
             return $("#tableEquipments").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

@@ -19,7 +19,7 @@
 
         const getTable = (stateSave = true) => {
             return $("#plans_table").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

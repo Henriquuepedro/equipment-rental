@@ -21,7 +21,7 @@
             const status = $('#status').val();
 
             return $("#tableCompanies").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

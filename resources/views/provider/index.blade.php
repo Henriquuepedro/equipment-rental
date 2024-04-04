@@ -22,7 +22,7 @@
 
         const getTableProvider = (stateSave = true) => {
             return $("#tableProviders").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

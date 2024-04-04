@@ -23,7 +23,7 @@
         const getTable = (stateSave = true) => {
 
             return $("#tableLogs").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

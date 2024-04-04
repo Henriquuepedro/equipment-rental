@@ -18,7 +18,7 @@
 
         const getTable = (stateSave = true) => {
             return $("#tableGuides").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,
