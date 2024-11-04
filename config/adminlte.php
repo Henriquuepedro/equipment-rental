@@ -335,6 +335,14 @@ return [
                     'route' => 'provider.index',
                     'text' => 'Fornecedor',
                     'route_active'  => ['provider.create', 'provider.edit']
+                ],
+                [
+                    'permissions' => [
+                        'DisposalPlaceView'
+                    ],
+                    'route' => 'disposal_place.index',
+                    'text' => 'Local de descarte',
+                    'route_active'  => ['disposal_place.create', 'disposal_place.edit']
                 ]
             ]
         ],

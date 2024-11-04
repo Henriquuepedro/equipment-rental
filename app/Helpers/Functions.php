@@ -850,3 +850,10 @@ if (!function_exists('extractDataPhone')) {
         ];
     }
 }
+
+if (!function_exists('getHtmlStatusList')) {
+    function getHtmlStatusList(int $status): string
+    {
+        return $status ? '<div class="badge badge-pill badge-lg badge-success">Ativo</div>' : '<div class="badge badge-pill badge-lg badge-danger">Inativo</div>';
+    }
+}

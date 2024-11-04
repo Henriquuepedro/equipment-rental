@@ -137,6 +137,44 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="form-group col-md-3">
+                                        <label>CEP</label>
+                                        <input {{ $disabled }} type="text" class="form-control" name="address_zipcode" autocomplete="nope" value="{{ $driver->address_zipcode }}">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Endereço</label>
+                                        <input {{ $disabled }} type="text" class="form-control" name="address_name" autocomplete="nope" value="{{ $driver->address_name }}">
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label>Número</label>
+                                        <input {{ $disabled }} type="text" class="form-control" name="address_number" autocomplete="nope" value="{{ $driver->address_number }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label>Complemento</label>
+                                        <input {{ $disabled }} type="text" class="form-control" name="address_complement" autocomplete="nope" value="{{ $driver->address_complement }}">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Referência</label>
+                                        <input {{ $disabled }} type="text" class="form-control" name="address_reference" autocomplete="nope" value="{{ $driver->address_reference }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label>Bairro</label>
+                                        <input {{ $disabled }} type="text" class="form-control" name="address_neigh" autocomplete="nope" value="{{ $driver->address_neigh }}">
+                                    </div>
+                                    <div  {{ $disabled }} class="form-group col-md-4">
+                                        <label>Estado</label>
+                                        <select class="form-control" name="address_state" data-value-state="{{ $driver->address_state }}"></select>
+                                    </div>
+                                    <div  {{ $disabled }} class="form-group col-md-4">
+                                        <label>Cidade</label>
+                                        <select class="form-control" name="address_city" data-value-city="{{ $driver->address_city }}"></select>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="form-group col-md-12">
                                         <label for="observation">Observação</label>
                                         <textarea {{ $disabled }} class="form-control" id="observation" name="observation" rows="3">{{ old('observation') ?? $driver->observation }}</textarea>

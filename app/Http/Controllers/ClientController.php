@@ -348,7 +348,7 @@ class ClientController extends Controller
                 $value->name,
                 $value->email ?: 'Não Informado',
                 formatPhone($value->phone_1),
-                $value->active ? '<div class="badge badge-pill badge-lg badge-success">Ativo</div>' : '<div class="badge badge-pill badge-lg badge-danger">Inativo</div>',
+                getHtmlStatusList($value->active),
                 dropdownButtonsDataList($buttons, $value->id)
             );
         }

@@ -21,9 +21,9 @@ class RentalEquipmentController extends Controller
         $this->rental = new Rental();
     }
 
-    public function getEquipmentsRental(int $rental_id): JsonResponse
+    public function getEquipmentsRental(int $rental_id = null): JsonResponse
     {
-        if (!hasPermission('RentalUpdatePost')) {
+        if (!hasPermission('RentalUpdatePost') || is_null($rental_id)) {
             return response()->json();
         }
 

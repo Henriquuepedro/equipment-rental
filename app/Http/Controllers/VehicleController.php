@@ -252,6 +252,10 @@ class VehicleController extends Controller
 
     public function getVehicles(Request $request): JsonResponse
     {
+        if (!hasPermission('VehicleView')) {
+            return response()->json(['data' => [], 'lastId' => 0]);
+        }
+
         $company_id = $request->user()->company_id;
         $vehicleData = [];
         $lastId = 0;

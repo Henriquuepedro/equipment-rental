@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BudgetCreatePost;
 use App\Http\Requests\RentalCreatePost;
 use App\Http\Requests\RentalDeletePost;
+use App\Http\Requests\RentalMtrCreatePost;
 use App\Models\Address;
 use App\Models\Budget;
 use App\Models\Driver;
@@ -12,6 +13,7 @@ use App\Models\Equipment;
 use App\Models\EquipmentWallet;
 use App\Models\Rental;
 use App\Models\RentalEquipment;
+use App\Models\RentalMtr;
 use App\Models\RentalPayment;
 use App\Models\RentalResidue;
 use App\Models\Residue;
@@ -46,6 +48,7 @@ class RentalController extends Controller
     private RentalEquipment $rental_equipment;
     private RentalPayment $rental_payment;
     private RentalResidue $rental_residue;
+    private RentalMtr $rental_mtr;
 
     public function __construct()
     {
@@ -61,6 +64,7 @@ class RentalController extends Controller
         $this->rental_equipment = new RentalEquipment();
         $this->rental_payment = new RentalPayment();
         $this->rental_residue = new RentalResidue();
+        $this->rental_mtr = new RentalMtr();
     }
 
     public function index(string $filter_start_date = null, string $filter_end_date = null, string $date_filter_by = null, int $client_id = null): Factory|View|RedirectResponse|Application
@@ -193,6 +197,8 @@ class RentalController extends Controller
 
         $permissionUpdate = hasPermission('RentalUpdatePost');
         $permissionDelete = hasPermission('RentalDeletePost');
+        $permissionViewMtr = hasPermission('RentalMtrView');
+        $permissionCreateMtr = hasPermission('RentalMtrCreatePost');
 
         foreach ($data['data'] as $value) {
             if ($response_simplified) {
@@ -238,7 +244,16 @@ class RentalController extends Controller
                 }
             }
 
-            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='$value->id'><i class='fas fa-trash-o'></i> Excluir Locação</button>" : '';
+            if ($type_rental === 'finished' && ($permissionCreateMtr || $permissionViewMtr)) {
+                $rental_mtr = $this->rental_mtr->getByRental($value->id, $company_id);
+                if ($rental_mtr && $permissionViewMtr) {
+                    $buttons .= "<a href='".route('print.generate-mtr', ['rental_mtr_id' => $rental_mtr->id])."' target='_blank' class='dropdown-item'><i class='fa fa-file-invoice'></i> Gerar MTR</a>";
+                } else if (!$rental_mtr && $permissionCreateMtr) {
+                    $buttons .= "<button class='dropdown-item btnShowMtr' data-rental-id='$value->id'><i class='fa fa-file-invoice'></i> Gerar MTR</button>";
+                }
+            }
+
+            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='$value->id'><i class='fas fa-trash-can'></i> Excluir Locação</button>" : '';
             $buttons .= "<a href='".route('print.rental', ['rental' => $value->id])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
 
             $buttons = dropdownButtonsDataList($buttons, $value->id);

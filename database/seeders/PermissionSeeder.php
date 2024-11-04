@@ -55,7 +55,13 @@ class PermissionSeeder extends Seeder
             ['id' => 38, 'name' => 'BillsToPayUpdatePost', 'text' => 'Atualizar', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1'],
             ['id' => 39, 'name' => 'BillsToPayDeletePost', 'text' => 'Excluir', 'group_name' => 'bills_to_pay', 'group_text' => 'Contas a Pagar', 'auto_check' => '[36]', 'active' => '1'],
             ['id' => 40, 'name' => 'ReportView', 'text' => 'Visualizar', 'group_name' => 'report', 'group_text' => 'Relatório', 'auto_check' => '[]', 'active' => '1'],
-            ['id' => 41, 'name' => 'PlanView', 'text' => 'Visualizar', 'group_name' => 'plan', 'group_text' => 'Plano', 'auto_check' => '[]', 'active' => '1']
+            ['id' => 41, 'name' => 'PlanView', 'text' => 'Visualizar', 'group_name' => 'plan', 'group_text' => 'Plano', 'auto_check' => '[]', 'active' => '1'],
+            ['id' => 42, 'name' => 'DisposalPlaceView', 'text' => 'Visualizar', 'group_name' => 'disposal_place', 'group_text' => 'Local de Descarte', 'auto_check' => '[]', 'active' => '1'],
+            ['id' => 43, 'name' => 'DisposalPlaceCreatePost', 'text' => 'Cadastrar', 'group_name' => 'disposal_place', 'group_text' => 'Local de Descarte', 'auto_check' => '[42]', 'active' => '1'],
+            ['id' => 44, 'name' => 'DisposalPlaceUpdatePost', 'text' => 'Atualizar', 'group_name' => 'disposal_place', 'group_text' => 'Local de Descarte', 'auto_check' => '[42]', 'active' => '1'],
+            ['id' => 45, 'name' => 'DisposalPlaceDeletePost', 'text' => 'Excluir', 'group_name' => 'disposal_place', 'group_text' => 'Local de Descarte', 'auto_check' => '[42]', 'active' => '1'],
+            ['id' => 46, 'name' => 'RentalMtrView', 'text' => 'Visualizar', 'group_name' => 'rental_mtr', 'group_text' => 'MTR', 'auto_check' => '[]', 'active' => '1'],
+            ['id' => 47, 'name' => 'RentalMtrCreatePost', 'text' => 'Cadastrar', 'group_name' => 'rental_mtr', 'group_text' => 'MTR', 'auto_check' => '[46]', 'active' => '1'],
         ];
 
         foreach ($permissions as $permission) {

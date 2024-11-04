@@ -39,7 +39,7 @@ class Residue extends Model
 
     public function getResidue(int $company_id, int $residue_id)
     {
-        return $this->where(['company_id' => $company_id, 'id' => $residue_id])->get();
+        return $this->where(['company_id' => $company_id, 'id' => $residue_id])->first();
     }
 
     public function insert(array $data)
