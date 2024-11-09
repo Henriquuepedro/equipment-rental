@@ -11,7 +11,7 @@
 
 @section('js')
     <script>
-        var tableDriver;
+        let tableDriver;
         $(function () {
             tableDriver = getTable(false);
         });

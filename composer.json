@@ -27,7 +27,8 @@
         "pusher/pusher-php-server": "^7.2",
         "ramsey/uuid": "^4.7",
         "sentry/sentry-laravel": "^4.4",
-        "spatie/laravel-http-logger": "^1.10"
+        "spatie/laravel-http-logger": "^1.10",
+        "twilio/sdk": "^8.3"
     },
     "require-dev": {
         "kitloong/laravel-migrations-generator": "^6.10",

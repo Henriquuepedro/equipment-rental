@@ -61,12 +61,13 @@ if (!function_exists('getFetchDataTables')) {
          */
         foreach ($filters as $filters_) {
             foreach ($filters_ as $type_filter => $filter) {
-                // vai agrupar a query.
-                /*if (in_array($type_filter, ['group_start', 'group_end', 'or_group_start'])) {
-                    $db->$type_filter();
-                    continue;
-                }*/
                 foreach ($filter as $column => $value) {
+                    // vai agrupar a query.
+                    if ($type_filter == 'where' && $column == 'function') {
+                        $db->where($value);
+                        continue;
+                    }
+
                     if (likeText('% %', $column)) {
                         $exp_column = explode(' ', $column);
                         $db->$type_filter($exp_column[0], $exp_column[1], $value);

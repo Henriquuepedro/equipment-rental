@@ -226,6 +226,14 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
     });
 
+    // Local de descarte
+    Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+
+        Route::get('/', [App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+        Route::get('/{id?}', [App\Http\Controllers\NotificationController::class, 'view'])->name('view');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -437,6 +445,10 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
         Route::group(['prefix' => '/mtr-de-locacao', 'as' => 'rental_mtr.'], function () {
             Route::post('/gerar-mtr', [App\Http\Controllers\RentalMtrController::class, 'createMtr'])->name('create-mtr');
+        });
+
+        Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\NotificationController::class, 'fetch'])->name('fetch');
         });
     });
 

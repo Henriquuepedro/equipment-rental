@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use StdClass;
+use Twilio\Rest\Client as TwilioRestClient;
 
 class RentalController extends Controller
 {
@@ -65,6 +66,27 @@ class RentalController extends Controller
         $this->rental_payment = new RentalPayment();
         $this->rental_residue = new RentalResidue();
         $this->rental_mtr = new RentalMtr();
+
+        /*try {
+            $sid = env('TWILIO_SID');
+            $token = env('TWILIO_TOKEN');
+            $client = new TwilioRestClient($sid, $token);
+
+            // Use the Client to make requests to the Twilio REST API
+            $sent = $client->messages->create(
+            // The number you'd like to send the message to
+                'whatsapp:+554896677961',
+                [
+                    // A Twilio phone number you purchased at https://console.twilio.com
+                    'from' => 'whatsapp:+14155238886',
+                    // The body of the text message you'd like to send
+                    'body' => "Message sent by Locaí"
+                ]
+            );
+            dd($sent);
+        } catch (Exception $exception) {
+            dd($exception->getMessage());
+        }*/
     }
 
     public function index(string $filter_start_date = null, string $filter_end_date = null, string $date_filter_by = null, int $client_id = null): Factory|View|RedirectResponse|Application
@@ -244,19 +266,8 @@ class RentalController extends Controller
                 }
             }
 
-            if ($type_rental === 'finished' && ($permissionCreateMtr || $permissionViewMtr)) {
-                $rental_mtr = $this->rental_mtr->getByRental($value->id, $company_id);
-                if ($rental_mtr && $permissionViewMtr) {
-                    $buttons .= "<a href='".route('print.generate-mtr', ['rental_mtr_id' => $rental_mtr->id])."' target='_blank' class='dropdown-item'><i class='fa fa-file-invoice'></i> Gerar MTR</a>";
-                } else if (!$rental_mtr && $permissionCreateMtr) {
-                    $buttons .= "<button class='dropdown-item btnShowMtr' data-rental-id='$value->id'><i class='fa fa-file-invoice'></i> Gerar MTR</button>";
-                }
-            }
-
             $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveRental' data-rental-id='$value->id'><i class='fas fa-trash-can'></i> Excluir Locação</button>" : '';
             $buttons .= "<a href='".route('print.rental', ['rental' => $value->id])."' target='_blank' class='dropdown-item'><i class='fas fa-print'></i> Imprimir Recibo</a>";
-
-            $buttons = dropdownButtonsDataList($buttons, $value->id);
 
             $expectedDeliveryDate   = null;
             $expectedWithdrawalDate = null;
@@ -313,6 +324,17 @@ class RentalController extends Controller
                     $actualWithdrawalDate = $equipment->actual_withdrawal_date;
                 }
             }
+
+            if ($allWithdrawn && $type_rental === 'finished' && ($permissionCreateMtr || $permissionViewMtr)) {
+                $rental_mtr = $this->rental_mtr->getByRental($value->id, $company_id);
+                if ($rental_mtr && $permissionViewMtr) {
+                    $buttons .= "<a href='".route('print.generate-mtr', ['rental_mtr_id' => $rental_mtr->id])."' target='_blank' class='dropdown-item'><i class='fa fa-file-invoice'></i> Gerar MTR</a>";
+                } else if (!$rental_mtr && $permissionCreateMtr) {
+                    $buttons .= "<button class='dropdown-item btnShowMtr' data-rental-id='$value->id'><i class='fa fa-file-invoice'></i> Gerar MTR</button>";
+                }
+            }
+
+            $buttons = dropdownButtonsDataList($buttons, $value->id);
 
             $colorBadgeDeliveryDate     = $allDelivered ? 'success' : (strtotime($expectedDeliveryDate) < time() ? 'danger' : 'warning');
             $colorBadgeWithdrawalDate   = $allWithdrawn ? 'success' : ($expectedWithdrawalDate !== null && strtotime($expectedWithdrawalDate) < time() ? 'danger' : 'warning');

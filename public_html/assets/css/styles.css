@@ -33,7 +33,7 @@ select[readonly] {
 .form-group.label-animate label {
     top: 18px;
     left: 5px;
-    font-size: 0.75em;
+    font-size: 0.9em;
     z-index: 6;
 }
 
@@ -1312,4 +1312,12 @@ p {
 }
 table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child:before {
     top: 5px
+}
+#payment .bullet-line-list li:before {
+    left: -20px;
+}
+.navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .count-indicator .count {
+    width: 18px;
+    height: 17px;
+    line-height: 0.85rem;
 }
