@@ -261,6 +261,12 @@ return [
                     'route_active'  => ['master.guide.create', 'master.guide.edit']
                 ],
                 [
+                    'route' => 'master.notification.index',
+                    'text' => 'Notificação',
+                    'permissions'   => [],
+                    'route_active'  => ['master.notification.create', 'master.notification.edit']
+                ],
+                [
                     'route' => 'master.audit_log.index',
                     'text' => 'Logs de Auditoria',
                     'permissions'   => [],

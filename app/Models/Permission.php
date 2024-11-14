@@ -37,7 +37,7 @@ class Permission extends Model
         return $this->get();
     }
 
-    public function getPermissionByName($name)
+    public function getPermissionByName(string $name)
     {
         return $this->select('id')->where('name', $name)->first();
     }
@@ -50,5 +50,10 @@ class Permission extends Model
     public function getPermissionByGroup($group)
     {
         return $this->where('group_name', $group)->get();
+    }
+
+    public function getById(string $id)
+    {
+        return $this->find($id);
     }
 }

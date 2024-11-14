@@ -62,6 +62,7 @@ class PermissionSeeder extends Seeder
             ['id' => 45, 'name' => 'DisposalPlaceDeletePost', 'text' => 'Excluir', 'group_name' => 'disposal_place', 'group_text' => 'Local de Descarte', 'auto_check' => '[42]', 'active' => '1'],
             ['id' => 46, 'name' => 'RentalMtrView', 'text' => 'Visualizar', 'group_name' => 'rental_mtr', 'group_text' => 'MTR', 'auto_check' => '[]', 'active' => '1'],
             ['id' => 47, 'name' => 'RentalMtrCreatePost', 'text' => 'Cadastrar', 'group_name' => 'rental_mtr', 'group_text' => 'MTR', 'auto_check' => '[46]', 'active' => '1'],
+            ['id' => 48, 'name' => 'NotificationView', 'text' => 'Visualizar', 'group_name' => 'notification', 'group_text' => 'Notificação', 'auto_check' => '[]', 'active' => '1'],
         ];
 
         foreach ($permissions as $permission) {

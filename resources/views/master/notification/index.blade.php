@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Listagem de Veículos')
+@section('title', 'Listagem de Notificações')
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Listagem de Veículos</h1>
+    <h1 class="m-0 text-dark">Listagem de Notificações</h1>
 @stop
 
 @section('css')
@@ -11,13 +11,13 @@
 
 @section('js')
     <script>
-        let tableVehicle;
+        let tableNotification;
         $(function () {
-            tableVehicle = getTable(false);
+            tableNotification = getTable(false);
         });
 
         const getTable = (stateSave = true) => {
-            return $("#tableVehicles").DataTable({
+            return $("#tableNotifications").DataTable({
                 "responsive": true,
                 "processing": true,
                 "autoWidth": false,
@@ -28,7 +28,7 @@
                 "serverMethod": "post",
                 "order": [[ 0, 'desc' ]],
                 "ajax": {
-                    url: '{{ route('ajax.vehicle.fetch') }}',
+                    url: '{{ route('ajax.master.notification.fetch') }}',
                     pages: 2,
                     type: 'POST',
                     data: { "_token": $('meta[name="csrf-token"]').attr('content') },
@@ -45,13 +45,14 @@
             });
         }
 
-        $(document).on('click', '.btnRemoveVehicle', function (){
-            const vehicle_id = $(this).attr('vehicle-id');
-            const vehicle_name = $(this).closest('tr').find('td:eq(1)').text();
+
+        $(document).on('click', '.btnRemove', function (){
+            const notification_id = $(this).data('notification-id');
+            const notification_name = $(this).closest('tr').find('td:eq(1)').text();
 
             Swal.fire({
-                title: 'Exclusão de Veículo',
-                html: "Você está prestes a excluir definitivamente o veículo <br><strong>"+vehicle_name+"</strong><br>Deseja continuar?",
+                title: 'Exclusão de Notificação',
+                html: "Você está prestes a excluir definitivamente a notificação <br><strong>"+notification_name+"</strong><br>Deseja continuar?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -66,18 +67,19 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         type: 'POST',
-                        url: "{{ route('ajax.vehicle.delete') }}",
-                        data: { vehicle_id },
+                        url: "{{ route('ajax.master.notification.delete') }}",
+                        data: { notification_id },
                         dataType: 'json',
                         success: response => {
-                            $('[data-bs-toggle="tooltip"]').tooltip('dispose')
-                            tableVehicle.destroy();
-                            $("#tableVehicles tbody").empty();
-                            tableVehicle = getTable();
+                            if (response.success) {
+                                $('[data-bs-toggle="tooltip"]').tooltip('dispose');
+                                tableNotification.destroy();
+                                tableNotification = getTable();
+                            }
                             Toast.fire({
                                 icon: response.success ? 'success' : 'error',
                                 title: response.message
-                            })
+                            });
                         }, error: e => {
                             if (e.status !== 403 && e.status !== 422)
                                 console.log(e);
@@ -88,7 +90,7 @@
                                     icon: 'error',
                                     title: 'Você não tem permissão para fazer essa operação!'
                                 });
-                                $(`button[vehicle-id="${vehicle_id}"]`).trigger('blur');
+                                $(`button[data-notification-id="${notification_id}"]`).trigger('blur');
                             }
                             if (xhr.status === 422) {
 
@@ -111,7 +113,7 @@
                     });
                 }
             })
-        })
+        });
     </script>
 @stop
 
@@ -127,33 +129,33 @@
             <div class="card">
                 <div class="card-body">
                     <div class="header-card-body justify-content-between flex-wrap">
-                        <h4 class="card-title no-border">Veículos Cadastrados</h4>
-                        @if(in_array('VehicleCreatePost', $permissions))
-                        <a href="{{ route('vehicle.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
-                        @endif
+                        <h4 class="card-title no-border">Notificações Cadastrados</h4>
+                        <a href="{{ route('master.notification.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Cadastro</a>
                     </div>
-                    <table id="tableVehicles" class="table">
+                    <table id="tableNotifications" class="table">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nome</th>
-                            <th>Marca</th>
-                            <th>Modelo</th>
-                            <th>Referência</th>
+                            <th>Título</th>
+                            <th>Expira em</th>
+                            <th>Permissão</th>
+                            <th>Situação</th>
+                            <th>Criado em</th>
                             <th>Ação</th>
                         </tr>
                         </thead>
                         <tbody>
                         </tbody>
                         <tfoot>
-                            <tr>
-                                <th>#</th>
-                                <th>Nome</th>
-                                <th>Marca</th>
-                                <th>Modelo</th>
-                                <th>Referência</th>
-                                <th>Ação</th>
-                            </tr>
+                        <tr>
+                            <th>#</th>
+                            <th>Título</th>
+                            <th>Expira em</th>
+                            <th>Permissão</th>
+                            <th>Situação</th>
+                            <th>Criado em</th>
+                            <th>Ação</th>
+                        </tr>
                         </tfoot>
                     </table>
                 </div>

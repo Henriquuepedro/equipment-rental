@@ -80,6 +80,13 @@ if (! function_exists('hasPermission')) {
     }
 }
 
+if (! function_exists('getAllPermissions')) {
+    function getAllPermissions(): array
+    {
+        return empty(auth()->user()->__get('permission')) ? [] : json_decode(auth()->user()->__get('permission'));
+    }
+}
+
 if (! function_exists('hasAdmin')) {
     function hasAdmin(): bool
     {

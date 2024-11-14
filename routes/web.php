@@ -226,6 +226,14 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
     });
 
+    // Local de descarte
+    Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+
+        Route::get('/', [App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+        Route::get('/{id?}', [App\Http\Controllers\NotificationController::class, 'view'])->name('view');
+
+    });
+
     // Consulta AJAX
     Route::group(['prefix' => '/ajax', 'as' => 'ajax.'], function () {
         Route::group(['prefix' => '/cliente', 'as' => 'client.'], function () {
@@ -427,6 +435,11 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
                 Route::post('/buscar', [App\Http\Controllers\Master\AuditLogController::class, 'fetch'])->name('fetch');
             });
 
+            Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\NotificationController::class, 'fetch'])->name('fetch');
+                Route::post('/delete', [App\Http\Controllers\Master\NotificationController::class, 'delete'])->name('delete');
+            });
+
         });
 
         Route::group(['prefix' => '/locais-de-descarte', 'as' => 'disposal_place.'], function () {
@@ -437,6 +450,10 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
         Route::group(['prefix' => '/mtr-de-locacao', 'as' => 'rental_mtr.'], function () {
             Route::post('/gerar-mtr', [App\Http\Controllers\RentalMtrController::class, 'createMtr'])->name('create-mtr');
+        });
+
+        Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\NotificationController::class, 'fetch'])->name('fetch');
         });
     });
 
@@ -475,6 +492,17 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/atualizar/{id}', [App\Http\Controllers\Master\GuideController::class, 'update'])->name('update');
             Route::get('/novo', [App\Http\Controllers\Master\GuideController::class, 'create'])->name('create');
             Route::post('/novo', [App\Http\Controllers\Master\GuideController::class, 'insert'])->name('insert');
+
+        });
+
+        // Manuais
+        Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+
+            Route::get('/', [App\Http\Controllers\Master\NotificationController::class, 'index'])->name('index');
+            Route::get('/atualizar/{id}', [App\Http\Controllers\Master\NotificationController::class, 'edit'])->name('edit');
+            Route::post('/atualizar/{id}', [App\Http\Controllers\Master\NotificationController::class, 'update'])->name('update');
+            Route::get('/novo', [App\Http\Controllers\Master\NotificationController::class, 'create'])->name('create');
+            Route::post('/novo', [App\Http\Controllers\Master\NotificationController::class, 'insert'])->name('insert');
 
         });
 

@@ -11,7 +11,7 @@
 
 @section('js')
     <script>
-        var tableGuide;
+        let tableGuide;
         $(function () {
             tableGuide = getTable(false);
         });

@@ -11,7 +11,7 @@
 
 @section('js')
     <script>
-        var tableCompany;
+        let tableCompany;
         $(function () {
             tableCompany = getTable(false);
         });

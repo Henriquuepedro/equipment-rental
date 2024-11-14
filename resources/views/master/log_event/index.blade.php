@@ -14,7 +14,7 @@
     <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="application/javascript" src="https://npmcdn.com/flatpickr@4.6.6/dist/l10n/pt.js"></script>
     <script>
-        var tablePlan;
+        let tablePlan;
         $(function () {
             tablePlan = getTable(false);
             loadDaterangePickerInput($('input[name="intervalDates"]'), function () {}, FORMAT_DATETIME_BRAZIL, true);

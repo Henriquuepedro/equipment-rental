@@ -11,7 +11,7 @@
 
 @section('js')
     <script>
-        var tableBudget;
+        let tableBudget;
         $(function () {
             tableBudget = getTable(false);
         });
