@@ -27,7 +27,7 @@
                 { read },
                 'tableNotifications',
                 stateSave,
-                [ 0, 'asc' ],
+                [ 2, 'desc' ],
                 'POST',
                 () => {},
                 () => {
@@ -73,6 +73,7 @@
                             <tr>
                                 <th>Título</th>
                                 <th>Situação</th>
+                                <th>Criado Em</th>
                                 <th>Ação</th>
                             </tr>
                         </thead>
@@ -82,6 +83,7 @@
                             <tr>
                                 <th>Título</th>
                                 <th>Situação</th>
+                                <th>Criado Em</th>
                                 <th>Ação</th>
                             </tr>
                         </tfoot>

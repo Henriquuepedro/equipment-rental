@@ -43,9 +43,19 @@ class Notification extends Model
      */
     protected $casts = [];
 
+    public function insert($data)
+    {
+        return $this->create($data);
+    }
+
     public function edit(array $data, int $id)
     {
         return $this->where('id', $id)->first()->fill($data)->save();
+    }
+
+    public function remove(int $id)
+    {
+        return $this->get($id)->delete();
     }
 
     public function getNotReadLastRows(int $company_id, int $count = null)
@@ -70,6 +80,11 @@ class Notification extends Model
         }
 
         return $query->limit($count)->get();
+    }
+
+    public function get(int $id)
+    {
+        return $this->find($id);
     }
 
     public function getByid(int $company_id, int $id)

@@ -1321,3 +1321,6 @@ table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child:b
     height: 17px;
     line-height: 0.85rem;
 }
+.accordion .card .card-header a[aria-expanded=true] {
+    color: #ffffff;
+}

@@ -57,7 +57,7 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="form-group col-md-12 text-center">
-                                    <h3>{{ $notification->title }}</h3>
+                                    <h3><i class="{{ $notification->title_icon }}"></i> {{ $notification->title }}</h3>
                                 </div>
                             </div>
                             <div class="row">

@@ -435,6 +435,11 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
                 Route::post('/buscar', [App\Http\Controllers\Master\AuditLogController::class, 'fetch'])->name('fetch');
             });
 
+            Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\NotificationController::class, 'fetch'])->name('fetch');
+                Route::post('/delete', [App\Http\Controllers\Master\NotificationController::class, 'delete'])->name('delete');
+            });
+
         });
 
         Route::group(['prefix' => '/locais-de-descarte', 'as' => 'disposal_place.'], function () {
@@ -487,6 +492,17 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/atualizar/{id}', [App\Http\Controllers\Master\GuideController::class, 'update'])->name('update');
             Route::get('/novo', [App\Http\Controllers\Master\GuideController::class, 'create'])->name('create');
             Route::post('/novo', [App\Http\Controllers\Master\GuideController::class, 'insert'])->name('insert');
+
+        });
+
+        // Manuais
+        Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+
+            Route::get('/', [App\Http\Controllers\Master\NotificationController::class, 'index'])->name('index');
+            Route::get('/atualizar/{id}', [App\Http\Controllers\Master\NotificationController::class, 'edit'])->name('edit');
+            Route::post('/atualizar/{id}', [App\Http\Controllers\Master\NotificationController::class, 'update'])->name('update');
+            Route::get('/novo', [App\Http\Controllers\Master\NotificationController::class, 'create'])->name('create');
+            Route::post('/novo', [App\Http\Controllers\Master\NotificationController::class, 'insert'])->name('insert');
 
         });
 

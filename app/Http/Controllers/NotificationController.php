@@ -67,7 +67,7 @@ class NotificationController extends Controller
         try {
             $filters        = array();
             $filter_default = array();
-            $fields_order   = array('title','active','');
+            $fields_order   = array('title','active','created_at','');
 
             $filter_default[]['where']['function'] = function($query) use ($company_id) {
                 $query->where('company_id', null)
@@ -101,6 +101,7 @@ class NotificationController extends Controller
             $result[] = array(
                 $value->title,
                 $value->read ? '<div class="badge badge-pill badge-lg badge-success">Lido</div>' : '<div class="badge badge-pill badge-lg badge-danger">Não lido</div>',
+                dateInternationalToDateBrazil($value->created_at, DATETIME_BRAZIL_NO_SECONDS),
                 dropdownButtonsDataList($buttons, $value->id)
             );
         }
