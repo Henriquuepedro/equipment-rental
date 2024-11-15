@@ -33,6 +33,7 @@ class PlanPayment extends Model
         'gross_amount',
         'net_amount',
         'client_amount',
+        'is_subscription',
         'company_id',
         'user_created',
         'user_updated'

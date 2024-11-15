@@ -66,6 +66,65 @@
         .bs-tooltip-auto .tooltip-arrow::before {
             border-top-color: #0d6efd !important;
         }
+
+        .discount-subscription-payment {
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-text-size-adjust: 100%;
+            display: inline-block;
+            background: #1e3bb3;
+            width: auto;
+            height: 30px;
+            line-height: 32px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            border-radius:4px;
+            padding:0 15px;
+            position: absolute;
+            right: 2%;
+            bottom: 13%;
+        }
+        .discount-subscription-payment:after {
+            content: " ";
+            height: 22px;
+            width: 22px;
+            background:#1e3bb3;
+            position: absolute;
+            top:4px;
+            left:-9px;
+            border-radius:4px;
+            -moz-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+        .discount-subscription-payment:before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            background: #fff;
+            position: absolute;
+            top: 12px;
+            left: 0px;
+            z-index: 1;
+            border-radius: 10px;
+        }
+        @keyframes btn-pisca {
+
+            0% { opacity: 0.5; }
+            25% { opacity: 0.75; }
+            50% { opacity: 1; }
+            75% { opacity: 0.75; }
+            100% { opacity: 0.5; }
+        }
+        .btn-subscription-payment {
+            animation: btn-pisca 1.5s linear infinite;
+        }
+
     </style>
 @stop
 
@@ -89,15 +148,21 @@
             $.get(`{{ route('ajax.plan.get-plans') }}/${type}`, response => {
                 $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).empty();
 
-                let price_from, description, alert_user, message_equipment_mmanager, percentage_off, discount_months;
+                let price_from, description, alert_user, message_equipment_mmanager, percentage_off, discount_months, button_subscription_payment;
 
                 $(response).each(function(key, value){
+                    button_subscription_payment = '';
                     percentage_off = type === 6 ? '10' : (type === 12 ? '20' : '');
                     discount_months = type !== 1 ? `<p class="fw-normal mb-0">R$ ${numberToReal(value.value)} por ${tag_plan}</p><p class="fw-normal mb-0">valor equivalente mensal de</p>` : '';
                     price_from = value.from_value === null || parseFloat(value.from_value) === 0 ? '' : `<div class="d-flex flex-wrap justify-content-center align-items-center mb-1"><p class="fw-normal mb-0 text-primary" style="text-decoration:line-through;">R$ ${numberToReal(value.from_value)}</p>&nbsp;<div class="badge badge-pill badge-lg badge-success">${percentage_off}% OFF</div></div>`;
                     description = value.description === '<p><br></p>' ? '' : value.description;
                     alert_user = value.allowed_users ? `Até <b>${value.allowed_users}</b> usuários` : 'Usuários ilimitados';
-                    message_equipment_mmanager = value.quantity_equipment ? `Até <b>${value.quantity_equipment}</b> equipamentos` : 'Equipamentos ilimitados'
+                    message_equipment_mmanager = value.quantity_equipment ? `Até <b>${value.quantity_equipment}</b> equipamentos` : 'Equipamentos ilimitados';
+
+                    if (type === 1) {
+                        button_subscription_payment = `<div class="row col-md-12 d-flex justify-content-center"><a href="${window.location.href}/confirmar-recorrencia/${value.id}" class="btn btn-warning btn-block col-md-10 col-xs-12 mt-2 btn-subscription-payment">Assinar Recorrente</a><div class="discount-subscription-payment">-15%</div></div>`;
+                    }
+
                     $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append(
                         `<div class="col-md-3 col-xl-3 grid-margin stretch-card pricing-card">
                             <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body">
@@ -115,8 +180,9 @@
                                 <div class="pr-2 pl-4 text-center plan-features mb-2">
                                     ${description}
                                 </div>
-                                <div class="wrapper d-flex justify-content-center">
-                                    <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block col-md-10">Assinar</a>
+                                <div class="wrapper d-flex justify-content-center flex-wrap">
+                                    <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block col-md-10 col-xs-12">Assinar</a>
+                                    ${button_subscription_payment}
                                 </div>
                             </div>
                         </div>`

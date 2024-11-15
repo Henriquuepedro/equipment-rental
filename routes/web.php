@@ -179,6 +179,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
         Route::get('/', [App\Http\Controllers\PlanController::class, 'index'])->name('index');
         Route::get('/solicitacoes', [App\Http\Controllers\PlanController::class, 'request'])->name('request');
         Route::get('/confirmar/{plan?}', [App\Http\Controllers\PlanController::class, 'confirm'])->name('confirm');
+        Route::get('/confirmar-recorrencia/{plan?}', [App\Http\Controllers\PlanController::class, 'confirm_subscription_payment'])->name('confirm_subscription_payment');
         Route::post('/criar-pagamento/{plan?}', [App\Http\Controllers\PlanController::class, 'insert'])->name('insert');
         Route::get('/visualizar-solicitacao/{payment_id}', [App\Http\Controllers\PlanController::class, 'view'])->name('view');
 
