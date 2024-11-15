@@ -435,7 +435,7 @@ return [
                 [
                     'route'         => 'plan.index',
                     'text'          => 'Planos',
-                    'route_active'  => ['plan.confirm']
+                    'route_active'  => ['plan.confirm', 'plan.confirm_subscription_payment']
                 ],
                 [
                     'route'         => 'plan.request',

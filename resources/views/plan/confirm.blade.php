@@ -257,8 +257,7 @@
             @endif
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Solicitações</h4>
-                    <p class="card-description">Solicitações realizadas.</p>
+                    <h4 class="card-title">Planos disponíveis</h4>
                     <div id="paymentBrick_container"></div>
                     <div class="row">
                         <div class="col-md-6 offset-md-3 mt-3 mb-3">
