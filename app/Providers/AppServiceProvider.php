@@ -60,6 +60,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Contracts\View\View;
 use App\Models\Company;
 use Illuminate\Support\Facades\URL;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class
 AppServiceProvider extends ServiceProvider
@@ -89,6 +90,11 @@ AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') !== 'local') {
             URL::forceScheme('https');
         }
+
+        LogViewer::auth(function ($request) {
+            return $request->user()
+                && likeText('%@locai.com.br%', $request->user()->email);
+        });
 
         // Variaveis para serem usadas em todas as views
         // Definir um array chamado settings contendo a suas

@@ -198,40 +198,9 @@ class PlanController extends Controller
             $request_options->setCustomHeaders(["X-Idempotency-Key: {$request->input('idempotency_key')}"]);
             $request_options->setCustomHeaders(["X-meli-session-id: {$request->input('device_id')}"]);
 
-
             if ($request->has('subscription_payment')) {
                 $preApproval = new PreApprovalClient();
-
-                $createRequestPreApproval = array(
-                    'back_url' => str_replace('http://localhost:8000/', 'https://app.locai.com.br/', $createRequest['notification_url']),  // URL de retorno após pagamento
-                    'reason' => $createRequest['description'],  // Razão da assinatura (descrição do serviço ou produto)
-                    'payer_email' => $createRequest['payer']['email'],
-                    'auto_recurring' => [
-                        'frequency' => $createRequest['auto_recurring']['frequency'],
-                        'frequency_type' => $createRequest['auto_recurring']['frequency_type'],
-                        'transaction_amount' => $createRequest['auto_recurring']['transaction_amount'],
-                        'currency_id' => $createRequest['auto_recurring']['currency_id'],
-                        'start_date' => str_replace('+00:00', 'Z', $createRequest['auto_recurring']['start_date']),
-                        'end_date' => str_replace('+00:00', 'Z', $createRequest['auto_recurring']['end_date']),
-                        'recurrent_payment' => true,  // Definir como pagamento recorrente
-                    ],
-                    'card_token' => $createRequest['token'],  // Token do cartão gerado pelo front-end
-                    'payer' => [
-                        'name' => $createRequest['additional_info']['payer']['first_name'],  // Nome do cliente
-                        'surname' => $createRequest['additional_info']['payer']['last_name'],  // Sobrenome
-                        'email' => $createRequest['payer']['email'],  // E-mail do cliente
-                        'identification' => [
-                            'type' => $createRequest['payer']['identification']['type'],  // Tipo de documento
-                            'number' => $createRequest['payer']['identification']['number']  // Número do CPF do cliente
-                        ],
-                    ],
-                    'additional_info' => [
-                        'order_id' => $createRequest['external_reference'],  // ID do pedido (pode ser útil para o controle interno)
-                        'product_description' => $createRequest['description'],  // Descrição do produto ou serviço
-                    ]
-                );
-
-                $payment = $preApproval->create($createRequestPreApproval, $request_options);
+                $payment = $preApproval->create($createRequest, $request_options);
             } else {
                 $payment = $client->create($createRequest, $request_options);
             }
@@ -287,7 +256,7 @@ class PlanController extends Controller
             'key_pix'           => $payment->point_of_interaction->transaction_data->qr_code ?? null,
             'base64_key_pix'    => $payment->point_of_interaction->transaction_data->qr_code_base64 ?? null,
             'payment_method_id' => $request->has('subscription_payment') ? $createRequest['payment_method_id'] : $payment->payment_method_id,
-            'payment_type_id'   => $request->has('subscription_payment') ? null : $payment->payment_type_id,
+            'payment_type_id'   => $request->has('subscription_payment') ? 'credit_card' : $payment->payment_type_id,
             'plan_id'           => $plan,
             'status_detail'     => $request->has('subscription_payment') ? 'pending_review_manual' : $payment->status_detail,
             'installments'      => $request->has('subscription_payment') ? 1 : $payment->installments,
@@ -457,24 +426,6 @@ class PlanController extends Controller
             ]
         ];
 
-        if ($request->has('subscription_payment')) {
-            $datetime_start_date = new DateTime('now', new DateTimeZone(TIMEZONE_DEFAULT));
-            $start_date = $datetime_start_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_start_date->format('v')) . 'Z';
-
-            $datetime_end_date = new DateTime($start_date, new DateTimeZone(TIMEZONE_DEFAULT));
-            $datetime_end_date->modify('+1 year');
-            $end_date = $datetime_end_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_end_date->format('v')) . 'Z';
-
-            $createRequest['auto_recurring'] = [
-                "frequency" => 1,  // Frequência mensal
-                "frequency_type" => "months",  // Tipo mensal
-                "transaction_amount" => roundDecimal($plan_data->value - ($plan_data->value * 0.15)),  // Valor da mensalidade
-                "currency_id" => "BRL",  // Moeda
-                "start_date" => $start_date,  // Data de início
-                "end_date" => $end_date,  // Data de término
-            ];
-        }
-
         // É cartão
         if ($request->input('token') && $request->input('issuer_id')) {
             $check_payment_method = 'card';
@@ -542,6 +493,88 @@ class PlanController extends Controller
                 throw new Exception('Tipo de pagamento não encontrado.');
         }
 
+        if ($request->has('subscription_payment')) {
+            $datetime_start_date = new DateTime('now', new DateTimeZone(TIMEZONE_DEFAULT));
+            $start_date = $datetime_start_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_start_date->format('v')) . 'Z';
+
+            $datetime_end_date = new DateTime($start_date, new DateTimeZone(TIMEZONE_DEFAULT));
+            $datetime_end_date->modify('+1 year');
+            $end_date = $datetime_end_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_end_date->format('v')) . 'Z';
+
+            $createRequest = array(
+                'external_reference'    => $code_payment,
+                'back_url'              => str_replace('http://localhost:8000/', 'https://app.locai.com.br/', $createRequest['notification_url']),  // URL de retorno após pagamento
+                'reason'                => $createRequest['description'],  // Razão da assinatura (descrição do serviço ou produto)
+                'payer_email'           => $createRequest['payer']['email'],
+                'notification_url'      => route('mercadopago.notification'),
+                'auto_recurring'        => [
+                    'frequency'             => 1,  // Frequência mensal
+                    'frequency_type'        => "months",  // Tipo mensal
+                    'transaction_amount'    => roundDecimal($plan_data->value - ($plan_data->value * 0.15)),  // Valor da mensalidade
+                    'currency_id'           => "BRL",  // Moeda
+                    'start_date'            => str_replace('+00:00', 'Z', $start_date),
+                    'end_date'              => str_replace('+00:00', 'Z', $end_date),
+                    'recurrent_payment'     => true,  // Definir como pagamento recorrente
+                ],
+                'card_token'    => $createRequest['token'],  // Token do cartão gerado pelo front-end
+                'payer'         => [
+                    'name'              => $createRequest['additional_info']['payer']['first_name'],  // Nome do cliente
+                    'surname'           => $createRequest['additional_info']['payer']['last_name'],  // Sobrenome
+                    'email'             => $createRequest['payer']['email'],  // E-mail do cliente
+                    'identification'    => [
+                        'type'      => $createRequest['payer']['identification']['type'],  // Tipo de documento
+                        'number'    => $createRequest['payer']['identification']['number']  // Número do CPF do cliente
+                    ],
+                ],
+                'additional_info' => [
+                    'order_id'              => $createRequest['external_reference'],  // ID do pedido (pode ser útil para o controle interno)
+                    'product_description'   => $createRequest['description'],  // Descrição do produto ou serviço
+                ]
+            );
+        }
+
         return $createRequest;
+    }
+
+    public function cancelSubscription(Request $request): JsonResponse
+    {
+        $company_id = $request->user()->company_id;
+        $plan_id = $request->input('plan_id');
+
+        $payment = $this->plan_payment->getById($company_id, $plan_id);
+        if (!$payment) {
+            return response()->json(['success' => false, 'message' => 'Não foi possível localizar o plano!']);
+        }
+
+        try {
+            MercadoPagoConfig::setAccessToken(env('MP_ACCESS_TOKEN'));
+
+            // Instanciar o cliente de PreApproval
+            $client = new PreApprovalClient();
+
+            // Atualizar o status da assinatura para 'cancelled'
+            $client->update($payment->id_transaction, ['status' => 'cancelled']);
+
+            $this->plan_payment->edit(array('status' => 'cancelled'), $company_id, $plan_id);
+
+            return response()->json(['success' => true, 'message' => 'Assinatura cancelada com sucesso!']);
+        } catch (MPApiException $exception) {
+            $error_message = $exception->getApiResponse()->getContent();
+
+            Log::error("[MPApiException] Payment doesn't canceled to the company $company_id to the plan $plan_id.", [
+                'request'   => $createRequest ?? [],
+                'response'  => $error_message,
+                'trace'     => $exception->getTraceAsString()
+            ]);
+            return response()->json(['success' => false, 'message' => $error_message['message']], 400);
+        } catch (Exception $exception) {
+            $error_message = $exception->getMessage();
+            Log::error("[Exception] Payment doesn't canceled to the company $company_id to the plan $plan_id.", [
+                'request'   => $createRequest ?? [],
+                'response'  => $error_message,
+                'trace'     => $exception->getTraceAsString()
+            ]);
+            return response()->json(['success' => false, 'message' => $error_message], 400);
+        }
     }
 }

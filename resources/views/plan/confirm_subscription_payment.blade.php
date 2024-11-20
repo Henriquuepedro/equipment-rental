@@ -237,7 +237,8 @@
             @endif
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Planos disponíveis</h4>
+                    <h4 class="card-title">Dados para assinar</h4>
+                    <p class="card-description">O plano por assinatura é realizado através do pagamento com cartão de crédito, onde todo mês será realizado uma cobrança do valor abaixo, durante 12 meses, sendo possível realizar o cancelamento a qualquer momento.</p>
                     <div class="col-md-12 d-flex justify-content-center" id="payment_container">
                         <form class="col-md-6" method="POST" id="subscriptionForm">
                             {{ csrf_field() }}
@@ -252,7 +253,6 @@
                                 <div class="form-group col-md-12">
                                     <label for="amount">Valor do plano</label>
                                     <input type="text" class="form-control" value="{{ formatMoney($plan->value, 2, 'R$ ') }} recorrentes por 12 meses" readonly>
-                                    <small>Cancele a qualquer momento.</small>
                                 </div>
                             </div>
 
@@ -315,11 +315,6 @@
                             <img src="https://imgmp.mlstatic.com/org-img/MLB/MP/BANNERS/tipo2_575X40.jpg?v=1"
                                  alt="Mercado Pago - Meios de pagamento" title="Mercado Pago - Meios de pagamento"
                                  style="width: 100%; height: 45px"/>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 offset-md-3 mt-3 mb-3 text-center">
-                            <a href="https://www.mercadopago.com.br/ajuda/322" target="_blank">Veja os juros de parcelamentos!</a>
                         </div>
                     </div>
                 </div>

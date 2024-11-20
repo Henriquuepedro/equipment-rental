@@ -160,11 +160,11 @@
                     message_equipment_mmanager = value.quantity_equipment ? `Até <b>${value.quantity_equipment}</b> equipamentos` : 'Equipamentos ilimitados';
 
                     if (type === 1) {
-                        button_subscription_payment = `<div class="row col-md-12 d-flex justify-content-center"><a href="${window.location.href}/confirmar-recorrencia/${value.id}" class="btn btn-warning btn-block col-md-10 col-xs-12 mt-2 btn-subscription-payment">Assinar Recorrente</a><div class="discount-subscription-payment">-15%</div></div>`;
+                        button_subscription_payment = `<div class="row col-md-12 col-sm-12 col-xs-12 d-flex justify-content-center"><a href="${window.location.href}/confirmar-recorrencia/${value.id}" class="btn btn-warning btn-block col-md-10 sm col-xs-12 mt-2 btn-subscription-payment">Assinar Recorrente</a><div class="discount-subscription-payment">-15%</div></div>`;
                     }
 
                     $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append(
-                        `<div class="col-md-3 col-xl-3 grid-margin stretch-card pricing-card">
+                        `<div class="col-xl-3 col-lg-6 col-md-6 col-sm-12 grid-margin stretch-card pricing-card">
                             <div class="card border-${value.highlight ? 'success' : 'primary'} border pricing-card-body">
                                 <div class="text-center pricing-card-head">
                                     <h3>${value.name}</h3>
@@ -181,7 +181,7 @@
                                     ${description}
                                 </div>
                                 <div class="wrapper d-flex justify-content-center flex-wrap">
-                                    <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block col-md-10 col-xs-12">Assinar</a>
+                                    <a href="${window.location.href}/confirmar/${value.id}" class="btn ${value.highlight ? 'btn-success' : 'btn-outline-primary'} btn-block col-md-10 col-sm-12 col-xs-12">Assinar</a>
                                     ${button_subscription_payment}
                                 </div>
                             </div>

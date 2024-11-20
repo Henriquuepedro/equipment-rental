@@ -381,6 +381,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
             Route::get('/visualizar-planos/{type?}', [App\Http\Controllers\PlanController::class, 'getPlans'])->name('get-plans');
             Route::post('/buscar', [App\Http\Controllers\PlanController::class, 'fetchRequests'])->name('fetch');
+            Route::post('/cancelar-assinatura', [App\Http\Controllers\PlanController::class, 'cancelSubscription'])->name('cancel_subscription');
 
         });
 
