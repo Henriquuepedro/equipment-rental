@@ -100,7 +100,7 @@ class UserController extends Controller
                 $value->name,
                 $value->email,
                 formatPhone($value->phone),
-                $value->active ? '<div class="badge badge-pill badge-lg badge-success">Ativo</div>' : '<div class="badge badge-pill badge-lg badge-danger">Inativo</div>',
+                getHtmlStatusList($value->active),
                 $value->type_user == 0 ? 'Usuário' : ($value->type_user == 1 ? 'Administrador' : 'Administrador Master'),
                 dateInternationalToDateBrazil($value->last_access_at),
                 dateInternationalToDateBrazil($value->created_at, DATETIME_BRAZIL_NO_SECONDS),

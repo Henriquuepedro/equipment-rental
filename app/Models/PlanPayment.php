@@ -33,6 +33,7 @@ class PlanPayment extends Model
         'gross_amount',
         'net_amount',
         'client_amount',
+        'is_subscription',
         'company_id',
         'user_created',
         'user_updated'
@@ -57,12 +58,12 @@ class PlanPayment extends Model
         return $this->create($data);
     }
 
-    public function edit($data, $company_id, $id)
+    public function edit(array $data, int $company_id, int $id)
     {
         return $this->where(['company_id' => $company_id, 'id' => $id])->first()->fill($data)->save();
     }
 
-    public function getPaymentByTransaction(int $id_transaction)
+    public function getPaymentByTransaction(string $id_transaction)
     {
         return $this->where('id_transaction', $id_transaction)->first();
     }

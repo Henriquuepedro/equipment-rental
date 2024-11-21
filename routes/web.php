@@ -113,6 +113,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/locacao', [App\Http\Controllers\PrintController::class, 'reportRental'])->name('report_rental');
             Route::post('/financeiro', [App\Http\Controllers\PrintController::class, 'reportBill'])->name('report_bill');
         });
+        Route::get('/locacao-gerar-mtr/{rental_mtr_id?}', [App\Http\Controllers\PrintController::class, 'rentalMtr'])->name('generate-mtr');
 
     });
 
@@ -178,6 +179,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
         Route::get('/', [App\Http\Controllers\PlanController::class, 'index'])->name('index');
         Route::get('/solicitacoes', [App\Http\Controllers\PlanController::class, 'request'])->name('request');
         Route::get('/confirmar/{plan?}', [App\Http\Controllers\PlanController::class, 'confirm'])->name('confirm');
+        Route::get('/confirmar-recorrencia/{plan?}', [App\Http\Controllers\PlanController::class, 'confirm_subscription_payment'])->name('confirm_subscription_payment');
         Route::post('/criar-pagamento/{plan?}', [App\Http\Controllers\PlanController::class, 'insert'])->name('insert');
         Route::get('/visualizar-solicitacao/{payment_id}', [App\Http\Controllers\PlanController::class, 'view'])->name('view');
 
@@ -210,6 +212,26 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
     Route::group(['prefix' => '/manual', 'as' => 'guide.'], function () {
 
         Route::get('/', [App\Http\Controllers\GuideController::class, 'index'])->name('index');
+
+    });
+
+    // Local de descarte
+    Route::group(['prefix' => '/locais-de-descarte', 'as' => 'disposal_place.'], function () {
+
+        Route::get('/', [App\Http\Controllers\DisposalPlaceController::class, 'index'])->name('index');
+        Route::get('/novo', [App\Http\Controllers\DisposalPlaceController::class, 'create'])->name('create');
+        Route::post('/cadastro', [App\Http\Controllers\DisposalPlaceController::class, 'insert'])->name('insert');
+
+        Route::get('/{id?}', [App\Http\Controllers\DisposalPlaceController::class, 'edit'])->name('edit');
+        Route::post('/atualizar', [App\Http\Controllers\DisposalPlaceController::class, 'update'])->name('update');
+
+    });
+
+    // Local de descarte
+    Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+
+        Route::get('/', [App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+        Route::get('/{id?}', [App\Http\Controllers\NotificationController::class, 'view'])->name('view');
 
     });
 
@@ -288,7 +310,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/equipamentos-para-retirar', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRentalToWithdraw'])->name('get-equipments-to-withdraw');
             Route::post('/atualizar-para-entregue', [App\Http\Controllers\RentalEquipmentController::class, 'deliverEquipment'])->name('delivery_equipment');
             Route::post('/atualizar-para-retirado', [App\Http\Controllers\RentalEquipmentController::class, 'withdrawEquipment'])->name('withdrawal_equipment');
-            Route::get('/equipamentos/{rental_id}', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRental'])->name('get_equipments_rental');
+            Route::get('/equipamentos/{rental_id?}', [App\Http\Controllers\RentalEquipmentController::class, 'getEquipmentsRental'])->name('get_equipments_rental');
             Route::get('/pagamentos/{rental_id}', [App\Http\Controllers\BillsToReceiveController::class, 'getPaymentsRental'])->name('get_payments_rental');
             Route::get('/full/{rental_id?}', [App\Http\Controllers\RentalController::class, 'getFull'])->name('get_full');
             Route::get('/locacoes-por-mes/{months}', [App\Http\Controllers\RentalController::class, 'getRentalsForMonths'])->name('get-rentals-for-month');
@@ -359,6 +381,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
             Route::get('/visualizar-planos/{type?}', [App\Http\Controllers\PlanController::class, 'getPlans'])->name('get-plans');
             Route::post('/buscar', [App\Http\Controllers\PlanController::class, 'fetchRequests'])->name('fetch');
+            Route::post('/cancelar-assinatura', [App\Http\Controllers\PlanController::class, 'cancelSubscription'])->name('cancel_subscription');
 
         });
 
@@ -414,6 +437,25 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
                 Route::post('/buscar', [App\Http\Controllers\Master\AuditLogController::class, 'fetch'])->name('fetch');
             });
 
+            Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+                Route::post('/buscar', [App\Http\Controllers\Master\NotificationController::class, 'fetch'])->name('fetch');
+                Route::post('/delete', [App\Http\Controllers\Master\NotificationController::class, 'delete'])->name('delete');
+            });
+
+        });
+
+        Route::group(['prefix' => '/locais-de-descarte', 'as' => 'disposal_place.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\DisposalPlaceController::class, 'fetch'])->name('fetch');
+            Route::post('/delete', [App\Http\Controllers\DisposalPlaceController::class, 'delete'])->name('delete');
+            Route::get('/visualizar-locais', [App\Http\Controllers\DisposalPlaceController::class, 'getDisposalPlaces'])->name('get-disposal-places');
+        });
+
+        Route::group(['prefix' => '/mtr-de-locacao', 'as' => 'rental_mtr.'], function () {
+            Route::post('/gerar-mtr', [App\Http\Controllers\RentalMtrController::class, 'createMtr'])->name('create-mtr');
+        });
+
+        Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+            Route::post('/buscar', [App\Http\Controllers\NotificationController::class, 'fetch'])->name('fetch');
         });
     });
 
@@ -452,6 +494,17 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/atualizar/{id}', [App\Http\Controllers\Master\GuideController::class, 'update'])->name('update');
             Route::get('/novo', [App\Http\Controllers\Master\GuideController::class, 'create'])->name('create');
             Route::post('/novo', [App\Http\Controllers\Master\GuideController::class, 'insert'])->name('insert');
+
+        });
+
+        // Manuais
+        Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
+
+            Route::get('/', [App\Http\Controllers\Master\NotificationController::class, 'index'])->name('index');
+            Route::get('/atualizar/{id}', [App\Http\Controllers\Master\NotificationController::class, 'edit'])->name('edit');
+            Route::post('/atualizar/{id}', [App\Http\Controllers\Master\NotificationController::class, 'update'])->name('update');
+            Route::get('/novo', [App\Http\Controllers\Master\NotificationController::class, 'create'])->name('create');
+            Route::post('/novo', [App\Http\Controllers\Master\NotificationController::class, 'insert'])->name('insert');
 
         });
 

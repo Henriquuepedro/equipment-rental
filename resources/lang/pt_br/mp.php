@@ -60,4 +60,6 @@ return [
 
     'bolbradesco'       => '',
 
+    'preapproval'       => 'Recorrência',
+
 ];

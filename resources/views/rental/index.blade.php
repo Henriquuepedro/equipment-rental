@@ -57,6 +57,9 @@
             border-top-left-radius: 0 !important;
             border-left: 0;
         }
+        .tooltip.show {
+            z-index: 1055 !important;
+        }
     </style>
 @stop
 
@@ -75,7 +78,8 @@
             elementForm = $('#viewRental');
             draggableMap = false;
             gestureHandlingMap = true;
-            checkLabelAnimate()
+            checkLabelAnimate();
+            $(`#modalGenerateMtr .equipmentsRentalTable [data-toggle="tooltip"]`).tooltip();
         });
 
         const setTabRental = () => {
@@ -172,7 +176,7 @@
             const date_filter_by = $('#date_filter_by').val();
 
             tableRental = $("#tableRentals").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,
@@ -398,6 +402,154 @@
             })
         });
 
+        $(document).on('click', '.btnGenerateMtr', function (){
+            const rental_id = $(this).data('rental-id');
+            const rental_name = $(this).closest('tr').find('td:eq(1)').html();
+
+            Swal.fire({
+                title: 'Gerar MTR',
+                html: "<h4>Você está prestes a emitir o MTR</h4> <br><strong>"+rental_name+"</strong><br>A data da geração do MTR será referente ao dia atual, deseja continuar?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#19d895',
+                cancelButtonColor: '#bbb',
+                confirmButtonText: 'Sim, gerar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: 'POST',
+                        url: "{{ route('ajax.rental.delete') }}",
+                        data: { rental_id },
+                        dataType: 'json',
+                        success: response => {
+                            getTable();
+                            Toast.fire({
+                                icon: response.success ? 'success' : 'error',
+                                title: response.message
+                            })
+                        }, error: e => {
+                            console.log(e);
+                        },
+                        complete: function(xhr) {
+                            if (xhr.status === 403) {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: 'Você não tem permissão para fazer essa operação!'
+                                });
+                                $(`button[data-rental-id="${rental_id}"]`).trigger('blur');
+                            }
+                        }
+                    });
+                }
+            })
+        });
+
+        $(document).on('click', '.btnShowMtr', function(){
+
+            const rental_id = $(this).data('rental-id');
+            $('#modalGenerateMtr [name="rental_id"]').val(rental_id);
+            $('#modalGenerateMtr').modal('show');
+            loadDrivers(null, `#modalGenerateMtr select[name="rental_mtr_drivers"]`, false);
+            loadDisposalPlaces(null, `#modalGenerateMtr select[name="rental_mtr_disposal_places"]`, false);
+            $('#modalGenerateMtr button[type="submit"]').attr('disabled', false);
+            $('#modalGenerateMtr .modal-body .content-view-mtr').remove();
+
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: 'GET',
+                url: "{{ route('ajax.rental.get_equipments_rental') }}" + `/${rental_id}`,
+                dataType: 'json',
+                success: response => {
+
+                    let equipments = '';
+                    let date_operation = '';
+
+                    $.each(response, function( index, value ) {
+                        equipments += `
+                        <tr id-rental-equipment="${value.id}" class="selected">
+                            <td>
+                                <div class="form-group">
+                                    <input type="text" class="form-control d-flex align-items-center" value="${value.name ?? 'Caçamba '+value.volume+'m³'} - ${value.reference}" disabled>
+                                    <input type="hidden" name="equipment[]" value="${value.id}">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <select class="form-control residues" name="residue[]"></select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="quantity[]">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="classification[]">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group flatpickr d-flex no-margin">
+                                    <input type="tel" class="form-control flatpickr-input" name="date[]" value="${getTodayDateBr(true, false)}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                    <div class="input-button-calendar col-md-3 no-padding">
+                                        <a class="input-button pull-left btn-primary btn btn-sm" title="toggle" data-toggle>
+                                            <i class="fa fa-calendar text-white"></i>
+                                        </a>
+                                        <a class="input-button pull-right btn-primary btn btn-sm" title="clear" data-clear>
+                                            <i class="fa fa-times text-white"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>`
+                    });
+
+                    $(`#modalGenerateMtr .equipmentsRentalTable tbody`).empty().append(equipments);
+
+                    $.each(response, function( index, value ) {
+                        getOptionsForm('residues', $(`#modalGenerateMtr .equipmentsRentalTable tbody tr[id-rental-equipment="${value.id}"] select[name="residue[]"]`));
+                    });
+
+                    $(`#modalGenerateMtr [type="checkbox"]`).iCheck({
+                        checkboxClass: 'icheckbox_square-blue',
+                        radioClass: 'iradio_square-blue',
+                        increaseArea: '20%' // optional
+                    });
+
+                    $('.flatpickr').flatpickr({
+                        enableTime: true,
+                        dateFormat: "d/m/Y H:i",
+                        time_24hr: true,
+                        wrap: true,
+                        clickOpens: false,
+                        allowInput: true,
+                        locale: "pt"
+                    });
+
+                    console.log(response);
+                }, error: e => {
+                    console.log(e);
+                },
+                complete: function(xhr) {
+                    if (xhr.status === 403) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Você não tem permissão para fazer essa operação!'
+                        });
+                        $(`button[data-rental-id="${rental_id}"]`).trigger('blur');
+                    }
+                }
+            });
+
+        });
+
         $(document).on('click', '.btnDeliver', function(){
 
             const rental_id = $(this).data('rental-id');
@@ -605,11 +757,115 @@
                 });
             }
         });
+
+        $("#formGenerateMtr").validate({
+            rules: {
+                rental_id: {
+                    required: true
+                },
+                rental_mtr_drivers: {
+                    required: true
+                },
+                rental_mtr_disposal_places: {
+                    required: true
+                }
+            },
+            messages: {
+                rental_id: {
+                    required: 'Locação não localizada, tente novamente!.'
+                },
+                rental_mtr_drivers: {
+                    required: 'Informe o motorista.'
+                },
+                rental_mtr_disposal_places: {
+                    required: 'Informe o local de descarte.'
+                }
+            },
+            invalidHandler: function(event, validator) {
+                let arrErrors = [];
+                $.each(validator.errorMap, function (key, val) {
+                    arrErrors.push(val);
+                });
+                setTimeout(() => {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atenção',
+                        html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                    });
+                }, 500);
+            },
+            submitHandler: function(form) {
+                let id_form         = $('.modal:visible form').attr('id');
+                let getForm         = $('#' + id_form);
+
+                getForm.find('button[type="submit"]').attr('disabled', true);
+
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: 'POST',
+                    url: getForm.attr('action'),
+                    data: getForm.serialize(),
+                    dataType: 'json',
+                    success: response => {
+                        if (!response.success) {
+                            getForm.find('button[type="submit"]').attr('disabled', false);
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atenção',
+                                html: '<ol><li>' + response.message + '</li></ol>'
+                            });
+                            return false;
+                        }
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: response.message
+                        });
+
+                        $('#modalGenerateMtr .modal-body').append(`
+                        <div class="row mt-4 content-view-mtr">
+                            <div class="col-md-12 d-flex justify-content-center">
+                                <a href='${response.print_mtr}' target='_blank' class='btn btn-primary col-md-6'>Visualizar MTR</a>
+                            </div>
+                        </div>
+                        `);
+
+                    }, error: e => {
+                        console.log(e);
+                        getForm.find('button[type="submit"]').attr('disabled', false);
+                        let arrErrors = [];
+
+                        $.each(e.responseJSON.errors, function( index, value ) {
+                            arrErrors.push(value);
+                        });
+
+                        if (!arrErrors.length && e.responseJSON.message !== undefined) {
+                            arrErrors.push('Você não tem permissão para fazer essa operação!');
+                        }
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atenção',
+                            html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                        });
+                    }
+                });
+            }
+        });
+
+        $('#modalGenerateMtr').on('hidden.bs.modal', function () {
+            if ($('#modalGenerateMtr .modal-body .content-view-mtr').length) {
+                getTable();
+            }
+        })
     </script>
 
     @include('includes.driver.modal-script')
     @include('includes.vehicle.modal-script')
     @include('includes.rental.modal-script')
+    @include('includes.disposal_place.modal-script')
 @stop
 
 @section('content')
@@ -804,5 +1060,50 @@
         </div>
     </div>
     @include('includes.rental.modal-view')
+    <div class="modal fade" id="modalGenerateMtr" tabindex="-1" role="dialog" aria-labelledby="modalGenerateMtr" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <form action="{{ route('ajax.rental_mtr.create-mtr') }}" method="POST" id="formGenerateMtr">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Gerar MTR</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Selecione o motorista resposável pelo transporte</label>
+                                <select name="rental_mtr_drivers" id="rental_mtr_drivers" class="form-control"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Selecione o local para descarte</label>
+                                <select name="rental_mtr_disposal_places" id="rental_mtr_disposal_places" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <table class="table equipmentsRentalTable">
+                                    <thead>
+                                        <th style="width: 30%">Equipamento</th>
+                                        <th style="width: 20%">Resíduo <sup>*</sup><i class="fa fa-info-circle" data-toggle="tooltip" title="Tipo de resíduo"></i></th>
+                                        <th style="width: 15%">Quantidade <sup>*</sup><i class="fa fa-info-circle" data-toggle="tooltip" title="Quantidade em volume ou peso"></i></th>
+                                        <th style="width: 15%">Classificação <i class="fa fa-info-circle" data-toggle="tooltip" title="Classificação do resíduo, se aplicável"></i></th>
+                                        <th style="width: 20%">Data da coleta <sup>*</sup></th>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-around">
+                        <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        <button type="submit" class="btn btn-success col-md-3"><i class="fa fa-check"></i> Confirmar</button>
+                    </div>
+                    <input type="hidden" name="rental_id">
+                </form>
+            </div>
+        </div>
+    </div>
     <input type="hidden" id="route_lat_lng_my_company" value="{{ route('ajax.company.get-lat-lng-my-company') }}">
 @stop

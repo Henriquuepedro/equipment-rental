@@ -11,14 +11,14 @@
 
 @section('js')
     <script>
-        var tableVehicle;
+        let tableVehicle;
         $(function () {
             tableVehicle = getTable(false);
         });
 
         const getTable = (stateSave = true) => {
             return $("#tableVehicles").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

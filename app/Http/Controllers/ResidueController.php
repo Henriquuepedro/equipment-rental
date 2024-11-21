@@ -226,10 +226,9 @@ class ResidueController extends Controller
     public function get(int $id): JsonResponse
     {
         $company_id = Auth::user()->__get('company_id');
-        $residues = $this->residue->getResidue($company_id, $id);
+        $residue = $this->residue->getResidue($company_id, $id);
+        $response[] = $residue->name ?? '';
 
-        return response()->json(count($residues) ? array_map(function($residue) {
-            return $residue['name'];
-        }, $residues->toArray()): array());
+        return response()->json($response);
     }
 }

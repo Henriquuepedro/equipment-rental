@@ -11,7 +11,7 @@
 
 @section('js')
     <script>
-        var tablePlan;
+        let tablePlan;
         $(function () {
             tablePlan = getTable(false);
         });
@@ -19,7 +19,7 @@
         const getTable = (stateSave = true) => {
 
             return $("#tablePlans").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

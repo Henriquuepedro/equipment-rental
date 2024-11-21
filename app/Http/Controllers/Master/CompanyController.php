@@ -92,7 +92,7 @@ class CompanyController extends Controller
                 formatCPF_CNPJ($value->cpf_cnpj),
                 $value->email,
                 formatPhone($value->phone_1),
-                $value->status ? '<div class="badge badge-pill badge-lg badge-success">Ativo</div>' : '<div class="badge badge-pill badge-lg badge-danger">Inativo</div>',
+                getHtmlStatusList($value->status),
                 dateInternationalToDateBrazil($value->plan_expiration_date, DATETIME_BRAZIL_NO_SECONDS),
                 dateInternationalToDateBrazil($value->created_at, DATETIME_BRAZIL_NO_SECONDS),
                 $buttons

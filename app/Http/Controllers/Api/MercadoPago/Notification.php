@@ -39,7 +39,7 @@ class Notification extends Controller
 
                 $request_signature_check = $request_signature_v1[1];
                 $request_signature_ts = $request_signature_ts[1];
-                $check_sognature_data_id = $request->input('data')['id'];
+                $check_sognature_data_id = $request->input('data')['id'] ?? null;
                 $check_sognature_type = $request->input('type');
                 $check_sognature_action = $request->input('action');
                 $check_sognature_api_version = $request->input('api_version');
@@ -60,20 +60,15 @@ class Notification extends Controller
             }
 
             if (
-                (
-                    in_array($request->input('action'), array("test.created", "test.updated")) &&
-                    $request->input('type') == "test"
-                ) || (
-                    $request->input('type') == "subscription_preapproval" &&
-                    $request->input('entity') == "preapproval"
-                )
+                in_array($request->input('action'), array("test.created", "test.updated")) &&
+                $request->input('type') == "test"
             ) {
                 return response()->json();
             }
 
             if (
                 !in_array($request->input('action'), array("payment.created", "payment.updated", "payment.create", "payment.update")) ||
-                $request->input('type') != "payment"
+                !in_array($request->input('type'), array("payment", "preapproval"))
             ) {
                 $mercado_pago_service->debugEcho("type or action don't accept. [action={$request->input('action')} | type={$request->input('type')}].");
                 return response()->json(array(), 406);

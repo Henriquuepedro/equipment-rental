@@ -121,16 +121,24 @@ class DriverController extends Controller
         $isAjax = isAjax();
 
         $createDriver = $this->driver->insert(array(
-            'company_id'    => $dataDriver->company_id,
-            'name'          => $dataDriver->name,
-            'cpf'           => $dataDriver->cpf,
-            'rg'            => $dataDriver->rg,
-            'cnh'           => $dataDriver->cnh,
-            'cnh_exp'       => $dataDriver->cnh_exp,
-            'email'         => $dataDriver->email,
-            'phone'         => $dataDriver->phone,
-            'observation'   => $dataDriver->observation,
-            'user_insert'   => $dataDriver->user_id
+            'company_id'            => $dataDriver->company_id,
+            'name'                  => $dataDriver->name,
+            'cpf'                   => $dataDriver->cpf,
+            'rg'                    => $dataDriver->rg,
+            'cnh'                   => $dataDriver->cnh,
+            'cnh_exp'               => $dataDriver->cnh_exp,
+            'email'                 => $dataDriver->email,
+            'phone'                 => $dataDriver->phone,
+            'observation'           => $dataDriver->observation,
+            'address_zipcode'       => $dataDriver->address_zipcode,
+            'address_name'          => $dataDriver->address_name,
+            'address_number'        => $dataDriver->address_number,
+            'address_complement'    => $dataDriver->address_complement,
+            'address_reference'     => $dataDriver->address_reference,
+            'address_neigh'         => $dataDriver->address_neigh,
+            'address_city'          => $dataDriver->address_city,
+            'address_state'         => $dataDriver->address_state,
+            'user_insert'           => $dataDriver->user_id
         ));
 
         $driverId = $createDriver->id;
@@ -194,15 +202,23 @@ class DriverController extends Controller
 
         $updateDriver = $this->driver->edit(
             array(
-                'name'          => $dataDriver->name,
-                'cpf'           => $dataDriver->cpf,
-                'rg'            => $dataDriver->rg,
-                'cnh'           => $dataDriver->cnh,
-                'cnh_exp'       => $dataDriver->cnh_exp,
-                'email'         => $dataDriver->email,
-                'phone'         => $dataDriver->phone,
-                'observation'   => $dataDriver->observation,
-                'user_update'   => $dataDriver->user_id
+                'name'                  => $dataDriver->name,
+                'cpf'                   => $dataDriver->cpf,
+                'rg'                    => $dataDriver->rg,
+                'cnh'                   => $dataDriver->cnh,
+                'cnh_exp'               => $dataDriver->cnh_exp,
+                'email'                 => $dataDriver->email,
+                'phone'                 => $dataDriver->phone,
+                'observation'           => $dataDriver->observation,
+                'address_zipcode'       => $dataDriver->address_zipcode,
+                'address_name'          => $dataDriver->address_name,
+                'address_number'        => $dataDriver->address_number,
+                'address_complement'    => $dataDriver->address_complement,
+                'address_reference'     => $dataDriver->address_reference,
+                'address_neigh'         => $dataDriver->address_neigh,
+                'address_city'          => $dataDriver->address_city,
+                'address_state'         => $dataDriver->address_state,
+                'user_update'           => $dataDriver->user_id
             ),
             $dataDriver->driver_id
         );
@@ -223,17 +239,25 @@ class DriverController extends Controller
     {
         $obj = new \stdClass;
 
-        $obj->company_id    = $request->user()->company_id;
-        $obj->user_id       = $request->user()->id;
-        $obj->name          = filter_var($request->input('name'));
-        $obj->email         = $request->input('email') ? (filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) ? $request->input('email') : null) : null;
-        $obj->phone         = $request->input('phone') ? filter_var(onlyNumbers($request->input('phone')), FILTER_SANITIZE_NUMBER_INT) : null;
-        $obj->cpf           = $request->input('cpf') ? filter_var(onlyNumbers($request->input('cpf')), FILTER_SANITIZE_NUMBER_INT) : null;
-        $obj->rg            = $request->input('rg') ? filter_var(onlyNumbers($request->input('rg')), FILTER_SANITIZE_NUMBER_INT) : null;
-        $obj->cnh           = $request->input('cnh') ? filter_var(onlyNumbers($request->input('cnh')), FILTER_SANITIZE_NUMBER_INT) : null;
-        $obj->cnh_exp       = $request->input('cnh_exp');
-        $obj->observation   = $request->input('observation') ? filter_var($request->input('observation')) : null;
-        $obj->driver_id     = $request->input('driver_id') ? (int)$request->input('driver_id') : null;
+        $obj->company_id            = $request->user()->company_id;
+        $obj->user_id               = $request->user()->id;
+        $obj->name                  = filter_var($request->input('name'));
+        $obj->email                 = $request->input('email') ? (filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) ? $request->input('email') : null) : null;
+        $obj->phone                 = $request->input('phone') ? filter_var(onlyNumbers($request->input('phone')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $obj->cpf                   = $request->input('cpf') ? filter_var(onlyNumbers($request->input('cpf')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $obj->rg                    = $request->input('rg') ? filter_var(onlyNumbers($request->input('rg')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $obj->cnh                   = $request->input('cnh') ? filter_var(onlyNumbers($request->input('cnh')), FILTER_SANITIZE_NUMBER_INT) : null;
+        $obj->cnh_exp               = $request->input('cnh_exp');
+        $obj->observation           = $request->input('observation') ? filter_var($request->input('observation')) : null;
+        $obj->address_zipcode       = filter_var(onlyNumbers($request->input('address_zipcode')), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->address_name          = filter_var($request->input('address_name'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->address_number        = filter_var($request->input('address_number'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->address_complement    = filter_var($request->input('address_complement'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->address_reference     = filter_var($request->input('address_reference'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->address_neigh         = filter_var($request->input('address_neigh'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->address_city          = filter_var($request->input('address_city'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->address_state         = filter_var($request->input('address_state'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->driver_id             = $request->input('driver_id') ? (int)$request->input('driver_id') : null;
 
         return $obj;
     }

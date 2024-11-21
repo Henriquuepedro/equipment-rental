@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Models\PlanHistory;
 use App\Models\PlanPayment;
 use App\Models\User;
+use DateTime;
 use DateTimeZone;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -32,6 +33,7 @@ use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
 use Lcobucci\JWT\Validation\Constraint\PermittedFor;
 use Normalizer;
 use Ramsey\Uuid\Uuid;
+use MercadoPago\Client\PreApproval\PreApprovalClient;
 
 class PlanController extends Controller
 {
@@ -93,6 +95,44 @@ class PlanController extends Controller
         return view('plan.confirm', compact('plan', 'tokenStr', 'company_data', 'idempotency_key'));
     }
 
+    public function confirm_subscription_payment(int $plan): Factory|View|RedirectResponse|Application
+    {
+        $plan = $this->plan->getById($plan);
+        $company_id = Auth::user()->__get('company_id');
+
+        if (!$plan) {
+            return redirect()->route('plan.index')
+                ->with('warning', "Plano não encontrado!");
+        }
+
+        $now    = new DateTimeImmutable("now");
+        $config = Configuration::forSymmetricSigner(new Sha256(), InMemory::plainText(config('app.key')));
+
+        $plan->value = roundDecimal($plan->value - ($plan->value * 0.15));
+
+        $token = $config->builder()
+            ->issuedBy(url()->current())
+            ->withHeader('iss', url()->current())
+            ->permittedFor(url()->route('plan.insert', array('plan' => $plan)))
+            ->issuedAt($now)
+            ->expiresAt($now->modify('+12 hours'))
+            ->withClaim('uid', 1)
+            ->withClaim('plan_value', $plan->value)
+            ->withClaim('plan_id', $plan->id)
+            ->withClaim('plan_name', $plan->name)
+            ->getToken($config->signer(), $config->signingKey());
+
+        $tokenStr = $token->toString();
+
+        $company_data = $this->company->getCompany($company_id);
+        $company_data->first_company_name = explode(' ', $company_data->name)[0];
+        $company_data->last_company_name  = str_replace("$company_data->first_company_name ", '', $company_data->name);
+
+        $idempotency_key = Uuid::uuid4()->toString();
+
+        return view('plan.confirm_subscription_payment', compact('plan', 'tokenStr', 'company_data', 'idempotency_key'));
+    }
+
     public function request(): Factory|View|Application
     {
         return view('plan.request');
@@ -142,8 +182,7 @@ class PlanController extends Controller
             }
 
             if (
-                roundDecimal($plan_data->value) != roundDecimal($request->input('transaction_amount')) ||
-                roundDecimal($plan_data->value) != roundDecimal($plan_value)
+                roundDecimal($plan_data->value - ($plan_data->value * 0.15)) != roundDecimal($plan_value)
             ) {
                 return response()->json(['errors' => 'Valor não corresponde ao valor do plano selecionado.'], 400);
             }
@@ -158,7 +197,13 @@ class PlanController extends Controller
             $request_options = new RequestOptions();
             $request_options->setCustomHeaders(["X-Idempotency-Key: {$request->input('idempotency_key')}"]);
             $request_options->setCustomHeaders(["X-meli-session-id: {$request->input('device_id')}"]);
-            $payment = $client->create($createRequest, $request_options);
+
+            if ($request->has('subscription_payment')) {
+                $preApproval = new PreApprovalClient();
+                $payment = $preApproval->create($createRequest, $request_options);
+            } else {
+                $payment = $client->create($createRequest, $request_options);
+            }
 
             $this->validatePaymentResult($payment);
             Log::info("Payment created successfully to the company $company_id to the plan $plan.", [
@@ -185,22 +230,22 @@ class PlanController extends Controller
         }
 
         // Taxas: https://www.mercadopago.com.br/ajuda/custo-receber-pagamentos_220
-        $netAmount = $payment->transaction_amount;
+        $netAmount = $request->has('subscription_payment') ? $payment->auto_recurring->transaction_amount : $payment->transaction_amount;
         if (!empty($payment->transaction_details->net_received_amount)) {
             $netAmount = $payment->transaction_details->net_received_amount;
         } else if ($check_payment_method === 'pix') {
             $netAmount = $payment->transaction_amount * 0.99; // taxa de 0.99% no pix
         } elseif (in_array($check_payment_method, array('bolbradesco', 'pec'))) {
             $netAmount = $payment->transaction_amount - 3.49; // taxa de R$ 3.49 no boleto
-        } elseif ($check_payment_method === 'card') {
-            if ($payment->payment_type_id === 'credit_card') {
-                $netAmount = $payment->transaction_amount - ($payment->transaction_amount * (3.98 / 100)); // taxa de 3.98% no cartão de crédito
+        } elseif ($request->has('subscription_payment') || $check_payment_method === 'card') {
+            if ($request->has('subscription_payment') || $payment->payment_type_id === 'credit_card') {
+                $netAmount -= ($netAmount * (3.98 / 100)); // taxa de 3.98% no cartão de crédito
             } else {
-                $netAmount = $payment->transaction_amount - ($payment->transaction_amount * (3.99 / 100)); // taxa de 3.99% no cartão
+                $netAmount -= ($netAmount * (3.99 / 100)); // taxa de 3.99% no cartão
             }
         }
 
-        $dateOfExpiration = formatDateInternational($payment->date_of_expiration ?? null);
+        $dateOfExpiration = formatDateInternational($request->has('subscription_payment') ? $payment->auto_recurring->end_date : ($payment->date_of_expiration ?? null));
 
         $this->plan_payment->insert(array(
             'id_transaction'    => $payment->id,
@@ -210,15 +255,16 @@ class PlanController extends Controller
             'date_of_expiration'=> $dateOfExpiration,
             'key_pix'           => $payment->point_of_interaction->transaction_data->qr_code ?? null,
             'base64_key_pix'    => $payment->point_of_interaction->transaction_data->qr_code_base64 ?? null,
-            'payment_method_id' => $payment->payment_method_id,
-            'payment_type_id'   => $payment->payment_type_id,
+            'payment_method_id' => $request->has('subscription_payment') ? $createRequest['payment_method_id'] : $payment->payment_method_id,
+            'payment_type_id'   => $request->has('subscription_payment') ? 'credit_card' : $payment->payment_type_id,
             'plan_id'           => $plan,
-            'status_detail'     => $payment->status_detail,
-            'installments'      => $payment->installments,
+            'status_detail'     => $request->has('subscription_payment') ? 'pending_review_manual' : $payment->status_detail,
+            'installments'      => $request->has('subscription_payment') ? 1 : $payment->installments,
             'status'            => $payment->status,
-            'gross_amount'      => $payment->transaction_amount,
+            'gross_amount'      => $request->has('subscription_payment') ? $payment->auto_recurring->transaction_amount : $payment->transaction_amount,
             'net_amount'        => roundDecimal($netAmount),
-            'client_amount'     => $payment->transaction_details->total_paid_amount,
+            'client_amount'     => $request->has('subscription_payment') ? $payment->auto_recurring->transaction_amount : $payment->transaction_details->total_paid_amount,
+            'is_subscription'   => $request->has('subscription_payment'),
             'company_id'        => $company_id,
             'user_created'      => $request->user()->id
         ));
@@ -226,7 +272,7 @@ class PlanController extends Controller
         // Pagamento foi criado. Validar a situação. Ele poder ter sido rejeitado diretamente.
         try {
             $this->mercado_pago_exception->setPayment($payment);
-            $verify = $this->mercado_pago_exception->verifyTransaction();
+            $verify = $this->mercado_pago_exception->verifyTransaction($request->has('subscription_payment'));
         }  catch (Exception $exception) {
             return response()->json(['errors' => $exception->getMessage(), 'payment_id' => $payment->id], 400);
         }
@@ -348,7 +394,7 @@ class PlanController extends Controller
         $payer                  = $request->input('payer');
         $createRequest          = [
             'external_reference'    => $code_payment,
-            "transaction_amount"    => roundDecimal($plan_data->value),
+            "transaction_amount"    => roundDecimal($request->has('subscription_payment') ? roundDecimal($plan_data->value - ($plan_data->value * 0.15)) : $plan_data->value),
             "description"           => $plan_data->name,
             "payment_method_id"     => $request->input('payment_method_id'),
             'notification_url'      => route('mercadopago.notification'),
@@ -361,7 +407,7 @@ class PlanController extends Controller
                         "description"   => $plan_data->name,
                         "category_id"   => "plan",
                         "quantity"      => 1,
-                        "unit_price"    => roundDecimal($plan_data->value)
+                        "unit_price"    => roundDecimal($request->has('subscription_payment') ? roundDecimal($plan_data->value - ($plan_data->value * 0.15)) : $plan_data->value)
                     ]
                 ],
                 "payer" => [
@@ -436,10 +482,10 @@ class PlanController extends Controller
                 $createRequest["payer"] = array(
                     "entity_type"    => "individual",
                     "type"           => "customer",
-                    "email"          => $payer['email'],
+                    "email"          => $request->has('subscription_payment') ? auth()->user()->__get('email') : $payer['email'],
                     "identification" => array(
-                        "type"       => $payer['identification']['type'],
-                        "number"     => onlyNumbers($payer['identification']['number'])
+                        "type"       => $request->has('subscription_payment') ? $request->input('identification')['type'] : $payer['identification']['type'],
+                        "number"     => onlyNumbers($request->has('subscription_payment') ? $request->input('identification')['number'] : $payer['identification']['number'])
                     )
                 );
                 break;
@@ -447,6 +493,88 @@ class PlanController extends Controller
                 throw new Exception('Tipo de pagamento não encontrado.');
         }
 
+        if ($request->has('subscription_payment')) {
+            $datetime_start_date = new DateTime('now', new DateTimeZone(TIMEZONE_DEFAULT));
+            $start_date = $datetime_start_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_start_date->format('v')) . 'Z';
+
+            $datetime_end_date = new DateTime($start_date, new DateTimeZone(TIMEZONE_DEFAULT));
+            $datetime_end_date->modify('+1 year');
+            $end_date = $datetime_end_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_end_date->format('v')) . 'Z';
+
+            $createRequest = array(
+                'external_reference'    => $code_payment,
+                'back_url'              => str_replace('http://localhost:8000/', 'https://app.locai.com.br/', $createRequest['notification_url']),  // URL de retorno após pagamento
+                'reason'                => $createRequest['description'],  // Razão da assinatura (descrição do serviço ou produto)
+                'payer_email'           => $createRequest['payer']['email'],
+                'notification_url'      => route('mercadopago.notification'),
+                'auto_recurring'        => [
+                    'frequency'             => 1,  // Frequência mensal
+                    'frequency_type'        => "months",  // Tipo mensal
+                    'transaction_amount'    => roundDecimal($plan_data->value - ($plan_data->value * 0.15)),  // Valor da mensalidade
+                    'currency_id'           => "BRL",  // Moeda
+                    'start_date'            => str_replace('+00:00', 'Z', $start_date),
+                    'end_date'              => str_replace('+00:00', 'Z', $end_date),
+                    'recurrent_payment'     => true,  // Definir como pagamento recorrente
+                ],
+                'card_token'    => $createRequest['token'],  // Token do cartão gerado pelo front-end
+                'payer'         => [
+                    'name'              => $createRequest['additional_info']['payer']['first_name'],  // Nome do cliente
+                    'surname'           => $createRequest['additional_info']['payer']['last_name'],  // Sobrenome
+                    'email'             => $createRequest['payer']['email'],  // E-mail do cliente
+                    'identification'    => [
+                        'type'      => $createRequest['payer']['identification']['type'],  // Tipo de documento
+                        'number'    => $createRequest['payer']['identification']['number']  // Número do CPF do cliente
+                    ],
+                ],
+                'additional_info' => [
+                    'order_id'              => $createRequest['external_reference'],  // ID do pedido (pode ser útil para o controle interno)
+                    'product_description'   => $createRequest['description'],  // Descrição do produto ou serviço
+                ]
+            );
+        }
+
         return $createRequest;
+    }
+
+    public function cancelSubscription(Request $request): JsonResponse
+    {
+        $company_id = $request->user()->company_id;
+        $plan_id = $request->input('plan_id');
+
+        $payment = $this->plan_payment->getById($company_id, $plan_id);
+        if (!$payment) {
+            return response()->json(['success' => false, 'message' => 'Não foi possível localizar o plano!']);
+        }
+
+        try {
+            MercadoPagoConfig::setAccessToken(env('MP_ACCESS_TOKEN'));
+
+            // Instanciar o cliente de PreApproval
+            $client = new PreApprovalClient();
+
+            // Atualizar o status da assinatura para 'cancelled'
+            $client->update($payment->id_transaction, ['status' => 'cancelled']);
+
+            $this->plan_payment->edit(array('status' => 'cancelled'), $company_id, $plan_id);
+
+            return response()->json(['success' => true, 'message' => 'Assinatura cancelada com sucesso!']);
+        } catch (MPApiException $exception) {
+            $error_message = $exception->getApiResponse()->getContent();
+
+            Log::error("[MPApiException] Payment doesn't canceled to the company $company_id to the plan $plan_id.", [
+                'request'   => $createRequest ?? [],
+                'response'  => $error_message,
+                'trace'     => $exception->getTraceAsString()
+            ]);
+            return response()->json(['success' => false, 'message' => $error_message['message']], 400);
+        } catch (Exception $exception) {
+            $error_message = $exception->getMessage();
+            Log::error("[Exception] Payment doesn't canceled to the company $company_id to the plan $plan_id.", [
+                'request'   => $createRequest ?? [],
+                'response'  => $error_message,
+                'trace'     => $exception->getTraceAsString()
+            ]);
+            return response()->json(['success' => false, 'message' => $error_message], 400);
+        }
     }
 }

@@ -8,151 +8,7 @@
 
 @section('css')
     <style>
-        .hide-last-event {
-            height: 100px;
-            width: 3px;
-            background: #fff;
-            position: relative;
-            left: 250px;
-            margin-top: -98px;
-        }
 
-        .shadow-sm .card-header:not(.bg-primary) {
-            background-color: #dde;
-            border: 1px solid #dde;
-        }
-
-        .pricing-card-title {
-            font-size: 2.5rem !important;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        ul.list-unstyled li {
-            font-size: 1.2rem !important;
-        }
-
-        .timeline::before {
-            display: none;
-        }
-
-        .timeline {
-            border-left: 3px solid #727cf5;
-            border-bottom-right-radius: 4px;
-            border-top-right-radius: 4px;
-            background: rgba(114, 124, 245, 0.09);
-            margin: 0 auto;
-            letter-spacing: 0.2px;
-            position: relative;
-            line-height: 1.4em;
-            font-size: 1.03em;
-            padding: 50px;
-            list-style: none;
-            text-align: left;
-            max-width: 40%;
-        }
-
-        @media (max-width: 992px) {
-            .hide-last-event {
-                height: 98px;
-                left: 135px;
-                margin-top: -98px;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .timeline {
-                max-width: 98%;
-                padding: 25px;
-            }
-            .hide-last-event {
-                height: 103px;
-                left: 125px;
-                margin-top: -103px;
-            }
-        }
-
-        @media (max-width: 580px) {
-            .hide-last-event {
-                display: none;
-            }
-        }
-
-        .timeline h1 {
-            font-weight: 300;
-            font-size: 1.4em;
-        }
-
-        .timeline h2,
-        .timeline h3 {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-
-        .timeline .event {
-            border-bottom: 1px dashed #e8ebf1;
-            padding-bottom: 25px;
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        @media (max-width: 767px) {
-            .timeline .event {
-                padding-top: 30px;
-            }
-        }
-
-        .timeline .event:last-of-type {
-            padding-bottom: 0;
-            margin-bottom: 0;
-            border: none;
-        }
-
-        .timeline .event:before,
-        .timeline .event:after {
-            position: absolute;
-            display: block;
-            top: 0;
-        }
-
-        .timeline .event:before {
-            left: -207px;
-            content: attr(data-date);
-            text-align: right;
-            font-weight: bold;
-            font-size: 1em;
-            min-width: 120px;
-        }
-
-        @media (max-width: 767px) {
-            .timeline .event:before {
-                left: 0px;
-                text-align: left;
-            }
-        }
-
-        .timeline .event:after {
-            -webkit-box-shadow: 0 0 0 3px #727cf5;
-            box-shadow: 0 0 0 3px #727cf5;
-            left: -55.8px;
-            background: #fff;
-            border-radius: 50%;
-            height: 9px;
-            width: 9px;
-            content: "";
-            top: 5px;
-        }
-
-        .timeline .event:after:last-child {
-
-        }
-
-        @media (max-width: 767px) {
-            .timeline .event:after {
-                left: -31.8px;
-            }
-        }
     </style>
 @stop
 
@@ -173,6 +29,56 @@
                 title: copy ? 'Copiado com sucesso.' : 'Não foi possível copiar.'
             });
         });
+
+        $('#btn_cancel_subscription').on('click', function () {
+            const plan_id = $(this).data('plan-id');
+
+            Swal.fire({
+                title: 'Cancelamento de assinatura',
+                html: "Você está prestes a cancelar a assinatura<br><br>Não será possível reverter a ação.<br><br>Deseja continuar a excluir?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#bbb',
+                confirmButtonText: 'Sim, cancelar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: 'POST',
+                        url: "{{ route('ajax.plan.cancel_subscription') }}",
+                        data: { plan_id },
+                        dataType: 'json',
+                        success: response => {
+                            Toast.fire({
+                                icon: response.success ? 'success' : 'error',
+                                title: response.message
+                            })
+
+                            if (response.success) {
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 500);
+                            }
+                        }, error: e => {
+                            console.log(e);
+                        },
+                        complete: function(xhr) {
+                            if (xhr.status === 403) {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: 'Você não tem permissão para fazer essa operação!'
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+        })
     </script>
 @stop
 
@@ -223,7 +129,7 @@
                                     </div>
                                     <div class="form-group col-md-8">
                                         <label>Situação Atual Detalhada</label>
-                                        <input type="text" class="form-control" name="status_detail" value="{{ __("mp.$payment->status_detail") }}" disabled />
+                                        <input type="text" class="form-control" name="status_detail" value="{{ $payment->status_detail ? __("mp.$payment->status_detail") : __("mp.$payment->status") }}" disabled />
                                     </div>
                                 </div>
                                 @if ($payment->payment_method_id === 'pix' && $payment->payment_type_id === 'bank_transfer')
@@ -288,6 +194,13 @@
                                     </div>
                                 </div>
                                 @endif
+                                @if ($payment->is_subscription)
+                                    <div class="row d-flex justify-content-center mt-3">
+                                        <div class="form-group col-md-4">
+                                            <button type="button" class="btn btn-danger col-md-12" id="btn_cancel_subscription" data-plan-id="{{ $payment->id }}">Cancelar assinatura</button>
+                                        </div>
+                                    </div>
+                                @endif
                                 @if (count($plan_histories))
                                     <div class="row histories-division">
                                         <div class="col-md-12"><hr/></div>
@@ -297,7 +210,7 @@
                                             <h4>Histórico da Transação</h4>
                                         </div>
                                     </div>
-                                    <div class="vertical-timeline mt-3">
+                                    <div class="timeline mt-3">
                                         @foreach($plan_histories as $key => $plan_history)
                                             <div class="timeline-wrapper timeline-wrapper-{{ getColorStatusMP($plan_history->status) }} {{ $key % 2 == 0 ? 'timeline-inverted' : '' }}">
                                                 <div class="timeline-badge"></div>
@@ -306,10 +219,15 @@
                                                         <h6 class="timeline-title">{{ __('mp.' . $plan_history->status) }}</h6>
                                                     </div>
                                                     <div class="timeline-body">
-                                                        <p>{{ __('mp.' . $plan_history->status_detail) }}</p>
+                                                        @if ($payment->is_subscription)
+                                                            @php($exp_observation = explode(':', $plan_history->observation))
+                                                            <p>{{ __('mp.' . $exp_observation[0]) . ':' . $exp_observation[1] }}</p>
+                                                        @elseif ($plan_history->status_detail)
+                                                            <p>{{ __('mp.' . $plan_history->status_detail) }}</p>
+                                                        @endif
                                                     </div>
                                                     <div class="timeline-footer d-flex align-items-center">
-                                                        <span class="ml-auto font-weight-bold">{{ dateInternationalToDateBrazil($plan_history->created_at, DATETIME_INTERNATIONAL_NO_SECONDS) }}</span>
+                                                        <span class="ml-auto font-weight-bold">{{ dateInternationalToDateBrazil($plan_history->created_at, DATETIME_BRAZIL_NO_SECONDS) }}</span>
                                                     </div>
                                                 </div>
                                             </div>

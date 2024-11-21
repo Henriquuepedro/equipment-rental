@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Alterar de Cliente')
+@section('title', 'Alterar Cliente')
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Alterar de Cliente</h1>
+    <h1 class="m-0 text-dark">Alterar Cliente</h1>
 @stop
 
 @section('css')

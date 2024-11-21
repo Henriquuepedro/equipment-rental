@@ -11,7 +11,7 @@
 
 @section('js')
     <script>
-        var tableUser;
+        let tableUser;
         $(function () {
             tableUser = getTable(false);
         });
@@ -21,7 +21,7 @@
             const active = $('#active').val();
 
             return $("#tableUsers").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

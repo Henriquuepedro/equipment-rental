@@ -15,14 +15,14 @@
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js" type="application/javascript"></script>
     <script src="//cdn.datatables.net/plug-ins/1.13.7/api/processing().js" type="application/javascript"></script>
     <script>
-        var tableProvider;
+        let tableProvider;
         $(function () {
             tableProvider = getTableProvider(false);
         });
 
         const getTableProvider = (stateSave = true) => {
             return $("#tableProviders").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

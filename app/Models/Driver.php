@@ -15,7 +15,25 @@ class Driver extends Model
      * @var array
      */
     protected $fillable = [
-        'company_id', 'name', 'cpf', 'rg', 'cnh', 'cnh_exp', 'email', 'phone', 'observation', 'user_insert', 'user_update'
+        'company_id',
+        'name',
+        'cpf',
+        'rg',
+        'cnh',
+        'cnh_exp',
+        'email',
+        'phone',
+        'observation',
+        'address_zipcode',
+        'address_name',
+        'address_number',
+        'address_complement',
+        'address_reference',
+        'address_neigh',
+        'address_city',
+        'address_state',
+        'user_insert',
+        'user_update'
     ];
 
     /**

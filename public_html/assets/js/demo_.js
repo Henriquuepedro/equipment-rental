@@ -161,7 +161,15 @@ $(document).on('click', '[data-widget="collapse"]', function (){
 });
 
 const checkLabelAnimate = () => {
-    $("input[type='text'].form-control, input[type='email'].form-control, input[type='date'].form-control, input[type='tel'].form-control, input[type='number'].form-control, select.form-control").each(function() {
+    $(`
+        input[type='text'].form-control,
+        input[type='email'].form-control,
+        input[type='date'].form-control,
+        input[type='tel'].form-control,
+        input[type='number'].form-control,
+        select.form-control,
+        textarea.form-control
+    `).each(function() {
         if ($(this).val() !== '') {
             $(this).parents('.form-group').addClass("label-animate");
         } else {
@@ -414,6 +422,13 @@ const getOptionsForm = async (type, el, selected = null, select_default = null) 
             options = '<option value="">Selecione ...</option>';
             data_search = 'data';
             break;
+        case 'residues':
+            endpoint = `${base_uri}/residuo/visualizar-residuos`;
+            field_id = 'id';
+            field_text = 'name';
+            options = '<option value="">Selecione ...</option>';
+            data_search = 'data';
+            break;
         default:
             return el.empty().append(options);
     }
@@ -590,6 +605,7 @@ const formatDate = (date, format_out, message_default = null) => {
 const loadSearchZipcode = (selector, contentElement) => {
     $(document).on('blur', selector, function (){
         const cep = $(this).val().replace(/\D/g, '');
+        let tagName = '';
 
         if (cep.length === 0) {
             return false;
@@ -604,16 +620,27 @@ const loadSearchZipcode = (selector, contentElement) => {
         $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function(dados) {
             if (!("erro" in dados)) {
                 if(dados.logradouro !== '') {
-                    contentElement.find('[name="address"]').val(dados.logradouro).parent().addClass("label-animate");
+                    contentElement.find('[name="address"], [name="address_name"]').val(dados.logradouro).parent().addClass("label-animate");
                 }
                 if(dados.bairro !== '') {
-                    contentElement.find('[name="neigh"]').val(dados.bairro).parent().addClass("label-animate");
-                }
-                if(dados.localidade !== '') {
-                    contentElement.find('[name="city"]').val(dados.localidade).parent().addClass("label-animate");
+                    contentElement.find('[name*="neigh"]').val(dados.bairro).parent().addClass("label-animate");
                 }
                 if(dados.uf !== '') {
-                    contentElement.find('[name="state"]').val(dados.uf).parent().addClass("label-animate");
+                    tagName = contentElement.find('[name*="state"]').prop("tagName");
+                    if (tagName === 'SELECT') {
+                        loadStates(contentElement.find('[name*="state"]'), dados.uf);
+                    } else {
+                        contentElement.find('[name*="state"]').val(dados.uf).parent().addClass("label-animate");
+                    }
+                }
+                if(dados.localidade !== '' && dados.uf !== '') {
+                    tagName = contentElement.find('[name*="city"]').prop("tagName");
+                    if (tagName === 'SELECT') {
+                        loadCities(contentElement.find('[name*="city"]'), dados.uf, dados.localidade);
+                    } else {
+                        contentElement.find('[name*="city"]').val(dados.uf).parent().addClass("label-animate");
+                    }
+
                 }
             }
             else {

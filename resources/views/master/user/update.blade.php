@@ -126,7 +126,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="alert alert-primary" role="alert">
-                                                <i class="mdi mdi-alert-circle"></i> Após a criação do usuário, o mesmo deverá confirmar seu e-mail para acessar a plataforma.
+                                                <i class="mdi mdi-alert-circle"></i> Após a criação do usuário, o mesmo deverá acessar o e-mail e realizar uma confirmação para acessar a plataforma.
                                             </div>
                                         </div>
                                     </div>
@@ -189,7 +189,7 @@
                                     <div class="row">
                                         <div class="col-md-12 mb-3 text-center">
                                             <h4 class="no-margin">Permissões de acesso</h4>
-                                            <small>Defina as permissão do usuário</small>
+                                            <small>Defina as permissões do usuário</small>
                                             <br>
                                             <div class="d-flex justify-content-center mt-4">
                                                 <div class="switch">

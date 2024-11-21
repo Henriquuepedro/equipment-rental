@@ -20,37 +20,37 @@ class MercadoPagoException extends Exception
     }
 
     #Verify transaction
-    public function verifyTransaction(): array
+    public function verifyTransaction(bool $is_subscription = false): array
     {
         if ($this->getPayment()->status == 'approved' || $this->getPayment()->status == 'in_process' || $this->getPayment()->status == 'pending') {
             return [
                 'class' => 'success',
-                'message'=>$this->getStatus()
+                'message'=>$this->getStatus($is_subscription)
             ];
         }
         elseif ($this->getPayment()->status == "rejected") {
             return [
                 'class' => 'error',
-                'message'=>$this->getStatus()
+                'message'=>$this->getStatus($is_subscription)
             ];
         } else {
             return [
                 'class' => 'error',
-                'message'=>$this->getStatus()
+                'message'=>$this->getStatus($is_subscription)
             ];
         }
     }
 
     #Get Status
-    public function getStatus(): string
+    public function getStatus(bool $is_subscription = false): string
     {
         $qr_code_base64 = $this->getPayment()->point_of_interaction->transaction_data->qr_code_base64 ?? '';
         $qr_code = $this->getPayment()->point_of_interaction->transaction_data->qr_code ?? '';
         $external_resource_url = $this->getPayment()->transaction_details->external_resource_url ?? '';
         $barcode = $this->getPayment()->barcode->content ?? '';
         $statement_descriptor = $this->getPayment()->statement_descriptor ?? '';
-        $dateOfExpiration = formatDateInternational($this->getPayment()->date_of_expiration, 'd/m H:i');
-        $dateOfExpirationOnlyDate = formatDateInternational($this->getPayment()->date_of_expiration, 'd/m');
+        $dateOfExpiration = formatDateInternational($this->getPayment()->date_of_expiration ?? '', 'd/m H:i');
+        $dateOfExpirationOnlyDate = formatDateInternational($this->getPayment()->date_of_expiration ?? '', 'd/m');
 
         $status=[
             'accredited'                            => "Seu pagamento foi aprovado! Você verá o nome $statement_descriptor na sua fatura de cartão de crédito.",
@@ -72,6 +72,10 @@ class MercadoPagoException extends Exception
             'cc_rejected_other_reason'              => 'O cartão não processou seu pagamento',
             'pending_waiting_transfer'              => "<p class='mt-2'>Falta pouco! Escaneie o código QR pelo seu app de pagamentos ou Internet Banking</p><h4>Pague até <b>$dateOfExpiration</b>.</h4><img width='200px' src='data:image/jpeg;base64,$qr_code_base64'/><br/><br>Se preferir, você pode pagá-lo copiando e colando o código abaixo:<br><div class='input-group mt-1'><input type='text' class='form-control' value='$qr_code' readonly><span class='input-group-btn'><button type='button' class='btn btn-primary btn-flat copy-input'><i class='fas fa-copy'></i></button></span></div><br/><span class='status_copy'></span>"
         ];
+
+        if ($is_subscription) {
+            return $status['pending_review_manual'];
+        }
 
         if (array_key_exists($this->getPayment()->status_detail, $status)) {
             return $status[$this->getPayment()->status_detail];

@@ -18,6 +18,7 @@ class PlanHistory extends Model
         'payment_id',
         'status_detail',
         'status',
+        'observation',
         'status_date'
     ];
 
@@ -46,13 +47,13 @@ class PlanHistory extends Model
         return $this->where('payment_id', $payment)->get();
     }
 
-    public function getStatusByPayment(int $payment_id, $status)
+    public function getStatusByPayment(int $payment_id, string $observation, $status)
     {
         if (!is_array($status)) {
             $status = array($status);
         }
 
-        return $this->where('payment_id', $payment_id)->whereIn('status', $status)->first();
+        return $this->where(array('payment_id' => $payment_id, 'observation' => $observation))->whereIn('status', $status)->first();
     }
 
     public function getPenultimatePlanConfirmedCompany(int $company, int $planIgnore)
@@ -86,8 +87,13 @@ class PlanHistory extends Model
         }
     }
 
-    public function getHistoryByStatusAndStatusDetail(int $planId, string $status, string $statusDetail)
+    public function getHistoryByStatusAndStatusDetail(int $planId, string $status, ?string $statusDetail, ?string $observation)
     {
-        return $this->where(['payment_id' => $planId, 'status' => $status, 'status_detail' => $statusDetail])->first();
+        return $this->where([
+            'payment_id' => $planId,
+            'status' => $status,
+            'status_detail' => $statusDetail,
+            'observation' => $observation
+        ])->first();
     }
 }

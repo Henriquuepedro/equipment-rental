@@ -11,7 +11,7 @@
 
 @section('js')
     <script>
-        var tableCompany;
+        let tableCompany;
         $(function () {
             tableCompany = getTable(false);
         });
@@ -21,7 +21,7 @@
             const status = $('#status').val();
 
             return $("#tableCompanies").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

@@ -161,7 +161,7 @@ $("#formUpdateResidueModal").validate({
 
 const getTable = (stateSave = true) => {
     return $("#tableResidues").DataTable({
-        "scrollX": true,
+        "responsive": true,
         "processing": true,
         "autoWidth": false,
         "serverSide": true,

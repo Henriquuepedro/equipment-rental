@@ -261,6 +261,12 @@ return [
                     'route_active'  => ['master.guide.create', 'master.guide.edit']
                 ],
                 [
+                    'route' => 'master.notification.index',
+                    'text' => 'Notificação',
+                    'permissions'   => [],
+                    'route_active'  => ['master.notification.create', 'master.notification.edit']
+                ],
+                [
                     'route' => 'master.audit_log.index',
                     'text' => 'Logs de Auditoria',
                     'permissions'   => [],
@@ -335,6 +341,14 @@ return [
                     'route' => 'provider.index',
                     'text' => 'Fornecedor',
                     'route_active'  => ['provider.create', 'provider.edit']
+                ],
+                [
+                    'permissions' => [
+                        'DisposalPlaceView'
+                    ],
+                    'route' => 'disposal_place.index',
+                    'text' => 'Local de descarte',
+                    'route_active'  => ['disposal_place.create', 'disposal_place.edit']
                 ]
             ]
         ],
@@ -421,7 +435,7 @@ return [
                 [
                     'route'         => 'plan.index',
                     'text'          => 'Planos',
-                    'route_active'  => ['plan.confirm']
+                    'route_active'  => ['plan.confirm', 'plan.confirm_subscription_payment']
                 ],
                 [
                     'route'         => 'plan.request',

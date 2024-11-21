@@ -80,6 +80,13 @@ if (! function_exists('hasPermission')) {
     }
 }
 
+if (! function_exists('getAllPermissions')) {
+    function getAllPermissions(): array
+    {
+        return empty(auth()->user()->__get('permission')) ? [] : json_decode(auth()->user()->__get('permission'));
+    }
+}
+
 if (! function_exists('hasAdmin')) {
     function hasAdmin(): bool
     {
@@ -848,5 +855,12 @@ if (!function_exists('extractDataPhone')) {
             'ddd' => $ddd,
             'phone' => $phone
         ];
+    }
+}
+
+if (!function_exists('getHtmlStatusList')) {
+    function getHtmlStatusList(int $status): string
+    {
+        return $status ? '<div class="badge badge-pill badge-lg badge-success">Ativo</div>' : '<div class="badge badge-pill badge-lg badge-danger">Inativo</div>';
     }
 }

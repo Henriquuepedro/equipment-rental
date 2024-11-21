@@ -8,13 +8,17 @@ use App\Models\BudgetEquipment;
 use App\Models\BudgetPayment;
 use App\Models\Client;
 use App\Models\Company;
+use App\Models\DisposalPlace;
 use App\Models\Driver;
 use App\Models\Equipment;
+use App\Models\EquipmentRentalMtr;
 use App\Models\FormPayment;
 use App\Models\Provider;
 use App\Models\Rental;
 use App\Models\RentalEquipment;
+use App\Models\RentalMtr;
 use App\Models\RentalPayment;
+use App\Models\Residue;
 use App\Models\Vehicle;
 use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +45,10 @@ class PrintController extends Controller
     private Equipment $equipment;
     private FormPayment $form_payment;
     private BillToPayPayment $bill_to_pay_payment;
+    private RentalMtr $rental_mtr;
+    private EquipmentRentalMtr $equipment_rental_mtr;
+    private DisposalPlace $disposal_place;
+    private Residue $residue;
 
     public function __construct(PDF $pdf)
     {
@@ -59,6 +67,10 @@ class PrintController extends Controller
         $this->equipment            = new Equipment;
         $this->form_payment         = new FormPayment;
         $this->bill_to_pay_payment  = new BillToPayPayment;
+        $this->rental_mtr           = new RentalMtr();
+        $this->equipment_rental_mtr = new EquipmentRentalMtr();
+        $this->disposal_place       = new DisposalPlace();
+        $this->residue              = new Residue();
 
         $this->pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 
@@ -367,6 +379,45 @@ class PrintController extends Controller
         return view('print.report.bill', compact('company', 'logo_company', 'bills', 'data_filter_view_pdf', 'type_report', 'bill_type', 'bill_status'));*/
 
         $pdf = $this->pdf->loadView('print.report.bill', $contentPrint);
+        return $pdf->stream();
+    }
+
+    public function rentalMtr(int $rental_mtr_id = null): Response|RedirectResponse
+    {
+        $company_id = Auth::user()->__get('company_id');
+        $rental_mtr = $this->rental_mtr->getByid($rental_mtr_id, $company_id);
+
+        if (!$rental_mtr) {
+            return redirect()->route('rental.index');
+        }
+
+        $contentRecibo = $this->getDataFormatBudgetRental($rental_mtr->rental_id, false);
+        if (!$contentRecibo) {
+            return redirect()->route('rental.index');
+        }
+
+        $driver_id = $rental_mtr->driver_id;
+        $disposal_place_id = $rental_mtr->disposal_place_id;
+
+        $contentRecibo['driver'] = $this->driver->getDriver($driver_id, $company_id);
+        $contentRecibo['disposal_place'] = $this->disposal_place->getByid($disposal_place_id, $company_id);
+        $contentRecibo['rental_mtr'] = $rental_mtr;
+        $contentRecibo['company']->logo = getImageCompanyBase64($contentRecibo['company']);
+        $equipments_rental_mtr = $this->equipment_rental_mtr->getByRentalMtr($rental_mtr_id, $company_id);
+
+        $equipments_rental_mtr = array_map(function($equipment) use ($company_id) {
+            return array(
+                'rental_equipment_id'   => $equipment['rental_equipment_id'],
+                'residue'               => $this->residue->getResidue($company_id, $equipment['residue_id']),
+                'quantity'              => $equipment['quantity'],
+                'classification'        => $equipment['classification'],
+                'date'                  => dateInternationalToDateBrazil($equipment['date'], DATETIME_BRAZIL_NO_SECONDS),
+            );
+        }, $equipments_rental_mtr->toArray());
+
+        $contentRecibo['equipments_rental_mtr'] = $equipments_rental_mtr;
+
+        $pdf = $this->pdf->loadView('print.rental-mtr', $contentRecibo);
         return $pdf->stream();
     }
 }

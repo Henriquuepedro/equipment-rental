@@ -202,7 +202,7 @@
             @foreach($equipments as $equipment)
                 <tr>
                     <td class='info' style='width: {{ $budget ? 69 : 35 }}%'>
-                        <span>Equipamento {!! $equipment->exchange_rental_equipment_id ? '<b>(exchanged)</b>' : '' !!}</span>
+                        <span>Equipamento {!! $equipment->exchange_rental_equipment_id ? '<b>(TROCA)</b>' : '' !!}</span>
                         <p class='dadosLocacao'>{{ $equipment->name ?? 'Caçamba '.$equipment->volume.'m³' }} - {{ $equipment->reference }}</p>
                     </td>
                     <td class='info' style='width: 10%'>

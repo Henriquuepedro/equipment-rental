@@ -11,14 +11,14 @@
 
 @section('js')
     <script>
-        var tableBudget;
+        let tableBudget;
         $(function () {
             tableBudget = getTable(false);
         });
 
         const getTable = (stateSave = true) => {
             return $("#tableBudgets").DataTable({
-                "scrollX": true,
+                "responsive": true,
                 "processing": true,
                 "autoWidth": false,
                 "serverSide": true,

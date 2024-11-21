@@ -8,6 +8,7 @@ use App\Models\PlanHistory;
 use App\Models\PlanPayment;
 use Exception;
 use MercadoPago\Client\Payment\PaymentClient;
+use MercadoPago\Client\PreApproval\PreApprovalClient;
 use MercadoPago\MercadoPagoConfig;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,6 +20,10 @@ class MercadoPagoService
     private PlanHistory $plan_history;
     private Plan $plan;
     private Company $company;
+
+    protected array $cancel_status = array('rejected', 'cancelled', 'refunded', 'charged_back', 'expired', 'paused');
+
+    protected array $approve_status = array('approved', 'authorized');
 
     public function __construct(bool $debug = false)
     {
@@ -48,7 +53,11 @@ class MercadoPagoService
             MercadoPagoConfig::setAccessToken(env('MP_ACCESS_TOKEN'));
 
             try {
-                $payment = new PaymentClient();
+                if ($plan_payment->is_subscription) {
+                    $payment = new PreApprovalClient();
+                } else {
+                    $payment = new PaymentClient();
+                }
                 $data_payment = $payment->get($code);
             } catch(\Exception $e) {
                 $this->debugEcho("get payment ($code) to mercadoPago found a error. {$e->getMessage()}");
@@ -56,8 +65,10 @@ class MercadoPagoService
             }
 
             $status         = $data_payment->status;
-            $status_detail  = $data_payment->status_detail;
-            $last_modified  = formatDateInternational($data_payment->date_last_updated) ?? dateNowInternational();
+            $status_detail  = $plan_payment->is_subscription ? null : $data_payment->status_detail;
+            $last_modified  = $plan_payment->is_subscription ? $data_payment->last_modified : $data_payment->date_last_updated;
+            $last_modified  = formatDateInternational($last_modified) ?? dateNowInternational();
+            $observation    = $plan_payment->is_subscription ? 'preapproval: '.(($data_payment->summarized->quotas - $data_payment->summarized->pending_charge_quantity) + 1).'/'.$data_payment->summarized->quotas : null;
 
             $this->debugEcho("[CODE_TRANSACTION=$code]");
             $this->debugEcho("[PLAN=$plan_payment_id]");
@@ -66,8 +77,8 @@ class MercadoPagoService
             $this->debugEcho("[COMPANY=$company_id]");
 
             // verificar se o status já existe
-            if ($this->plan_history->getHistoryByStatusAndStatusDetail($plan_payment_id, $status, $status_detail)) {
-                $this->debugEcho("status ($status) and status_detail ($status_detail) in use to plan_id ($plan_payment_id).");
+            if ($this->plan_history->getHistoryByStatusAndStatusDetail($plan_payment_id, $status, $status_detail, $observation)) {
+                $this->debugEcho("status ($status) and status_detail ($status_detail) and observation ($observation) in use to plan_id ($plan_payment_id).");
                 return Response::HTTP_OK;
             }
 
@@ -79,13 +90,13 @@ class MercadoPagoService
             $this->debugEcho("[MONTH=$month_plan]");
 
             // Pedido aprovado, liberar dias do plano.
-            if (in_array($status, array('approved', 'authorized'))) {
+            if (in_array($status, $this->approve_status)) {
                 $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) is approved or authorized.");
                 // Pagamento já teve uma aprovação anteriormente, não deve adicionar mais dias no plano.
-                if (!$this->plan_history->getStatusByPayment($plan_payment_id, array('approved', 'authorized'))) {
+                if (!$this->plan_history->getStatusByPayment($plan_payment_id, $observation, $this->approve_status)) {
                     $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) isn't approved or authorized.");
                     // Pagamento não tem indício de cancelamento, continuar com a aprovação e adicionar os dias.
-                    if (!$this->plan_history->getStatusByPayment($plan_payment_id, array('rejected', 'cancelled', 'refunded', 'charged_back'))) {
+                    if (!$this->plan_history->getStatusByPayment($plan_payment_id, $observation, $this->cancel_status)) {
                         $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) isn't rejected, cancelled, refunded or charged_back.");
                         // Adicionar quantidade de meses conforme o plano e atualiza o plano da empresa.
                         $this->company->setDatePlanAndUpdatePlanCompany($company_id, $plan_config_id, $month_plan);
@@ -94,13 +105,13 @@ class MercadoPagoService
                 }
             }
             // Pedido perdeu sua aprovação, deve verificar se chegou a ocorrer alguma aprovação para reverter.
-            elseif (in_array($status, array('rejected', 'cancelled', 'refunded', 'charged_back'))) {
+            elseif (in_array($status, $this->cancel_status)) {
                 $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) is rejected or cancelled or refunded or charged_back.");
                 // Pagamento já teve uma aprovação anteriormente, deve reverter a aprovação.
-                if ($this->plan_history->getStatusByPayment($plan_payment_id, array('approved', 'authorized'))) {
+                if ($this->plan_history->getStatusByPayment($plan_payment_id, $observation, $this->approve_status)) {
                     $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) has already been approved or authorized.");
                     // Pagamento já perdeu a aprovação anteriormente, não deve reverter a aprovação novamente.
-                    if (!$this->plan_history->getStatusByPayment($plan_payment_id, array('rejected', 'cancelled', 'refunded', 'charged_back'))) {
+                    if (!$this->plan_history->getStatusByPayment($plan_payment_id, $observation, $this->cancel_status)) {
                         $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) isn't rejected, cancelled, refunded or charged_back.");
                         // identificar qual o plano anterior do que precisa ser cancelado.
                         $plan_id_old = $this->plan_history->getPenultimatePlanConfirmedCompany($company_id, $plan_payment_id);
@@ -116,7 +127,8 @@ class MercadoPagoService
                 'payment_id'    => $plan_payment_id,
                 'status_detail' => $status_detail,
                 'status'        => $status,
-                'status_date'   => $last_modified
+                'status_date'   => $last_modified,
+                'observation'   => $observation
             );
             $this->plan_history->insert($plan_history);
             $this->debugEcho("New history created. " . json_encode($plan_history, JSON_UNESCAPED_UNICODE) . "\n");
