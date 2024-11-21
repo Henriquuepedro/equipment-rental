@@ -108,7 +108,7 @@ class PlanController extends Controller
         $now    = new DateTimeImmutable("now");
         $config = Configuration::forSymmetricSigner(new Sha256(), InMemory::plainText(config('app.key')));
 
-        $plan->value = ($plan->value - ($plan->value * 0.15));
+        $plan->value = roundDecimal($plan->value - ($plan->value * 0.15));
 
         $token = $config->builder()
             ->issuedBy(url()->current())
@@ -394,7 +394,7 @@ class PlanController extends Controller
         $payer                  = $request->input('payer');
         $createRequest          = [
             'external_reference'    => $code_payment,
-            "transaction_amount"    => roundDecimal($request->has('subscription_payment') ? ($plan_data->value - ($plan_data->value * 0.15)) : $plan_data->value),
+            "transaction_amount"    => roundDecimal($request->has('subscription_payment') ? roundDecimal($plan_data->value - ($plan_data->value * 0.15)) : $plan_data->value),
             "description"           => $plan_data->name,
             "payment_method_id"     => $request->input('payment_method_id'),
             'notification_url'      => route('mercadopago.notification'),
@@ -407,7 +407,7 @@ class PlanController extends Controller
                         "description"   => $plan_data->name,
                         "category_id"   => "plan",
                         "quantity"      => 1,
-                        "unit_price"    => roundDecimal($request->has('subscription_payment') ? ($plan_data->value - ($plan_data->value * 0.15)) : $plan_data->value)
+                        "unit_price"    => roundDecimal($request->has('subscription_payment') ? roundDecimal($plan_data->value - ($plan_data->value * 0.15)) : $plan_data->value)
                     ]
                 ],
                 "payer" => [
