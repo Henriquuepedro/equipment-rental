@@ -108,7 +108,7 @@ class PlanController extends Controller
         $now    = new DateTimeImmutable("now");
         $config = Configuration::forSymmetricSigner(new Sha256(), InMemory::plainText(config('app.key')));
 
-        $plan->value = roundDecimal($plan->value - ($plan->value * 0.15));
+        $plan->value = roundDecimal($plan->value - ($plan->value * 0.15), 2, false);
 
         $token = $config->builder()
             ->issuedBy(url()->current())
@@ -182,7 +182,7 @@ class PlanController extends Controller
             }
 
             if (
-                roundDecimal($plan_data->value - ($plan_data->value * 0.15)) != roundDecimal($plan_value)
+                roundDecimal($plan_data->value - ($plan_data->value * 0.15), 2, false) != roundDecimal($plan_value, 2, false)
             ) {
                 return response()->json(['errors' => 'Valor não corresponde ao valor do plano selecionado.'], 400);
             }
@@ -262,7 +262,7 @@ class PlanController extends Controller
             'installments'      => $request->has('subscription_payment') ? 1 : $payment->installments,
             'status'            => $payment->status,
             'gross_amount'      => $request->has('subscription_payment') ? $payment->auto_recurring->transaction_amount : $payment->transaction_amount,
-            'net_amount'        => roundDecimal($netAmount),
+            'net_amount'        => roundDecimal($netAmount, 2, false),
             'client_amount'     => $request->has('subscription_payment') ? $payment->auto_recurring->transaction_amount : $payment->transaction_details->total_paid_amount,
             'is_subscription'   => $request->has('subscription_payment'),
             'company_id'        => $company_id,
@@ -394,7 +394,7 @@ class PlanController extends Controller
         $payer                  = $request->input('payer');
         $createRequest          = [
             'external_reference'    => $code_payment,
-            "transaction_amount"    => roundDecimal($request->has('subscription_payment') ? roundDecimal($plan_data->value - ($plan_data->value * 0.15)) : $plan_data->value),
+            "transaction_amount"    => roundDecimal($request->has('subscription_payment', 2, false) ? roundDecimal($plan_data->value - ($plan_data->value * 0.15), 2, false) : $plan_data->value),
             "description"           => $plan_data->name,
             "payment_method_id"     => $request->input('payment_method_id'),
             'notification_url'      => route('mercadopago.notification'),
@@ -407,7 +407,7 @@ class PlanController extends Controller
                         "description"   => $plan_data->name,
                         "category_id"   => "plan",
                         "quantity"      => 1,
-                        "unit_price"    => roundDecimal($request->has('subscription_payment') ? roundDecimal($plan_data->value - ($plan_data->value * 0.15)) : $plan_data->value)
+                        "unit_price"    => roundDecimal($request->has('subscription_payment', 2, false) ? roundDecimal($plan_data->value - ($plan_data->value * 0.15), 2, false) : $plan_data->value)
                     ]
                 ],
                 "payer" => [
@@ -510,7 +510,7 @@ class PlanController extends Controller
                 'auto_recurring'        => [
                     'frequency'             => 1,  // Frequência mensal
                     'frequency_type'        => "months",  // Tipo mensal
-                    'transaction_amount'    => roundDecimal($plan_data->value - ($plan_data->value * 0.15)),  // Valor da mensalidade
+                    'transaction_amount'    => roundDecimal($plan_data->value - ($plan_data->value * 0.15), 2, false),  // Valor da mensalidade
                     'currency_id'           => "BRL",  // Moeda
                     'start_date'            => str_replace('+00:00', 'Z', $start_date),
                     'end_date'              => str_replace('+00:00', 'Z', $end_date),
