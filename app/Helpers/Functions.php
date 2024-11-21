@@ -622,9 +622,13 @@ if (!function_exists('subDate')) {
 }
 
 if (!function_exists('roundDecimal')) {
-    function roundDecimal(string|float $value, int $decimal = 2): float
+    function roundDecimal(string|float $value, int $decimal = 2, bool $return_float = true): float
     {
-        return (float)number_format($value, $decimal, '.', '');
+        $value = number_format($value, $decimal, '.', '');
+        if ($return_float) {
+            $value = (float)$value
+        }
+        return $value;
     }
 }
 
