@@ -26,7 +26,7 @@ var FORMAT_DATETIME_BRAZIL_NO_SECONDS = 'DD/MM/YYYY HH:mm';
 var FORMAT_DATE_BRAZIL = 'DD/MM/YYYY';
 
 var MaskPhoneBehavior = function (val) {
-    return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+    return onlyNumbers(val).length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
 },
 maskPhoneOptions = {
 onKeyPress: function(val, e, field, options) {
@@ -97,14 +97,22 @@ onKeyPress: function(val, e, field, options) {
         }, 500);
 
         $(".form-control").click(function() {
-            $(this).parent().addClass("label-animate");
+            if ($(this).parents('.form-group').length) {
+                $(this).parents('.form-group').addClass("label-animate");
+            } else {
+                $(this).parent().addClass("label-animate");
+            }
         });
 
         $(window).click(function(event) {
             if (!$(event.target).is('.form-control')) {
                 $(".form-control").each(function() {
                     if ($(this).val() === '') {
-                        $(this).parent().removeClass("label-animate");
+                        if ($(this).parents('.form-group').length) {
+                            $(this).parents('.form-group').removeClass("label-animate");
+                        } else {
+                            $(this).parent().removeClass("label-animate");
+                        }
                     }
                 });
             }
@@ -112,10 +120,18 @@ onKeyPress: function(val, e, field, options) {
         $(document).on('click, focus change', ".form-control", function() {
             $(".form-control").each(function() {
                 if ($(this).val() === '') {
-                    $(this).parent().removeClass("label-animate");
+                    if ($(this).parents('.form-group').length) {
+                        $(this).parents('.form-group').removeClass("label-animate");
+                    } else {
+                        $(this).parent().removeClass("label-animate");
+                    }
                 }
             });
-            $(this).parent().addClass("label-animate").find("label").addClass('label-focus');
+            if ($(this).parents('.form-group').length) {
+                $(this).parents('.form-group').addClass("label-animate").find("label").addClass('label-focus');
+            } else {
+                $(this).parent().addClass("label-animate").find("label").addClass('label-focus');
+            }
         });
 
         $(document).on('blur', ".form-control", function(event) {
@@ -159,6 +175,20 @@ onKeyPress: function(val, e, field, options) {
 $(document).on('click', '[data-widget="collapse"]', function (){
     $(this).closest('.box').find('.box-body').toggle('slow');
 });
+
+$(document).on('click', '.show-hide-password', function () {
+    const button_action = $(this);
+    const password_field = $(this).closest('.input-group').find('input[type="password"], input[type="text"]');
+    if (password_field.length) {
+        if (password_field.attr('type') === 'password') {
+            password_field.prop('type', 'text');
+            button_action.find('i').removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            password_field.prop('type', 'password');
+            button_action.find('i').removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    }
+})
 
 const checkLabelAnimate = () => {
     $(`
@@ -603,18 +633,20 @@ const formatDate = (date, format_out, message_default = null) => {
 }
 
 const loadSearchZipcode = (selector, contentElement) => {
-    $(document).on('blur', selector, function (){
-        const cep = $(this).val().replace(/\D/g, '');
+    $(document).on('keyup blur', selector, function (e){
+        const cep = onlyNumbers($(this).val());
         let tagName = '';
 
         if (cep.length === 0) {
             return false;
         }
         if (cep.length !== 8) {
-            Toast.fire({
-                icon: 'error',
-                title: 'CEP não encontrado'
-            });
+            if (e.type === 'focusout' || e.type === 'blur') {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'CEP inválido, informe 8 dígitos.'
+                });
+            }
             return false;
         }
         $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function(dados) {
@@ -788,4 +820,8 @@ const getTableList = (
     let object = {...object_default, ...object_external};
 
     return $(`#${varTable}`).DataTable(object);
+}
+
+const onlyNumbers = value => {
+    return value.replace(/\D/g, '');
 }

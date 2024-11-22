@@ -165,12 +165,22 @@
                                 <div class="row">
                                     <div class="form-group col-md-6">
                                         <label for="password">Senha <sup>*</sup></label>
-                                        <input type="password" class="form-control" id="password" name="password" autocomplete="nope" value="{{ old('password') }}" required>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="password" name="password" autocomplete="nope" value="{{ old('password') }}" required>
+                                            <div class="input-group-addon input-group-append">
+                                                <button type="button" class="btn btn-secondary show-hide-password"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
                                         <small>A senha deve conter no mínimo 8 dígitos.</small>
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="password_confirmation">Confirme a Senha <sup>*</sup></label>
-                                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" autocomplete="nope" value="{{ old('password_confirmation') }}" required>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" autocomplete="nope" value="{{ old('password_confirmation') }}" required>
+                                            <div class="input-group-addon input-group-append">
+                                                <button type="button" class="btn btn-secondary show-hide-password"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 

@@ -7,9 +7,22 @@ $(() => {
     }
     $('[name="state"], [name="city"]').select2();
 
-    loadStates($('[name="state"]'));
-    getOptionsForm('nationality', $('#formUpdateProvider [name="nationality"], #formCreateProvider [name="nationality"], #formCreateProviderModal [name="nationality"]'), $('[name="nationality_id"]').val() ?? null);
-    getOptionsForm('marital_status', $('#formUpdateProvider [name="marital_status"], #formCreateProvider [name="marital_status"], #formCreateProviderModal [name="marital_status"]'), $('[name="marital_status_id"]').val() ?? null);
+    getOptionsForm('nationality', $('form[id*="Provider"] [name="nationality"]'), $('[name="nationality_id"]').val() ?? null);
+    getOptionsForm('marital_status', $('form[id*="Provider"] [name="marital_status"]'), $('[name="marital_status_id"]').val() ?? null);
+
+    const state = $('[name="state"]').data('value-state');
+    const city = $('[name="city"]').data('value-city');
+    if (typeof state !== "undefined" && typeof city !== "undefined") {
+        loadStates($('[name="state"]'), state);
+        loadCities($('[name="city"]'), state, city);
+    } else if (typeof state !== "undefined" && typeof city === "undefined") {
+        loadStates($('[name="state"]'), state);
+    } else {
+        loadStates($('[name="state"]'));
+        loadCities($('[name="city"]'));
+    }
+
+    loadSearchZipcode('#formUpdateProvider [name="cep"]', $('#formUpdateProvider'));
 });
 
 $(document).on('keydown', function(e){
