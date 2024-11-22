@@ -132,14 +132,14 @@
                                         <input {{ $disabled }} type="tel" class="form-control" id="rg_ie" name="rg_ie" autocomplete="nope" value="{{ old('rg_ie', $disposal_place->rg_ie ?? '') }}">
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="phone_1">Telefone Principal <sup>*</sup></label>
-                                        <input {{ $disabled }} type="tel" class="form-control" id="phone_1" name="phone_1" autocomplete="nope" value="{{ old('phone_1', $disposal_place->phone_1 ?? '') }}">
+                                        <label for="contact">Contato</label>
+                                        <input {{ $disabled }} type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact', $disposal_place->contact ?? '') }}">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-4">
-                                        <label for="contact">Contato</label>
-                                        <input {{ $disabled }} type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact', $disposal_place->contact ?? '') }}">
+                                        <label for="phone_1">Telefone Principal <sup>*</sup></label>
+                                        <input {{ $disabled }} type="tel" class="form-control" id="phone_1" name="phone_1" autocomplete="nope" value="{{ old('phone_1', $disposal_place->phone_1 ?? '') }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="phone_2">Telefone Secundário</label>
@@ -193,13 +193,13 @@
                                         <label for="address_neigh">Bairro</label>
                                         <input {{ $disabled }} type="text" class="form-control" name="address_neigh" id="address_neigh" autocomplete="nope" value="{{ old('address_neigh', $disposal_place->address_neigh ?? '') }}">
                                     </div>
-                                    <div  {{ $disabled }} class="form-group col-md-4">
+                                    <div class="form-group col-md-4">
                                         <label for="address_state">Estado</label>
-                                        <select class="form-control" name="address_state" id="address_state" data-value-state="{{ old('address_state', $disposal_place->address_state ?? '') }}"></select>
+                                        <select {{ $disabled }} class="form-control" name="address_state" id="address_state" data-value-state="{{ old('address_state', $disposal_place->address_state ?? '') }}"></select>
                                     </div>
-                                    <div  {{ $disabled }} class="form-group col-md-4">
+                                    <div class="form-group col-md-4">
                                         <label for="address_city">Cidade</label>
-                                        <select class="form-control" name="address_city" id="address_city" data-value-city="{{ old('address_city', $disposal_place->address_city ?? '') }}"></select>
+                                        <select {{ $disabled }} class="form-control" name="address_city" id="address_city" data-value-city="{{ old('address_city', $disposal_place->address_city ?? '') }}"></select>
                                     </div>
                                 </div>
                             </div>

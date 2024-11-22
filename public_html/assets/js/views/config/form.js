@@ -13,6 +13,25 @@ $(() => {
     var target = document.getElementById("src-profile-logo");
     showImage(src,target);
     setTabConfigCompany();
+
+    $('[name="state"], [name="city"]').select2();
+    const state = $('[name="state"]').data('value-state');
+    const city = $('[name="city"]').data('value-city');
+    if (typeof state !== "undefined" && typeof city !== "undefined") {
+        loadStates($('[name="state"]'), state);
+        loadCities($('[name="city"]'), state, city);
+    } else if (typeof state !== "undefined" && typeof city === "undefined") {
+        loadStates($('[name="state"]'), state);
+    } else {
+        loadStates($('[name="state"]'));
+        loadCities($('[name="city"]'));
+    }
+
+    loadSearchZipcode('#formUpdateCompany [name="cep"]', $('#formUpdateCompany'));
+});
+
+$('[name="state"]').on('change', function(){
+    loadCities($('[name="city"]'), $(this).val());
 });
 
 $('#newUserModal').on('shown.bs.modal', function(){
@@ -484,7 +503,7 @@ $(document).on('click', '#viewPermission .modal-body input[type="checkbox"], #ne
         }
     });
 
-    if (auto_check.length) {
+    if (auto_check && auto_check.length) {
         auto_check.forEach(id => {
             $(`${parentEl} input[type="checkbox"][data-permission-id="${id}"]`).prop('checked', true);
         })
@@ -496,7 +515,7 @@ $(document).on('click', '.changeTypeUser', function (){
     const user_name = $(this).attr('user-name');
     const type_user = $(this).attr('type-user');
 
-    if (type_user != 0 && type_user != 1) {
+    if (parseInt(type_user) !== 0 && parseInt(type_user) !== 1) {
         Toast.fire({
             icon: 'error',
             title: 'Ocorreu um problema para identificar o usuário, tente mais tarde!'
@@ -504,7 +523,7 @@ $(document).on('click', '.changeTypeUser', function (){
         return false;
     }
 
-    const typeChange = type_user == 0 ? 'administrador' : 'usuário';
+    const typeChange = parseInt(type_user) === 0 ? 'administrador' : 'usuário';
 
     Swal.fire({
         title: 'Tornar usuário como '+typeChange,
@@ -533,7 +552,7 @@ $(document).on('click', '.changeTypeUser', function (){
                     });
 
                     if (response.success) {
-                        loadUsers(type_user == 1, user_id);
+                        loadUsers(parseInt(type_user) === 1, user_id);
                     }
 
                 }, error: e => {
@@ -674,15 +693,15 @@ const loadUsers = (openPermissions = false, user_id = false) => {
 
             $.each(response, function( index, value ) {
 
-                userMaster          = value.type_user === 2;
+                userMaster          = parseInt(value.type_user) === 2;
                 userSession         = value.user_id_session === value.id;
                 colorBtnStatus      = value.active ? 'warning' : 'success';
                 nameBtnStatus       = value.active ? '<i class="fa fa-user-times"></i> Inativar' : '<i class="fa fa-user-check"></i> Ativar';
                 statusUser          = value.active ? '<div class="badge badge-success text-dark ml-2 status-user">Ativo</div>' : '<div class="badge badge-warning text-dark ml-2 status-user">Inativo</div>';
-                identificationUser  = value.type_user === 2 ? 'Admin-Master' : (value.type_user === 1 ? 'Admin' : 'User');
-                viewPermission      = value.type_user === 0 && !userSession;
-                viewChangeTypeUser  = value.type_user === 0 && !userSession;
-                viewChangeTypeAdm   = value.type_user === 1 && !userSession;
+                identificationUser  = parseInt(value.type_user) === 2 ? 'Admin-Master' : (parseInt(value.type_user) === 1 ? 'Admin' : 'User');
+                viewPermission      = parseInt(value.type_user) === 0 && !userSession;
+                viewChangeTypeUser  = parseInt(value.type_user) === 0 && !userSession;
+                viewChangeTypeAdm   = parseInt(value.type_user) === 1 && !userSession;
                 viewBtnDeleteUser   = !userMaster && !userSession;
                 viewInativeUser     = value.user_id_session !== value.id && !userMaster && !userSession;
                 viewUpdateUser      = !userMaster && !userSession;

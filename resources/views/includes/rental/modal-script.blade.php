@@ -15,6 +15,8 @@
     });
 
     $(document).on('click', '.btnViewRental', function(){
+        const btn = $(this);
+        const text_btn = $(this).text();
         const rental_id = parseInt($(this).data('rental-id'));
         const modal = $('#viewRental');
 
@@ -22,6 +24,8 @@
             modal.modal('show');
             return;
         }
+        $(this).html('<i class="fa fa-spin fa-spinner"></i> Carregando');
+        btn.prop('disabled', true);
 
         last_rental_id = rental_id;
 
@@ -33,6 +37,8 @@
             url: '{{ route('ajax.rental.get_full') }}/' + rental_id,
             dataType: 'json',
             success: response => {
+                $(this).text(text_btn);
+                btn.prop('disabled', false);
                 modal.modal('show');
                 setTimeout(() => {
                     //https://www.google.com/maps/place/27%C2%B040'04.0%22S+48%C2%B033'54.5%22W
@@ -101,6 +107,8 @@
                     title: 'Atenção',
                     html: 'Não foi possível localizar a locação'
                 });
+                $(this).text(text_btn);
+                btn.prop('disabled', false);
             }
         });
     });

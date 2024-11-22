@@ -209,12 +209,12 @@
                                         <input {{ $disabled }} type="text" class="form-control" name="neigh" autocomplete="nope" value="{{ old('neigh') ?? $provider->neigh }}">
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label>Cidade</label>
-                                        <input {{ $disabled }} type="text" class="form-control" name="city" autocomplete="nope" value="{{ old('city') ?? $provider->city }}">
+                                        <label for="address_state">Estado</label>
+                                        <select {{ $disabled }} class="form-control" name="state" id="state" data-value-state="{{ old('state', $provider->state ?? '') }}"></select>
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label>Estado</label>
-                                        <input {{ $disabled }} type="text" class="form-control" name="state" autocomplete="nope" value="{{ old('state') ?? $provider->state }}">
+                                        <label for="address_city">Cidade</label>
+                                        <select {{ $disabled }} class="form-control" name="city" id="city" data-value-city="{{ old('city', $provider->city ?? '') }}"></select>
                                     </div>
                                 </div>
                             </div>
