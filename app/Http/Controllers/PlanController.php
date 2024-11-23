@@ -507,6 +507,7 @@ class PlanController extends Controller
                 'reason'                => $createRequest['description'],  // Razão da assinatura (descrição do serviço ou produto)
                 'payer_email'           => $createRequest['payer']['email'],
                 'notification_url'      => route('mercadopago.notification'),
+                "payment_method_id"     => $createRequest['payment_method_id'],
                 'auto_recurring'        => [
                     'frequency'             => 1,  // Frequência mensal
                     'frequency_type'        => "months",  // Tipo mensal
