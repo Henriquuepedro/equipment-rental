@@ -194,7 +194,7 @@
                                     </div>
                                 </div>
                                 @endif
-                                @if ($payment->is_subscription)
+                                @if ($payment->is_subscription && $payment->status !== 'cancelled')
                                     <div class="row d-flex justify-content-center mt-3">
                                         <div class="form-group col-md-4">
                                             <button type="button" class="btn btn-danger col-md-12" id="btn_cancel_subscription" data-plan-id="{{ $payment->id }}">Cancelar assinatura</button>
