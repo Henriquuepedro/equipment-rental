@@ -289,7 +289,10 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Dados para assinar</h4>
-                    <p class="card-description">O plano por assinatura é realizado através do pagamento com cartão de crédito, onde todo mês será realizado uma cobrança do valor abaixo, durante 12 meses, sendo possível realizar o cancelamento a qualquer momento.</p>
+                    <p class="card-description">
+                        O plano por assinatura é realizado através do pagamento com cartão de crédito, onde todo mês será realizado uma cobrança do valor abaixo, durante 12 meses, sendo possível realizar o cancelamento a qualquer momento.<br>
+                        Todos os pagamentos acontecem no dia 10 de cada mês, caso a assinatura aconteça em qualquer outro dia, será realizado uma cobrança proporcional até o dia 10.
+                    </p>
                     <div id="paymentBrick_container"></div>
                     <div class="row">
                         <div class="col-md-6 offset-md-3 mt-3 mb-3">

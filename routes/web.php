@@ -427,6 +427,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
 
             Route::group(['prefix' => '/planos', 'as' => 'plan.'], function () {
                 Route::post('/buscar', [App\Http\Controllers\Master\PlanController::class, 'fetch'])->name('fetch');
+                Route::post('/criar-no-gateway', [App\Http\Controllers\Master\PlanController::class, 'createPlanGateway'])->name('create_plan_gateway');
             });
 
             Route::group(['prefix' => '/manual', 'as' => 'guide.'], function () {
