@@ -58,7 +58,7 @@
 
         $(document).on('click', '.btnCreatePlanGateway', function (){
             const plan_id               = $(this).data('plan-id');
-            const discount_subscription = $(this).data('discount-subscription');
+            const discount_subscription = $(this).data('discount-subscription') ?? 0;
             const plan_id_gateway       = $(this).data('plan-id-gateway');
             const plan_name             = $(this).closest('tr').find('td:eq(0)').text();
             const plan_price            = $(this).closest('tr').find('td:eq(1)').text();
@@ -66,7 +66,7 @@
             Swal.fire({
                 title: `${plan_id_gateway ? 'Atualização' : 'Criação'} de plano no gateway de pagamento`,
                 html: `Você está prestes a ${plan_id_gateway ? 'atualizar' : 'criar'} o plano no gateway de pagamento<br>
-                        <strong>Atualmente o valor de desconto em percentual para a assinatura é de R$ ${discount_subscription}</strong><br>
+                        <strong>Atualmente o valor de desconto em percentual para a assinatura é de ${discount_subscription}%</strong><br>
                         <strong>Plano: ${plan_name}</strong><br>
                         <strong>Valor do Plano: R$ ${plan_price}</strong><br>
                         <strong>Código do Plano: ${plan_id}</strong><br><br>
