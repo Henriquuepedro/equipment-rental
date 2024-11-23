@@ -224,7 +224,7 @@ class PlanController extends Controller
                             "frequency" => 0,
                             "frequency_type" => "days"
                         ],*/
-                        "transaction_amount" => roundDecimal($plan->value),
+                        "transaction_amount" => roundDecimal($plan->value,  2, false),
                         "currency_id" => "BRL"
                     ],
                     "payment_methods_allowed" => [

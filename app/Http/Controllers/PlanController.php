@@ -434,7 +434,7 @@ class PlanController extends Controller
 
         $createRequest          = [
             'external_reference'    => $code_payment,
-            "transaction_amount"    => roundDecimal($plan_data->value),
+            "transaction_amount"    => $plan_data->value,
             "description"           => $plan_data->name,
             "payment_method_id"     => $request->input('payment_method_id'),
             'notification_url'      => str_Replace('http://localhost:8000', 'https://teste.locai.com.br', route('mercadopago.notification')),
@@ -447,7 +447,7 @@ class PlanController extends Controller
                         "description"   => $plan_data->name,
                         "category_id"   => "plan",
                         "quantity"      => 1,
-                        "unit_price"    => roundDecimal($plan_data->value)
+                        "unit_price"    => $plan_data->value
                     ]
                 ],
                 "payer" => [
