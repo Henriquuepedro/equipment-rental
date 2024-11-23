@@ -46,7 +46,7 @@
                                     <button type="submit" class="btn btn-link p-0 mt-3 mb-0 align-baseline">
                                         {{ __('adminlte::adminlte.verify_request_another') }}
                                     </button><br>
-                                    para {{ auth()->user()->email }}.
+                                    para {{ auth()->user()->__get('email') }}.
                                 </form>
                             </div>
 

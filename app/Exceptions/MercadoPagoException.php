@@ -74,6 +74,9 @@ class MercadoPagoException extends Exception
         ];
 
         if ($is_subscription) {
+            if (!empty($this->getPayment()->init_point)) {
+                return "O pagamento foi processado!<br>Mas não foi possível realizar a cobrança no cartão informado, deve ser feita de forma manual na operada de pagamentos<br>Conclua o pagamento o quanto antes e não perca o seu pagamento!";
+            }
             return $status['pending_review_manual'];
         }
 

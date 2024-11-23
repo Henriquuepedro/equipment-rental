@@ -181,8 +181,13 @@ class PlanController extends Controller
                 $check_payment_method = 'card';
             }
 
+            if ($request->has('subscription_payment')) {
+                $plan_data->value -= ($plan_data->value * 0.15);
+            }
+            $plan_data->value = roundDecimal($plan_data->value, 2, false);
+
             if (
-                roundDecimal($plan_data->value - ($plan_data->value * 0.15), 2, false) != roundDecimal($plan_value, 2, false)
+                $plan_data->value != roundDecimal($plan_value, 2, false)
             ) {
                 return response()->json(['errors' => 'Valor não corresponde ao valor do plano selecionado.'], 400);
             }
@@ -212,7 +217,6 @@ class PlanController extends Controller
             ]);
         } catch (MPApiException $exception) {
             $error_message = $exception->getApiResponse()->getContent();
-
             Log::error("[MPApiException] Payment doesn't created to the company $company_id to the plan $plan.", [
                 'request'   => $createRequest ?? [],
                 'response'  => $error_message,
@@ -250,7 +254,7 @@ class PlanController extends Controller
         $this->plan_payment->insert(array(
             'id_transaction'    => $payment->id,
             'code_payment'      => $code_payment,
-            'link_billet'       => $payment->transaction_details->external_resource_url ?? null,
+            'link_billet'       => $request->has('subscription_payment') ? ($payment->init_point ?? null) : ($payment->transaction_details->external_resource_url ?? null),
             'barcode_billet'    => $payment->transaction_details->digitable_line ?? null,
             'date_of_expiration'=> $dateOfExpiration,
             'key_pix'           => $payment->point_of_interaction->transaction_data->qr_code ?? null,
@@ -262,7 +266,7 @@ class PlanController extends Controller
             'installments'      => $request->has('subscription_payment') ? 1 : $payment->installments,
             'status'            => $payment->status,
             'gross_amount'      => $request->has('subscription_payment') ? $payment->auto_recurring->transaction_amount : $payment->transaction_amount,
-            'net_amount'        => roundDecimal($netAmount, 2, false),
+            'net_amount'        => roundDecimal($netAmount),
             'client_amount'     => $request->has('subscription_payment') ? $payment->auto_recurring->transaction_amount : $payment->transaction_details->total_paid_amount,
             'is_subscription'   => $request->has('subscription_payment'),
             'company_id'        => $company_id,
@@ -280,7 +284,18 @@ class PlanController extends Controller
             return response()->json(['errors' => $verify['message'], 'payment_id' => $payment->id], 400);
         }
 
-        return response()->json(['message' => $verify['message'], 'payment_id' => $payment->id]);
+        $response = [
+            'message' => $verify['message'],
+            'payment_id' => $payment->id
+        ];
+
+        if ($request->has('subscription_payment')) {
+            $response['payment_method'] = $createRequest['payment_method_id'];
+            $response['init_point'] = $payment->init_point ?? '';
+            $response['status'] = $payment->status;
+        }
+
+        return response()->json($response);
     }
 
     /**
@@ -385,19 +400,27 @@ class PlanController extends Controller
         $check_payment_method   = $request->input('payment_method_id');
         $company_data           = $this->company->getCompany($company_id);
         $plan_data              = $this->plan->getById($plan);
-        $first_company_name     = explode(' ', $company_data->name)[0];
-        $last_company_name      = str_replace("$first_company_name ", '', $company_data->name);
+        $card_client_name       = $request->input('card_client_name', $company_data->name) ?: $company_data->name;
+        $first_company_name     = explode(' ', $card_client_name)[0];
+        $last_company_name      = str_replace("$first_company_name ", '', $card_client_name);
         $system_name            = Normalizer::normalize(config('app.name'), Normalizer::NFD);
         $system_name            = preg_replace('/[\x{0300}-\x{036F}]/u', '', $system_name);
         $system_name            = str_replace(' ', '_', $system_name);
         $system_name            = strtoupper($system_name);
         $payer                  = $request->input('payer');
+
+        if ($request->has('subscription_payment')) {
+            $plan_data->value -= ($plan_data->value * 0.15);
+        }
+
+        $plan_data->value = roundDecimal($plan_data->value, 2, false);
+
         $createRequest          = [
             'external_reference'    => $code_payment,
-            "transaction_amount"    => roundDecimal($request->has('subscription_payment', 2, false) ? roundDecimal($plan_data->value - ($plan_data->value * 0.15), 2, false) : $plan_data->value),
+            "transaction_amount"    => roundDecimal($plan_data->value),
             "description"           => $plan_data->name,
             "payment_method_id"     => $request->input('payment_method_id'),
-            'notification_url'      => route('mercadopago.notification'),
+            'notification_url'      => str_Replace('http://localhost:8000', 'https://teste.locai.com.br', route('mercadopago.notification')),
             "statement_descriptor"  => $system_name,
             "additional_info"       => [
                 "items"             => [
@@ -407,7 +430,7 @@ class PlanController extends Controller
                         "description"   => $plan_data->name,
                         "category_id"   => "plan",
                         "quantity"      => 1,
-                        "unit_price"    => roundDecimal($request->has('subscription_payment', 2, false) ? roundDecimal($plan_data->value - ($plan_data->value * 0.15), 2, false) : $plan_data->value)
+                        "unit_price"    => roundDecimal($plan_data->value)
                     ]
                 ],
                 "payer" => [
@@ -482,10 +505,10 @@ class PlanController extends Controller
                 $createRequest["payer"] = array(
                     "entity_type"    => "individual",
                     "type"           => "customer",
-                    "email"          => $request->has('subscription_payment') ? auth()->user()->__get('email') : $payer['email'],
+                    "email"          => $payer['email'],
                     "identification" => array(
-                        "type"       => $request->has('subscription_payment') ? $request->input('identification')['type'] : $payer['identification']['type'],
-                        "number"     => onlyNumbers($request->has('subscription_payment') ? $request->input('identification')['number'] : $payer['identification']['number'])
+                        "type"       => $payer['identification']['type'],
+                        "number"     => onlyNumbers($payer['identification']['number'])
                     )
                 );
                 break;
@@ -502,6 +525,7 @@ class PlanController extends Controller
             $end_date = $datetime_end_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_end_date->format('v')) . 'Z';
 
             $createRequest = array(
+                'preapproval_plan_id'   => '2c9380849319a00d01935a00bbc0151f',
                 'external_reference'    => $code_payment,
                 'back_url'              => str_replace('http://localhost:8000/', 'https://app.locai.com.br/', $createRequest['notification_url']),  // URL de retorno após pagamento
                 'reason'                => $createRequest['description'],  // Razão da assinatura (descrição do serviço ou produto)
@@ -511,7 +535,7 @@ class PlanController extends Controller
                 'auto_recurring'        => [
                     'frequency'             => 1,  // Frequência mensal
                     'frequency_type'        => "months",  // Tipo mensal
-                    'transaction_amount'    => roundDecimal($plan_data->value - ($plan_data->value * 0.15), 2, false),  // Valor da mensalidade
+                    'transaction_amount'    => roundDecimal($plan_data->value),  // Valor da mensalidade
                     'currency_id'           => "BRL",  // Moeda
                     'start_date'            => str_replace('+00:00', 'Z', $start_date),
                     'end_date'              => str_replace('+00:00', 'Z', $end_date),
@@ -530,7 +554,8 @@ class PlanController extends Controller
                 'additional_info' => [
                     'order_id'              => $createRequest['external_reference'],  // ID do pedido (pode ser útil para o controle interno)
                     'product_description'   => $createRequest['description'],  // Descrição do produto ou serviço
-                ]
+                ],
+                //'status' => "authorized",
             );
         }
 
