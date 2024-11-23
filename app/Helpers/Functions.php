@@ -626,7 +626,7 @@ if (!function_exists('roundDecimal')) {
     {
         $value = number_format($value, $decimal, '.', '');
         if ($return_float) {
-            $value = (float)$value;
+            return (float)$value;
         }
         return (string)$value;
     }
