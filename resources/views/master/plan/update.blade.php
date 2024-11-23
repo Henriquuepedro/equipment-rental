@@ -12,7 +12,7 @@
 @section('js')
 <script>
     $(function(){
-        $('[name="value"], [name="from_value"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
+        $('[name="value"], [name="from_value"], [name="discount_subscription"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
 
         if ($('#content_description').length) {
 
@@ -108,11 +108,11 @@
                                 </div>
                                 <div class="col-md-12 no-padding">
                                     <div class="row">
-                                        <div class="form-group col-md-5">
+                                        <div class="form-group col-md-3">
                                             <label>Nome (*)</label>
                                             <input type="text" class="form-control" name="name" value="{{ old('name', $plan->name ?? '') }}" required>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-3">
                                             <label>Quantidade de Meses (*)</label>
                                             <select name="month_time" id="month_time" class="form-control select2" required>
                                                 <option value="1" {{ old('month_time', $plan->month_time ?? 0) == 1 ? 'selected' : '' }}>1 Mês</option>
@@ -121,6 +121,12 @@
                                                 <option value="12" {{ old('month_time', $plan->month_time ?? 0) == 12 ? 'selected' : '' }}>12 Meses</option>
                                             </select>
                                         </div>
+                                        @if ($plan->month_time && (int)$plan->month_time === 1)
+                                            <div class="form-group col-md-3">
+                                                <label>Desconto na recorrência(%)</label>
+                                                <input type="text" class="form-control" name="discount_subscription" value="{{ old('discount_subscription', formatMoney($plan->discount_subscription ?? 0)) }}">
+                                             </div>
+                                        @endif
                                         <div class="form-group col-md-3">
                                             <div class="switch d-flex mt-4">
                                                 <input type="checkbox" class="check-style check-xs" name="highlight" id="highlight" {{ old('highlight', $plan->highlight ?? false) ? 'checked' : '' }}>

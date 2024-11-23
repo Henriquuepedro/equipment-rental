@@ -22,7 +22,9 @@ class Plan extends Model
         'quantity_equipment',
         'highlight',
         'month_time',
-        'allowed_users'
+        'allowed_users',
+        'plan_id_gateway',
+        'discount_subscription'
     ];
 
     /**

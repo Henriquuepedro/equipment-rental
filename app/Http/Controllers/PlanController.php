@@ -105,10 +105,19 @@ class PlanController extends Controller
                 ->with('warning', "Plano não encontrado!");
         }
 
+        if (empty($plan->plan_id_gateway)) {
+            return redirect()->route('plan.index')
+                ->with('warning', "Código do plano no gateway de pagamento não encontrado.");
+        }
+
         $now    = new DateTimeImmutable("now");
         $config = Configuration::forSymmetricSigner(new Sha256(), InMemory::plainText(config('app.key')));
 
-        $plan->value = roundDecimal($plan->value - ($plan->value * 0.15), 2, false);
+        if (!empty($plan->discount_subscription)) {
+            $plan->value -= ($plan->value * ($plan->discount_subscription / 100));
+        }
+
+        $plan->value = roundDecimal($plan->value, 2, false);
 
         $token = $config->builder()
             ->issuedBy(url()->current())
@@ -176,13 +185,19 @@ class PlanController extends Controller
             $plan_data              = $this->plan->getById($plan);
             $code_payment           = getKeyRandom();
 
+            if (empty($plan_data->plan_id_gateway)) {
+                return response()->json(['errors' => 'Código do plano no gateway de pagamento não encontrado.'], 400);
+            }
+
             // É cartão
             if ($request->input('token') && $request->input('issuer_id')) {
                 $check_payment_method = 'card';
             }
 
             if ($request->has('subscription_payment')) {
-                $plan_data->value -= ($plan_data->value * 0.15);
+                if (!empty($plan_data->discount_subscription)) {
+                    $plan_data->value -= ($plan_data->value * ($plan_data->discount_subscription / 100));
+                }
             }
             $plan_data->value = roundDecimal($plan_data->value, 2, false);
 
@@ -410,7 +425,9 @@ class PlanController extends Controller
         $payer                  = $request->input('payer');
 
         if ($request->has('subscription_payment')) {
-            $plan_data->value -= ($plan_data->value * 0.15);
+            if (!empty($plan_data->discount_subscription)) {
+                $plan_data->value -= ($plan_data->value * ($plan_data->discount_subscription / 100));
+            }
         }
 
         $plan_data->value = roundDecimal($plan_data->value, 2, false);
@@ -517,6 +534,10 @@ class PlanController extends Controller
         }
 
         if ($request->has('subscription_payment')) {
+            if (empty($plan_data->plan_id_gateway)) {
+                throw new Exception('Código do plano no gateway de pagamento não encontrado.');
+            }
+
             $datetime_start_date = new DateTime('now', new DateTimeZone(TIMEZONE_DEFAULT));
             $start_date = $datetime_start_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_start_date->format('v')) . 'Z';
 
@@ -525,7 +546,7 @@ class PlanController extends Controller
             $end_date = $datetime_end_date->format('Y-m-d\TH:i:s.') . sprintf('%03d', $datetime_end_date->format('v')) . 'Z';
 
             $createRequest = array(
-                'preapproval_plan_id'   => '2c9380849319a00d01935a00bbc0151f',
+                'preapproval_plan_id'   => $plan_data->plan_id_gateway,
                 'external_reference'    => $code_payment,
                 'back_url'              => str_replace('http://localhost:8000/', 'https://app.locai.com.br/', $createRequest['notification_url']),  // URL de retorno após pagamento
                 'reason'                => $createRequest['description'],  // Razão da assinatura (descrição do serviço ou produto)
@@ -542,6 +563,7 @@ class PlanController extends Controller
                     'recurrent_payment'     => true,  // Definir como pagamento recorrente
                 ],
                 'card_token'    => $createRequest['token'],  // Token do cartão gerado pelo front-end
+                'card_token_id' => $createRequest['token'],  // Token do cartão gerado pelo front-end
                 'payer'         => [
                     'name'              => $createRequest['additional_info']['payer']['first_name'],  // Nome do cliente
                     'surname'           => $createRequest['additional_info']['payer']['last_name'],  // Sobrenome
@@ -555,7 +577,7 @@ class PlanController extends Controller
                     'order_id'              => $createRequest['external_reference'],  // ID do pedido (pode ser útil para o controle interno)
                     'product_description'   => $createRequest['description'],  // Descrição do produto ou serviço
                 ],
-                //'status' => "authorized",
+                'status' => "authorized",
             );
         }
 

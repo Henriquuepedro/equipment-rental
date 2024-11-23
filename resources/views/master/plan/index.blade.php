@@ -18,6 +18,10 @@
 
         const getTable = (stateSave = true) => {
 
+            if (typeof tablePlan !== 'undefined') {
+                tablePlan.destroy();
+            }
+
             return $("#tablePlans").DataTable({
                 "responsive": true,
                 "processing": true,
@@ -50,7 +54,77 @@
             tablePlan.destroy();
             $("#tablePlans tbody").empty();
             tablePlan = getTable();
-        })
+        });
+
+        $(document).on('click', '.btnCreatePlanGateway', function (){
+            const plan_id               = $(this).data('plan-id');
+            const discount_subscription = $(this).data('discount-subscription');
+            const plan_id_gateway       = $(this).data('plan-id-gateway');
+            const plan_name             = $(this).closest('tr').find('td:eq(0)').text();
+            const plan_price            = $(this).closest('tr').find('td:eq(1)').text();
+
+            Swal.fire({
+                title: `${plan_id_gateway ? 'Atualização' : 'Criação'} de plano no gateway de pagamento`,
+                html: `Você está prestes a ${plan_id_gateway ? 'atualizar' : 'criar'} o plano no gateway de pagamento<br>
+                        <strong>Atualmente o valor de desconto em percentual para a assinatura é de R$ ${discount_subscription}</strong><br>
+                        <strong>Plano: ${plan_name}</strong><br>
+                        <strong>Valor do Plano: R$ ${plan_price}</strong><br>
+                        <strong>Código do Plano: ${plan_id}</strong><br><br>
+                        <h3>Deseja continuar?</h3>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, desejo criar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: 'POST',
+                        url: $('[name="routeCreatePlanGateway"]').val(),
+                        data: { plan_id },
+                        dataType: 'json',
+                        success: response => {
+                            tablePlan = getTable();
+                            Toast.fire({
+                                icon: response.success ? 'success' : 'error',
+                                title: response.message
+                            })
+                        }, error: e => {
+                            if (e.status !== 403 && e.status !== 422)
+                                console.log(e);
+                        },
+                        complete: function(xhr) {
+                            if (xhr.status === 403) {
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: 'Você não tem permissão para fazer essa operação!'
+                                });
+                            }
+                            if (xhr.status === 422) {
+
+                                let arrErrors = [];
+
+                                $.each(xhr.responseJSON.errors, function( index, value ) {
+                                    arrErrors.push(value);
+                                });
+
+                                if (!arrErrors.length && xhr.responseJSON.message !== undefined)
+                                    arrErrors.push('Você não tem permissão para fazer essa operação!');
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Atenção',
+                                    html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+        });
     </script>
 @stop
 
@@ -97,4 +171,5 @@
             </div>
         </div>
     </div>
+    <input type="hidden" name="routeCreatePlanGateway" value="{{ route('ajax.master.plan.create_plan_gateway') }}">
 @stop
