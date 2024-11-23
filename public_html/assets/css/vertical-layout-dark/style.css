@@ -8545,6 +8545,60 @@
   --bs-form-invalid-border-color: #ea868f;
 }
 
+#statusScreenBrickPreApproval_container {
+    --brincks-mp-text-primary-color: #FFFFFF;
+    --brincks-mp-text-secondary-color: #B5BBC8;
+    --brincks-mp-input-background-color: #313742;
+    --brincks-mp-form-background-color: #171E2E;
+    --brincks-mp-secondary-background-color: #313742;
+    --brincks-mp-base-color: #5AE4DB;
+    --brincks-mp-base-color-first-variant: #23BDB0;
+    --brincks-mp-base-color-second-variant: #ADF2ED;
+    --brincks-mp-secondary-color: #093633;
+    --brincks-mp-error-color: #F58EA4;
+    --brincks-mp-warning-color: #F8A373;
+    --brincks-mp-success-color: #B9EF98;
+    --brincks-mp-outline-primary-color: #7A869C;
+    --brincks-mp-outline-secondary-color: #657288;
+    --brincks-mp-disabled-text-color: #7A869C;
+    --brincks-mp-disabled-background-color: #212B42;
+    --brincks-mp-button-text-color: #171E2E;
+    --brincks-mp-font-size-extra-small: 12px;
+    --brincks-mp-font-size-small: 13px;
+    --brincks-mp-font-size-medium: 14px;
+    --brincks-mp-font-size-large: 16px;
+    --brincks-mp-font-size-extra-large: 18px;
+    --brincks-mp-font-size-extra-extra-large: 20px;
+    --brincks-mp-font-weight-normal: 400;
+    --brincks-mp-font-weight-semi-bold: 600;
+    --brincks-mp-form-inputs-text-transform: none;
+    --brincks-mp-input-vertical-padding: 8px;
+    --brincks-mp-input-horizontal-padding: 12px;
+    --brincks-mp-input-focused-box-shadow: 0px 0px 0px 3px transparent;
+    --brincks-mp-input-error-focused-box-shadow: 0px 0px 0px 3px transparent;
+    --brincks-mp-input-border-width: 1px;
+    --brincks-mp-input-focused-border-width: 2px;
+    --brincks-mp-border-radius-small: 4px;
+    --brincks-mp-border-radius-medium: 3px;
+    --brincks-mp-border-radius-large: 16px;
+    --brincks-mp-border-radius-full: 100%;
+    --brincks-mp-form-padding: 16px;
+    --brincks-mp-skeleton-light-color: #1B2130;
+    --brincks-mp-skeleton-dark-color: #6B6F7C;
+    --brincks-mp-skeleton-border-color: #657288;
+    --brincks-mp-input-min-height: 38px;
+    --brincks-mp-label-spacing: 4px;
+    --brincks-mp-row-spacing: 18px;
+    --brincks-mp-button-padding: 14px 48px;
+    --brincks-mp-row-gap: 16px;
+    --brincks-mp-width-small: 16px;
+    --brincks-mp-height-small: 16px;
+    --brincks-mp-width-medium: 36px;
+    --brincks-mp-height-medium: 24px;
+    --brincks-mp-wallet-icon-background-color: #F5F5F5;
+    --brincks-mp-link-text-color: #009EE3;
+}
+
 *,
 *::before,
 *::after {

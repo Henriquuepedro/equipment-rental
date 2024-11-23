@@ -90,7 +90,7 @@
                             "type": "{{ $company_data->type_person === 'pf' ? "CPF" : "CNPJ" }}",
                             "number": "{{ $company_data->cpf_cnpj }}",
                         },
-                        email: '{{ auth()->user()->email }}',
+                        email: '{{ auth()->user()->__get('email') }}',
                         address: {
                             zipCode: '{{ $company_data->cep }}',
                             federalUnit: '{{ $company_data->state }}',
@@ -127,7 +127,11 @@
                         */
                     },
                     onSubmit: ({ selectedPaymentMethod, formData }) => {
-                        const obj_token = {'token_plan': $('[name="token_plan"]').val(), 'device_id': $('[name="device_id"]').val()}
+                        const obj_token = {
+                            'token_plan': $('[name="token_plan"]').val(),
+                            'device_id': $('[name="device_id"]').val(),
+                            'card_client_name': $('[name="HOLDER_NAME"]').val() ?? null
+                        }
                         let new_object = {...obj_token, ...formData};
 
                         // callback chamado quando há click no botão de envio de dados
@@ -144,7 +148,7 @@
                                 if (response.ok) {
                                     return response.json().then((response) => {
                                         if (typeof response.payment_id !== "undefined" && response.payment_id) {
-                                            renderStatusScreenBrick(bricksBuilder, response.payment_id);
+                                            renderStatusScreenBrick(response.payment_id);
                                         } else {
                                             Swal.fire({
                                                 icon: 'error',
@@ -158,7 +162,7 @@
                                 reject();
                                 return response.json().then(error => {
                                     if (typeof error.payment_id !== "undefined" && error.payment_id) {
-                                        renderStatusScreenBrick(bricksBuilder, error.payment_id);
+                                        renderStatusScreenBrick(error.payment_id);
                                     } else {
                                         Swal.fire({
                                             icon: 'error',
@@ -190,14 +194,14 @@
                     },
                 },
             };
-            window.paymentBrickController = await bricksBuilder.create(
+            window.paymentBrickController = await mp.bricks().create(
                 "payment",
                 "paymentBrick_container",
                 settings
             );
         }
 
-        const renderStatusScreenBrick = async (bricksBuilder, paymentId) => {
+        const renderStatusScreenBrick = async paymentId => {
             const settings = {
                 initialization: {
                     paymentId, // Payment identifier, from which the status will be checked
@@ -229,7 +233,7 @@
                     },
                 },
             };
-            window.statusScreenBrickController = await bricksBuilder.create('statusScreen', 'statusScreenBrick_container', settings);
+            window.statusScreenBrickController = await mp.bricks().create('statusScreen', 'statusScreenBrick_container', settings);
         };
 
         $(document).on('click', '.copy-input', function() {
