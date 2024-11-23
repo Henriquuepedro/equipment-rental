@@ -200,12 +200,12 @@
                                                     <input type="text" class="form-control" name="neigh" id="neigh" value="{{ old('neigh') ?? $company->neigh }}">
                                                 </div>
                                                 <div class="form-group col-md-4">
-                                                    <label for="city">Cidade</label>
-                                                    <input type="text" class="form-control" name="city" id="city" value="{{ old('city') ?? $company->city }}">
+                                                    <label for="address_state">Estado</label>
+                                                    <select class="form-control" name="state" id="state" data-value-state="{{ old('state', $company->state ?? '') }}"></select>
                                                 </div>
                                                 <div class="form-group col-md-4">
-                                                    <label for="state">Estado</label>
-                                                    <input type="text" class="form-control" name="state" id="state" value="{{ old('state') ?? $company->state }}">
+                                                    <label for="address_city">Cidade</label>
+                                                    <select class="form-control" name="city" id="city" data-value-city="{{ old('city', $company->city ?? '') }}"></select>
                                                 </div>
                                             </div>
                                         </div>
@@ -241,8 +241,7 @@
                                                 <div class="form-group col-md-3 card-config-company">
                                                     <div class="switch d-flex flex-wrap justify-content-center text-center">
                                                         <input type="checkbox" class="check-style check-md" name="{{ $config['name'] }}" id="{{ $config['name'] }}" {{ old() ? old($config['name']) ? 'checked': '' : ($config['status'] ? 'checked' : '') }}>
-                                                        <label for="{{ $config['name'] }}" class="check-style check-md"></label>
-                                                        {{ $config['description'] }}
+                                                        <label for="{{ $config['name'] }}" class="check-style check-md"></label>&nbsp;{{ $config['description'] }}
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -308,12 +307,22 @@
                                 <div class="row">
                                     <div class="form-group col-md-6">
                                         <label>Senha</label>
-                                        <input type="password" class="form-control" name="password_modal" id="password_modal">
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" name="password_modal" id="password_modal">
+                                            <div class="input-group-addon input-group-append">
+                                                <button type="button" class="btn btn-secondary show-hide-password"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
                                         <small>A senha deve conter no mínimo 8 dígitos.</small>
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label>Confirme a Senha</label>
-                                        <input type="password" class="form-control" name="password_modal_confirmation">
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" name="password_modal_confirmation">
+                                            <div class="input-group-addon input-group-append">
+                                                <button type="button" class="btn btn-secondary show-hide-password"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">

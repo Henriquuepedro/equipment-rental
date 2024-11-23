@@ -71,7 +71,7 @@
                                 <div class="my-2 d-flex justify-content-between align-items-center">
                                     <div class="form-check">
                                         <label class="text-muted">
-                                            <input type="checkbox" name="remember"> {{ __('adminlte::adminlte.remember_me') }}
+                                            <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> {{ __('adminlte::adminlte.remember_me') }}
                                         </label>
                                     </div>
                                     <a href="{{ $password_reset_url }}" class="auth-link text-primary">Esqueci minha senha</a>

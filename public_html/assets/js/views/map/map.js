@@ -99,7 +99,7 @@ const getLocationRental = (reload_map = false) => {
         initMap();
     }
     mapRental.on('locationfound', onLocationFoundRental);
-    mapRental.on('locationerror', onLocationErrorRental);
+    mapRental.on('locationerror', onLocationErrorRental);onLocationError
     mapRental.locate({setView: true, maxZoom: 12});
 }
 
@@ -108,7 +108,7 @@ const onLocationFoundRental = e => {
 }
 
 async function onLocationErrorRental(e){
-    if (parseInt(e.code) === 1) {
+    if (!draggableMap && parseInt(e.code) === 1) {
         const address = await deniedLocation();
 
         const center = L.latLng(address.lat, address.lng);

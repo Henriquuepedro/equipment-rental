@@ -29,7 +29,7 @@
             }
         });
 
-        if (auto_check.length) {
+        if (auto_check && auto_check.length) {
             auto_check.forEach(id => {
                 $(`${parentEl} input[type="checkbox"][data-permission-id="${id}"]`).prop('checked', true);
             })

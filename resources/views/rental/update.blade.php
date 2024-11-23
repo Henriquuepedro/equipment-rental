@@ -320,6 +320,7 @@
                                                     <i class="fa fa-plus input-group-text text-white"></i>
                                                 </div>
                                             </div>
+                                            <div class="badge badge-pill badge-sm badge-success col-md-12 no-border-radius">Clique na linha do equipamento para seleciona-lo.</div>
                                         </div>
                                         <div class="form-group col-md-12 mt-2 table-responsive content-equipment">
                                             <table class="table list-equipment d-table">
@@ -515,6 +516,7 @@
     <input type="hidden" id="routeGetEquipments" value="{{ route('ajax.equipment.get-equipments') }}">
     <input type="hidden" id="routeGetPriceStockPeriodEquipment" value="{{ route('ajax.equipment.get-price-per-period') }}">
     <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
+    <input type="hidden" id="route_lat_lng_my_company" value="{{ route('ajax.company.get-lat-lng-my-company') }}">
     <input type="hidden" id="budget" value="{{ $budget }}">
     <input type="hidden" id="back_to_list" value="{{ route($budget ? 'budget.index' : 'rental.index') }}">
 

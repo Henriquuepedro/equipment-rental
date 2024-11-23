@@ -283,7 +283,7 @@ table.dataTable > tbody > tr.selected > * {
   color: white;
   color: rgb(var(--dt-row-selected-text));
 }
-table.dataTable > tbody > tr.selected a {
+table.dataTable > tbody > tr.selected a:not(.dropdown-item) {
   color: #090a0b;
   color: rgb(var(--dt-row-selected-link));
 }

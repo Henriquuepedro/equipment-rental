@@ -137,14 +137,14 @@
                                         <input {{ $disabled }} type="tel" class="form-control" id="rg_ie" name="rg_ie" autocomplete="nope" value="{{ old('rg_ie', $client->rg_ie) }}">
                                     </div>
                                     <div class="form-group col-md-4">
-                                        <label for="phone_1">Telefone Principal</label>
-                                        <input {{ $disabled }} type="tel" class="form-control" id="phone_1" name="phone_1" autocomplete="nope" value="{{ old('phone_1', $client->phone_1) }}">
+                                        <label for="contact">Contato</label>
+                                        <input {{ $disabled }} type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact', $client->contact) }}">
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-md-4">
-                                        <label for="contact">Contato</label>
-                                        <input {{ $disabled }} type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact', $client->contact) }}">
+                                        <label for="phone_1">Telefone Principal</label>
+                                        <input {{ $disabled }} type="tel" class="form-control" id="phone_1" name="phone_1" autocomplete="nope" value="{{ old('phone_1', $client->phone_1) }}">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="phone_2">Telefone Secundário</label>
