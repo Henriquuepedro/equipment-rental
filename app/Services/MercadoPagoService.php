@@ -7,10 +7,13 @@ use App\Models\Plan;
 use App\Models\PlanHistory;
 use App\Models\PlanPayment;
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Client\PreApproval\PreApprovalClient;
 use MercadoPago\MercadoPagoConfig;
 use Symfony\Component\HttpFoundation\Response;
+use UnexpectedValueException;
 
 class MercadoPagoService
 {
@@ -49,17 +52,39 @@ class MercadoPagoService
             $company_id         = (int)$plan_payment->company_id;
             $plan_config_id     = (int)$plan_payment->plan_id;
 
-            // recupera dados do mercado pago
-            MercadoPagoConfig::setAccessToken(env('MP_ACCESS_TOKEN'));
-
             try {
+                /*
+                $mp_config = new MercadoPagoConfig();
+                $mp_config->setAccessToken(env('MP_ACCESS_TOKEN'));
+                $mp_config->setConnectionTimeout(2000);
+
                 if ($plan_payment->is_subscription) {
                     $payment = new PreApprovalClient();
                 } else {
                     $payment = new PaymentClient();
                 }
                 $data_payment = $payment->get($code);
-            } catch(\Exception $e) {
+                */
+
+                if ($plan_payment->is_subscription) {
+                    $uri = "/preapproval/$code";
+                } else {
+                    $uri = "/v1/payments/$code";
+                }
+
+                $client = new Client([
+                    'base_uri' => 'https://api.mercadopago.com',
+                    'headers'  => [
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Bearer ' . env('MP_ACCESS_TOKEN'),
+                        'timeout' => 2, // Response timeout
+                        'connect_timeout' => 2.1, // Connection timeout
+                    ]
+                ]);
+                $request = $client->get($uri);
+                $data_payment = json_decode($request->getBody()->getContents());
+            } catch(Exception | GuzzleException | UnexpectedValueException $e) {
                 $this->debugEcho("get payment ($code) to mercadoPago found a error. {$e->getMessage()}");
                 return Response::HTTP_BAD_REQUEST;
             }

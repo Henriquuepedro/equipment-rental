@@ -624,9 +624,9 @@ if (!function_exists('subDate')) {
 if (!function_exists('roundDecimal')) {
     function roundDecimal(string|float $value, int $decimal = 2, bool $return_float = true): float|string
     {
-        $value = number_format($value, $decimal, '.', '');
+        $value = (float)number_format($value, $decimal, '.', '');
         if ($return_float) {
-            return (float)$value;
+            return $value;
         }
         return (string)$value;
     }
