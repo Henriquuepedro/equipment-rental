@@ -576,9 +576,13 @@ class PlanController extends Controller
                 'additional_info' => [
                     'order_id'              => $createRequest['external_reference'],  // ID do pedido (pode ser útil para o controle interno)
                     'product_description'   => $createRequest['description'],  // Descrição do produto ou serviço
-                ],
-                'status' => "authorized",
+                ]
             );
+
+            // Atualmente, autorizar o pagamento só funciona em produção.
+            if (env('APP_ENV') === 'production') {
+                $createRequest['status'] = 'authorized';
+            }
         }
 
         return $createRequest;
