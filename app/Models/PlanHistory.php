@@ -47,7 +47,7 @@ class PlanHistory extends Model
         return $this->where('payment_id', $payment)->get();
     }
 
-    public function getStatusByPayment(int $payment_id, string $observation, $status)
+    public function getStatusByPayment(int $payment_id, ?string $observation, $status)
     {
         if (!is_array($status)) {
             $status = array($status);

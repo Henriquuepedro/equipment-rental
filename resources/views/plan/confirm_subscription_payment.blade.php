@@ -7,6 +7,7 @@
 @stop
 
 @section('css')
+    <link href="{{ asset('assets/vendors/brincks/css/style.css') }}" rel="stylesheet">
     <style>
         #paymentBrick_container [type="submit"] {
             display: inline-block;
@@ -51,11 +52,11 @@
             }
         }
 
-        #statusScreenBrick_container section:first-child {
+        #statusScreenBrickPreApproval_container section:first-child {
             border-radius: 0 !important;
         }
 
-        #statusScreenBrick_container div[class^=banner-]:first-child {
+        #statusScreenBrickPreApproval_container div[class^=banner-]:first-child {
             border-radius: 0 !important;
         }
     </style>
@@ -70,159 +71,209 @@
             locale: 'pt-BR'
         });
 
-        let isFormMounted = false;
+        const bricksBuilder = mp.bricks();
 
-        const cardForm = mp.cardForm({
-            amount: $('[name="amount_plan"]').val(),
-            autoMount: true,
-            form: {
-                id: "subscriptionForm",
-                cardholderName: { id: "cardholderName" },
-                cardNumber: { id: "cardNumber" },
-                cardExpirationMonth: { id: "cardExpirationMonth" },
-                cardExpirationYear: { id: "cardExpirationYear" },
-                securityCode: { id: "securityCode" },
-                identificationNumber: { id: "identificationNumber" },
-                issuer: { id: "issuer" },
-                installments: { id: "installments" },
-            },
-            callbacks: {
-                onFormMounted: error => {
-                    if (error) {
-                        console.warn("Erro ao montar o formulário:", error);
-                        return;
-                    }
-                    console.log("Formulário montado com sucesso.");
-                    isFormMounted = true;
-                },
-                onSubmit: async event => {
-                    event.preventDefault();
-
-                    // Verificar se o formulário foi montado antes de prosseguir
-                    if (!isFormMounted) {
-                        alert("O formulário de pagamento ainda não foi montado corretamente.");
-                        return;
-                    }
-
-                    // Obter dados do cartão e outros campos
-                    const cardData = cardForm.getCardFormData();
-                    const { paymentMethodId, cardholderEmail, token, installments, issuer } = cardData;
-
-                    // Validar se o valor de 'paymentMethodId' está presente
-                    if (!paymentMethodId) {
-                        alert('Método de pagamento não selecionado.');
-                        return;
-                    }
-
-                    // Validar o campo de número do cartão
-                    const cardNumber = document.getElementById('cardNumber').value;
-                    if (!cardNumber || cardNumber.length < 13) {
-                        alert('Número de cartão inválido.');
-                        return;
-                    }
-
-                    // Obter o BIN dos primeiros 6 dígitos do número do cartão
-                    const bin = cardNumber.slice(0, 6);
-
-                    // Validar o campo identificationNumber (CPF ou CNPJ)
-                    let identificationNumber = document.getElementById('identificationNumber').value;
-                    identificationNumber = identificationNumber.replace(/\D/g, ''); // Remove qualquer caracter não numérico
-
-                    // Verificar se o CPF ou CNPJ tem o tamanho correto
-                    if (identificationNumber.length !== 11 && identificationNumber.length !== 14) {
-                        alert("Por favor, insira um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.");
-                        return;
-                    }
-
-                    // Buscar o issuer (emissor) usando o bin e o método de pagamento
-                    let issuerId = cardData.issuerId;
-                    if (!issuerId) {
-                        const issuers = await mp.getIssuers(paymentMethodId, bin);
-                        issuerId = issuers && issuers.length > 0 ? issuers[0].id : null;
-                    }
-
-                    // Definir installments (parcelas)
-                    const selectedInstallments = document.getElementById('installments').value;
-
-                    // Atualizar o campo oculto com o issuerId
-                    document.getElementById('issuer').value = issuerId;
-
-                    const formData = {
-                        email: cardholderEmail,
-                        token,
-                        payment_method_id: paymentMethodId,
-                        issuer_id: issuerId,
-                        installments: selectedInstallments,
-                        transactionAmount: $('[name="amount_plan"]').val(),
-                        identification: {
-                            type: document.getElementById('identificationType').value,
-                            number: document.getElementById('identificationNumber').value,
-                        }
-                    }
-                    const obj_token = {
-                        token_plan: $('[name="token_plan"]').val(),
-                        device_id: $('[name="device_id"]').val(),
-                        idempotency_key: $('[name="idempotency_key"]').val(),
-                        subscription_payment: true
-                    }
-                    let new_object = {...obj_token, ...formData};
-
-                    // Enviar dados para o backend
-                    fetch($('[name="route_send_payment"]').val(), {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(new_object)
-                    })
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.errors) {
-                                Swal.fire({
-                                    title: 'Ocorreu um problema para efeturar o pagamento',
-                                    html: result.errors,
-                                    icon: "error",
-                                    showCancelButton: false,
-                                    confirmButtonText: "Concluir",
-                                    reverseButtons: true,
-                                    allowOutsideClick: false
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Pagamento aceito',
-                                    html: result.message,
-                                    icon: "success",
-                                    showCancelButton: false,
-                                    confirmButtonText: "Concluir",
-                                    reverseButtons: true,
-                                    allowOutsideClick: false
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = $('[name="route_request_payment"]').val()
-                                    }
-                                });
-                            }
-                        })
-                        .catch(err => {
-                            console.error(err);
-
-                            Swal.fire({
-                                title: 'Ocorreu um problema para efeturar o pagamento',
-                                html: err.toString(),
-                                icon: "error",
-                                showCancelButton: false,
-                                confirmButtonText: "Concluir",
-                                reverseButtons: true,
-                                allowOutsideClick: false
-                            });
-                        });
-                },
-                onFetching: resource => {
-                    console.log("fetching resource:", resource);
-                }
-            }
+        $(function (){
+            renderPaymentBrick(bricksBuilder);
         });
+
+        const renderPaymentBrick = async (bricksBuilder) => {
+            const settings = {
+                initialization: {
+                    /*
+                      "amount" é a quantia total a pagar por todos os meios de pagamento com exceção da Conta Mercado Pago e Parcelas sem cartão de crédito, que têm seus valores de processamento determinados no backend através do "preferenceId"
+                    */
+                    amount: $('[name="amount_plan"]').val(),
+                    // preferenceId: "<PREFERENCE_ID>",
+                    payer: {
+                        firstName: '{{ $company_data->first_company_name }}',
+                        lastName: '{{ $company_data->last_company_name }}',
+                        identification: {
+                            "type": "{{ $company_data->type_person === 'pf' ? "CPF" : "CNPJ" }}",
+                            "number": "{{ $company_data->cpf_cnpj }}",
+                        },
+                        email: '{{ auth()->user()->__get('email') }}',
+                        address: {
+                            zipCode: '{{ $company_data->cep }}',
+                            federalUnit: '{{ $company_data->state }}',
+                            city: '{{ $company_data->city }}',
+                            neighborhood: '{{ $company_data->neigh }}',
+                            streetName: '{{ $company_data->address }}',
+                            streetNumber: '{{ $company_data->number }}',
+                            complement: '{{ $company_data->complement }}',
+                        }
+                    },
+                },
+                customization: {
+                    visual: {
+                        style: {
+                            theme: parseInt($('[name="style_template"]').val()) === 3 ? "dark" : "bootstrap",
+                        },
+                    },
+                    paymentMethods: {
+                        creditCard: "all",
+                        maxInstallments: 1
+                    },
+                },
+                callbacks: {
+                    onReady: () => {
+                        /*
+                         Callback chamado quando o Brick está pronto.
+                         Aqui, você pode ocultar o seu site, por exemplo.
+                        */
+                    },
+                    onSubmit: ({ selectedPaymentMethod, formData }) => {
+                        const obj_token = {
+                            token_plan: $('[name="token_plan"]').val(),
+                            device_id: $('[name="device_id"]').val(),
+                            card_client_name: $('[name="HOLDER_NAME"]').val() ?? null,
+                            // idempotency_key: $('[name="idempotency_key"]').val(),
+                            subscription_payment: true
+                        }
+                        let new_object = {...obj_token, ...formData};
+
+                        // callback chamado quando há click no botão de envio de dados
+                        return new Promise((resolve, reject) => {
+                            fetch($('[name="route_send_payment"]').val(), {
+                                method: "POST",
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(new_object),
+                            })
+                                .then((response) => {
+                                    if (response.ok) {
+                                        return response.json().then((response) => {
+                                            if (typeof response.payment_id !== "undefined" && response.payment_id) {
+                                                renderStatusScreenBrick(response.message, response.payment_method, response.init_point, response.status);
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Pagamento não realizado',
+                                                    html: response.errors
+                                                });
+                                            }
+                                        });
+                                    }
+
+                                    reject();
+                                    return response.json().then(error => {
+                                        if (typeof error.payment_id !== "undefined" && error.payment_id) {
+                                            renderStatusScreenBrick(response.message, response.payment_method, response.init_point, response.status);
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Pagamento não realizado',
+                                                html: error.errors
+                                            });
+                                        }
+                                    });
+                                })
+                                .then((response) => {
+                                    // receber o resultado do pagamento
+                                    resolve();
+                                })
+                                .catch((error) => {
+                                    // manejar a resposta de erro ao tentar criar um pagamento
+                                    reject();
+
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Pagamento não realizado',
+                                        html: error.errors
+                                    });
+                                });
+                        });
+                    },
+                    onError: (error) => {
+                        // callback chamado para todos os casos de erro do Brick
+                        console.error(error);
+                    },
+                },
+            };
+
+            window.paymentBrickController = await bricksBuilder.create(
+                "payment",
+                "paymentBrick_container",
+                settings
+            );
+        }
+
+        const renderStatusScreenBrick = (message, payment_method, init_point, status) => {
+            const color_status   = status !== 'pending' ? 'success' : 'warning';
+            const icon_status    = status !== 'pending' ? 'fa-check' : 'fa-warning';
+            const content_status = status !== 'pending' ? `
+            <div class="row-2DV3l5 svelte-15powyh">
+                 <div class="brick-row-title-1fPbjc svelte-15powyh">
+                    <h1 aria-label="Seu pagamento foi aprovado" class="svelte-101ibq7 extra-extra-large-1eRDc5">Seu pagamento foi aprovado</h1>
+                 </div>
+                 <h2 class="svelte-12nsdgl secondary-style-RPgUa7 padding-top-CmYDHg hide-2kWVMb"></h2>
+              </div>`
+                : `
+              <div class="row-2DV3l5 svelte-15powyh">
+                <div class="brick-row-title-1fPbjc svelte-15powyh">
+                  <h1 aria-label="${message}" class="svelte-101ibq7 extra-extra-large-1eRDc5">${message}</h1>
+                </div>
+            </div>`;
+
+            let content = `<div class="fade-wrapper-3PVuVZ svelte-1yy4rvb" style="">
+              <section class="svelte-1hgkimz">
+                 <header>
+                    <div class="svelte-ax97e0">
+                       <div>
+                          <div class="row-2DV3l5 svelte-15powyh">
+                             <div class="banner-1slUhr svelte-15powyh ${color_status}-3C0O37"></div>
+                             <div class="icon-2EaB9L svelte-15powyh ${color_status}-3C0O37">
+                                <i class="fa-solid ${icon_status}"></i>
+                             </div>
+                          </div>
+                          ${content_status}
+                       </div>
+                    </div>
+                 </header>
+                 <div class="status-body-1Ad2Op svelte-1hgkimz" style="position: relative;">
+                    <section class="svelte-h9a98r">
+                       <div class="wrapper-3IdSv7 svelte-1ica6gz">
+                          <div class="icon-2-OwEK svelte-1ica6gz background-white-3mYVBZ">
+                             <div role="img" data-testid="icon" class="wrapper-3WCSbE svelte-cqvb04" aria-hidden="true" style=""><img src="https://www.mercadopago.com/org-img/MP3/API/logos/${payment_method}.gif" alt="${payment_method}" aria-hidden="true" class="svelte-cqvb04"></div>
+                          </div>
+                          <div class="content-2u3w8A svelte-1ica6gz">
+                             <p aria-label="2 reais" class="svelte-1ica6gz">R$ ${numberToReal($('[name="amount_plan"]').val())} <span class="svelte-1ica6gz"></span></p>
+                             <span class="svelte-1ica6gz">Cartão de Crédito</span>
+                          </div>
+                       </div>
+                    </section>
+                    <div class="details-oy8snH svelte-1hgkimz">
+                       <div class="wrapper-3IdSv7 svelte-1ica6gz">
+                          <div class="icon-2-OwEK svelte-1ica6gz">
+                             <i class="fa-solid fa-bag-shopping"></i>
+                          </div>
+                          <div class="content-2u3w8A svelte-1ica6gz">
+                             <p class="svelte-1ica6gz">Descrição <span class="svelte-1ica6gz"></span></p>
+                             <span class="svelte-1ica6gz">${$('[name="plan_name"]').val()}</span>
+                          </div>
+                       </div>
+                    </div>`;
+
+                    if (status === 'pending') {
+                        content += `<div class="status-body-1Ad2Op svelte-1hgkimz" style="position: relative;">
+                            <a href="${init_point}" target="_blank" aria-label="" type="submit"
+                               class="svelte-15hy5j4 secondary-3Qj0ZF margin-1qSn3W"> <span class="svelte-15hy5j4">Realizar Pagamento</span></a>
+                        </div>`;
+                    }
+
+                    content += `<div class="wrapper-2F0p0I svelte-j7wp1b"> <a href="${$('[name="route_request_payment"]').val()}" aria-label="" type="submit" class="svelte-15hy5j4 transparent-CXDHMO"> <span class="svelte-15hy5j4">Ver solicitações</span></a></div>
+                 </div>
+              </section>
+            </div>`;
+
+            $('#resultPayment #statusScreenBrickPreApproval_container')
+                .prop('style', 'max-width: 100%;--font-size-extra-small: 12px;--font-size-small: 13px;--font-size-medium: 14px;--font-size-large: 16px;--font-size-extra-large: 18px;--font-size-extra-extra-large: 20px;--font-weight-normal: 400;--font-weight-semi-bold: 600;--form-inputs-text-transform: none;--input-vertical-padding: 8px;--input-horizontal-padding: 12px;--input-focused-box-shadow: 0px 0px 0px 3px transparent;--input-error-focused-box-shadow: 0px 0px 0px 3px transparent;--input-border-width: 1px;--input-focused-border-width: 2px;--border-radius-small: 4px;--border-radius-medium: 3px;--border-radius-large: 16px;--border-radius-full: 100%;--form-padding: 16px;--input-min-height: 38px;--label-spacing: 4px;--row-spacing: 18px;--button-padding: 14px 48px;--row-gap: 16px;--width-small: 16px;--height-small: 16px;--width-medium: 36px;--height-medium: 24px;')
+                .empty()
+                .append(content);
+            $('#resultPayment').modal('show');
+        }
     </script>
 @stop
 
@@ -238,78 +289,11 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Dados para assinar</h4>
-                    <p class="card-description">O plano por assinatura é realizado através do pagamento com cartão de crédito, onde todo mês será realizado uma cobrança do valor abaixo, durante 12 meses, sendo possível realizar o cancelamento a qualquer momento.</p>
-                    <div class="col-md-12 d-flex justify-content-center" id="payment_container">
-                        <form class="col-md-6" method="POST" id="subscriptionForm">
-                            {{ csrf_field() }}
-                            <div class="row">
-                                <div class="form-group col-md-12">
-                                    <label for="email">E-mail da solicitação</label>
-                                    <input type="email" class="form-control" id="email" name="email" value="{{ auth()->user()->__get('email') }}" readonly>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group col-md-12">
-                                    <label for="amount">Valor do plano</label>
-                                    <input type="text" class="form-control" value="{{ formatMoney($plan->value, 2, 'R$ ') }} recorrentes por 12 meses" readonly>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group col-md-12">
-                                    <label for="cardholderName">Nome do Titular</label>
-                                    <input type="text" class="form-control" id="cardholderName" data-checkout="cardholderName" required>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group col-md-4">
-                                    <label for="identificationType">Tipo de Identificação</label>
-                                    <select class="form-control" id="identificationType" data-checkout="identificationType" required>
-                                        <option value="CPF">CPF</option>
-                                        <option value="CNPJ">CNPJ</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-8">
-                                    <label for="identificationNumber">Identificação</label>
-                                    <input type="text" class="form-control" id="identificationNumber" data-checkout="identificationNumber" required>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group col-md-12">
-                                    <label for="cardNumber">Número do Cartão</label>
-                                    <input type="text" class="form-control" id="cardNumber" data-checkout="cardNumber" required>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group col-md-4">
-                                    <label for="cardExpirationMonth">Mês de Expiração (MM)</label>
-                                    <input type="text" class="form-control" id="cardExpirationMonth" data-checkout="cardExpirationMonth" required>
-                                </div>
-
-                                <div class="form-group col-md-4">
-                                    <label for="cardExpirationYear">Ano de Expiração (AAAA)</label>
-                                    <input type="text" class="form-control" id="cardExpirationYear" data-checkout="cardExpirationYear" required>
-                                </div>
-
-                                <div class="form-group col-md-4">
-                                    <label for="securityCode">Código de Segurança (CVV)</label>
-                                    <input type="text" class="form-control" id="securityCode" data-checkout="securityCode" required>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group col-md-12 mt-3">
-                                    <button type="submit" class="btn btn-primary w-100">Assinar por recorrência agora</button>
-                                </div>
-                            </div>
-                            <select id="issuer" name="issuer" class="d-none"></select>
-                            <select id="installments" name="installments" class="d-none"></select>
-                        </form>
-                    </div>
+                    <p class="card-description">
+                        O plano por assinatura é realizado através do pagamento com cartão de crédito, onde todo mês será realizado uma cobrança do valor abaixo, durante 12 meses, sendo possível realizar o cancelamento a qualquer momento.<br>
+                        Todos os pagamentos acontecem no dia 10 de cada mês, caso a assinatura aconteça em qualquer outro dia, será realizado uma cobrança proporcional até o dia 10.
+                    </p>
+                    <div id="paymentBrick_container"></div>
                     <div class="row">
                         <div class="col-md-6 offset-md-3 mt-3 mb-3">
                             <img src="https://imgmp.mlstatic.com/org-img/MLB/MP/BANNERS/tipo2_575X40.jpg?v=1"
@@ -325,7 +309,7 @@
     <div class="modal fade" id="resultPayment" tabindex="-1" role="dialog" aria-labelledby="resultPaymentLabel" aria-hidden="true" data-backdrop="static">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
-                <div id="statusScreenBrick_container"></div>
+                <div id="statusScreenBrickPreApproval_container"></div>
             </div>
         </div>
     </div>
@@ -334,7 +318,7 @@
     <input type="hidden" name="route_request_payment" value="{{ route('plan.request') }}">
     <input type="hidden" name="amount_plan" value="{{ $plan->value }}">
     <input type="hidden" name="style_template" value="{{ $settings['style_template'] }}">
-    <input type="hidden" name="amount_plan" value="{{ $plan->value }}">
+    <input type="hidden" name="plan_name" value="{{ $plan->name }}">
     <input type="hidden" name="token_plan" value="{{ $tokenStr }}">
     <input type="hidden" name="device_id" id="deviceId">
     <input type="hidden" name="idempotency_key" id="idempotency_key" value="{{ $idempotency_key }}">

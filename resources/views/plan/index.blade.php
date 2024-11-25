@@ -159,8 +159,13 @@
                     alert_user = value.allowed_users ? `Até <b>${value.allowed_users}</b> usuários` : 'Usuários ilimitados';
                     message_equipment_mmanager = value.quantity_equipment ? `Até <b>${value.quantity_equipment}</b> equipamentos` : 'Equipamentos ilimitados';
 
-                    if (type === 1) {
-                        button_subscription_payment = `<div class="row col-md-12 col-sm-12 col-xs-12 d-flex justify-content-center"><a href="${window.location.href}/confirmar-recorrencia/${value.id}" class="btn btn-warning btn-block col-md-10 sm col-xs-12 mt-2 btn-subscription-payment">Assinar Recorrente</a><div class="discount-subscription-payment">-15%</div></div>`;
+                    if (type === 1 && value.plan_id_gateway) {
+                        flag_discount_subscription = '';
+                        if (value.discount_subscription) {
+                            discount_subscription = parseInt(value.discount_subscription);
+                            flag_discount_subscription = `<div class="discount-subscription-payment">-${discount_subscription}%</div>`;
+                        }
+                        button_subscription_payment = `<div class="row col-md-12 col-sm-12 col-xs-12 d-flex justify-content-center"><a href="${window.location.href}/confirmar-recorrencia/${value.id}" class="btn btn-warning btn-block col-md-10 sm col-xs-12 mt-2 btn-subscription-payment">Assinar Recorrente</a>${flag_discount_subscription}</div>`;
                     }
 
                     $(`[data-month-time="${type}"].tab-pane`).find(`.pricing-table`).append(

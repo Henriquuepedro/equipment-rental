@@ -67,8 +67,8 @@ class Notification extends Controller
             }
 
             if (
-                !in_array($request->input('action'), array("payment.created", "payment.updated", "payment.create", "payment.update")) ||
-                !in_array($request->input('type'), array("payment", "preapproval"))
+                !in_array($request->input('action'), array("payment.created", "payment.updated", "payment.create", "payment.update", "updated", "created")) ||
+                !in_array($request->input('type'), array("payment", "preapproval", "subscription_authorized_payment", "subscription_preapproval", "subscription_preapproval_plan"))
             ) {
                 $mercado_pago_service->debugEcho("type or action don't accept. [action={$request->input('action')} | type={$request->input('type')}].");
                 return response()->json(array(), 406);

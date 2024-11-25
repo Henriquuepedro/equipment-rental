@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
 use Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -12,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use GuzzleHttp\Client;
 
 class PlanController extends Controller
 {
@@ -51,7 +53,7 @@ class PlanController extends Controller
         try {
             $filters        = array();
             $filter_default = array();
-            $fields_order   = array('name', 'value', 'quantity_equipment', 'month_time', '');
+            $fields_order   = array('name', 'value', 'quantity_equipment', 'allowed_users', 'month_time', '');
 
             $query = array(
                 'from' => 'plans'
@@ -72,8 +74,25 @@ class PlanController extends Controller
         }
 
         foreach ($data['data'] as $value) {
-            $buttons = "<a href='".route('master.plan.edit', ['id' => $value->id])."' class='dropdown-item' data-rental-id='$value->id'><i class='fas fa-edit'></i> Atualizar Plano</a>";
-            $buttons = dropdownButtonsDataList($buttons, $value->id);
+            $buttons = [
+                [
+                    'tag'       => 'a',
+                    'title'     => 'Atualizar Plano',
+                    'icon'      => 'fas fa-edit',
+                    'href'      => route('master.plan.edit', ['id' => $value->id])
+                ]
+            ];
+
+            if ($value->month_time == 1) {
+                $buttons[] = [
+                    'tag'       => 'button',
+                    'title'     => $value->plan_id_gateway ? 'Atualizar plano no gateway' : 'Criar plano no gateway',
+                    'icon'      => 'fas fa-arrow-up-from-bracket',
+                    'attribute' => "data-plan-id='$value->id' data-discount-subscription='".formatMoney($value->discount_subscription)."' data-plan-id-gateway='$value->plan_id_gateway'",
+                    'class'     => 'btnCreatePlanGateway',
+                ];
+            }
+            $buttons = newDropdownButtonsDataList($buttons);
 
             $highlight = $value->highlight ? ' <i class="fa fa-star text-warning"></i>' : '';
             $month_time = $value->month_time == 1 ? ' mês' : ' meses';
@@ -102,7 +121,13 @@ class PlanController extends Controller
 
     public function update(Request $request, int $id): RedirectResponse
     {
-        $update = $this->plan->updateById($this->formatDataPlanToSAve($request), $id);
+        try {
+            $update = $this->plan->updateById($this->formatDataPlanToSave($request), $id);
+        } catch (Exception $exception) {
+            return redirect()->back()
+                ->withErrors(["Não foi possível cadastrar o plano! {$exception->getMessage()}"])
+                ->withInput();
+        }
 
         if (!$update) {
             return redirect()->back()
@@ -116,7 +141,13 @@ class PlanController extends Controller
 
     public function insert(Request $request): RedirectResponse
     {
-        $insert = $this->plan->insert($this->formatDataPlanToSAve($request));
+        try {
+            $insert = $this->plan->insert($this->formatDataPlanToSave($request));
+        } catch (Exception $exception) {
+            return redirect()->back()
+                ->withErrors(["Não foi possível cadastrar o plano! {$exception->getMessage()}"])
+                ->withInput();
+        }
 
         if (!$insert) {
             return redirect()->back()
@@ -128,9 +159,14 @@ class PlanController extends Controller
             ->with('success', "Plano cadastrado com sucesso!");
     }
 
-    private function formatDataPlanToSAve(Request $request): array
+    /**
+     * @param Request $request
+     * @return array
+     * @throws Exception
+     */
+    private function formatDataPlanToSave(Request $request): array
     {
-        return [
+        $response = [
             'name'                  => filter_var($request->input('name')),
             'description'           => filter_var($request->input('description')),
             'value'                 => transformMoneyBr_En(filter_var($request->input('value'))),
@@ -138,7 +174,88 @@ class PlanController extends Controller
             'quantity_equipment'    => filter_var($request->input('quantity_equipment')) ?: null,
             'highlight'             => (bool)$request->input('highlight'),
             'month_time'            => filter_var($request->input('month_time'), FILTER_VALIDATE_INT),
-            'allowed_users'         => filter_var($request->input('allowed_users'), FILTER_VALIDATE_INT, FILTER_FLAG_EMPTY_STRING_NULL) ?: null
+            'allowed_users'         => filter_var($request->input('allowed_users'), FILTER_VALIDATE_INT, FILTER_FLAG_EMPTY_STRING_NULL) ?: null,
+            'discount_subscription' => transformMoneyBr_En(filter_var($request->input('discount_subscription'))) ?: null,
         ];
+
+        if (!empty($response['discount_subscription']) && ($response['discount_subscription'] < 0 || $response['discount_subscription'] > 100)) {
+            throw new Exception("O valor do percentual de desconto deve ser entre 0,00 e 100,00");
+        }
+
+        return $response;
+    }
+
+    public function createPlanGateway(Request $request): JsonResponse
+    {
+        $plan_id = $request->input('plan_id');
+
+        $plan = $this->plan->getById($plan_id);
+
+        if (!$plan) {
+            return response()->json(array('success' => false, 'message' => "Plano não encontrado."));
+        }
+
+        if ($plan->month_time != 1) {
+            return response()->json(array('success' => false, 'message' => "Plano não encontrado."));
+        }
+
+        $access_token = env('MP_ACCESS_TOKEN');
+
+        $client = new Client();
+
+        try {
+            if (!empty($plan->discount_subscription) && $plan->discount_subscription < 100) {
+                $plan->value -= ($plan->value * ($plan->discount_subscription / 100));
+            }
+
+            $options = array(
+                'headers' => array(
+                    'Authorization' => 'Bearer ' . $access_token,
+                ),
+                'json' => [
+                    "reason" => $plan->name,
+                    "auto_recurring" => [
+                        "frequency" => 1,
+                        "frequency_type" => "months",
+                        "repetitions" => 12,
+                        "billing_day" => 10,
+                        "billing_day_proportional" => true,
+                        /*"free_trial" => [
+                            "frequency" => 0,
+                            "frequency_type" => "days"
+                        ],*/
+                        "transaction_amount" => roundDecimal($plan->value,  2, false),
+                        "currency_id" => "BRL"
+                    ],
+                    "payment_methods_allowed" => [
+                        "payment_types" => [
+                            [
+                                "id" => "credit_card"
+                            ]
+                        ]
+                    ],
+                    "back_url" => str_Replace('http://localhost:8000', 'https://teste.locai.com.br', route('plan.request'))
+                ]
+            );
+
+            if (empty($plan->plan_id_gateway)) {
+                $request = $client->post('https://api.mercadopago.com/preapproval_plan', $options);
+                $response = json_decode($request->getBody()->getContents());
+
+                if (empty($response->id))  {
+                    return response()->json(array('success' => false, 'message' => "Não foi possível identificar o ID do plano criado. " . json_encode($response, JSON_UNESCAPED_UNICODE)));
+                }
+
+                $id = $response->id;
+
+                $this->plan->updateById(array('plan_id_gateway' => $id), $plan_id);
+            } else {
+                $client->put("https://api.mercadopago.com/preapproval_plan/$plan->plan_id_gateway", $options);
+            }
+        } catch (Exception | GuzzleException $exception) {
+            return response()->json(array('success' => false, 'message' => $exception->getMessage()));
+        }
+
+        return response()->json(array('success' => true, 'message' => "Plano criado com sucesso no gateway"));
     }
 }
