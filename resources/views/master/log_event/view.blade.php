@@ -101,6 +101,12 @@
                                                         if (likeText('%phone%', $field_name)) {
                                                             $old = formatPhone($old, '') ?? $old;
                                                         }
+                                                        if (!is_string($new)) {
+                                                            $new = json_encode($new, JSON_UNESCAPED_UNICODE);
+                                                        }
+                                                        if (!is_string($old)) {
+                                                            $old = json_encode($old, JSON_UNESCAPED_UNICODE);
+                                                        }
                                                     @endphp
                                                     <td class="bg-white text-black">{{ Lang::get("field.$field_name") }}</td>
                                                     <td class="bg-danger text-white">{{ $old }}</td>
