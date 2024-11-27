@@ -81,10 +81,10 @@
                                                         $new = $log->details['new'][$field_name];
                                                         $old = $log->details['old'][$field_name];
 
-                                                        if (strtotime($new) !== false) {
+                                                        if (is_string($new) && strtotime($new) !== false) {
                                                             $new = dateInternationalToDateBrazil($new) ?? $new;
                                                         }
-                                                        if (strtotime($old) !== false) {
+                                                        if (is_string($old) && strtotime($old) !== false) {
                                                             $old = dateInternationalToDateBrazil($old) ?? $old;
                                                         }
 
