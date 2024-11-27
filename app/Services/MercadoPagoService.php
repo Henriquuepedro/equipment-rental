@@ -71,8 +71,8 @@ class MercadoPagoService
                         'status'                => $preapproval->payment->status,
                         'transaction_amount'    => $preapproval->transaction_amount,
                         'gateway_payment_id'    => $preapproval->id,
-                        'gateway_debit_date'    => $preapproval->gateway_debit_date,
-                        'gateway_date_created'  => $preapproval->gateway_date_created,
+                        'gateway_debit_date'    => $preapproval->debit_date,
+                        'gateway_date_created'  => $preapproval->date_created,
                     ));
                 } else {
                     $preapproval_id = $preapproval_payment->preapproval_id;
@@ -92,7 +92,7 @@ class MercadoPagoService
                 } else {
                     $data_payment = $this->getPayment($code);
                 }
-            } catch(Exception | GuzzleException | UnexpectedValueException $e) {
+            } catch(Exception | UnexpectedValueException $e) {
                 $this->debugEcho("get payment ($code) to mercadoPago found a error. {$e->getMessage()}");
                 return Response::HTTP_BAD_REQUEST;
             }
