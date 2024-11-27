@@ -91,31 +91,28 @@ class MercadoPagoService
 
             try {
                 if ($plan_payment->is_subscription) {
+                    if (!$preapproval_payment) {
+                        $this->debugEcho("get preapproval data ($code) to MercadoPago not found.");
+                        return Response::HTTP_BAD_REQUEST;
+                    }
+
                     $data_payment = $this->getPreapproval($code);
+                    $status = $preapproval_payment['status'];
+                    $status_detail = $preapproval_payment['status_detail'];
+                    $last_modified = $preapproval_payment['gateway_last_modified'];
+                    $last_modified = formatDateInternational($last_modified) ?? dateNowInternational();
+                    $observation = 'preapproval: ' . (($data_payment->summarized->quotas - $data_payment->summarized->pending_charge_quantity) + 1) . '/' . $data_payment->summarized->quotas;
                 } else {
                     $data_payment = $this->getPayment($code);
+                    $status         = $data_payment->status;
+                    $status_detail  = $data_payment->status_detail;
+                    $last_modified  = $data_payment->date_last_updated;
+                    $last_modified  = formatDateInternational($last_modified) ?? dateNowInternational();
+                    $observation    = null;
                 }
             } catch(Exception | UnexpectedValueException $e) {
                 $this->debugEcho("get payment ($code) to mercadoPago found a error. {$e->getMessage()}");
                 return Response::HTTP_BAD_REQUEST;
-            }
-
-            $status         = $data_payment->status;
-            $status_detail  = $data_payment->status_detail;
-            $last_modified  = $data_payment->date_last_updated;
-            $last_modified  = formatDateInternational($last_modified) ?? dateNowInternational();
-            $observation    = null;
-
-            if ($plan_payment->is_subscription) {
-                if (!$preapproval_payment) {
-                    $this->debugEcho("get preapproval data ($code) to MercadoPago not found.");
-                    return Response::HTTP_BAD_REQUEST;
-                }
-                $status = $preapproval_payment['status'];
-                $status_detail = $preapproval_payment['status_detail'];
-                $last_modified = $preapproval_payment['gateway_last_modified'];
-                $last_modified = formatDateInternational($last_modified) ?? dateNowInternational();
-                $observation = 'preapproval: ' . (($data_payment->summarized->quotas - $data_payment->summarized->pending_charge_quantity) + 1) . '/' . $data_payment->summarized->quotas;
             }
 
             $this->debugEcho("[CODE_TRANSACTION=$code]");
