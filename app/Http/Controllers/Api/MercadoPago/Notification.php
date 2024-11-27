@@ -19,6 +19,7 @@ class Notification extends Controller
         try {
             $debug = (bool)$request->input('debug');
             $mercado_pago_service = new MercadoPagoService($debug);
+            $type = $request->input('type');
 
             // Valida assinatura enviada no cabeçalho.
             $signature_mp = env('MP_SIGNATURE');
@@ -40,7 +41,7 @@ class Notification extends Controller
                 $request_signature_check = $request_signature_v1[1];
                 $request_signature_ts = $request_signature_ts[1];
                 $check_sognature_data_id = $request->input('data')['id'] ?? null;
-                $check_sognature_type = $request->input('type');
+                $check_sognature_type = $type;
                 $check_sognature_action = $request->input('action');
                 $check_sognature_api_version = $request->input('api_version');
                 $check_sognature_date_created = $request->input('date_created');
@@ -61,22 +62,22 @@ class Notification extends Controller
 
             if (
                 in_array($request->input('action'), array("test.created", "test.updated")) &&
-                $request->input('type') == "test"
+                $type == "test"
             ) {
                 return response()->json();
             }
 
             if (
                 !in_array($request->input('action'), array("payment.created", "payment.updated", "payment.create", "payment.update", "updated", "created")) ||
-                !in_array($request->input('type'), array("payment", "preapproval", "subscription_authorized_payment", "subscription_preapproval", "subscription_preapproval_plan"))
+                !in_array($type, array("payment", "preapproval", "subscription_authorized_payment", "subscription_preapproval", "subscription_preapproval_plan"))
             ) {
-                $mercado_pago_service->debugEcho("type or action don't accept. [action={$request->input('action')} | type={$request->input('type')}].");
+                $mercado_pago_service->debugEcho("type or action don't accept. [action={$request->input('action')} | type=$type].");
                 return response()->json(array(), 406);
             }
 
             $code = $request->input('data')['id'];
 
-            return response()->json(array(), $mercado_pago_service->updatePayment($code));
+            return response()->json(array(), $mercado_pago_service->updatePayment($code, $type));
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
