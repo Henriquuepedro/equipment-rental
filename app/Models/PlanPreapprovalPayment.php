@@ -23,7 +23,8 @@ class PlanPreapprovalPayment extends Model
         'transaction_amount',
         'gateway_payment_id',
         'gateway_debit_date',
-        'gateway_date_created'
+        'gateway_date_created',
+        'gateway_last_modified'
     ];
 
     /**

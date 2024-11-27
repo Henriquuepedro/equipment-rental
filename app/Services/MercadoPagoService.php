@@ -45,6 +45,7 @@ class MercadoPagoService
     {
         try {
             $plan_payment = $this->plan_payment->getPaymentByTransaction($code);
+            $preapproval_payment = null;
 
             if (!$plan_payment) {
                 if ($type !== 'subscription_authorized_payment') {
@@ -73,7 +74,9 @@ class MercadoPagoService
                         'gateway_payment_id'    => $preapproval->id,
                         'gateway_debit_date'    => $preapproval->debit_date,
                         'gateway_date_created'  => $preapproval->date_created,
+                        'gateway_last_modified'  => $preapproval->last_modified,
                     ));
+                    $preapproval_payment = $this->plan_preapproval_payment->getByGatewayPaymentId($code);
                 } else {
                     $preapproval_id = $preapproval_payment->preapproval_id;
                 }
@@ -98,10 +101,22 @@ class MercadoPagoService
             }
 
             $status         = $data_payment->status;
-            $status_detail  = $plan_payment->is_subscription ? null : $data_payment->status_detail;
-            $last_modified  = $plan_payment->is_subscription ? $data_payment->last_modified : $data_payment->date_last_updated;
+            $status_detail  = $data_payment->status_detail;
+            $last_modified  = $data_payment->date_last_updated;
             $last_modified  = formatDateInternational($last_modified) ?? dateNowInternational();
-            $observation    = $plan_payment->is_subscription ? 'preapproval: '.(($data_payment->summarized->quotas - $data_payment->summarized->pending_charge_quantity) + 1).'/'.$data_payment->summarized->quotas : null;
+            $observation    = null;
+
+            if ($plan_payment->is_subscription) {
+                if (!$preapproval_payment) {
+                    $this->debugEcho("get preapproval data ($code) to MercadoPago not found.");
+                    return Response::HTTP_BAD_REQUEST;
+                }
+                $status = $preapproval_payment['status'];
+                $status_detail = $preapproval_payment['status_detail'];
+                $last_modified = $preapproval_payment['gateway_last_modified'];
+                $last_modified = formatDateInternational($last_modified) ?? dateNowInternational();
+                $observation = 'preapproval: ' . (($data_payment->summarized->quotas - $data_payment->summarized->pending_charge_quantity) + 1) . '/' . $data_payment->summarized->quotas;
+            }
 
             $this->debugEcho("[CODE_TRANSACTION=$code]");
             $this->debugEcho("[PLAN=$plan_payment_id]");
