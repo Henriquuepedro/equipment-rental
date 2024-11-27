@@ -81,10 +81,10 @@
                                                         $new = $log->details['new'][$field_name];
                                                         $old = $log->details['old'][$field_name];
 
-                                                        if (strtotime($new) !== false) {
+                                                        if (is_string($new) && strtotime($new) !== false) {
                                                             $new = dateInternationalToDateBrazil($new) ?? $new;
                                                         }
-                                                        if (strtotime($old) !== false) {
+                                                        if (is_string($old) && strtotime($old) !== false) {
                                                             $old = dateInternationalToDateBrazil($old) ?? $old;
                                                         }
 
@@ -100,6 +100,12 @@
                                                         }
                                                         if (likeText('%phone%', $field_name)) {
                                                             $old = formatPhone($old, '') ?? $old;
+                                                        }
+                                                        if (!is_string($new)) {
+                                                            $new = json_encode($new, JSON_UNESCAPED_UNICODE);
+                                                        }
+                                                        if (!is_string($old)) {
+                                                            $old = json_encode($old, JSON_UNESCAPED_UNICODE);
                                                         }
                                                     @endphp
                                                     <td class="bg-white text-black">{{ Lang::get("field.$field_name") }}</td>
