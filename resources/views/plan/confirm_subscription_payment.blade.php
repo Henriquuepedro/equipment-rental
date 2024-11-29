@@ -70,38 +70,25 @@
         const mp = new MercadoPago('{{ env('MP_PUBLIC_KEY') }}', {
             locale: 'pt-BR'
         });
-
         const bricksBuilder = mp.bricks();
 
         $(function (){
-            renderPaymentBrick(bricksBuilder);
+            renderCardPaymentBrick(bricksBuilder);
         });
 
-        const renderPaymentBrick = async (bricksBuilder) => {
+        const renderCardPaymentBrick = async (bricksBuilder) => {
             const settings = {
                 initialization: {
                     /*
                       "amount" é a quantia total a pagar por todos os meios de pagamento com exceção da Conta Mercado Pago e Parcelas sem cartão de crédito, que têm seus valores de processamento determinados no backend através do "preferenceId"
                     */
                     amount: $('[name="amount_plan"]').val(),
-                    // preferenceId: "<PREFERENCE_ID>",
                     payer: {
-                        firstName: '{{ $company_data->first_company_name }}',
-                        lastName: '{{ $company_data->last_company_name }}',
                         identification: {
                             "type": "{{ $company_data->type_person === 'pf' ? "CPF" : "CNPJ" }}",
                             "number": "{{ $company_data->cpf_cnpj }}",
                         },
-                        email: '{{ auth()->user()->__get('email') }}',
-                        address: {
-                            zipCode: '{{ $company_data->cep }}',
-                            federalUnit: '{{ $company_data->state }}',
-                            city: '{{ $company_data->city }}',
-                            neighborhood: '{{ $company_data->neigh }}',
-                            streetName: '{{ $company_data->address }}',
-                            streetNumber: '{{ $company_data->number }}',
-                            complement: '{{ $company_data->complement }}',
-                        }
+                        email: '{{ auth()->user()->__get('email') }}'
                     },
                 },
                 customization: {
@@ -111,7 +98,6 @@
                         },
                     },
                     paymentMethods: {
-                        creditCard: "all",
                         maxInstallments: 1
                     },
                 },
@@ -122,15 +108,15 @@
                          Aqui, você pode ocultar o seu site, por exemplo.
                         */
                     },
-                    onSubmit: ({ selectedPaymentMethod, formData }) => {
+                    onSubmit: (cardFormData) => {
                         const obj_token = {
                             token_plan: $('[name="token_plan"]').val(),
                             device_id: $('[name="device_id"]').val(),
                             card_client_name: $('[name="HOLDER_NAME"]').val() ?? null,
-                            // idempotency_key: $('[name="idempotency_key"]').val(),
+                            idempotency_key: $('[name="idempotency_key"]').val(),
                             subscription_payment: true
                         }
-                        let new_object = {...obj_token, ...formData};
+                        let new_object = {...obj_token, ...cardFormData};
 
                         // callback chamado quando há click no botão de envio de dados
                         return new Promise((resolve, reject) => {
@@ -142,48 +128,48 @@
                                 },
                                 body: JSON.stringify(new_object),
                             })
-                                .then((response) => {
-                                    if (response.ok) {
-                                        return response.json().then((response) => {
-                                            if (typeof response.payment_id !== "undefined" && response.payment_id) {
-                                                renderStatusScreenBrick(response.message, response.payment_method, response.init_point, response.status);
-                                            } else {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: 'Pagamento não realizado',
-                                                    html: response.errors
-                                                });
-                                            }
-                                        });
-                                    }
-
-                                    reject();
-                                    return response.json().then(error => {
-                                        if (typeof error.payment_id !== "undefined" && error.payment_id) {
+                            .then((response) => {
+                                if (response.ok) {
+                                    return response.json().then((response) => {
+                                        if (typeof response.payment_id !== "undefined" && response.payment_id) {
                                             renderStatusScreenBrick(response.message, response.payment_method, response.init_point, response.status);
                                         } else {
                                             Swal.fire({
                                                 icon: 'error',
                                                 title: 'Pagamento não realizado',
-                                                html: error.errors
+                                                html: response.errors
                                             });
                                         }
                                     });
-                                })
-                                .then((response) => {
-                                    // receber o resultado do pagamento
-                                    resolve();
-                                })
-                                .catch((error) => {
-                                    // manejar a resposta de erro ao tentar criar um pagamento
-                                    reject();
+                                }
 
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Pagamento não realizado',
-                                        html: error.errors
-                                    });
+                                reject();
+                                return response.json().then(error => {
+                                    if (typeof error.payment_id !== "undefined" && error.payment_id) {
+                                        renderStatusScreenBrick(response.message, response.payment_method, response.init_point, response.status);
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Pagamento não realizado',
+                                            html: error.errors
+                                        });
+                                    }
                                 });
+                            })
+                            .then((response) => {
+                                // receber o resultado do pagamento
+                                resolve();
+                            })
+                            .catch((error) => {
+                                // manejar a resposta de erro ao tentar criar um pagamento
+                                reject();
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Pagamento não realizado',
+                                    html: error.errors
+                                });
+                            });
                         });
                     },
                     onError: (error) => {
@@ -193,11 +179,7 @@
                 },
             };
 
-            window.paymentBrickController = await bricksBuilder.create(
-                "payment",
-                "paymentBrick_container",
-                settings
-            );
+            window.cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
         }
 
         const renderStatusScreenBrick = (message, payment_method, init_point, status) => {
@@ -293,7 +275,7 @@
                         O plano por assinatura é realizado através do pagamento com cartão de crédito, onde todo mês será realizado uma cobrança do valor abaixo, durante 12 meses, sendo possível realizar o cancelamento a qualquer momento.<br>
                         Todos os pagamentos acontecem no dia 10 de cada mês, caso a assinatura aconteça em qualquer outro dia, será realizado uma cobrança proporcional até o dia 10.
                     </p>
-                    <div id="paymentBrick_container"></div>
+                    <div id="cardPaymentBrick_container"></div>
                     <div class="row">
                         <div class="col-md-6 offset-md-3 mt-3 mb-3">
                             <img src="https://imgmp.mlstatic.com/org-img/MLB/MP/BANNERS/tipo2_575X40.jpg?v=1"
