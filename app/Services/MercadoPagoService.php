@@ -83,6 +83,11 @@ class MercadoPagoService
 
                 $code = $preapproval_id;
                 $plan_payment = $this->plan_payment->getPaymentByTransaction($code);
+            } else {
+                if ($plan_payment->is_subscription) {
+                    $preapproval_payment = $plan_payment;
+                    $preapproval_payment->gateway_last_modified = $plan_payment->date_last_updated;
+                }
             }
 
             $plan_payment_id    = (int)$plan_payment->id;
@@ -97,9 +102,9 @@ class MercadoPagoService
                     }
 
                     $data_payment = $this->getPreapproval($code);
-                    $status = $preapproval_payment['status'];
-                    $status_detail = $preapproval_payment['status_detail'];
-                    $last_modified = $preapproval_payment['gateway_last_modified'];
+                    $status = $preapproval_payment->status;
+                    $status_detail = $preapproval_payment->status_detail;
+                    $last_modified = $preapproval_payment->gateway_last_modified;
                     $last_modified = formatDateInternational($last_modified) ?? dateNowInternational();
                     $observation = 'preapproval: ' . (($data_payment->summarized->quotas - $data_payment->summarized->pending_charge_quantity) + 1) . '/' . $data_payment->summarized->quotas;
                 } else {
