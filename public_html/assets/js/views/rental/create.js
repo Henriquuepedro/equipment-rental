@@ -355,7 +355,7 @@
                     });
                     $('#formRental .steps ul li.current').addClass('error');
                 } else {
-                    if (!$('[name="rental_id"]').length && typeLocation === 0 && newPricesUpdate.length) {
+                    if (typeLocation === 0 && newPricesUpdate.length) {
                         await Swal.fire({
                             title: newPricesUpdate.length === 1 ? 'Valor de equipamento atualizado.' : 'Valores de equipamentos atualizados.',
                             html: newPricesUpdate.length === 1 ? `O valor do equipamento abaixo foi alterado: <br><br><ol><li><b>${newPricesUpdateNames[0]}</b></li></ol><h4>Deseja atualizar?</h4>` : "Os valores dos equipamentos abaixo foram alterados: <br><br><ol><li><b>" + newPricesUpdateNames.join('</b></li><li><b>') + '</b></li></ol><h4>Deseja atualizar?</h4>',
@@ -377,7 +377,7 @@
                             $('.list-equipments-payment-load').hide();
                             $('.list-equipments-payment').slideDown('slow');
                         })
-                    } else if (!$('[name="rental_id"]').length && typeLocation === 1 && newPricesUpdate.length) {
+                    } else if (typeLocation === 1 && newPricesUpdate.length) {
 
                         $.each(newPricesUpdate, function (key, val) {
                             val.el.val(val.price);
@@ -651,6 +651,7 @@ const updateDataEquipmentToPayment = async () => {
     let newPricesUpdateNames = [];
     let idEquipments = [];
     let priceEquipment = 0;
+    let priceEquipmentTotal = 0;
     let idEquipment,stockEquipment,nameEquipment;
     await $('#equipments-selected div.card').each(async function() {
         idEquipment        = parseInt($('.card-header', this).attr('id-equipment'));
@@ -686,12 +687,14 @@ const updateDataEquipmentToPayment = async () => {
                 $(`#price-un-equipment-${equipment[0]}`).val(numberToReal(priceEquipment));
                 $(`.list-equipments-payment li[id-equipment="${equipment[0]}"] .stock-equipment-payment strong`).text(equipment[1] + 'un');
 
-                if (numberToReal(priceEquipment * equipment[1]) !== $(`#price-total-equipment-${equipment[0]}`).val()) {
+                priceEquipmentTotal = getTotalPriceEquipment(priceEquipment, equipment[0], equipment[1]);
+
+                if (numberToReal(priceEquipmentTotal) !== $(`#price-total-equipment-${equipment[0]}`).val()) {
                     newPricesUpdate.push({
                         el: $(`#price-total-equipment-${equipment[0]}`),
-                        price: numberToReal(priceEquipment * equipment[1])
+                        price: numberToReal(priceEquipmentTotal)
                     });
-                    newPricesUpdateNames.push(equipment[2] + ' | R$' + $(`#price-total-equipment-${equipment[0]}`).val() + ' <i class="fas fa-long-arrow-alt-right"></i> R$' + numberToReal(priceEquipment * equipment[1]));
+                    newPricesUpdateNames.push(equipment[2] + ' | R$' + $(`#price-total-equipment-${equipment[0]}`).val() + ' <i class="fas fa-long-arrow-alt-right"></i> R$' + numberToReal(priceEquipmentTotal));
                 }
             }
         }));

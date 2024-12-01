@@ -241,7 +241,7 @@
                                                 <div class="form-group col-md-3 card-config-company">
                                                     <div class="switch d-flex flex-wrap justify-content-center text-center">
                                                         <input type="checkbox" class="check-style check-md" name="{{ $config['name'] }}" id="{{ $config['name'] }}" {{ old() ? old($config['name']) ? 'checked': '' : ($config['status'] ? 'checked' : '') }}>
-                                                        <label for="{{ $config['name'] }}" class="check-style check-md"></label>&nbsp;{{ $config['description'] }}
+                                                        <label for="{{ $config['name'] }}" class="check-style check-md"></label><span class="col-md-12">{{ $config['description'] }}</span>
                                                     </div>
                                                 </div>
                                             @endforeach

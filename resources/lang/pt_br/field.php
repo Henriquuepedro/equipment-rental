@@ -55,4 +55,8 @@ return [
     'driver_id' => 'Código do motorista',
     'active' => 'Ativo',
 
+    // Configuração da empresa
+    'view_observation_client_rental' => 'Visualizar observação do cliente na locação',
+    'multiply_quantity_of_equipment_per_amount' => 'Multiplicar a quantidade de equipamentos por valor',
+    'multiply_quantity_of_equipment_per_day' => 'Multiplicar a quantidade de equipamentos por dia',
 ];
