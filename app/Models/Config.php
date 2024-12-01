@@ -17,7 +17,9 @@ class Config extends Model
     protected $fillable = [
         'view_observation_client_rental',
         'user_update',
-        'company_id'
+        'company_id',
+        'multiply_quantity_of_equipment_per_amount',
+        'multiply_quantity_of_equipment_per_day',
     ];
 
     /**
@@ -56,5 +58,10 @@ class Config extends Model
     {
         $db = $this->where('company_id', $company_id)->first();
         return (bool)$db->$config;
+    }
+
+    public function getByCompany(int $company_id)
+    {
+        return $this->where('company_id', $company_id)->first();
     }
 }

@@ -51,10 +51,6 @@ class CompanyController extends Controller
         $configCompanyValue  = $dataConfigCompany['value'];
         $configCompany       = new \StdClass();
 
-        $fromToNameConfig    = [
-            'view_observation_client_rental' => 'Visualizar observação do cliente na locação'
-        ];
-
         foreach ($configCompanyColumn as $configIndex) {
             if (in_array($configIndex, ['id', 'company_id', 'user_update', 'created_at', 'updated_at'])) {
                 continue;
@@ -63,7 +59,7 @@ class CompanyController extends Controller
             $configCompany->$configIndex = [
                 'status'        => $configCompanyValue && $configCompanyValue->$configIndex,
                 'name'          => $configIndex,
-                'description'   => $fromToNameConfig[$configIndex]
+                'description'   => __("field.$configIndex")
             ];
         }
 

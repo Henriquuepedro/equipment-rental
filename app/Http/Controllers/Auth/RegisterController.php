@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Config;
 use App\Models\Plan;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
@@ -108,6 +109,10 @@ class RegisterController extends Controller
             'contact'               => $data['contact'],
             'plan_id'               => $plan->id,
             'plan_expiration_date'  => sumDate(dateNowInternational(), null, null, 15)
+        ]);
+
+        $company = Config::create([
+            'company_id' => $company->id,
         ]);
 
         return $this->user->create([

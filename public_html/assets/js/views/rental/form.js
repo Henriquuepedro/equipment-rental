@@ -661,12 +661,17 @@ const getEquipment = async equipment => {
 }
 
 const createEquipmentPayment = async (equipment, priceStock = null, unity_price = null, total_price = null, quantity = null) => {
-
     let dataEquipment   = await getEquipment(equipment);
     let stockEquipment  = quantity === null ? $(`#collapseEquipment-${equipment} input[name^="stock_equipment_"]`).val() : quantity;
     const priceEquipment    = unity_price === null ? (priceStock === null ? await getPriceEquipment(equipment) : priceStock.price) : unity_price;
     let priceEquipmentFormat = numberToReal(priceEquipment);
-    let priceEquipmentTotal  = numberToReal(total_price === null ? (priceEquipment * stockEquipment) : total_price);
+    let priceEquipmentTotal  = total_price;
+
+    if (total_price === null) {
+        priceEquipmentTotal = getTotalPriceEquipment(priceEquipment, equipment, stockEquipment);
+    }
+
+    priceEquipmentTotal = numberToReal(priceEquipmentTotal);
 
     if (!dataEquipment) {
         return false;
@@ -1175,4 +1180,24 @@ const getPaymentsRental = (rental_id, is_budget, callback) => {
             callback(response);
         }, error: e => { console.log(e) }
     });
+}
+
+const getTotalPriceEquipment = (priceEquipment, equipment, stock_equipment) => {
+
+    let multiply_quantity_of_equipment_per_amount = parseInt($('#multiply_quantity_of_equipment_per_amount').val());
+    let multiply_quantity_of_equipment_per_day = parseInt($('#multiply_quantity_of_equipment_per_day').val());
+    const dateDelivery = new Date(transformDateForEn($(`input[name="date_delivery_equipment_${equipment}"]`).val().split(' ')[0]).replace(/-/g, '/'));
+    const dateWithdrawal = new Date(transformDateForEn($(`input[name="date_withdrawal_equipment_${equipment}"]`).val().split(' ')[0]).replace(/-/g, '/'));
+    const diffTime = Math.abs(dateWithdrawal.getTime() - dateDelivery.getTime());
+    const diffDay = Math.ceil(diffTime / (1000 * 3600 * 24));
+
+    let priceEquipmentTotal = priceEquipment;
+    if (multiply_quantity_of_equipment_per_amount) {
+        priceEquipmentTotal *= stock_equipment;
+    }
+    if (multiply_quantity_of_equipment_per_day && diffDay > 0) {
+        priceEquipmentTotal *= diffDay;
+    }
+
+    return priceEquipmentTotal;
 }
