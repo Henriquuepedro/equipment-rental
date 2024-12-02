@@ -412,7 +412,7 @@ String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.substr(1);
 }
 
-const getOptionsForm = async (type, el, selected = null, select_default = null) => {
+const getOptionsForm = async (type, el, selected = null, select_default = null, company = null) => {
 
     const base_uri = $('[name="base_url"]').val() + '/ajax';
     let options = '<option value="0">Selecione ...</option>';
@@ -420,6 +420,7 @@ const getOptionsForm = async (type, el, selected = null, select_default = null) 
     let field_id;
     let field_text;
     let data_search = null;
+    el.empty();
 
     switch (type) {
         case 'nationality':
@@ -454,6 +455,16 @@ const getOptionsForm = async (type, el, selected = null, select_default = null) 
             break;
         case 'residues':
             endpoint = `${base_uri}/residuo/visualizar-residuos`;
+            field_id = 'id';
+            field_text = 'name';
+            options = '<option value="">Selecione ...</option>';
+            data_search = 'data';
+            break;
+        case 'drivers':
+            endpoint = `${base_uri}/motorista/visualizar-motoristas`;
+            if (company) {
+                endpoint += `/${company}`;
+            }
             field_id = 'id';
             field_text = 'name';
             options = '<option value="">Selecione ...</option>';

@@ -20,14 +20,6 @@
 <script src="{{ asset('vendor/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.js') }}"></script>
 <script>
     $(function(){
-        $('[name="state"], [name="city"]').select2();
-        loadStates($('[name="state"]'), null, 'Todos');
-        loadCities($('[name="city"]'), null, null, 'Selecione o Estado');
-
-        $('#date_filter').trigger('change');
-        moment.locale('pt-br');
-        loadDaterangePickerInput($('input[name="intervalDates"]'), function () {});
-
         $('.select-listbox').bootstrapDualListbox({
             // default text
             filterTextClear: 'Mostrar todos',
@@ -57,15 +49,6 @@
             btnClass: 'btn-outline-secondary',
         });
 
-    });
-
-    $('[name="state"]').on('change', function(){
-        loadCities($('[name="city"]'), $(this).val(), 'Todos');
-    });
-
-    $('#date_filter').on('change', function(){
-        const label = $(`#date_filter option[value="${$(this).val()}"]`).text();
-        $('[for="intervalDates"] span.label_date_filter').text(label);
     });
 
     $('[name="type"]').on('change', async function (){

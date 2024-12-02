@@ -239,7 +239,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="col-8">
+                        <div class="col-md-8">
                             <div class="tab-content tab-content-vertical">
                                 <form action="{{ route('profile.update') }}" method="POST" class="row" id="formUpdateProfile">
                                     <div class="tab-pane fade show active" id="user-profile-info" role="tabpanel" aria-labelledby="user-profile-info-tab">
