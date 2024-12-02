@@ -35,7 +35,7 @@ class DriverCommissionsExport implements FromCollection
      */
     public function collection(): Collection
     {
-        $rental_equipments = $this->rental_equipment->getComissionByDriverAndDate($this->company_id, $this->date_start, $this->date_end, $this->driver_id);
+        $rental_equipments = $this->rental_equipment->getConmissionByDriverAndDate($this->company_id, $this->date_start, $this->date_end, $this->driver_id);
 
         return new Collection($rental_equipments);
     }

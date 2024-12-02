@@ -244,7 +244,7 @@ class RentalEquipment extends Model
             ->get();
     }
 
-    public function getComissionByDriverAndDate(int $company_id, string $date_start, string $date_end, int $driver_id)
+    public function getConmissionByDriverAndDate(int $company_id, string $date_start, string $date_end, int $driver_id)
     {
         return $this
             ->select('rental_equipments.*', 'rentals.code')
