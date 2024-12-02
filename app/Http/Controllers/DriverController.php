@@ -111,7 +111,7 @@ class DriverController extends Controller
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        return view('driver.create');
+        return view('driver.update');
     }
 
     public function insert(DriverCreatePost $request): JsonResponse|RedirectResponse
@@ -138,6 +138,7 @@ class DriverController extends Controller
             'address_neigh'         => $dataDriver->address_neigh,
             'address_city'          => $dataDriver->address_city,
             'address_state'         => $dataDriver->address_state,
+            'commission'            => $dataDriver->commission,
             'user_insert'           => $dataDriver->user_id
         ));
 
@@ -218,6 +219,7 @@ class DriverController extends Controller
                 'address_neigh'         => $dataDriver->address_neigh,
                 'address_city'          => $dataDriver->address_city,
                 'address_state'         => $dataDriver->address_state,
+                'commission'            => transformMoneyBr_En($dataDriver->commission),
                 'user_update'           => $dataDriver->user_id
             ),
             $dataDriver->driver_id
@@ -257,16 +259,21 @@ class DriverController extends Controller
         $obj->address_neigh         = filter_var($request->input('address_neigh'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
         $obj->address_city          = filter_var($request->input('address_city'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
         $obj->address_state         = filter_var($request->input('address_state'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
+        $obj->commission            = filter_var($request->input('commission'), FILTER_FLAG_EMPTY_STRING_NULL) ?: null;
         $obj->driver_id             = $request->input('driver_id') ? (int)$request->input('driver_id') : null;
 
         return $obj;
     }
 
-    public function getDrivers(): JsonResponse
+    public function getDrivers(int $company_id = null): JsonResponse
     {
-        $company_id = Auth::user()->__get('company_id');
+        $auth_company_id = Auth::user()->__get('company_id');
         $driverData = [];
         $lastId = 0;
+
+        if ($auth_company_id != 1 && $auth_company_id != $company_id) {
+            return response()->json(['data' => $driverData, 'lastId' => $lastId]);
+        }
 
         $drivers = $this->driver->getDrivers($company_id);
 

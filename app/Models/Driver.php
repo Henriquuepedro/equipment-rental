@@ -32,6 +32,7 @@ class Driver extends Model
         'address_neigh',
         'address_city',
         'address_state',
+        'commission',
         'user_insert',
         'user_update'
     ];

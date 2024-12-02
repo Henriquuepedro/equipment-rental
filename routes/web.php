@@ -170,6 +170,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
         Route::get('/locacao', [App\Http\Controllers\ReportController::class, 'rental'])->name('rental');
         Route::get('/financeiro', [App\Http\Controllers\ReportController::class, 'bill'])->name('bill');
         Route::get('/cadastro', [App\Http\Controllers\ReportController::class, 'register'])->name('register');
+        Route::get('/comissao', [App\Http\Controllers\ReportController::class, 'commission'])->name('commission');
 
     });
 
@@ -205,6 +206,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
     Route::group(['prefix' => '/exportar', 'as' => 'export.'], function () {
 
         Route::post('/cadastro', [App\Http\Controllers\ExportController::class, 'register'])->name('register');
+        Route::post('/comissao-de-motorista', [App\Http\Controllers\ExportController::class, 'driver_commission'])->name('driver_commission');
 
     });
 
@@ -281,7 +283,7 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
             Route::post('/buscar', [App\Http\Controllers\DriverController::class, 'fetchDrivers'])->name('fetch');
             Route::post('/delete', [App\Http\Controllers\DriverController::class, 'delete'])->name('delete');
             Route::post('/novo-motorista', [App\Http\Controllers\DriverController::class, 'insert'])->name('new-driver');
-            Route::get('/visualizar-motoristas', [App\Http\Controllers\DriverController::class, 'getDrivers'])->name('get-drivers');
+            Route::get('/visualizar-motoristas/{company_id?}', [App\Http\Controllers\DriverController::class, 'getDrivers'])->name('get-drivers');
             Route::get('/visualizar-motorista/{id?}', [App\Http\Controllers\DriverController::class, 'get'])->name('get');
         });
         Route::group(['prefix' => '/veiculo', 'as' => 'vehicle.'], function () {
