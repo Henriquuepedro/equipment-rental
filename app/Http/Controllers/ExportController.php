@@ -88,19 +88,19 @@ class ExportController extends Controller
         $company_id = hasAdminMaster() ? $request->input('company') : $request->user()->company_id;
 
         if (empty($company_id)) {
-            return redirect()->route('report.register')
+            return redirect()->route('report.commission')
                 ->withErrors("Selecione uma empresa.");
         }
 
         $driver = $this->driver->getDriver($request->input('drivers'), $company_id);
 
         if (empty($driver)) {
-            return redirect()->route('report.register')
+            return redirect()->route('report.commission')
                 ->withErrors("Selecione um motorista.");
         }
 
         if (empty($driver['commission'])) {
-            return redirect()->route('report.register')
+            return redirect()->route('report.commission')
                 ->withErrors("Motorista sem comissão configurada.");
         }
 
