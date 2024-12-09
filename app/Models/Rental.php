@@ -43,6 +43,8 @@ class Rental extends Model
         'net_value',
         'calculate_net_amount_automatic',
         'automatic_parcel_distribution',
+        'multiply_quantity_of_equipment_per_amount',
+        'multiply_quantity_of_equipment_per_day',
         'observation',
         'user_insert',
         'user_update'

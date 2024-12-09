@@ -1,5 +1,5 @@
 var ChartColor = ["#5D62B4", "#54C3BE", "#EF726F", "#F9C446", "rgb(93.0, 98.0, 180.0)", "#21B7EC", "#04BCCC"];
-var primaryColor = getComputedStyle(document.body).getPropertyValue('--primary');
+var primaryColor = getComputedStyle(document.body).getPropertyValue('--bs-center-graph-text-color');
 var secondaryColor = getComputedStyle(document.body).getPropertyValue('--secondary');
 var successColor = getComputedStyle(document.body).getPropertyValue('--success');
 var warningColor = getComputedStyle(document.body).getPropertyValue('--warning');
@@ -412,7 +412,7 @@ String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.substr(1);
 }
 
-const getOptionsForm = async (type, el, selected = null, select_default = null) => {
+const getOptionsForm = async (type, el, selected = null, select_default = null, company = null) => {
 
     const base_uri = $('[name="base_url"]').val() + '/ajax';
     let options = '<option value="0">Selecione ...</option>';
@@ -420,6 +420,7 @@ const getOptionsForm = async (type, el, selected = null, select_default = null) 
     let field_id;
     let field_text;
     let data_search = null;
+    el.empty();
 
     switch (type) {
         case 'nationality':
@@ -454,6 +455,16 @@ const getOptionsForm = async (type, el, selected = null, select_default = null) 
             break;
         case 'residues':
             endpoint = `${base_uri}/residuo/visualizar-residuos`;
+            field_id = 'id';
+            field_text = 'name';
+            options = '<option value="">Selecione ...</option>';
+            data_search = 'data';
+            break;
+        case 'drivers':
+            endpoint = `${base_uri}/motorista/visualizar-motoristas`;
+            if (company) {
+                endpoint += `/${company}`;
+            }
             field_id = 'id';
             field_text = 'name';
             options = '<option value="">Selecione ...</option>';

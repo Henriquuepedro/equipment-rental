@@ -1325,3 +1325,6 @@ table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child:b
 .accordion .card .card-header a[aria-expanded=true] {
     color: #ffffff;
 }
+.navbar .navbar-menu-wrapper .navbar-nav .nav-item.dropdown .navbar-dropdown[aria-labelledby="UserDropdown"] {
+    min-width: 220px
+}

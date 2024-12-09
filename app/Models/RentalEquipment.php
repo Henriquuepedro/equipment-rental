@@ -243,4 +243,21 @@ class RentalEquipment extends Model
             })
             ->get();
     }
+
+    public function getConmissionByDriverAndDate(int $company_id, string $date_start, string $date_end, int $driver_id)
+    {
+        return $this
+            ->select('rental_equipments.*', 'rentals.code')
+            ->join('rentals', 'rentals.id', '=', 'rental_equipments.rental_id')
+            ->where('rental_equipments.company_id', $company_id)
+            ->where(function($query) use ($date_start, $date_end, $driver_id) {
+                $query->orWhere(function($query) use ($date_start, $date_end, $driver_id) {
+                    $query->whereBetween('rental_equipments.actual_delivery_date', array($date_start, $date_end))->where('rental_equipments.actual_driver_delivery', $driver_id);
+                });
+                $query->orWhere(function($query) use ($date_start, $date_end, $driver_id) {
+                    $query->whereBetween('rental_equipments.actual_withdrawal_date', array($date_start, $date_end))->where('rental_equipments.actual_driver_withdrawal', $driver_id);
+                });
+            })
+            ->get();
+    }
 }

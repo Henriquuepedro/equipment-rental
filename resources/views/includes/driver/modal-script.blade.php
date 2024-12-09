@@ -3,10 +3,21 @@
         $('#newDriverModal [name="cpf"]').mask('000.000.000-00');
         $('#newDriverModal [name="phone"]').mask('(00) 000000000');
         $('#newDriverModal [name="rg"], #newDriverModal [name="cnh"]').mask('0#');
+        $('#newDriverModal [name="commission"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
+        $('#newDriverModal [name="address_state"], #newDriverModal [name="address_city"]').select2();
+        $('#newDriverModal [name="address_zipcode"]').mask('00.000-000');
     });
+
+    $('#newDriverModal').on('shown.bs.modal', function(){
+        loadStates($('#newDriverModal [name="address_state"]'));
+        loadCities($('#newDriverModal [name="address_city"]'));
+        loadSearchZipcode('#formCreateDriverModal [name="address_zipcode"]', $('#formCreateDriverModal'));
+    });
+
     $('#newDriverModal').on('hidden.bs.modal', function(e){
         $("body").addClass("modal-open");
     });
+
     $('#btnModalNewDriverModal').on('click', function(e){
         $('#newDriverModal').modal({
             backdrop: 'static',
@@ -14,6 +25,7 @@
             show: true
         }).modal("show");
     });
+
     // Validar dados
     $("#formCreateDriverModal").validate({
         rules: {

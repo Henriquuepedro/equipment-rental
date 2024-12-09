@@ -526,6 +526,8 @@
     <input type="hidden" name="address_city" value="{{ $rental->address_city }}">
     <input type="hidden" name="address_state" value="{{ $rental->address_state }}">
     <input type="hidden" name="first_load_page" value="1">
+    <input type="hidden" id="multiply_quantity_of_equipment_per_amount" value="{{ $rental->multiply_quantity_of_equipment_per_amount }}">
+    <input type="hidden" id="multiply_quantity_of_equipment_per_day" value="{{ $rental->multiply_quantity_of_equipment_per_day }}">
 
     <input type="hidden" name="residues" value="{{ implode(',', array_map(function($residue) { return $residue['id']; }, $rental_residue->toArray())) }}">
 @stop

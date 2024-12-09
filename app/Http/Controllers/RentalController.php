@@ -8,6 +8,7 @@ use App\Http\Requests\RentalDeletePost;
 use App\Http\Requests\RentalMtrCreatePost;
 use App\Models\Address;
 use App\Models\Budget;
+use App\Models\Config;
 use App\Models\Driver;
 use App\Models\Equipment;
 use App\Models\EquipmentWallet;
@@ -50,6 +51,7 @@ class RentalController extends Controller
     private RentalPayment $rental_payment;
     private RentalResidue $rental_residue;
     private RentalMtr $rental_mtr;
+    private Config $config;
 
     public function __construct()
     {
@@ -66,6 +68,7 @@ class RentalController extends Controller
         $this->rental_payment = new RentalPayment();
         $this->rental_residue = new RentalResidue();
         $this->rental_mtr = new RentalMtr();
+        $this->config = new Config();
 
         /*try {
             $sid = env('TWILIO_SID');
@@ -414,8 +417,10 @@ class RentalController extends Controller
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
         $budget = false;
+        $company_id = Auth::user()->__get('company_id');
+        $config = $this->config->getByCompany($company_id);
 
-        return view('rental.create', compact('budget'));
+        return view('rental.create', compact('budget', 'config'));
     }
 
     public function insert(RentalCreatePost $request): JsonResponse

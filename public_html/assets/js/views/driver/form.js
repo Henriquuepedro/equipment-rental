@@ -4,6 +4,7 @@ $(() => {
     $('[name="rg"], [name="cnh"]').mask('0#');
     $('[name="address_state"], [name="address_city"]').select2();
     $('[name="address_zipcode"]').mask('00.000-000');
+    $('[name="commission"]').maskMoney({thousands: '.', decimal: ',', allowZero: true});
 
     const state = $('[name="address_state"]').data('value-state');
     const city = $('[name="address_city"]').data('value-city');

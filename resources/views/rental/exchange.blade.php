@@ -402,4 +402,6 @@
     <input type="hidden" id="routeGetVehicle" value="{{ route('ajax.vehicle.get-vehicle') }}">
     <input type="hidden" id="route_lat_lng_my_company" value="{{ route('ajax.company.get-lat-lng-my-company') }}">
     <input type="hidden" id="back_to_list" value="{{ route('rental.index') }}">
+    <input type="hidden" id="multiply_quantity_of_equipment_per_amount" value="{{ $rental->multiply_quantity_of_equipment_per_amount }}">
+    <input type="hidden" id="multiply_quantity_of_equipment_per_day" value="{{ $rental->multiply_quantity_of_equipment_per_day }}">
 @stop

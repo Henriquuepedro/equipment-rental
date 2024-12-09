@@ -421,6 +421,10 @@ return [
                 [
                     'route' => 'report.register',
                     'text'  => 'Cadastro'
+                ],
+                [
+                    'route' => 'report.commission',
+                    'text'  => 'Comissão'
                 ]
             ]
         ],
