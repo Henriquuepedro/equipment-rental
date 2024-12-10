@@ -41,52 +41,48 @@ class MercadoPagoService
         $this->log_payment_data = '';
     }
 
-    public function updatePayment(string $code, string $type): int
+    /**
+     * @todo pegar os dias faltantes para o dia 10 e adicionar no plano.
+     *
+     * @param string $code
+     * @return int
+     */
+    public function updatePayment(string $code): int
     {
         try {
-            $plan_payment = $this->plan_payment->getPaymentByTransaction($code);
-            $preapproval_payment = null;
+            $data_payment = $this->getPayment($code);
 
-            if (!$plan_payment) {
-                if ($type !== 'subscription_authorized_payment') {
-                    $this->debugEcho("plan code ($code) not found.");
-                    return Response::HTTP_NOT_FOUND;
-                }
+            // Validação do cartão.
+            if ($data_payment->operation_type == 'card_validation') {
+                $this->debugEcho("card validation");
+                return Response::HTTP_OK;
+            }
 
-                $preapproval_payment = $this->plan_preapproval_payment->getByGatewayPaymentId($code);
+            $plan_payment = $this->plan_payment->getPaymentByCodePayment($data_payment->external_reference);
 
-                if (!$preapproval_payment) {
-                    $preapproval = $this->getPreapprovalAuthorizedPayments($code);
-                    $preapproval_id = $preapproval->preapproval_id;
-                    $data_preapproval = $this->plan_payment->getPaymentByTransaction($preapproval_id);
-                    if (!$data_preapproval) {
-                        $this->debugEcho("plan preapproval code ($code) and id_transaction ($preapproval_id) not found.");
-                        return Response::HTTP_NOT_FOUND;
-                    }
+            if ($plan_payment->is_subscription) {
+                $preapproval_payment = $this->plan_preapproval_payment->getByGatewayPaymentId($data_payment->id);
 
-                    $this->plan_preapproval_payment->insert(array(
-                        'company_id'            => $data_preapproval->company_id,
-                        'plan_payment_id'       => $data_preapproval->id,
-                        'preapproval_id'        => $preapproval_id,
-                        'status_detail'         => $preapproval->payment->status_detail,
-                        'status'                => $preapproval->payment->status,
-                        'transaction_amount'    => $preapproval->transaction_amount,
-                        'gateway_payment_id'    => $preapproval->id,
-                        'gateway_debit_date'    => $preapproval->debit_date,
-                        'gateway_date_created'  => $preapproval->date_created,
-                        'gateway_last_modified'  => $preapproval->last_modified,
-                    ));
-                    $preapproval_payment = $this->plan_preapproval_payment->getByGatewayPaymentId($code);
+                if ($preapproval_payment) {
+                    $this->plan_preapproval_payment->editById(array(
+                        'status_detail'         => $data_payment->status_detail,
+                        'status'                => $data_payment->status,
+                        'gateway_debit_date'    => $data_payment->date_last_updated,
+                        'gateway_last_modified' => $data_payment->date_last_updated,
+                    ), $preapproval_payment->id);
                 } else {
-                    $preapproval_id = $preapproval_payment->preapproval_id;
-                }
-
-                $code = $preapproval_id;
-                $plan_payment = $this->plan_payment->getPaymentByTransaction($code);
-            } else {
-                if ($plan_payment->is_subscription) {
-                    $preapproval_payment = $plan_payment;
-                    $preapproval_payment->gateway_last_modified = $plan_payment->date_last_updated;
+                    $this->plan_preapproval_payment->insert(array(
+                        'company_id'            => $plan_payment->company_id,
+                        'plan_payment_id'       => $plan_payment->id,
+                        'preapproval_id'        => $plan_payment->id_transaction,
+                        'status_detail'         => $data_payment->status_detail,
+                        'status'                => $data_payment->status,
+                        'transaction_amount'    => $data_payment->transaction_amount,
+                        'gateway_payment_id'    => $data_payment->id,
+                        'gateway_debit_date'    => $data_payment->date_last_updated,
+                        'gateway_date_created'  => $data_payment->date_created,
+                        'gateway_last_modified' => $data_payment->date_last_updated,
+                    ));
                 }
             }
 
@@ -95,25 +91,16 @@ class MercadoPagoService
             $plan_config_id     = (int)$plan_payment->plan_id;
 
             try {
-                if ($plan_payment->is_subscription) {
-                    if (!$preapproval_payment) {
-                        $this->debugEcho("get preapproval data ($code) to MercadoPago not found.");
-                        return Response::HTTP_BAD_REQUEST;
-                    }
+                $status         = $data_payment->status;
+                $status_detail  = $data_payment->status_detail;
+                $last_modified  = $data_payment->date_last_updated;
+                $last_modified  = formatDateInternational($last_modified) ?? dateNowInternational();
+                $observation    = null;
 
-                    $data_payment = $this->getPreapproval($code);
-                    $status = $preapproval_payment->status;
-                    $status_detail = $preapproval_payment->status_detail;
-                    $last_modified = $preapproval_payment->gateway_last_modified;
-                    $last_modified = formatDateInternational($last_modified) ?? dateNowInternational();
-                    $observation = 'preapproval: ' . (($data_payment->summarized->quotas - $data_payment->summarized->pending_charge_quantity) + 1) . '/' . $data_payment->summarized->quotas;
-                } else {
-                    $data_payment = $this->getPayment($code);
-                    $status         = $data_payment->status;
-                    $status_detail  = $data_payment->status_detail;
-                    $last_modified  = $data_payment->date_last_updated;
-                    $last_modified  = formatDateInternational($last_modified) ?? dateNowInternational();
-                    $observation    = null;
+                if ($plan_payment->is_subscription) {
+                    $subscription_sequence_total  = $data_payment->point_of_interaction->transaction_data->subscription_sequence->total;
+                    $subscription_sequence_number = $data_payment->point_of_interaction->transaction_data->subscription_sequence->number;
+                    $observation = "preapproval: $subscription_sequence_number/$subscription_sequence_total";
                 }
             } catch(Exception | UnexpectedValueException $e) {
                 $this->debugEcho("get payment ($code) to mercadoPago found a error. {$e->getMessage()}");
@@ -141,28 +128,28 @@ class MercadoPagoService
 
             // Pedido aprovado, liberar dias do plano.
             if (in_array($status, $this->approve_status)) {
-                $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) is approved or authorized.");
+                $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) is " . implode(', ', $this->approve_status));
                 // Pagamento já teve uma aprovação anteriormente, não deve adicionar mais dias no plano.
                 if (!$this->plan_history->getStatusByPayment($plan_payment_id, $observation, $this->approve_status)) {
-                    $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) isn't approved or authorized.");
+                    $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) wasn't " . implode(', ', $this->approve_status));
                     // Pagamento não tem indício de cancelamento, continuar com a aprovação e adicionar os dias.
                     if (!$this->plan_history->getStatusByPayment($plan_payment_id, $observation, $this->cancel_status)) {
-                        $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) isn't rejected, cancelled, refunded or charged_back.");
+                        $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) wasn't " . implode(', ', $this->cancel_status));
                         // Adicionar quantidade de meses conforme o plano e atualiza o plano da empresa.
                         $this->company->setDatePlanAndUpdatePlanCompany($company_id, $plan_config_id, $month_plan);
                         $this->debugEcho("Add $month_plan month to payment_id ($code).");
                     }
                 }
             }
-            // Pedido perdeu sua aprovação, deve verificar se chegou a ocorrer alguma aprovação para reverter.
+            // Pedido perdeu a sua aprovação, deve verificar se chegou a ocorrer alguma aprovação para reverter.
             elseif (in_array($status, $this->cancel_status)) {
-                $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) is rejected or cancelled or refunded or charged_back.");
+                $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) is " . implode(', ', $this->cancel_status));
                 // Pagamento já teve uma aprovação anteriormente, deve reverter a aprovação.
                 if ($this->plan_history->getStatusByPayment($plan_payment_id, $observation, $this->approve_status)) {
-                    $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) has already been approved or authorized.");
+                    $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) has already been " . implode(', ', $this->approve_status));
                     // Pagamento já perdeu a aprovação anteriormente, não deve reverter a aprovação novamente.
                     if (!$this->plan_history->getStatusByPayment($plan_payment_id, $observation, $this->cancel_status)) {
-                        $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) isn't rejected, cancelled, refunded or charged_back.");
+                        $this->debugEcho("payment ($code) and plan_id ($plan_payment_id) wasn't " . implode(', ', $this->cancel_status));
                         // identificar qual o plano anterior do que precisa ser cancelado.
                         $plan_id_old = $this->plan_history->getPenultimatePlanConfirmedCompany($company_id, $plan_payment_id);
                         $this->debugEcho("Remove $month_plan month to payment_id ($code).");

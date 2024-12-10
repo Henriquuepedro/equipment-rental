@@ -46,6 +46,11 @@ class PlanPreapprovalPayment extends Model
         return $this->create($data);
     }
 
+    public function editById(array $data, int $id)
+    {
+        return $this->find($id)->fill($data)->save();
+    }
+
     public function edit(array $data, string $gateway_payment_id, string $preapproval_id)
     {
         return $this->where([

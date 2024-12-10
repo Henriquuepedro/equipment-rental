@@ -60,6 +60,7 @@ class Notification extends Controller
                 }*/
             }
 
+            // É um teste, ignorar.
             if (
                 in_array($request->input('action'), array("test.created", "test.updated")) &&
                 $type == "test"
@@ -68,16 +69,30 @@ class Notification extends Controller
             }
 
             if (
-                !in_array($request->input('action'), array("payment.created", "payment.updated", "payment.create", "payment.update", "updated", "created")) ||
-                !in_array($type, array("payment", "preapproval", "subscription_authorized_payment", "subscription_preapproval", "subscription_preapproval_plan"))
+                !in_array($request->input('action'), array(
+                    "payment.created",
+                    "payment.updated",
+                    "payment.create",
+                    "payment.update",
+                    "updated",
+                    "created"
+                )) ||
+                !in_array($type, array(
+                    "payment",
+                    "preapproval",
+                    //"subscription_authorized_payment",
+                    //"subscription_preapproval",
+                    //"subscription_preapproval_plan"
+                ))
             ) {
+                // Retornar que deu certo para não notificar novamente.
                 $mercado_pago_service->debugEcho("type or action don't accept. [action={$request->input('action')} | type=$type].");
-                return response()->json(array(), 406);
+                return response()->json();
             }
 
             $code = $request->input('data')['id'];
 
-            return response()->json(array(), $mercado_pago_service->updatePayment($code, $type));
+            return response()->json(array(), $mercado_pago_service->updatePayment($code));
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

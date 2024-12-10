@@ -108,7 +108,7 @@ trait RentalTrait
             throw new Exception($arrResidue['error']);
         }
 
-        return array(
+        $response = array(
             'arrEquipment'  => $arrEquipment,
             'arrResidue'    => $arrResidue,
             'arrPayment'    => $arrPayment,
@@ -127,7 +127,7 @@ trait RentalTrait
                 'address_state'                             => $state,
                 'address_lat'                               => $lat,
                 'address_lng'                               => $lng,
-                'expected_delivery_date'                    => $dateDelivery->format(DATETIME_INTERNATIONAL),
+                    'expected_delivery_date'                    => $dateDelivery->format(DATETIME_INTERNATIONAL),
                 'expected_withdrawal_date'                  => $dateWithdrawal?->format(DATETIME_INTERNATIONAL),
                 'not_use_date_withdrawal'                   => $notUseDateWithdrawal,
                 'gross_value'                               => !$noCharged ? $responseEquipment->grossValue : null,
@@ -142,6 +142,11 @@ trait RentalTrait
                 $use_action                                 => $request->user()->id
             )
         );
+        if ($is_budget) {
+            $response['rental']['expires_in'] = $request->input('expires_in') ? DateTime::createFromFormat(DATETIME_BRAZIL_NO_SECONDS, $request->input('expires_in'))->format(DATETIME_INTERNATIONAL) : null;
+        }
+
+        return $response;
     }
 
     public function makeValidationToUpdate(RentalCreatePost | BudgetCreatePost $request, array $arrRental, array $arrEquipment, array $arrPayment): array

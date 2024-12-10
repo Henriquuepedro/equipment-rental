@@ -17,6 +17,9 @@
         });
 
         const getTable = (stateSave = true) => {
+            const clients = $('[name="clients"]').val();
+            const situation = $('[name="situation"]').val();
+
             return $("#tableBudgets").DataTable({
                 "responsive": true,
                 "processing": true,
@@ -31,7 +34,11 @@
                     url: '{{ route('ajax.budget.fetch') }}',
                     pages: 2,
                     type: 'POST',
-                    data: { "_token": $('meta[name="csrf-token"]').attr('content') },
+                    data: {
+                        clients,
+                        situation,
+                        "_token": $('meta[name="csrf-token"]').attr('content')
+                    },
                     error: function(jqXHR, ajaxOptions, thrownError) {
                         console.log(jqXHR, ajaxOptions, thrownError);
                     }
@@ -157,7 +164,14 @@
                     });
                 }
             })
-        })
+        });
+
+        $('[name="situation"], [name="clients"]').change(function(){
+            $('[data-bs-toggle="tooltip"]').tooltip('dispose')
+            tableBudget.destroy();
+            $("#tableBudgets tbody").empty();
+            tableBudget = getTable();
+        });
     </script>
 @stop
 
@@ -178,12 +192,32 @@
                         <a href="{{ route('budget.create') }}" class="mb-3 btn btn-primary col-md-3 btn-rounded btn-fw"><i class="fas fa-plus"></i> Novo Orçamento</a>
                         @endif
                     </div>
+                    <div class="row mb-3">
+                        <div class="col-md-8 form-group">
+                            <label>Cliente</label>
+                            <select class="form-control select2" name="clients">
+                                <option value="0">Todos</option>
+                                @foreach($clients as $client)
+                                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Situação</label>
+                            <select class="form-control" id="situation" name="situation">
+                                <option value="1">Não expirados</option>
+                                <option value="0">Expirados</option>
+                                <option value="all">Todos</option>
+                            </select>
+                        </div>
+                    </div>
                     <table id="tableBudgets" class="table">
                         <thead>
                             <tr>
                                 <th>Código</th>
                                 <th>Cliente/Endereço</th>
                                 <th>Criado Em</th>
+                                <th>Expira Em</th>
                                 <th>Ação</th>
                             </tr>
                         </thead>
@@ -193,6 +227,7 @@
                                 <th>Código</th>
                                 <th>Cliente/Endereço</th>
                                 <th>Criado Em</th>
+                                <th>Expira Em</th>
                                 <th>Ação</th>
                             </tr>
                         </tfoot>

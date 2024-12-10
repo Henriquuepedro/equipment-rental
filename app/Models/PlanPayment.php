@@ -81,4 +81,9 @@ class PlanPayment extends Model
     {
         return $this->whereIn('status', array('pending','inprocess','inmediation'))->get();
     }
+
+    public function getPaymentByCodePayment(string $code_payment)
+    {
+        return $this->where('code_payment', $code_payment)->first();
+    }
 }
