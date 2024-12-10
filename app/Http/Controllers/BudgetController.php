@@ -8,6 +8,7 @@ use App\Models\Budget;
 use App\Models\BudgetEquipment;
 use App\Models\BudgetPayment;
 use App\Models\BudgetResidue;
+use App\Models\Client;
 use App\Models\Config;
 use App\Models\Rental;
 use App\Models\RentalEquipment;
@@ -36,6 +37,7 @@ class BudgetController extends Controller
     private RentalResidue $rental_residue;
     private RentalPayment $rental_payment;
     private Config $config;
+    private Client $client;
 
     public function __construct()
     {
@@ -49,6 +51,7 @@ class BudgetController extends Controller
         $this->rental_residue = new RentalResidue();
         $this->rental_payment = new RentalPayment();
         $this->config = new Config();
+        $this->client = new Client();
     }
 
     public function index(): Factory|View|RedirectResponse|Application
@@ -58,7 +61,10 @@ class BudgetController extends Controller
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
 
-        return view('budget.index');
+        $company_id = Auth::user()->__get('company_id');
+        $clients = $this->client->getClients($company_id);
+
+        return view('budget.index', compact('clients'));
     }
 
     public function fetchBudgets(Request $request): JsonResponse
@@ -66,6 +72,8 @@ class BudgetController extends Controller
         $result     = array();
         $draw       = $request->input('draw');
         $company_id = $request->user()->company_id;
+        $clients    = $request->input('clients');
+        $situation  = $request->input('situation');
 
         try {
             $filters        = array();
@@ -89,6 +97,21 @@ class BudgetController extends Controller
 
             $filter_default[]['where']['budgets.company_id'] = $company_id;
 
+            if (!is_null($situation) && $situation !== 'all') {
+                if ($situation == 0) {
+                    $filters[]['where']['budgets.expires_in <'] = dateNowInternational();
+                } else {
+                    $filters[]['where']['function'] = function ($query) use ($situation) {
+                        $query->where('budgets.expires_in', null)
+                            ->orWhere('budgets.expires_in', '>', dateNowInternational());
+                    };
+                }
+            }
+
+            if (!is_null($clients) && $clients != 0) {
+                $filters[]['where']['budgets.client_id'] = $clients;
+            }
+
             $query = array();
             $query['select'] = [
                 'budgets.id',
@@ -101,7 +124,8 @@ class BudgetController extends Controller
                 'budgets.address_neigh',
                 'budgets.address_city',
                 'budgets.address_state',
-                'budgets.created_at'
+                'budgets.created_at',
+                'budgets.expires_in'
             ];
             $query['from'] = 'budgets';
             $query['join'][] = ['clients','clients.id','=','budgets.client_id'];
@@ -134,7 +158,8 @@ class BudgetController extends Controller
             $result[] = array(
                 formatCodeIndex($value->code),
                 "<div class='d-flex flex-wrap'><span class='font-weight-bold w-100'>$value->client_name</span><span class='mt-1 w-100'>$value->address_name, $value->address_number - $value->address_zipcode - $value->address_neigh - $value->address_city/$value->address_state</span></div>",
-                date(DATETIME_BRAZIL_NO_SECONDS, strtotime($value->created_at)),
+                formatDateInternational($value->created_at, DATETIME_BRAZIL_NO_SECONDS),
+                formatDateInternational($value->expires_in, DATETIME_BRAZIL_NO_SECONDS),
                 $buttons
             );
         }
@@ -158,9 +183,8 @@ class BudgetController extends Controller
         $budget = true;
         $company_id = Auth::user()->__get('company_id');
         $config = $this->config->getByCompany($company_id);
-        $multiply_quantity_of_equipment = $config->multiply_quantity_of_equipment ?: 0;
 
-        return view('rental.create', compact('budget', 'multiply_quantity_of_equipment'));
+        return view('rental.create', compact('budget', 'config'));
     }
 
 

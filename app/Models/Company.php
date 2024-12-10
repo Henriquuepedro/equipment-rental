@@ -98,11 +98,30 @@ class Company extends Model
             return null;
         }
 
-        return $this->where('id', $company_id)->first()->fill(
-            array(
-                'plan_id' => $plan_id,
-                'plan_expiration_date' => DB::raw("date_add(plan_expiration_date, interval $months month)")
-            )
-        )->save();
+        $company = $this->where('id', $company_id)->first();
+
+        if ($company) {
+            $plan_expiration_date = $company->plan_expiration_date;
+
+            if (strtotime($plan_expiration_date) < strtotime(dateNowInternational())) {
+                $plan_expiration_date = dateNowInternational();
+            }
+
+            if ($months > 0) {
+                $plan_expiration_date = sumDate($plan_expiration_date, 0, $months);
+            } else {
+                $months *= (-1);
+                $plan_expiration_date = subDate($plan_expiration_date, 0, $months);
+            }
+
+            return $this->where('id', $company_id)->first()->fill(
+                array(
+                    'plan_id' => $plan_id,
+                    'plan_expiration_date' => $plan_expiration_date
+                )
+            )->save();
+        }
+
+        return null;
     }
 }

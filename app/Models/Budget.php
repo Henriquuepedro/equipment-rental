@@ -39,6 +39,7 @@ class Budget extends Model
         'automatic_parcel_distribution',
         'multiply_quantity_of_equipment_per_amount',
         'multiply_quantity_of_equipment_per_day',
+        'expires_in',
         'observation',
         'user_insert',
         'user_update'

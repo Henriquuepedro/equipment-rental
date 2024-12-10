@@ -28,7 +28,7 @@
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
 }
-[name^="date_withdrawal"], [name^="date_delivery"], [name="stock_equipment"] {
+[name^="date_withdrawal"], [name^="date_delivery"], [name="stock_equipment"], [name="expires_in"] {
     border-bottom-right-radius: 0 !important;
     border-top-right-radius: 0 !important;;
 }
