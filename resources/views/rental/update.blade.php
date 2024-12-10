@@ -207,9 +207,9 @@
                     <div class="card">
                         <div class="card-body">
                             <form action="{{ route($budget ? 'ajax.budget.update-rental' : 'ajax.rental.update-rental', ['id' => $rental->id]) }}" method="POST" enctype="multipart/form-data" id="formRental" class="pb-2">
-                                <h3>Tipo de {{ $budget ? 'Orçamento' : 'Locação' }}</h3>
+                                <h3>Configuração {{ $budget ? 'do Orçamento' : 'da Locação' }}</h3>
                                 <div class="stepRental">
-                                    <h6 class="title-step">Tipo de {!! $budget ? 'Orçamento' : 'Locação <i class="fa fa-info-circle" data-bs-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
+                                    <h6 class="title-step">Configuração {!! $budget ? 'do Orçamento' : 'da Locação <i class="fa fa-info-circle" data-bs-toggle="tooltip" data-placement="bottom" title="Defina se haverá ou não cobrança para essa locação."></i>' !!}</h6>
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
                                             <div class="">
@@ -222,6 +222,23 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @if ($budget)
+                                        <h6 class="mt-3">Vencimento do orçamento</h6>
+                                        <div class="col-md-6">
+                                            <div class="form-group flatpickr">
+                                                <label class="label-date-btns">Data de vencimento</label>
+                                                <input type="tel" name="expires_in" class="form-control col-md-9 pull-left mtr-0" value="{{ formatDateInternational($rental->expires_in, DATETIME_BRAZIL_NO_SECONDS) }}" data-inputmask="'alias': 'datetime'" data-inputmask-inputformat="dd/mm/yyyy HH:MM" im-insert="false" data-input>
+                                                <div class="input-button-calendar col-md-3 no-padding pull-right">
+                                                    <a class="input-button pull-left btn-primary btn btn-sm" title="toggle" data-toggle>
+                                                        <i class="fa fa-calendar text-white"></i>
+                                                    </a>
+                                                    <a class="input-button pull-right btn-primary btn btn-sm" title="clear" data-clear>
+                                                        <i class="fa fa-times text-white"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                                 <h3>Cliente e Endereço</h3>
                                 <div class="stepRental">

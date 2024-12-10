@@ -40,8 +40,8 @@
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#bbb',
-                confirmButtonText: 'Sim, cancelar',
-                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Sim, cancelar minha assinatura',
+                cancelButtonText: 'Fechar',
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -194,7 +194,7 @@
                                     </div>
                                 </div>
                                 @endif
-                                @if ($payment->is_subscription && $payment->status !== 'cancelled')
+                                @if ($payment->is_subscription && !in_array($payment->status, array('cancelled')))
                                     <div class="row d-flex justify-content-center mt-3">
                                         <div class="form-group col-md-4">
                                             <button type="button" class="btn btn-danger col-md-12" id="btn_cancel_subscription" data-plan-id="{{ $payment->id }}">Cancelar assinatura</button>

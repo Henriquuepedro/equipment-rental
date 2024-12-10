@@ -1,4 +1,4 @@
-(function ($) {
+    (function ($) {
     'use strict';
     const form = $("#formRental");
     const budget = !!$('#budget').val();
