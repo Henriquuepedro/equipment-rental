@@ -144,14 +144,15 @@
                 }
             //}, 750)
 
-            if ($('[name="address_state"]').length) {
-                address_state = $('[name="address_state"]').val();
+            if ($('[name="rental_address_state"]').length) {
+                address_state = $('[name="rental_address_state"]').val();
+                console.log(address_state);
             }
 
             await loadStates($('[name="state"]'), address_state);
 
-            if (address_state && $('[name="address_city"]').length) {
-                address_city = $('[name="address_city"]').val();
+            if (address_state && $('[name="rental_address_city"]').length) {
+                address_city = $('[name="rental_address_city"]').val();
                 await loadCities($('[name="city"]'), address_state, address_city);
             }
 
@@ -539,9 +540,9 @@
 
     <input type="hidden" name="rental_id" value="{{ $rental->id }}">
     <input type="hidden" name="client_id" value="{{ $rental->client_id }}">
-    <input type="hidden" name="address" value="{{ $rental->client_id }}">
-    <input type="hidden" name="address_city" value="{{ $rental->address_city }}">
-    <input type="hidden" name="address_state" value="{{ $rental->address_state }}">
+    <input type="hidden" name="rental_address" value="{{ $rental->client_id }}">
+    <input type="hidden" name="rental_address_city" value="{{ $rental->address_city }}">
+    <input type="hidden" name="rental_address_state" value="{{ $rental->address_state }}">
     <input type="hidden" name="first_load_page" value="1">
     <input type="hidden" id="multiply_quantity_of_equipment_per_amount" value="{{ $rental->multiply_quantity_of_equipment_per_amount }}">
     <input type="hidden" id="multiply_quantity_of_equipment_per_day" value="{{ $rental->multiply_quantity_of_equipment_per_day }}">

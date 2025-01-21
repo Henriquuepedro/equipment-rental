@@ -127,7 +127,7 @@ trait RentalTrait
                 'address_state'                             => $state,
                 'address_lat'                               => $lat,
                 'address_lng'                               => $lng,
-                    'expected_delivery_date'                    => $dateDelivery->format(DATETIME_INTERNATIONAL),
+                'expected_delivery_date'                    => $dateDelivery->format(DATETIME_INTERNATIONAL),
                 'expected_withdrawal_date'                  => $dateWithdrawal?->format(DATETIME_INTERNATIONAL),
                 'not_use_date_withdrawal'                   => $notUseDateWithdrawal,
                 'gross_value'                               => !$noCharged ? $responseEquipment->grossValue : null,
