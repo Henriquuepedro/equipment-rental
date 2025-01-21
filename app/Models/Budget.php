@@ -17,6 +17,7 @@ class Budget extends Model
     protected $fillable = [
         'code',
         'company_id',
+        'type_rental',
         'client_id',
         'address_zipcode',
         'address_name',
@@ -42,7 +43,7 @@ class Budget extends Model
         'expires_in',
         'observation',
         'user_insert',
-        'user_update'
+        'user_update',
     ];
 
     /**
