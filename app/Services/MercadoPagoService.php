@@ -28,7 +28,7 @@ class MercadoPagoService
 
     protected array $cancel_status = array('rejected', 'cancelled', 'refunded', 'charged_back', 'expired', 'paused');
 
-    protected array $approve_status = array('approved', 'authorized');
+    protected array $approve_status = array('approved', 'authorized', 'accredited');
 
     public function __construct(bool $debug = false)
     {

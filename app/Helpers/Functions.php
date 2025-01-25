@@ -754,6 +754,8 @@ if (! function_exists('createLogEvent')) {
                 $details = $auditable_model->toArray();
             }
 
+            dataAnonymization($details);
+
             LogEvent::create([
                 'event'             => $event,
                 'user_id'           => is_null(auth()->user()) ? null : auth()->id(),
@@ -786,6 +788,33 @@ if (! function_exists('getStatusSupport')) {
             'closed'            => 'Finalizado',
             default             => $status,
         };
+    }
+}
+
+if (! function_exists('dataAnonymization')) {
+    /**
+     * Anonimização de dados
+     *
+     * @param array $data
+     */
+    function dataAnonymization(array &$data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                dataAnonymization($data[$key]);
+                continue;
+            }
+
+            if (
+                likeText('%token%', $key) ||
+                likeText('%credential%', $key) ||
+                likeText('%password%', $key) ||
+                likeText('%hash%', $key) ||
+                likeText('%senha%', $key)
+            ) {
+                $data[$key] = '*********';
+            }
+        }
     }
 }
 
