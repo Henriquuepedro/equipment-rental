@@ -54,6 +54,11 @@ return [
     'board' => 'Placa',
     'driver_id' => 'Código do motorista',
     'active' => 'Ativo',
+    'plan_expiration_date' => 'Data de expiração do plano',
+    'logo' => 'Logotipo',
+    'style_template' => 'Tema',
+    'remember_token' => 'Token de lembrança',
+    'password' => 'Senha',
 
     // Configuração da empresa
     'view_observation_client_rental' => 'Visualizar observação do cliente na locação',
