@@ -754,7 +754,9 @@ if (! function_exists('createLogEvent')) {
                 $details = $auditable_model->toArray();
             }
 
-            dataAnonymization($details);
+            if (!empty($details)) {
+                dataAnonymization($details);
+            }
 
             LogEvent::create([
                 'event'             => $event,
