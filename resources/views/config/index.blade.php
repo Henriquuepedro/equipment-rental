@@ -45,12 +45,20 @@
                 right: 40px !important;;
             }
         }
+        #integration .card{
+            background-color: var(--bs-border-color);
+        }
+        #integration .card-body p,
+        #integration .card-body h4 {
+            color: var(--bs-card-title-color);
+        }
     </style>
 @stop
 
 @section('js')
     <script src="{{ asset('assets/js/shared/file-upload.js') }}" type="application/javascript"></script>
     <script src="{{ asset('assets/js/views/config/form.js') }}" type="application/javascript"></script>
+    <script src="{{ asset('vendor/qrcodejs/qrcode.min.js') }}" type="application/javascript"></script>
 @stop
 
 @section('content')
@@ -87,6 +95,9 @@
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" id="config-tab" data-bs-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="false">Configuração</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="integration-tab" data-bs-toggle="tab" href="#integration" role="tab" aria-controls="integration" aria-selected="false">Integração</a>
                                 </li>
                             </ul>
                         </div>
@@ -216,9 +227,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        {{ csrf_field() }}
-                                    </form>
-                                </div>
+                                    </div>
+                                    {{ csrf_field() }}
+                                </form>
                             </div>
                             <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
                                 <div class="row">
@@ -254,6 +265,32 @@
                                     </div>
                                     {{ csrf_field() }}
                                 </form>
+                            </div>
+                            <div class="tab-pane fade" id="integration" role="tabpanel" aria-labelledby="integration-tab">
+                                <div class="row">
+                                    <div class="form-group col-md-12 text-center mb-2">
+                                        <h4>Defina as integrações para seu ambiente.</h4>
+                                    </div>
+                                </div>
+                                <div class="row d-flex justify-content-center">
+                                    @foreach($integrations as $integration)
+                                    <div class="col-md-4 grid-margin stretch-card">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="d-sm-flex flex-row flex-wrap text-start align-items-center">
+                                                    <img src="{{ asset("assets/images/system/integrations/$integration[name].png") }}" class="img-lg rounded" alt="profile image" />
+                                                    <div class="ms-sm-3 ms-md-0 ms-xl-3 mt-2 mt-sm-0 mt-md-2 mt-xl-0">
+                                                        <h4>{{ $integration['description'] }}</h4>
+                                                        <p class="mb-0 fw-bold">Conecte sua conta whatsapp para envios automáticos</p>
+                                                        <button type="button" class="btn btn-primary btn-flat btn-sm" data-bs-toggle="modal" data-bs-target="#integration-{{ $integration['name'] }}"><i class="fa fa-plug"></i> Conectar</button>
+                                                        <div class="additional-info"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -431,10 +468,52 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="integration-whatsapp" tabindex="-1" role="dialog" aria-labelledby="newIntegrationWhatsapp" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <form action="{{ route('ajax.integration.create-integration') }}" method="POST" id="formSaveIntegration">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newIntegrationWhatsapp">Integração com Whatsapp</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="form-group col-md-12 d-flex justify-content-center align-items-center flex-nowrap">
+                                <h3 class="mr-2">WhatsApp</h3> <img src="{{ asset("assets/images/system/integrations/$integration[name].png") }}" class="img-sm rounded" alt="profile image" />
+                            </div>
+                        </div>
+                        <div class="row" id="content-start-integration-whatsapp">
+                            <div class="form-group col-md-12 d-flex justify-content-center">
+                                <button type="button" id="btn-start-integration" class="col-md-6 btn btn-primary"><i class="fa fa-circle-play"></i> Iniciar Integração</button>
+                            </div>
+                        </div>
+                        <div class="row" id="content-terminate-integration-whatsapp">
+                            <div class="form-group col-md-12 d-flex justify-content-center">
+                                <button type="button" id="btn-terminate-integration" class="col-md-6 btn btn-primary"><i class="fa fa-circle-play"></i> Encerrar Integração</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-12 d-flex justify-content-center mt-2 flex-wrap" id="content-integration-whatsapp">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-right">
+                        <button type="button" class="btn btn-secondary col-md-3" data-bs-dismiss="modal"><i class="fa fa-times"></i> Fechar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <input type="hidden" id="routeGetUserPermission" value="{{ route('ajax.user.get-permission') }}">
     <input type="hidden" id="routeInactiveUser" value="{{ route('ajax.user.inactivate') }}">
     <input type="hidden" id="routeUserChangeType" value="{{ route('ajax.user.change-type') }}">
     <input type="hidden" id="routeDeleteUser" value="{{ route('ajax.user.delete') }}">
     <input type="hidden" id="routeGetUser" value="{{ route('ajax.user.get-user') }}">
     <input type="hidden" id="routeGetUsers" value="{{ route('ajax.user.get-users') }}">
+    <input type="hidden" id="routeCheckIntegration" value="{{ route('ajax.integration.check-integration') }}">
+    <input type="hidden" id="routeCreateIntegration" value="{{ route('ajax.integration.create-integration') }}">
+    <input type="hidden" id="routeTerminateIntegration" value="{{ route('ajax.integration.terminate-integration') }}">
 @stop

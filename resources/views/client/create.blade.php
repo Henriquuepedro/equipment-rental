@@ -124,17 +124,21 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-3">
                                         <label for="cpf_cnpj">CPF</label>
                                         <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" autocomplete="nope" value="{{ old('cpf_cnpj') }}">
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-3">
                                         <label for="rg_ie">RG</label>
                                         <input type="text" class="form-control" id="rg_ie" name="rg_ie" autocomplete="nope" value="{{ old('rg_ie') }}">
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-3">
                                         <label for="contact">Contato</label>
                                         <input type="text" class="form-control" id="contact" name="contact" autocomplete="nope" value="{{ old('contact') }}">
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label for="email">Endereço de E-mail</label>
+                                        <input type="email" class="form-control" id="email" name="email" autocomplete="nope" value="{{ old('email') }}">
                                     </div>
                                 </div>
                                 <div class="row">
@@ -142,13 +146,31 @@
                                         <label for="phone_1">Telefone Principal</label>
                                         <input type="text" class="form-control" id="phone_1" name="phone_1" autocomplete="nope" value="{{ old('phone_1') }}">
                                     </div>
+                                    <div class="col-md-3">
+                                        <br>
+                                        <br>
+                                        <label for="whatsapp_phone_1"><input type="checkbox" id="whatsapp_phone_1" name="whatsapp_phone_1" {{ old('whatsapp_phone_1') ? 'checked' : '' }}> Número contém WhatsApp</label>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <br>
+                                        <br>
+                                        <label><input type="checkbox" id="receiver_whatsapp_phone_1" name="receiver_whatsapp_phone_1" {{ old('receiver_whatsapp_phone_1') ? 'checked' : '' }}> Número de recebedor de mensagem do WhatsApp</label>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="form-group col-md-4">
                                         <label for="phone_2">Telefone Secundário</label>
                                         <input type="text" class="form-control" id="phone_2" name="phone_2" autocomplete="nope" value="{{ old('phone_2') }}">
                                     </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="email">Endereço de E-mail</label>
-                                        <input type="email" class="form-control" id="email" name="email" autocomplete="nope" value="{{ old('email') }}">
+                                    <div class="col-md-3">
+                                        <br>
+                                        <br>
+                                        <label for="whatsapp_phone_2"><input type="checkbox" id="whatsapp_phone_2" name="whatsapp_phone_2" {{ old('whatsapp_phone_2') ? 'checked' : '' }}> Número contém WhatsApp</label>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <br>
+                                        <br>
+                                        <label for="receiver_whatsapp_phone_2"><input type="checkbox" id="receiver_whatsapp_phone_2" name="receiver_whatsapp_phone_2" {{ old('receiver_whatsapp_phone_2') ? 'checked' : '' }}> Número de recebedor de mensagem do WhatsApp</label>
                                     </div>
                                 </div>
                                 <div class="row personal_data">

@@ -460,6 +460,16 @@ Route::group(['middleware' => ['auth', 'verified', CheckPlan::class, ControlUser
         Route::group(['prefix' => '/notificacao', 'as' => 'notification.'], function () {
             Route::post('/buscar', [App\Http\Controllers\NotificationController::class, 'fetch'])->name('fetch');
         });
+
+        Route::group(['prefix' => '/integracao', 'as' => 'integration.'], function () {
+            Route::get('/salvar-integracao', [App\Http\Controllers\IntegrationController::class, 'createIntegration'])->name('create-integration');
+            Route::get('/checar-integracao', [App\Http\Controllers\IntegrationController::class, 'checkConnection'])->name('check-integration');
+            Route::get('/encerrar-integracao', [App\Http\Controllers\IntegrationController::class, 'terminateConnection'])->name('terminate-integration');
+        });
+
+        Route::group(['prefix' => '/notificacao-whatsapp', 'as' => 'whatsapp-notification.'], function () {
+            Route::get('/pedido/{rental_id?}', [App\Http\Controllers\WhatsappNotificationController::class, 'rental'])->name('rental');
+        });
     });
 
     // Admin Master

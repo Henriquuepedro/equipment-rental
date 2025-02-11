@@ -859,6 +859,57 @@
             if ($('#modalGenerateMtr .modal-body .content-view-mtr').length) {
                 getTable();
             }
+        });
+
+        $(document).on('click', '.btnSendOnWhatsapp', function () {
+            Swal.fire({
+                title: 'Enviar mensagem por WhatsApp',
+                html: 'Tem certeza que deseja enviar uma mensagem por WhatsApp para o número do cliente?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#19d895',
+                cancelButtonColor: '#bbb',
+                confirmButtonText: 'Sim, enviar',
+                cancelButtonText: 'Não enviar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const rental_id = $(this).data('rental-id');
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: 'GET',
+                        url: `{{ route('ajax.whatsapp-notification.rental') }}/${rental_id}`,
+                        dataType: 'json',
+                        success: response => {
+                            $('#content-integration-whatsapp').empty();
+                            if (!response.success) {
+                                $('#content-start-integration-whatsapp').show();
+                                $('#content-terminate-integration-whatsapp').hide();
+                                $('[data-bs-target="#integration-whatsapp"]').html('<i class="fa fa-plug"></i> Conectar');
+                                if (response.message === 'session_not_connected') {
+                                    $('[data-bs-target="#integration-whatsapp"]')
+                                        .closest('.card-body')
+                                        .find('.additional-info')
+                                        .append('<div class="badge badge-pill badge-lg badge-warning mt-1">Pendente de escaneamento do QR Code</div>');
+                                }
+                            } else {
+                                $('#content-start-integration-whatsapp').hide();
+                                $('#content-terminate-integration-whatsapp').show();
+                                $('[data-bs-target="#integration-whatsapp"]').html('<i class="fa fa-plug"></i> Desconectar');
+                            }
+
+                            Toast.fire({
+                                icon: response.success ? 'success' : 'error',
+                                title: response.message
+                            });
+                        }, error: e => {
+                            console.log(e);
+                        }
+                    });
+                }
+            });
         })
     </script>
 

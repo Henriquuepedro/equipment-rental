@@ -224,23 +224,27 @@ class ClientController extends Controller
 
     private function formatDataClientToSave($request)
     {
-        $company_id     = $request->user()->company_id;
-        $user_id        = $request->user()->id;
-        $name           = filter_var($request->input('name_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $type           = filter_var($request->input('type_person'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $fantasy        = filter_var($request->input('fantasy_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $email          = filter_var($request->input('email'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_1        = filter_var(onlyNumbers($request->input('phone_1')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $phone_2        = filter_var(onlyNumbers($request->input('phone_2')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $cpf_cnpj       = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $rg_ie          = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $contact        = filter_var($request->input('contact'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $observation    = filter_var($request->input('observation'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $sex            = filter_var($request->input('sex'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $birth_date     = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
-        $nationality    = filter_var($request->input('nationality'));
-        $marital_status = filter_var($request->input('marital_status'));
-        $active         = $request->input('active') ? 1 : 0;
+        $company_id                 = $request->user()->company_id;
+        $user_id                    = $request->user()->id;
+        $name                       = filter_var($request->input('name_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $type                       = filter_var($request->input('type_person'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $fantasy                    = filter_var($request->input('fantasy_client'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $email                      = filter_var($request->input('email'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $phone_1                    = filter_var(onlyNumbers($request->input('phone_1')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $whatsapp_phone_1           = $request->input('whatsapp_phone_1') ? 1 : 0;
+        $receiver_whatsapp_phone_1  = $request->input('receiver_whatsapp_phone_1') ? 1 : 0;
+        $phone_2                    = filter_var(onlyNumbers($request->input('phone_2')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $whatsapp_phone_2           = $request->input('whatsapp_phone_2') ? 1 : 0;
+        $receiver_whatsapp_phone_2  = $request->input('receiver_whatsapp_phone_2') ? 1 : 0;
+        $cpf_cnpj                   = filter_var(onlyNumbers($request->input('cpf_cnpj')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $rg_ie                      = filter_var(onlyNumbers($request->input('rg_ie')), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $contact                    = filter_var($request->input('contact'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $observation                = filter_var($request->input('observation'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $sex                        = filter_var($request->input('sex'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $birth_date                 = filter_var($request->input('birth_date'), FILTER_DEFAULT, FILTER_FLAG_EMPTY_STRING_NULL);
+        $nationality                = filter_var($request->input('nationality'));
+        $marital_status             = filter_var($request->input('marital_status'));
+        $active                     = $request->input('active') ? 1 : 0;
 
         if (empty($nationality)) {
             $nationality = null;
@@ -259,23 +263,27 @@ class ClientController extends Controller
         }
 
         return array(
-            'company_id'    => $company_id,
-            'type'          => $type,
-            'name'          => $name,
-            'fantasy'       => $fantasy,
-            'email'         => $email,
-            'phone_1'       => $phone_1,
-            'phone_2'       => $phone_2,
-            'cpf_cnpj'      => $cpf_cnpj,
-            'rg_ie'         => $rg_ie,
-            'contact'       => $contact,
-            'sex'           => $sex,
-            'birth_date'    => $birth_date,
-            'nationality'   => $nationality,
-            'marital_status'=> $marital_status,
-            'active'        => $active,
-            'observation'   => $observation,
-            'user_insert'   => $user_id
+            'company_id'                => $company_id,
+            'type'                      => $type,
+            'name'                      => $name,
+            'fantasy'                   => $fantasy,
+            'email'                     => $email,
+            'phone_1'                   => $phone_1,
+            'whatsapp_phone_1'          => $whatsapp_phone_1,
+            'receiver_whatsapp_phone_1' => $receiver_whatsapp_phone_1,
+            'phone_2'                   => $phone_2,
+            'whatsapp_phone_2'          => $whatsapp_phone_2,
+            'receiver_whatsapp_phone_2' => $receiver_whatsapp_phone_2,
+            'cpf_cnpj'                  => $cpf_cnpj,
+            'rg_ie'                     => $rg_ie,
+            'contact'                   => $contact,
+            'sex'                       => $sex,
+            'birth_date'                => $birth_date,
+            'nationality'               => $nationality,
+            'marital_status'            => $marital_status,
+            'active'                    => $active,
+            'observation'               => $observation,
+            'user_insert'               => $user_id
         );
     }
 

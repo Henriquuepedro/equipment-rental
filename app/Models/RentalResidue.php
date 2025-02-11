@@ -44,13 +44,16 @@ class RentalResidue extends Model
 
     public function inserts(array $datas)
     {
-        foreach ($datas as $data)
-            if (!$this->create($data)) return false;
+        foreach ($datas as $data) {
+            if (!$this->create($data)) {
+                return false;
+            }
+        }
 
         return true;
     }
 
-    public function remove($rental_id, $company_id)
+    public function remove(int $rental_id, int $company_id)
     {
         return $this->getResidues($company_id, $rental_id)->each(fn ($register) => $register->delete());
     }
