@@ -77,7 +77,7 @@ class WhatsappNotificationController extends Controller
             $this->whatsapp_service->sendMessage($company_id, $real_phone, $content, 'MessageMedia', 'application/pdf', "Locação_$rental->code.pdf");
 
         } catch (Exception $exception) {
-            return response()->json(array('success' => false, 'message' => $exception->getMessage()), 400);
+            return response()->json(array('success' => false, 'message' => $exception->getMessage()));
         }
 
         return response()->json(array('success' => true, 'message' => 'Mensagem enviada com sucesso!'));
