@@ -28,6 +28,7 @@ $(() => {
     }
 
     loadSearchZipcode('#formUpdateCompany [name="cep"]', $('#formUpdateCompany'));
+    loadBtnsIntegrations();
 });
 
 $('[name="state"]').on('change', function(){
@@ -301,6 +302,101 @@ $('#formUpdatePermission').on('submit', function (){
 
         }, error: e => {
             getForm.find('button[type="submit"]').attr('disabled', false);
+            let arrErrors = [];
+
+            $.each(e.responseJSON.errors, function( index, value ) {
+                arrErrors.push(value);
+            });
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção',
+                html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+            });
+        }
+    });
+    return false;
+});
+
+$('#btn-start-integration').on('click', function (){
+    let btn = $(this);
+
+    btn.attr('disabled', true);
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'GET',
+        url: $('#routeCreateIntegration').val(),
+        dataType: 'json',
+        success: response => {
+            btn.attr('disabled', false);
+
+            if (!response.success) {
+                Toast.fire({
+                    icon: response.success ? 'success' : 'error',
+                    title: response.message
+                });
+            }
+
+            if (response.success) {
+                $('#content-start-integration-whatsapp').hide();
+                $('#content-terminate-integration-whatsapp').show();
+                $('#integration-whatsapp #content-integration-whatsapp').empty().append(`<h5 class="col-md-12 text-center">Escaneie o QR Code no seu WhatsApp para se conectar</h5><div id="qr-code-whatsapp"></div></h5>`);
+                $('[data-bs-target="#integration-whatsapp"]').html('<i class="fa fa-plug"></i> Desconectar').closest('.card-body').find('.additional-info').empty();
+
+                const qrcode = new QRCode("qr-code-whatsapp");
+                qrcode.makeCode(response.qr_code);
+            }
+
+        }, error: e => {
+            btn.attr('disabled', false);
+            let arrErrors = [];
+
+            $.each(e.responseJSON.errors, function( index, value ) {
+                arrErrors.push(value);
+            });
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção',
+                html: '<ol><li>'+arrErrors.join('</li><li>')+'</li></ol>'
+            });
+        }
+    });
+    return false;
+});
+
+$('#btn-terminate-integration').on('click', function (){
+    let btn = $(this);
+
+    btn.attr('disabled', true);
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'GET',
+        url: $('#routeTerminateIntegration').val(),
+        dataType: 'json',
+        success: response => {
+            btn.attr('disabled', false);
+
+            if (response.success) {
+                Toast.fire({
+                    icon: response.success ? 'success' : 'error',
+                    title: response.message
+                })
+            }
+
+            if (response.success) {
+                $('#content-start-integration-whatsapp').show();
+                $('#content-terminate-integration-whatsapp').hide();
+                $('#integration-whatsapp #content-integration-whatsapp').empty();
+                $('[data-bs-target="#integration-whatsapp"]').html('<i class="fa fa-plug"></i> Conectar');
+            }
+
+        }, error: e => {
+            btn.attr('disabled', false);
             let arrErrors = [];
 
             $.each(e.responseJSON.errors, function( index, value ) {
@@ -792,5 +888,36 @@ const showImage = (src,target) => {
     src.addEventListener("change",function() {
         // fill fr with image data
         fr.readAsDataURL(src.files[0]);
+    });
+}
+
+const loadBtnsIntegrations = () => {
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'GET',
+        url: $('#routeCheckIntegration').val(),
+        dataType: 'json',
+        success: response => {
+            $('#content-integration-whatsapp').empty();
+            if (!response.success) {
+                $('#content-start-integration-whatsapp').show();
+                $('#content-terminate-integration-whatsapp').hide();
+                $('[data-bs-target="#integration-whatsapp"]').html('<i class="fa fa-plug"></i> Conectar');
+                if (response.message === 'session_not_connected') {
+                    $('[data-bs-target="#integration-whatsapp"]')
+                        .closest('.card-body')
+                        .find('.additional-info')
+                        .append('<div class="badge badge-pill badge-lg badge-warning mt-1">Pendente de escaneamento do QR Code</div>');
+                }
+            } else {
+                $('#content-start-integration-whatsapp').hide();
+                $('#content-terminate-integration-whatsapp').show();
+                $('[data-bs-target="#integration-whatsapp"]').html('<i class="fa fa-plug"></i> Desconectar');
+            }
+        }, error: e => {
+            console.log(e);
+        }
     });
 }

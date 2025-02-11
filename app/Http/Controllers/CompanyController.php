@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CompanyUpdatePost;
 use App\Models\Company;
 use App\Models\Config;
+use App\Models\Integration;
+use App\Models\IntegrationToStore;
 use App\Models\Permission;
 use Exception;
 use GuzzleHttp\Client;
@@ -24,12 +26,16 @@ class CompanyController extends Controller
     private Company $company;
     private Permission $permission;
     private Config $config;
+    private IntegrationToStore $integration_to_store;
+    private Integration $integration;
 
     public function __construct()
     {
-        $this->company      = new Company();
-        $this->permission   = new Permission();
-        $this->config       = new Config();
+        $this->company              = new Company();
+        $this->permission           = new Permission();
+        $this->config               = new Config();
+        $this->integration_to_store = new IntegrationToStore();
+        $this->integration          = new Integration();
     }
 
     public function index(): View|Factory|RedirectResponse|Application
@@ -63,7 +69,10 @@ class CompanyController extends Controller
             ];
         }
 
-        return view('config.index', compact('company', 'htmlPermissions', 'configCompany'));
+        $integrations = $this->integration->getAllActive();
+        $integration_to_stores = $this->integration_to_store->getByCompany($company_id);
+
+        return view('config.index', compact('company', 'htmlPermissions', 'configCompany', 'integrations', 'integration_to_stores'));
     }
 
     public function updateCompany(CompanyUpdatePost $request): RedirectResponse

@@ -609,3 +609,7 @@ $(document).on('change','[name="state"], #state_new', function(){
 $(document).on('change','[name="state[]"]', function(){
     loadCities($(this).closest('td').find('[name="city[]"]'), $(this).val());
 });
+
+$('[name^="receiver_whatsapp_phone_"]').on('change', function(e){
+    $(`[name^="receiver_whatsapp_phone_"]:not([name="${$(e.target).attr('name')}"])`).prop('checked', false);
+});
