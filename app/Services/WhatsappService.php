@@ -22,6 +22,7 @@ class WhatsappService
         $this->integration_to_store = new IntegrationToStore();
         $this->integration = new Integration();
         $this->client = new Client(array(
+            'verify' => false,
             'base_uri' => env('WHATSAPP_BASE_URL'),
             'headers' => array(
                 'x-api-key' => env('WHATSAPP_API_KEY')
@@ -138,7 +139,7 @@ class WhatsappService
         } else {
             $this->integration_to_store->insert(array(
                 'company_id' => $company_id,
-                'integration_id' => $this->whatsapp_session_id,
+                'integration_id' => $whatsapp_integration->id,
                 'active' => true
             ));
         }
