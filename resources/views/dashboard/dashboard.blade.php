@@ -64,6 +64,20 @@
 @stop
 
 @section('content')
+    <div class="row mb-2">
+        <div class="col-md-3">
+            <a href="{{ route('rental.create') }}" class="btn btn-primary col-md-12"> <i class="fa fa-plus"></i> Nova Locação</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ route('budget.create') }}" class="btn btn-primary col-md-12"> <i class="fa fa-plus"></i> Novo Orçamento</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ route('client.create') }}" class="btn btn-primary col-md-12"> <i class="fa fa-plus"></i> Novo Cliente</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ route('equipment.create') }}" class="btn btn-primary col-md-12"> <i class="fa fa-plus"></i> Novo Equipamento</a>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12 grid-margin">
             <div class="card">

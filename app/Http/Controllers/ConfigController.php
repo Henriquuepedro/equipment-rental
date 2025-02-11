@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Config;
+use App\Models\IntegrationToStore;
+use App\Models\Integration;
 use Illuminate\Http\Request;
 
 class ConfigController extends Controller
 {
-    private $config;
+    private Config $config;
+    private IntegrationToStore $integration_to_store;
+    private Integration $integration;
 
-    public function __construct(Config $config)
+    public function __construct()
     {
-        $this->config = $config;
+        $this->config = new Config();
+        $this->integration_to_store = new IntegrationToStore();
+        $this->integration = new Integration();
     }
 
     public function updateConfig(Request $request)

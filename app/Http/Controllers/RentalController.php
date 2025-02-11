@@ -337,6 +337,8 @@ class RentalController extends Controller
                 }
             }
 
+            $buttons .= "<button class='dropdown-item btnSendOnWhatsapp' data-rental-id='$value->id'><i class='fab fa-whatsapp'></i> Enviar por Whatsapp</button>";
+
             $buttons = dropdownButtonsDataList($buttons, $value->id);
 
             $colorBadgeDeliveryDate     = $allDelivered ? 'success' : (strtotime($expectedDeliveryDate) < time() ? 'danger' : 'warning');
