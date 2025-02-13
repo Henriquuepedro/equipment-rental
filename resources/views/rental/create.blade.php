@@ -284,8 +284,8 @@
                                     </div>
                                 </div>
                                 {{ csrf_field() }}
-                                <input type="hidden" id="multiply_quantity_of_equipment_per_amount" name="multiply_quantity_of_equipment_per_amount" value="{{ $config->multiply_quantity_of_equipment_per_amount ?: 0 }}">
-                                <input type="hidden" id="multiply_quantity_of_equipment_per_day" name="multiply_quantity_of_equipment_per_day" value="{{ $config->multiply_quantity_of_equipment_per_day ?: 0 }}">
+                                <input type="hidden" id="multiply_quantity_of_equipment_per_amount" name="multiply_quantity_of_equipment_per_amount" value="{{ $config->multiply_quantity_of_equipment_per_amount ?? 0 }}">
+                                <input type="hidden" id="multiply_quantity_of_equipment_per_day" name="multiply_quantity_of_equipment_per_day" value="{{ $config->multiply_quantity_of_equipment_per_day ?? 0 }}">
                             </form>
                         </div>
                     </div>
