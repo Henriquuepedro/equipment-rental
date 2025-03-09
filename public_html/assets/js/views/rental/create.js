@@ -547,7 +547,13 @@ $(function() {
     // }
     $('#discount_value, #extra_value, #net_value').maskMoney({thousands: '.', decimal: ',', allowZero: true});
     loadDrivers(0, '#newVehicleModal [name="driver"]');
-    loadResidues(0, '.container-residues select[name="residues[]"]');
+
+    let residue_ids = [0];
+    if ($('[name="residues"]').val().split(',').length) {
+        residue_ids = $('[name="residues"]').val().split(',');
+    }
+
+    loadResidues(residue_ids, '.container-residues select[name="residues[]"]');
     $('[name="type_rental"]').iCheck({
         checkboxClass: 'icheckbox_square',
         radioClass: 'iradio_square-blue',

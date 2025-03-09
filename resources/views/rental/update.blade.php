@@ -60,7 +60,6 @@
                 await checkLabelAnimate();
 
                 if ($('[name="residues"]').val().split(',').length) {
-                    // $('.container-residues').show();
                     $('[name="residues[]"]').val($('[name="residues"]').val().split(',')).select2('destroy').select2();
                 }
 
@@ -146,7 +145,6 @@
 
             if ($('[name="rental_address_state"]').length) {
                 address_state = $('[name="rental_address_state"]').val();
-                console.log(address_state);
             }
 
             await loadStates($('[name="state"]'), address_state);
@@ -161,8 +159,6 @@
                 });
 
             await $('input[name="type_rental"]').on('ifChanged', function(){
-                console.log($('input[name="type_rental"]').val());
-
                 if (parseInt($('input[name="type_rental"]:checked').val()) === 1 && $('#parcels div').length) {
                     Swal.fire({
                         title: 'Alteração de Tipo de Locação',
@@ -311,6 +307,7 @@
                                 <div class="stepRental">
                                     <h6 class="title-step">Equipamentos</h6>
                                     <div class="row">
+                                        @if ($settings['company_config']['use_rental_residues'])
                                         <div class="form-group col-md-12 mt-2 label-animate container-residues">
                                             <label>Resíduos a serem utilizados</label>
                                             <div class="input-group label-animate">
@@ -320,6 +317,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        @endif
                                         <div class="col-md-12 mt-2 equipments-selected">
                                             <div class="accordion accordion-solid-header" id="equipments-selected" role="tablist">
                                             </div>
@@ -547,5 +545,5 @@
     <input type="hidden" id="multiply_quantity_of_equipment_per_amount" value="{{ $rental->multiply_quantity_of_equipment_per_amount }}">
     <input type="hidden" id="multiply_quantity_of_equipment_per_day" value="{{ $rental->multiply_quantity_of_equipment_per_day }}">
 
-    <input type="hidden" name="residues" value="{{ implode(',', array_map(function($residue) { return $residue['id']; }, $rental_residue->toArray())) }}">
+    <input type="hidden" name="residues" value="{{ implode(',', array_map(function($residue) { return $residue['residue_id']; }, $rental_residue->toArray())) }}">
 @stop

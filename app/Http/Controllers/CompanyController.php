@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyUpdatePost;
 use App\Models\Company;
-use App\Models\Config;
 use App\Models\Integration;
 use App\Models\IntegrationToStore;
 use App\Models\Permission;
@@ -25,7 +24,6 @@ class CompanyController extends Controller
 {
     private Company $company;
     private Permission $permission;
-    private Config $config;
     private IntegrationToStore $integration_to_store;
     private Integration $integration;
 
@@ -33,7 +31,6 @@ class CompanyController extends Controller
     {
         $this->company              = new Company();
         $this->permission           = new Permission();
-        $this->config               = new Config();
         $this->integration_to_store = new IntegrationToStore();
         $this->integration          = new Integration();
     }
@@ -52,27 +49,10 @@ class CompanyController extends Controller
 
         $htmlPermissions     = getFormPermission($this->permission->getAllPermissions());
 
-        $dataConfigCompany   = $this->config->getConfigColumnAndValue($company_id);
-        $configCompanyColumn = $dataConfigCompany['column'];
-        $configCompanyValue  = $dataConfigCompany['value'];
-        $configCompany       = new \StdClass();
-
-        foreach ($configCompanyColumn as $configIndex) {
-            if (in_array($configIndex, ['id', 'company_id', 'user_update', 'created_at', 'updated_at'])) {
-                continue;
-            }
-
-            $configCompany->$configIndex = [
-                'status'        => $configCompanyValue && $configCompanyValue->$configIndex,
-                'name'          => $configIndex,
-                'description'   => __("field.$configIndex")
-            ];
-        }
-
         $integrations = $this->integration->getAllActive();
         $integration_to_stores = $this->integration_to_store->getByCompany($company_id);
 
-        return view('config.index', compact('company', 'htmlPermissions', 'configCompany', 'integrations', 'integration_to_stores'));
+        return view('config.index', compact('company', 'htmlPermissions', 'integrations', 'integration_to_stores'));
     }
 
     public function updateCompany(CompanyUpdatePost $request): RedirectResponse

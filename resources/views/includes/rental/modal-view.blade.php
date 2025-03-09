@@ -34,6 +34,7 @@
                                 <div id="mapRental" style="height: 400px"></div>
                             </div>
                         </div>
+                        @if ($settings['company_config']['use_rental_residues'])
                         <div class="row mt-2 content-residues">
                             <div class="form-group col-md-12 label-animate container-residues">
                                 <label>Resíduos</label>
@@ -42,6 +43,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
                         <div class="row mt-2 content-equipments">
                             <div class="form-group col-md-12">
                                 <h5>Equipamentos</h5>

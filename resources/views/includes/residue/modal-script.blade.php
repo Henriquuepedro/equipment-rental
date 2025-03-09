@@ -39,9 +39,6 @@
                 data: getForm.serialize(),
                 dataType: 'json',
                 success: response => {
-
-                    console.log(response);
-
                     getForm.find('button[type="submit"]').attr('disabled', false);
 
                     if (!response.success) {
@@ -61,7 +58,7 @@
                     $('#newResidueModal').modal('hide');
                     cleanFormResidueModal();
                     checkLabelAnimate();
-                    @if(in_array(\Request::route()->getName(), ['rental.create', 'budget.create']))
+                    @if(in_array(\Request::route()->getName(), ['rental.create', 'budget.create', 'rental.edit', 'budget.edit']))
                         loadResidues(response.residue_id, '.container-residues select[name="residues[]"]');
                     @elseif(\Request::route()->getName() == 'residue.index')
                         reloadTable();
@@ -108,12 +105,13 @@
             url: '{{ route('ajax.residue.get-residues') }}',
             dataType: 'json',
             success: response => {
-
+                residue_id = $.isArray(residue_id) ? residue_id : [residue_id];
                 let selected;
-                let residue_id_selected = residue_id ?? response.lastId;
+                let residue_id_selected = residue_id.length ? residue_id : [response.lastId];
 
                 $.each(response.data, function( index, value ) {
-                    selected = value.id === parseInt(residue_id_selected) || valuesSelected.includes((value.id).toString()) ? 'selected' : '';
+                    console.log(valuesSelected);
+                    selected = residue_id_selected.includes((value.id).toString()) || (valuesSelected !== null && valuesSelected.includes((value.id).toString())) ? 'selected' : '';
                     $(el).append(`<option value='${value.id}' ${selected}>${value.name}</option>`);
                 });
 

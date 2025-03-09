@@ -107,6 +107,7 @@ AppServiceProvider extends ServiceProvider
 
                 $company = new Company();
                 $notification = new Notification();
+                $config = new Config();
                 $dataCompany = $company->getCompany(auth()->user()->__get('company_id'));
 
                 $settings['notifications'] = $notification->getNotReadLastRows($dataCompany->id, 6);
@@ -157,6 +158,11 @@ AppServiceProvider extends ServiceProvider
                     'start' => date(DATE_BRAZIL, strtotime("-1 months", time())),
                     'finish' => date(DATE_BRAZIL, strtotime("+1 months", time())),
                 ];
+
+                $settings['company_config'] = array_filter($config->getByCompany($dataCompany->id)->toArray(), function($config, $config_name){
+                    $field_remove = array('id', 'company_id', 'user_update', 'created_at', 'updated_at');
+                    return !in_array($config_name, $field_remove);
+                }, ARRAY_FILTER_USE_BOTH);
 
                 // permissões
                 if (auth()->user()->__get('type_user') == User::$TYPE_USER['admin'] || auth()->user()->__get('type_user') == User::$TYPE_USER['master']) { // administrador permissão total
