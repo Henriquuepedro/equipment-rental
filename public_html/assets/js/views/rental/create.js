@@ -549,7 +549,7 @@ $(function() {
     loadDrivers(0, '#newVehicleModal [name="driver"]');
 
     let residue_ids = [0];
-    if ($('[name="residues"]').val().split(',').length) {
+    if ($('[name="residues"]').val() && $('[name="residues"]').val().split(',').length) {
         residue_ids = $('[name="residues"]').val().split(',');
     }
 

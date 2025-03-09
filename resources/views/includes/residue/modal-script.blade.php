@@ -110,7 +110,6 @@
                 let residue_id_selected = residue_id.length ? residue_id : [response.lastId];
 
                 $.each(response.data, function( index, value ) {
-                    console.log(valuesSelected);
                     selected = residue_id_selected.includes((value.id).toString()) || (valuesSelected !== null && valuesSelected.includes((value.id).toString())) ? 'selected' : '';
                     $(el).append(`<option value='${value.id}' ${selected}>${value.name}</option>`);
                 });
