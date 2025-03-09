@@ -836,3 +836,7 @@ const getTableList = (
 const onlyNumbers = value => {
     return value.replace(/\D/g, '');
 }
+
+function isNumeric(value) {
+    return /^\d+$/.test(value);
+}

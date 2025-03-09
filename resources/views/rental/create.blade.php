@@ -143,6 +143,7 @@
                                 <div class="stepRental">
                                     <h6>Equipamentos</h6>
                                     <div class="row">
+                                        @if ($settings['company_config']['use_rental_residues'])
                                         <div class="form-group col-md-12 mt-2 label-animate container-residues">
                                             <label>Resíduos a serem utilizados</label>
                                             <div class="input-group label-animate">
@@ -152,6 +153,7 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        @endif;
                                         <div class="col-md-12 mt-2 equipments-selected">
                                             <div class="accordion accordion-solid-header" id="equipments-selected" role="tablist">
                                             </div>
@@ -284,8 +286,8 @@
                                     </div>
                                 </div>
                                 {{ csrf_field() }}
-                                <input type="hidden" id="multiply_quantity_of_equipment_per_amount" name="multiply_quantity_of_equipment_per_amount" value="{{ $config->multiply_quantity_of_equipment_per_amount ?? 0 }}">
-                                <input type="hidden" id="multiply_quantity_of_equipment_per_day" name="multiply_quantity_of_equipment_per_day" value="{{ $config->multiply_quantity_of_equipment_per_day ?? 0 }}">
+                                <input type="hidden" id="multiply_quantity_of_equipment_per_amount" name="multiply_quantity_of_equipment_per_amount" value="{{ $settings['company_config']->multiply_quantity_of_equipment_per_amount ?? 0 }}">
+                                <input type="hidden" id="multiply_quantity_of_equipment_per_day" name="multiply_quantity_of_equipment_per_day" value="{{ $settings['company_config']->multiply_quantity_of_equipment_per_day ?? 0 }}">
                             </form>
                         </div>
                     </div>

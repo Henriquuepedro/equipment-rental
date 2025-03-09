@@ -99,7 +99,7 @@ const getLocationRental = (reload_map = false) => {
         initMap();
     }
     mapRental.on('locationfound', onLocationFoundRental);
-    mapRental.on('locationerror', onLocationErrorRental);onLocationError
+    mapRental.on('locationerror', onLocationErrorRental);
     mapRental.locate({setView: true, maxZoom: 12});
 }
 
