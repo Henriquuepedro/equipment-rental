@@ -28,7 +28,7 @@ $(() => {
     }
 
     loadSearchZipcode('#formUpdateCompany [name="cep"]', $('#formUpdateCompany'));
-    loadBtnsIntegrations();
+    //loadBtnsIntegrations();
 });
 
 $('[name="state"]').on('change', function(){

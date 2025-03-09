@@ -96,9 +96,11 @@
                                 <li class="nav-item">
                                     <a class="nav-link" id="config-tab" data-bs-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="false">Configuração</a>
                                 </li>
+                                @if (false)
                                 <li class="nav-item">
                                     <a class="nav-link" id="integration-tab" data-bs-toggle="tab" href="#integration" role="tab" aria-controls="integration" aria-selected="false">Integração</a>
                                 </li>
+                                @endif
                             </ul>
                         </div>
                         <div class="tab-content tab-content-basic">
@@ -247,12 +249,12 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="form-group col-md-12 d-flex justify-content-center">
-                                            @foreach($configCompany as $config)
+                                        <div class="form-group col-md-12 d-flex justify-content-center flex-wrap">
+                                            @foreach($settings['company_config'] as $config_name => $config_value)
                                                 <div class="form-group col-md-3 card-config-company">
                                                     <div class="switch d-flex flex-wrap justify-content-center text-center">
-                                                        <input type="checkbox" class="check-style check-md" name="{{ $config['name'] }}" id="{{ $config['name'] }}" {{ old() ? old($config['name']) ? 'checked': '' : ($config['status'] ? 'checked' : '') }}>
-                                                        <label for="{{ $config['name'] }}" class="check-style check-md"></label><span class="col-md-12">{{ $config['description'] }}</span>
+                                                        <input type="checkbox" class="check-style check-md" name="{{ $config_name }}" id="{{ $config_name }}" {{ old() ? old($config_name) ? 'checked': '' : ($config_value ? 'checked' : '') }}>
+                                                        <label for="{{ $config_name }}" class="check-style check-md"></label><span class="col-md-12">{{ __("field.$config_name") }}</span>
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -266,6 +268,7 @@
                                     {{ csrf_field() }}
                                 </form>
                             </div>
+                            @if (false)
                             <div class="tab-pane fade" id="integration" role="tabpanel" aria-labelledby="integration-tab">
                                 <div class="row">
                                     <div class="form-group col-md-12 text-center mb-2">
@@ -292,6 +295,7 @@
                                     @endforeach
                                 </div>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -468,6 +472,7 @@
             </div>
         </div>
     </div>
+    @if (false)
     <div class="modal" id="integration-whatsapp" tabindex="-1" role="dialog" aria-labelledby="newIntegrationWhatsapp" aria-hidden="true">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
@@ -507,6 +512,7 @@
             </div>
         </div>
     </div>
+    @endif
     <input type="hidden" id="routeGetUserPermission" value="{{ route('ajax.user.get-permission') }}">
     <input type="hidden" id="routeInactiveUser" value="{{ route('ajax.user.inactivate') }}">
     <input type="hidden" id="routeUserChangeType" value="{{ route('ajax.user.change-type') }}">

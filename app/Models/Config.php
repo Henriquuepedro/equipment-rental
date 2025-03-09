@@ -20,6 +20,7 @@ class Config extends Model
         'company_id',
         'multiply_quantity_of_equipment_per_amount',
         'multiply_quantity_of_equipment_per_day',
+        'use_rental_residues',
     ];
 
     /**

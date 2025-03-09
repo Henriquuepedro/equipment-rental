@@ -9,7 +9,6 @@ use App\Models\BudgetEquipment;
 use App\Models\BudgetPayment;
 use App\Models\BudgetResidue;
 use App\Models\Client;
-use App\Models\Config;
 use App\Models\Rental;
 use App\Models\RentalEquipment;
 use App\Models\RentalPayment;
@@ -36,7 +35,6 @@ class BudgetController extends Controller
     private RentalEquipment $rental_equipment;
     private RentalResidue $rental_residue;
     private RentalPayment $rental_payment;
-    private Config $config;
     private Client $client;
 
     public function __construct()
@@ -50,7 +48,6 @@ class BudgetController extends Controller
         $this->rental_equipment = new RentalEquipment();
         $this->rental_residue = new RentalResidue();
         $this->rental_payment = new RentalPayment();
-        $this->config = new Config();
         $this->client = new Client();
     }
 
@@ -181,10 +178,8 @@ class BudgetController extends Controller
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
         $budget = true;
-        $company_id = Auth::user()->__get('company_id');
-        $config = $this->config->getByCompany($company_id);
 
-        return view('rental.create', compact('budget', 'config'));
+        return view('rental.create', compact('budget'));
     }
 
 
