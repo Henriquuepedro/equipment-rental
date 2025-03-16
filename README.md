@@ -1,9 +1,74 @@
-# Sistema de Locação
+# Rent Systema
 
-## Ambiente em Docker
+# Equipment Rental Management System
 
-#### Arquivo docker-compose.yml
+This is a PHP-based system designed for managing equipment rentals. The application provides comprehensive features for managing clients, equipment, drivers, vehicles, waste management, financial transactions, and more.
+
+## Features
+
+### 1. **Registration**
+- **Client**: Register new clients for equipment rental.
+- **Equipment**: Add and manage available equipment for rental.
+- **Driver**: Register drivers who handle the transportation of equipment.
+- **Vehicle**: Manage the vehicles used for transporting equipment.
+- **Waste**: Manage waste information associated with rentals.
+- **Supplier**: Register suppliers for equipment and services.
+- **Disposal Location**: Manage locations where waste is discarded.
+
+### 2. **Control**
+- **Rental**: Manage equipment rental orders, including rental dates and associated costs.
+- **Quote**: Create and manage rental quotes before finalizing the rental.
+- **Accounts Receivable**: Track payments to be received from clients.
+- **Accounts Payable**: Track payments to be made to suppliers or partners.
+- **Cash Flow**: Monitor the flow of cash within the business, tracking income and expenses.
+
+### 3. **Reports**
+- **Rental Report**: Generate reports related to rentals and equipment usage.
+- **Financial Report**: Generate financial reports for cash flow, accounts receivable, and accounts payable.
+- **Registration Report**: Reports on client, equipment, and supplier registrations.
+- **Commission Report**: Track commissions associated with rentals and other business activities.
+
+### 4. **Plans**
+- **Subscription Plans**: Offer monthly subscription plans for clients to rent equipment and services, integrated with the financial system using Mercado Pago.
+
+### 5. **Additional Features**
+- **Receipt Printing**: Print receipts after finalizing a rental or quote.
+- **Quote Approval**: Approve quotes before proceeding with equipment rental.
+- **MTR (Waste Transport Manifest) Printing**: Print MTR documents for waste management during equipment transportation.
+- **WhatsApp Notifications**: Send notifications via WhatsApp for updates on rentals, payments, or other key events.
+- **API Logs**: Keep logs of all API interactions to track system activity.
+- **Audit Logs**: Maintain detailed audit logs for actions taken by users in the system.
+
+### 6. **User Management**
+- **User Roles**: Two main user profiles:
+  - **Administrator**: Admin profile with the ability to define permissions and manage system settings.
+  - **Owner**: Higher-level profile with access to manage all companies, users, and system records.
+  
+### 7. **Email Notifications**
+- **SMTP Email**: Send emails for notifications, confirmations, and updates related to rentals and other activities.
+
+### 8. **User Manuals**
+- **Documentation**: Provide user manuals to guide users on how to effectively use the system.
+
+### 9. **Customer Support**
+- **In-App Support**: Built-in support system for handling customer queries and issues.
+
+--- 
+
+## Installation
+
+1. Clone the repository:
+```bash
+    git clone https://github.com/Henriquuepedro/locacao.git
 ```
+
+2. Navigate to the project directory:
+```bash
+    cd locacao
+```
+
+3. Create the file `docker-compose.yml` and enter:
+```bash
 services:
   php:
     build:
@@ -30,8 +95,8 @@ services:
       - MYSQL_ROOT_PASSWORD=L0c@c4O
 ```
 
-#### Arquivo Dockerfile
-```
+4. Create the file `Dockerfile` and enter:
+```bash
 FROM php:7.3-apache
 
 WORKDIR /var/www/public
@@ -77,13 +142,33 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 ENV PATH=$PATH:/root/composer/vendor/bin COMPOSER_ALLOW_SUPERUSER=1
 ```
 
-Executar `docker-compose up --build --force-recreate`
-
-Acessar container `docker exec -it locacao-php /bin/bash`
-
-## Configurando cron
-
+5. Run to create the container:
+```bash
+    docker-compose up --build --force-recreate
 ```
+
+6. Join in the container:
+```bash
+    docker exec -it locacao-php /bin/bash
+```
+
+7. Set up the environment variables. Copy the `.env.example` file to `.env` and update the necessary details (e.g., database, API credentials, SMTP settings):
+```bash
+    cp .env.example .env
+```
+
+8. Generate the application key:
+```bash
+    php artisan key:generate
+```
+
+The application should now be running at `http://localhost:8000`.
+
+---
+
+## Configuration the cron
+
+```bash
 apt-get update -y \
 && apt-get install cron -y \
 && echo "* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1" >> /etc/cron.d/scheduler \
@@ -91,12 +176,12 @@ apt-get update -y \
 && crontab /etc/cron.d/scheduler
 ```
 
-## Correções
+## Fixes to future
 
 ---
 
 #### `Call to undefined function Intervention\\Image\\Gd\\imagecreatefromjpeg()`
-```
+```bash
 RUN apt-get update && apt-get install -y \
 libfreetype6-dev \
 libjpeg62-turbo-dev \
@@ -107,13 +192,24 @@ libpng-dev \
 ---
 
 #### Error 404
-Alterar em `/etc/apache2/sites-available/000-default.conf` para `DocumentRoot /var/www/public`
+Update in `/etc/apache2/sites-available/000-default.conf` to `DocumentRoot /var/www/public`
 
 ---
 
-#### Permissão para o projeto em caso do seguinte erro: `docker  - Cannot save \\wsl$\Ubuntu\home\... Unable to open the file for writing.`
+#### Permission to the project if error is shown: `docker  - Cannot save \\wsl$\Ubuntu\home\... Unable to open the file for writing.`
 
-```
+```bash
 sudo chown -R www-data:www-data {PROJECT}/
 sudo chmod g+w {PROJECT}/
 ```
+
+---
+
+
+## Contributing
+
+Feel free to fork this project and submit pull requests. If you encounter any bugs or have suggestions for improvements, please open an issue on GitHub.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
