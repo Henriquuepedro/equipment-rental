@@ -1,4 +1,4 @@
-# Rent Systema
+# Rental System
 
 # Equipment Rental Management System
 
