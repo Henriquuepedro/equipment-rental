@@ -125,6 +125,9 @@
         });
     </script>
     @if(in_array('BillsToReceiveView', $permissions)) <script src="{{ asset('assets/js/views/bill_to_receive/index.js') }}" type="application/javascript"></script> @endif
+    @include('includes.bill_to_receive.script-view')
+    @include('includes.bill_to_receive.script-confirm')
+    @include('includes.bill_to_receive.script-reopen')
 @stop
 
 @section('content')

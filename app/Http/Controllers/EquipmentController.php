@@ -321,12 +321,13 @@ class EquipmentController extends Controller
         $searchUser = null;
         $getCacamba = false;
 
-        $ini        = $request->input('start');
-        $draw       = $request->input('draw');
-        $length     = $request->input('length');
-        $company_id = $request->user()->company_id;
+        $ini            = $request->input('start');
+        $draw           = $request->input('draw');
+        $length         = $request->input('length');
+        $system_search  = $request->input('system_search');
+        $company_id     = $request->user()->company_id;
 
-        if (!hasPermission('EquipmentView')) {
+        if (!hasPermission('EquipmentView') || ($system_search && empty($request->input('search')['value']))) {
             return response()->json(array(
                 "draw" => $draw,
                 "recordsTotal" => 0,
@@ -369,7 +370,7 @@ class EquipmentController extends Controller
         foreach ($data as $key => $value) {
             $buttons = "<a href='".route('equipment.edit', ['id' => $value['id']])."' class='dropdown-item'>";
             $buttons .= $permissionUpdate ? "<i class='fas fa-edit'></i> Atualizar Equipamento</a>" : "<i class='fas fa-eye'></i> Visualizar Equipamento</a>";
-            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveEquipment' equipment-id='{$value['id']}'><i class='fas fa-times'></i> Excluir Equipamento</button>" : '';
+            $buttons .= $permissionDelete && !$system_search ? "<button class='dropdown-item btnRemoveEquipment' equipment-id='{$value['id']}'><i class='fas fa-times'></i> Excluir Equipamento</button>" : '';
 
             $result[$key] = array(
                 $value['id'],

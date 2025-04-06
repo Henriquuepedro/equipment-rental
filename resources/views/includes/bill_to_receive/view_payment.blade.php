@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalViewPayment" tabindex="-1" role="dialog" aria-labelledby="modalViewPayment" aria-hidden="true">
+<div class="modal fade" id="{{ $modal_id ?? 'modalViewPayment' }}" tabindex="-1" role="dialog" aria-labelledby="{{ $modal_id ?? 'modalViewPayment' }}" aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">

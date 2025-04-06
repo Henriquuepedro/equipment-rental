@@ -535,7 +535,6 @@
             });
         }
     </script>
-    @if(in_array('BillsToReceiveView', $permissions)) <script src="{{ asset('assets/js/views/bill_to_receive/index.js') }}" type="application/javascript"></script> @endif
 @stop
 
 @section('content')
@@ -549,7 +548,7 @@
             @endif
             <div class="d-flex flex-column flex-md-row justify-content-between">
                 <h4 class="">Atendimento ao cliente</h4>
-                        <a type="button" class="btn btn-success" href="{{ route('support.create') }}"><i class="fa fa-plus"></i> Novo Atendimento</a>
+                <a type="button" class="btn btn-success" href="{{ route('support.create') }}"><i class="fa fa-plus"></i> Novo Atendimento</a>
             </div>
             <div class="card mb-2 mt-2">
                 <div class="card-body">
@@ -615,10 +614,6 @@
             </div>
         </div>
     </div>
-
-
-
-
     <div class="modal fade" id="modalViewSupport" tabindex="-1" role="dialog" aria-labelledby="modalViewSupport" aria-hidden="true">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
@@ -645,8 +640,6 @@
                             </div>
                         </div>
                     </div>
-
-
                     <div class="old-messages">
                         <div class="row">
                             <div class="col-md-12">
@@ -689,10 +682,6 @@
         <input type="hidden" name="path_files">
         <input type="hidden" name="support_id">
     </div>
-
-
-
-
     <div class="modal fade" id="modalUpdatePriority" tabindex="-1" role="dialog" aria-labelledby="modalUpdatePriority" aria-hidden="true">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
@@ -747,9 +736,6 @@
         </div>
         <input type="hidden" name="support_id">
     </div>
-
-
-
     <div class="modal fade" id="modalUpdateStatus" tabindex="-1" role="dialog" aria-labelledby="modalUpdateStatus" aria-hidden="true">
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">

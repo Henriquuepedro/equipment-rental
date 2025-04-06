@@ -77,10 +77,15 @@ class BillsToReceiveController extends Controller
         $company_id             = $request->user()->company_id;
         $type_rental            = $request->input('type');
         $show_client_name_list  = $request->input('show_client_name_list');
+        $system_search          = $request->input('system_search');
         $filters                = array();
         $filter_default         = array();
 
         try {
+            if ($system_search && empty($request->input('search')['value'])) {
+                throw new Exception("Listagem geral, deve digitar algo");
+            }
+
             // Filtro datas
             $filters_date['dateStart']   = $request->input('start_date');
             $filters_date['dateFinish']  = $request->input('end_date');
@@ -166,17 +171,21 @@ class BillsToReceiveController extends Controller
         $permissionDelete = hasPermission('BillsToReceiveDeletePost');
 
         foreach ($data['data'] as $value) {
+            $classBtnViewPayment    = $system_search ? 'btnGeneralSearchBillReceiveViewPayment' : 'btnViewPayment';
+            $classBtnConfirmPayment = $system_search ? 'btnGeneralSearchBillReceiveConfirmPayment' : 'btnConfirmPayment';
+            $classBtnReopenPayment  = $system_search ? 'btnGeneralSearchBillReceiveReopenPayment' : 'btnReopenPayment';
+
             $rental_code = formatCodeIndex($value->code);
             $data_prop_button = "data-rental-payment-id='$value->rental_payment_id' data-rental-code='$rental_code' data-name-client='$value->client_name' data-date-rental='" . date(DATETIME_BRAZIL_NO_SECONDS, strtotime($value->created_at)) . "' data-due-date='" . date(DATE_BRAZIL, strtotime($value->due_date)) . "' data-payment-id='$value->payment_id' data-payday='" . date(DATE_BRAZIL, strtotime($value->payday)) . "' data-due-value='" . number_format($value->due_value, 2, ',', '.') . "'";
 
             $txt_btn_paid = $type_rental == 'paid' ? 'Visualizar Pagamento' : 'Visualizar Lançamento';
-            $buttons = "<button class='dropdown-item btnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";
+            $buttons = "<button class='dropdown-item $classBtnViewPayment' $data_prop_button><i class='fas fa-eye'></i> $txt_btn_paid</button>";
 
             if ($permissionUpdate && in_array($type_rental, array('late', 'without_pay'))) {
-                $buttons .= "<button class='dropdown-item btnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
+                $buttons .= "<button class='dropdown-item $classBtnConfirmPayment' $data_prop_button><i class='fas fa-check'></i> Confirmar Pagamento</button>";
             }
             if ($type_rental == 'paid' && $permissionDelete) {
-                $buttons .= "<button class='dropdown-item btnReopenPayment' $data_prop_button><i class='fa-solid fa-rotate-left'></i> Reabrir Pagamento</button>";
+                $buttons .= "<button class='dropdown-item $classBtnReopenPayment' $data_prop_button><i class='fa-solid fa-rotate-left'></i> Reabrir Pagamento</button>";
             }
 
             $buttons = dropdownButtonsDataList($buttons, $value->rental_payment_id);
@@ -240,6 +249,9 @@ class BillsToReceiveController extends Controller
         $rental_read = array();
         $client_id = null;
         foreach ($payments as $payment) {
+            if (!empty($payment->payment_id)) {
+                return response()->json(array('success' => false, 'message' => "O registro já teve um pagamento efetuado em outra transação."));
+            }
             $rental = $this->rental->getRental($company_id, $payment->rental_id);
 
             // Locação não encontrada ou já lida.
