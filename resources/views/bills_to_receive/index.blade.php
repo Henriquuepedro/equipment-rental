@@ -23,6 +23,9 @@
 
     @include('includes.driver.modal-script')
     @include('includes.vehicle.modal-script')
+    @include('includes.bill_to_receive.script-view')
+    @include('includes.bill_to_receive.script-confirm')
+    @include('includes.bill_to_receive.script-reopen')
 @stop
 
 @section('content')

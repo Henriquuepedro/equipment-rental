@@ -409,15 +409,16 @@ class RentalController extends Controller
         return response()->json(['success' => false, 'message' => 'Não foi possível excluir a locação!']);
     }
 
-    public function create(): Factory|View|RedirectResponse|Application
+    public function create(Request $request): Factory|View|RedirectResponse|Application
     {
         if (!hasPermission('RentalCreatePost')) {
             return redirect()->route('rental.index')
                 ->with('warning', "Você não tem permissão para acessar essa página!");
         }
         $budget = false;
+        $client_to_create = $request->input('client');
 
-        return view('rental.create', compact('budget'));
+        return view('rental.create', compact('budget', 'client_to_create'));
     }
 
     public function insert(RentalCreatePost $request): JsonResponse

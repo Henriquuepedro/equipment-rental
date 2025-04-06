@@ -408,6 +408,10 @@ const sumMonthsDateNow = months => {
     return moment().add(months, 'M').format(FORMAT_DATE_INTERNATIONAL);
 }
 
+const sumYearsDateNow = years => {
+    return moment().add(years, 'Y').format(FORMAT_DATE_INTERNATIONAL);
+}
+
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.substr(1);
 }

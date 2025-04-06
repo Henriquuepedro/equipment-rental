@@ -30,6 +30,7 @@
                     @yield('content')
                 </div>
                 @include('adminlte::partials.footer.footer')
+                @include('adminlte::partials.quick-actions')
             </div>
         </div>
     </div>

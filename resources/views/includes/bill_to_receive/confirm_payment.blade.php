@@ -1,7 +1,7 @@
-<div class="modal fade" id="modalConfirmPayment" tabindex="-1" role="dialog" aria-labelledby="modalConfirmPayment" aria-hidden="true">
+<div class="modal fade" id="{{ $modal_id ?? 'modalConfirmPayment' }}" tabindex="-1" role="dialog" aria-labelledby="{{ $modal_id ?? 'modalConfirmPayment' }}" aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
-            <form action="{{ route('ajax.bills_to_receive.confirm_payment') }}" method="POST" id="formConfirmPayment">
+            <form action="{{ route('ajax.bills_to_receive.confirm_payment') }}" method="POST" id="{{ $form_id ?? 'formConfirmPayment' }}">
                 <div class="modal-header">
                     <h5 class="modal-title">Confirmar pagamento</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">

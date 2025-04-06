@@ -1,4 +1,4 @@
-    (function ($) {
+(function ($) {
     'use strict';
     const form = $("#formRental");
     const budget = !!$('#budget').val();
@@ -23,9 +23,9 @@
 
             if (newIndex === 1) {
                 setTimeout(() => {
-                    $('[name="client"]').select2();
-                    $('[name="state"]').select2('destroy').select2();
-                    $('[name="city"]').select2('destroy').select2();
+                    $('#formRental [name="client"]').select2();
+                    $('#formRental [name="state"]').select2('destroy').select2();
+                    $('#formRental [name="city"]').select2('destroy').select2();
                 }, 250);
             }
 
@@ -646,6 +646,10 @@ $(function() {
             btn.attr('disabled', false);
         });
     });
+
+    if ($('[name="client_id"]').length && $('[name="type_rental"][value="0"]').is(':checked')) {
+        $('#formRental').steps("next");
+    }
 });
 
 const updateDataEquipmentToPayment = async () => {

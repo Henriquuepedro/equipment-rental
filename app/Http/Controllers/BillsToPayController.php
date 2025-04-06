@@ -212,6 +212,9 @@ class BillsToPayController extends Controller
         $bill_to_pay_read = array();
         $provider_id = null;
         foreach ($payments as $payment) {
+            if (!empty($payment->payment_id)) {
+                return response()->json(array('success' => false, 'message' => "O registro já teve um pagamento efetuado em outra transação."));
+            }
             $bill_to_pay = $this->bill_to_pay_payment->getPayments($company_id, $payment->bill_to_pay_id);
 
             // Conta não encontrada ou já lida.

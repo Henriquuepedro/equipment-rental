@@ -312,6 +312,11 @@ class ClientController extends Controller
         try {
             // Filtro status
             $active = $request->input('active');
+            $system_search = $request->input('system_search');
+
+            if ($system_search && empty($request->input('search')['value'])) {
+                throw new Exception("Listagem geral, deve digitar algo");
+            }
 
             $filters        = array();
             $filter_default = array();
@@ -348,8 +353,11 @@ class ClientController extends Controller
         foreach ($data['data'] as $value) {
             $buttons = "<a href='".route('client.edit', ['id' => $value->id])."' class='dropdown-item'>";
             $buttons .= $permissionUpdate ? "<i class='fas fa-edit'></i> Atualizar Cadastro</a>" : "<i class='fas fa-eye'></i> Visualizar Cadastro</a>";
-            $buttons .= $permissionDelete ? "<button class='dropdown-item btnRemoveClient' data-client-id='$value->id'><i class='fas fa-solid fa-xmark pr-1'></i> Excluir Cadastro</button>" : '';
-            $buttons .= $permissionViewBill ? "<button class='dropdown-item btnViewBillClient' data-client-id='$value->id' data-client-name='$value->name'><i class='fas fa-regular fa-list-check'></i> Ficha Financeira</button>" : '';
+            $buttons .= $permissionDelete && !$system_search ? "<button class='dropdown-item btnRemoveClient' data-client-id='$value->id'><i class='fas fa-solid fa-xmark pr-1'></i> Excluir Cadastro</button>" : '';
+            $buttons .= $permissionViewBill && !$system_search ? "<button class='dropdown-item btnViewBillClient' data-client-id='$value->id' data-client-name='$value->name'><i class='fas fa-regular fa-list-check'></i> Ficha Financeira</button>" : '';
+            if ($system_search) {
+                $buttons .= "<a href='".route('rental.create')."?client=$value->id' class='dropdown-item'><i class='fas fa-plus'></i> Realizar Locação</a>";
+            }
 
             $result[] = array(
                 $value->id,

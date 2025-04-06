@@ -57,7 +57,7 @@
                                     <div class="row">
                                         <div class="d-flex justify-content-around col-md-12">
                                             <div class="">
-                                                <input type="radio" name="type_rental" id="have-payment" value="0">
+                                                <input type="radio" name="type_rental" id="have-payment" value="0" {{ !empty($client_to_create) ? 'checked' : '' }}>
                                                 <label for="have-payment">Com Cobrança</label>
                                             </div>
                                             <div class="">
@@ -425,5 +425,6 @@
     <input type="hidden" id="route_lat_lng_my_company" value="{{ route('ajax.company.get-lat-lng-my-company') }}">
     <input type="hidden" id="budget" value="{{ $budget }}">
     <input type="hidden" id="back_to_list" value="{{ route($budget ? 'budget.index' : 'rental.index') }}">
+    @if($client_to_create)<input type="hidden" name="client_id" value="{{ $client_to_create }}">@endif
 
 @stop

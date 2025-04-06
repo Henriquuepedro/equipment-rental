@@ -1,7 +1,7 @@
-<div class="modal fade" id="modalReopenPayment" tabindex="-1" role="dialog" aria-labelledby="modalReopenPayment" aria-hidden="true">
+<div class="modal fade" id="{{ $modal_id ?? 'modalReopenPayment' }}" tabindex="-1" role="dialog" aria-labelledby="{{ $modal_id ?? 'modalReopenPayment' }}" aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
-            <form action="{{ route('ajax.bills_to_receive.reopen_payment') }}" method="POST" id="formReopenPayment">
+            <form action="{{ route('ajax.bills_to_receive.reopen_payment') }}" method="POST" id="{{ $form_id ?? 'formConfirmPaymentformReopenPayment' }}">
                 <div class="modal-header">
                     <h5 class="modal-title"></h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
